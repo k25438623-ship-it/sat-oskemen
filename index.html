@@ -290,20 +290,21 @@
   <section id="auth" class="screen">
     <div class="auth-wrap">
       <div class="card">
-        <div class="meta">ШАГ 1 ИЗ 2 • ӨСКЕМЕН</div>
-        <h2 style="margin: 6px 0 12px;">Быстрый вход</h2>
-        <div class="actions">
-          <button class="btn btn-primary" style="flex:1" onclick="quickLogin('Google')">Войти через Google</button>
-          <button class="btn btn-ghost" style="flex:1" onclick="quickLogin('Apple')">Apple ID</button>
+        <div class="meta">ШАГ 1 ИЗ 2 • ОБЛАЧНЫЙ АККАУНТ SÄT</div>
+        <h2 style="margin: 6px 0 12px;">Вход и регистрация</h2>
+        <div>
+          <label class="meta">Email</label>
+          <input id="authEmail" type="email" class="input" placeholder="name@example.com" />
         </div>
-        <div style="margin-top: 14px;">
-          <label class="meta">Или номер телефона (+7)</label>
-          <div style="display:flex; gap:8px; margin-top:4px;">
-            <input id="phoneInput" class="input" style="margin-top:0" placeholder="+7 705 000 00 00" value="+7 705 412 88 10" />
-            <button class="btn btn-mint" onclick="fillCode()">Код</button>
-          </div>
-          <div id="codeHint" class="meta" style="margin-top:6px;"></div>
+        <div style="margin-top: 10px;">
+          <label class="meta">Пароль (от 6 символов)</label>
+          <input id="authPass" type="password" class="input" placeholder="••••••" />
         </div>
+        <div class="actions" style="margin-top: 14px;">
+          <button class="btn btn-primary" style="flex:1" onclick="authLogin()">Войти</button>
+          <button class="btn btn-mint" style="flex:1" onclick="authRegister()">Регистрация</button>
+        </div>
+        <div id="authStatusHint" class="meta" style="margin-top:8px;">Создайте аккаунт или войдите по Email, чтобы публиковать посты в ленте Өскемена.</div>
       </div>
 
       <div class="card">
@@ -316,21 +317,21 @@
 
         <div style="margin-top: 14px;">
           <label class="meta">Имя или название места</label>
-          <input id="nameInput" class="input" value="Алихан" placeholder="Например: Айдана или Кофейня «Иртыш»" />
+          <input id="nameInput" class="input" placeholder="Например: Айдана или Кофейня «Иртыш»" />
         </div>
 
         <div style="margin-top: 14px;">
           <label class="meta">Интересы и ритм</label>
           <div class="chips" id="interestChips">
-            <button type="button" class="chip active" onclick="toggleChip(this)">Кофе и встречи</button>
-            <button type="button" class="chip active" onclick="toggleChip(this)">Сибины и выезды</button>
+            <button type="button" class="chip" onclick="toggleChip(this)">Кофе и встречи</button>
+            <button type="button" class="chip" onclick="toggleChip(this)">Сибины и выезды</button>
             <button type="button" class="chip" onclick="toggleChip(this)">Новости города</button>
             <button type="button" class="chip" onclick="toggleChip(this)">Работа и проекты</button>
             <button type="button" class="chip" onclick="toggleChip(this)">Взаимопомощь</button>
           </div>
         </div>
 
-        <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="enterApp()">Открыть SÄT • Өскемен →</button>
+        <button class="btn btn-ghost" style="width:100%; margin-top:18px;" onclick="enterApp()">Войти без аккаунта →</button>
       </div>
     </div>
   </section>
@@ -341,7 +342,7 @@
         <div class="mini-badge">Ä</div>
         <div>
           <div style="font-weight:800; font-size:15px;">SÄT • Өскемен</div>
-          <div id="userStatusLine" class="meta">Житель • Сәт-карма +12</div>
+          <div id="userStatusLine" class="meta">Житель • Сәт-карма 0</div>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:6px;">
@@ -367,7 +368,7 @@
       </div>
 
       <div id="tab-people" class="tab-panel">
-        <h3 style="margin:0 0 12px;">Жители Өскемена рядом</h3>
+        <h3 style="margin:0 0 12px;">Жители Өскемена</h3>
         <div id="peopleList"></div>
       </div>
 
@@ -387,15 +388,17 @@
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <h2 id="profileName" style="margin:0;">Алихан</h2>
+              <h2 id="profileName" style="margin:0;">Участник</h2>
               <div id="profileRole" class="meta" style="margin-top:4px;">Житель Өскемена</div>
             </div>
-            <span id="verifiedBadge" class="tag">Не проверен</span>
+            <span id="verifiedBadge" class="tag care">Не проверен</span>
           </div>
-          <div id="profileKarma" class="meta" style="margin-top:12px; font-weight:700; color:var(--mint);">Сәт-карма: +12 добрых отметок</div>
+          <div id="profileEmailLine" class="meta" style="margin-top:6px;">Вход не выполнен</div>
+          <div id="profileKarma" class="meta" style="margin-top:10px; font-weight:700; color:var(--mint);">Сәт-карма: 0 отметок</div>
           <div class="actions">
             <button class="btn btn-mint" onclick="runSelfieCheck()">🤳 Проверка селфи-жестом (3 сек)</button>
             <button class="btn btn-ghost" onclick="switchRoleQuick()">Сменить роль</button>
+            <button class="btn btn-ghost" onclick="authLogout()">Выйти</button>
           </div>
           <div id="selfieStatus" class="meta" style="margin-top:8px;"></div>
         </div>
@@ -406,7 +409,7 @@
             При приглашении на встречу через <b>«⚡ Предложить Сәт»</b> можно включить тихий маяк для близкого человека и использовать кнопку <b>«Мягкий выход»</b>.
           </p>
           <label class="meta">Контакт доверия для встреч</label>
-          <input id="trustedContact" class="input" value="Айгерим (+7 777 ...)" onchange="saveState()" />
+          <input id="trustedContact" class="input" placeholder="Имя и номер телефона" onchange="saveState()" />
         </div>
       </div>
     </main>
@@ -498,78 +501,61 @@
 
   <div id="toast" class="toast"></div>
 
-  <script>
-    const STORAGE_KEY = 'sat_oskemen_v1';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      doc,
+      updateDoc,
+      increment,
+      onSnapshot,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvhWYumWTX-6M4k6kDT3PkZPpfJE2mEcw",
+      authDomain: "sat-oskemen.firebaseapp.com",
+      projectId: "sat-oskemen",
+      storageBucket: "sat-oskemen.firebasestorage.app",
+      messagingSenderId: "622960056003",
+      appId: "1:622960056003:web:8182bc730dff46ed02f476"
+    };
+
+    const fbApp = initializeApp(firebaseConfig);
+    const auth = getAuth(fbApp);
+    const db = getFirestore(fbApp);
+
+    const STORAGE_KEY = 'sat_oskemen_live_v1';
 
     const defaultState = {
       mood: 'irtysh',
       role: 'resident',
-      userName: 'Алихан',
+      userName: 'Участник',
+      trustedContact: '',
       verified: false,
-      karma: 12,
+      karma: 0,
       filter: 'all',
       chatMode: 'private',
       activeChatId: null,
-      posts: [
-        {
-          id: 'p1', type: 'cafe', author: 'Кофейня «Иртыш»', verified: true,
-          time: 'Осталось 1 ч 40 мин', title: 'Фирменный латте + свежий круассан',
-          body: 'Тёплая выпечка к утреннему разговору и спокойный столик у окна.',
-          price: '1 350 ₸', oldPrice: '1 850 ₸', confirms: 14
-        },
-        {
-          id: 'p2', type: 'news', author: 'Пульс города', verified: true,
-          time: '35 мин назад', title: 'Набережная Иртыша: вечерняя прогулка и освещение',
-          body: 'Фонари вдоль прогулочной зоны включены, ветра почти нет.',
-          confirms: 22
-        },
-        {
-          id: 'p3', type: 'people', author: 'Дана • 450 м', verified: true,
-          time: 'Сейчас в моменте', title: 'Ищу компанию на кофе или настолки в 20:00',
-          body: 'Буду рада доброму разговору в уютном месте без суеты.',
-          confirms: 7
-        },
-        {
-          id: 'p4', type: 'care', author: 'Взаимопомощь УКа', verified: false,
-          time: '18 мин назад', title: 'Нужны провода прикурить авто около центра',
-          body: 'Остановился во дворе, буду благодарен за помощь на 5 минут.',
-          confirms: 5
-        }
-      ],
-      people: [
-        { id: 'u1', name: 'Дана', badge: '✓ Живой профиль', karma: '+24', note: 'Любит кофе, кино и выезды на природу', friend: false },
-        { id: 'u2', name: 'Мирас', badge: '✓ Свой в УКа', karma: '+19', note: 'Настольные игры, фото и прогулки', friend: true },
-        { id: 'u3', name: 'Аружан', badge: '✓ Живой профиль', karma: '+31', note: 'Организует тёплые встречи книжного круга', friend: false }
-      ],
-      chats: [
-        {
-          id: 'c1', kind: 'private', title: 'Дана', sub: 'В сети • Рядом в Өскемене',
-          messages: [
-            { sender: 'them', text: 'Привет! Видела твой момент — заглянешь сегодня на кофе?' }
-          ]
-        },
-        {
-          id: 'c2', kind: 'private', title: 'Мирас', sub: 'Сәт-карма +19 • Друг',
-          messages: [
-            { sender: 'them', text: 'Если соберётесь на настолки на неделе — маякни!' }
-          ]
-        },
-        {
-          id: 'g1', kind: 'circles', title: 'Сибины и выезды • Өскемен', sub: '18 участников • Сәт-круг',
-          messages: [
-            { sender: 'them', text: 'Кто планирует поездку на выходных — пишите в круг.' }
-          ]
-        },
-        {
-          id: 'g2', kind: 'circles', title: 'Кофе и тёплые встречи', sub: '26 участников • Сәт-круг',
-          messages: [
-            { sender: 'them', text: 'Делимся уютными местами и локальными бонусами в УКа.' }
-          ]
-        }
-      ]
+      posts: [],
+      people: [],
+      chats: []
     };
 
     let state = loadState();
+    let cloudPosts = [];
+    let currentUser = null;
 
     function loadState() {
       try {
@@ -579,9 +565,9 @@
         return {
           ...structuredClone(defaultState),
           ...parsed,
-          posts: Array.isArray(parsed.posts) && parsed.posts.length ? parsed.posts : structuredClone(defaultState.posts),
-          people: Array.isArray(parsed.people) && parsed.people.length ? parsed.people : structuredClone(defaultState.people),
-          chats: Array.isArray(parsed.chats) && parsed.chats.length ? parsed.chats : structuredClone(defaultState.chats)
+          posts: Array.isArray(parsed.posts) ? parsed.posts : [],
+          people: Array.isArray(parsed.people) ? parsed.people : [],
+          chats: Array.isArray(parsed.chats) ? parsed.chats : []
         };
       } catch (e) {
         return structuredClone(defaultState);
@@ -597,7 +583,98 @@
       el.textContent = msg;
       el.classList.add('show');
       clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => el.classList.remove('show'), 2400);
+      showToast._t = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    const postsQuery = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    onSnapshot(postsQuery, (snapshot) => {
+      cloudPosts = snapshot.docs.map((d) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          fromCloud: true,
+          type: data.type || 'people',
+          author: data.author || 'Житель Өскемена',
+          verified: Boolean(data.verified),
+          time: data.time || 'Недавно',
+          title: data.title || '',
+          body: data.body || '',
+          price: data.price || '',
+          oldPrice: data.oldPrice || '',
+          confirms: Number(data.confirms || 0)
+        };
+      });
+      renderFeed();
+    }, (err) => {
+      console.warn('Firestore read warning:', err.message);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const emailLine = document.getElementById('profileEmailLine');
+      if (user) {
+        if (emailLine) emailLine.textContent = `Аккаунт: ${user.email}`;
+        if (!state.userName || state.userName === 'Участник') {
+          state.userName = user.email.split('@')[0];
+          saveState();
+        }
+        if (document.getElementById('splash').classList.contains('active') || document.getElementById('auth').classList.contains('active')) {
+          goScreen('app');
+          renderAll();
+        }
+      } else {
+        if (emailLine) emailLine.textContent = 'Вход не выполнен';
+      }
+    });
+
+    async function authRegister() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPass').value;
+      const nameVal = document.getElementById('nameInput').value.trim();
+      if (!email || pass.length < 6) {
+        showToast('Введите Email и пароль от 6 символов');
+        return;
+      }
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        state.userName = nameVal || email.split('@')[0];
+        saveState();
+        goScreen('app');
+        renderAll();
+        showToast('Аккаунт создан • Добро пожаловать в SÄT!');
+      } catch (e) {
+        showToast('Ошибка регистрации: ' + (e.code || e.message));
+      }
+    }
+
+    async function authLogin() {
+      const email = document.getElementById('authEmail').value.trim();
+      const pass = document.getElementById('authPass').value;
+      const nameVal = document.getElementById('nameInput').value.trim();
+      if (!email || !pass) {
+        showToast('Введите Email и пароль');
+        return;
+      }
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        if (nameVal) state.userName = nameVal;
+        saveState();
+        goScreen('app');
+        renderAll();
+        showToast('Вход выполнен');
+      } catch (e) {
+        showToast('Ошибка входа: ' + (e.code || e.message));
+      }
+    }
+
+    async function authLogout() {
+      try {
+        await signOut(auth);
+        goScreen('auth');
+        showToast('Вы вышли из аккаунта');
+      } catch (e) {
+        goScreen('auth');
+      }
     }
 
     function goScreen(id) {
@@ -605,21 +682,10 @@
       document.getElementById(id).classList.add('active');
     }
 
-    function quickLogin(provider) {
-      showToast(`Вход через ${provider} выполнен`);
-    }
-
-    function fillCode() {
-      document.getElementById('codeHint').textContent = 'Код подтверждения: 7742 (подставлен автоматически)';
-    }
-
     function setRole(role, btn) {
       state.role = role;
       document.querySelectorAll('#roleChips .chip').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
-      if (role === 'cafe' && document.getElementById('nameInput').value === 'Алихан') {
-        document.getElementById('nameInput').value = 'Кофейня «Алтай»';
-      }
     }
 
     function toggleChip(btn) {
@@ -659,11 +725,13 @@
 
     function renderAll() {
       document.getElementById('userStatusLine').textContent =
-        `${state.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель'} • Сәт-карма +${state.karma}`;
-      document.getElementById('profileName').textContent = state.userName;
+        `${state.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель'} • Сәт-карма ${state.karma}`;
+      document.getElementById('profileName').textContent = state.userName || 'Участник';
       document.getElementById('profileRole').textContent =
         state.role === 'cafe' ? 'Заведение в Өскемене' : 'Житель Өскемена';
-      document.getElementById('profileKarma').textContent = `Сәт-карма: +${state.karma} добрых отметок`;
+      document.getElementById('profileKarma').textContent = `Сәт-карма: ${state.karma} отметок`;
+      const tc = document.getElementById('trustedContact');
+      if (tc && tc.value !== state.trustedContact) tc.value = state.trustedContact || '';
       const vb = document.getElementById('verifiedBadge');
       vb.textContent = state.verified ? '✓ Живой профиль' : 'Не проверен';
       vb.className = state.verified ? 'tag' : 'tag care';
@@ -675,7 +743,12 @@
 
     function renderFeed() {
       const box = document.getElementById('feedList');
-      const items = state.filter === 'all' ? state.posts : state.posts.filter(p => p.type === state.filter);
+      const allPosts = [...cloudPosts, ...state.posts];
+      const items = state.filter === 'all' ? allPosts : allPosts.filter(p => p.type === state.filter);
+      if (!items.length) {
+        box.innerHTML = '<div class="card"><div style="font-weight:700; margin-bottom:6px;">Лента Өскемена пока пуста</div><div class="meta">Нажмите «+ Сәт» вверху, чтобы опубликовать первый реальный сигнал или новость.</div></div>';
+        return;
+      }
       box.innerHTML = items.map(p => {
         const tagClass = p.type === 'cafe' ? 'tag cafe' : (p.type === 'care' ? 'tag care' : 'tag');
         const tagLabel = p.type === 'cafe' ? 'Кафе • Момент' : (p.type === 'news' ? 'Новость' : (p.type === 'care' ? 'Забота' : 'Люди'));
@@ -697,10 +770,10 @@
               </div>
             ` : ''}
             <div class="actions">
-              <button class="btn btn-ghost" style="padding:8px 12px; font-size:12.5px;" onclick="confirmPost('${p.id}')">👍 Подтверждаю (${p.confirms})</button>
+              <button class="btn btn-ghost" style="padding:8px 12px; font-size:12.5px;" onclick="confirmPost('${p.id}', ${Boolean(p.fromCloud)})">👍 Подтверждаю (${p.confirms})</button>
               ${p.type === 'cafe'
                 ? `<button class="btn btn-mint" style="padding:8px 12px; font-size:12.5px;" onclick="claimBonus('${escapeHtml(p.title)}')">🎁 Забрать Сәт-бонус</button>
-                   <button class="btn btn-primary" style="padding:8px 12px; font-size:12.5px;" onclick="inviteFriendToDish('${escapeHtml(p.title)}')">Позвать друга</button>`
+                   <button class="btn btn-primary" style="padding:8px 12px; font-size:12.5px;" onclick="inviteFriendToDish('${escapeHtml(p.title)}')">Позвать в чат</button>`
                 : `<button class="btn btn-primary" style="padding:8px 12px; font-size:12.5px;" onclick="openChatByTitle('${escapeHtml(p.author)}')">⚡ Написать / Сәт</button>`
               }
             </div>
@@ -709,7 +782,19 @@
       }).join('');
     }
 
-    function confirmPost(id) {
+    async function confirmPost(id, isCloud) {
+      if (isCloud) {
+        try {
+          await updateDoc(doc(db, 'posts', id), { confirms: increment(1) });
+          state.karma += 1;
+          saveState();
+          renderAll();
+          showToast('Подтверждено в облаке • Карма +1');
+        } catch (e) {
+          showToast('Не удалось обновить счётчик');
+        }
+        return;
+      }
       const p = state.posts.find(x => x.id === id);
       if (!p) return;
       p.confirms += 1;
@@ -720,24 +805,29 @@
     }
 
     function claimBonus(dish) {
-      showToast(`Сәт-код активирован: ${dish}`);
+      showToast(`Сәт-бонус выбран: ${dish}`);
     }
 
     function inviteFriendToDish(dish) {
-      const target = state.chats.find(c => c.kind === 'private') || state.chats[0];
+      const target = state.chats[0];
       if (target) {
         target.messages.push({
           sender: 'me',
-          text: `Пойдём вместе на «${dish}» в Өскемене?`
+          text: `Предлагаю заглянуть на «${dish}» в Өскемене`
         });
         saveState();
         openChat(target.id);
-        showToast('Приглашение на блюдо отправлено в чат');
+      } else {
+        showToast('Сначала создайте чат или Сәт-круг');
       }
     }
 
     function renderPeople() {
       const box = document.getElementById('peopleList');
+      if (!state.people.length) {
+        box.innerHTML = '<div class="card"><div style="font-weight:700; margin-bottom:6px;">Список участников формируется</div><div class="meta">Когда жители Өскемена начнут публиковать сигналы в ленте и общаться, вы сможете открывать с ними диалоги прямо из постов.</div></div>';
+        return;
+      }
       box.innerHTML = state.people.map(u => `
         <div class="card">
           <div class="post-head">
@@ -763,7 +853,6 @@
       u.friend = !u.friend;
       saveState();
       renderPeople();
-      showToast(u.friend ? `${u.name} добавлен(а) в друзья` : `Убрано из друзей`);
     }
 
     function setChatMode(mode) {
@@ -782,11 +871,11 @@
       );
       const box = document.getElementById('chatList');
       if (!list.length) {
-        box.innerHTML = '<div class="card meta">Ничего не найдено</div>';
+        box.innerHTML = `<div class="card"><div style="font-weight:700; margin-bottom:6px;">${state.chatMode === 'circles' ? 'Сәт-кругов пока нет' : 'Личных чатов пока нет'}</div><div class="meta">${state.chatMode === 'circles' ? 'Нажмите «+ Круг», чтобы создать группу по интересам в Өскемене.' : 'Нажмите «⚡ Написать / Сәт» на любом посте в ленте, чтобы начать диалог.'}</div></div>`;
         return;
       }
       box.innerHTML = list.map(c => {
-        const last = c.messages[c.messages.length - 1]?.text || 'Нет сообщений';
+        const last = c.messages[c.messages.length - 1]?.text || 'Сообщений пока нет';
         return `
           <div class="card" style="cursor:pointer;" onclick="openChat('${c.id}')">
             <div class="post-head" style="margin-bottom:4px;">
@@ -807,8 +896,8 @@
           id: 'c_' + Date.now(),
           kind: 'private',
           title: name,
-          sub: 'Өскемен • Новый диалог',
-          messages: [{ sender: 'them', text: `Привет! На связи в SÄT • Өскемен.` }]
+          sub: 'Өскемен • Диалог',
+          messages: []
         };
         state.chats.unshift(chat);
         saveState();
@@ -828,6 +917,10 @@
 
     function renderChatMessages(chat) {
       const box = document.getElementById('chatMessages');
+      if (!chat.messages.length) {
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Напишите первое сообщение или предложите встречу через «⚡ Предложить Сәт».</div>';
+        return;
+      }
       box.innerHTML = chat.messages.map(m => {
         const cls = m.type === 'sat' ? 'msg sat-invite' : (m.sender === 'me' ? 'msg me' : 'msg them');
         return `<div class="${cls}">${escapeHtml(m.text)}</div>`;
@@ -855,15 +948,15 @@
       chat.messages.push({
         sender: 'me',
         type: 'sat',
-        text: `⚡ Предложен SÄT в Өскемене • ${beaconOn ? 'Маяк безопасности включён для близких' : 'Без маяка'}`
+        text: `⚡ Предложен SÄT в Өскемене • ${beaconOn ? 'Маяк безопасности включён' : 'Без маяка'}`
       });
       saveState();
       renderChatMessages(chat);
-      showToast(beaconOn ? 'Сәт отправлен • Маяк безопасности активен' : 'Приглашение на Сәт отправлено');
+      showToast('Приглашение на Сәт отправлено');
     }
 
     function softExit() {
-      showToast('📞 Мягкий выход активирован: через 30 сек поступит вежливый звонок-повод');
+      showToast('📞 Мягкий выход активирован: сигнал-повод запланирован через 30 сек');
     }
 
     function openCreateModal() {
@@ -874,7 +967,7 @@
       document.getElementById('cafeFields').style.display = e.target.value === 'cafe' ? 'block' : 'none';
     });
 
-    function publishPost() {
+    async function publishPost() {
       const type = document.getElementById('newPostType').value;
       const title = document.getElementById('newPostTitle').value.trim();
       const body = document.getElementById('newPostBody').value.trim();
@@ -886,25 +979,33 @@
         return;
       }
 
-      state.posts.unshift({
-        id: 'p_' + Date.now(),
+      const newPostObj = {
         type,
-        author: state.userName,
+        author: state.userName || 'Участник',
+        authorUid: currentUser ? currentUser.uid : null,
         verified: state.verified || type === 'cafe',
         time: timer ? `Осталось ${timer}` : 'Только что',
         title,
-        body: body || 'Актуально прямо сейчас в Өскемене.',
-        price: type === 'cafe' ? (price || '1 100 ₸') : '',
-        oldPrice: type === 'cafe' ? '1 500 ₸' : '',
-        confirms: 1
-      });
+        body: body || 'Актуально в Өскемене.',
+        price: type === 'cafe' ? (price || '') : '',
+        oldPrice: '',
+        confirms: 0,
+        createdAt: serverTimestamp()
+      };
+
+      try {
+        await addDoc(collection(db, 'posts'), newPostObj);
+        showToast('Опубликовано в облаке SÄT');
+      } catch (e) {
+        state.posts.unshift({ id: 'p_' + Date.now(), ...newPostObj });
+        saveState();
+        renderFeed();
+        showToast('Сохранено локально');
+      }
 
       document.getElementById('newPostTitle').value = '';
       document.getElementById('newPostBody').value = '';
       closeModalById('createModal');
-      saveState();
-      renderFeed();
-      showToast('Опубликовано в ленте SÄT');
     }
 
     function openCircleModal() {
@@ -918,26 +1019,26 @@
         id: 'g_' + Date.now(),
         kind: 'circles',
         title: name,
-        sub: '1 участник • Новый Сәт-круг',
-        messages: [{ sender: 'them', text: `Добро пожаловать в круг «${name}» в Өскемене!` }]
+        sub: '1 участник • Сәт-круг',
+        messages: []
       });
       document.getElementById('circleNameInput').value = '';
       closeModalById('circleModal');
       setChatMode('circles');
       saveState();
-      showToast('Новый Сәт-круг создан');
+      showToast('Сәт-круг создан');
     }
 
     function runSelfieCheck() {
       const status = document.getElementById('selfieStatus');
-      status.textContent = 'Смотрите в камеру и покажите знак ✌️ (3 сек)...';
+      status.textContent = 'Проверка жеста (3 сек)...';
       setTimeout(() => {
         state.verified = true;
-        state.karma += 5;
+        state.karma += 1;
         saveState();
         renderAll();
-        status.textContent = '✓ Готово! Профиль подтверждён, временный кадр удалён.';
-        showToast('✓ Живой профиль подтверждён (+5 к карме)');
+        status.textContent = '✓ Профиль подтверждён.';
+        showToast('✓ Живой профиль подтверждён');
       }, 1500);
     }
 
@@ -965,6 +1066,39 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
     }
+
+    Object.assign(window, {
+      goScreen,
+      authRegister,
+      authLogin,
+      authLogout,
+      setRole,
+      toggleChip,
+      enterApp,
+      setMood,
+      switchTab,
+      setFilter,
+      confirmPost,
+      claimBonus,
+      inviteFriendToDish,
+      toggleFriend,
+      setChatMode,
+      renderChats,
+      openChatByTitle,
+      openChat,
+      sendChatMsg,
+      proposeSat,
+      softExit,
+      openCreateModal,
+      publishPost,
+      openCircleModal,
+      createCircle,
+      runSelfieCheck,
+      switchRoleQuick,
+      closeModalById,
+      closeModals,
+      saveState
+    });
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SÄT • Өскемен</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#141b19" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <style>
+    :root {
+      --bg-base: #141b19;
+      --bg-glow-1: rgba(52, 168, 152, 0.16);
+      --bg-glow-2: rgba(255, 138, 92, 0.12);
+      --surface: rgba(28, 38, 35, 0.86);
+      --surface-elev: rgba(38, 51, 47, 0.94);
+      --border: rgba(255, 255, 255, 0.09);
+      --text: #f4f7f5;
+      --muted: #9fb0aa;
+      --accent: #ff7b54;
+      --accent-2: #ffb26b;
+      --mint: #4fd1b5;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    body[data-mood="dawn"] {
+      --bg-base: #f5efe6;
+      --bg-glow-1: rgba(255, 154, 102, 0.22);
+      --bg-glow-2: rgba(79, 179, 158, 0.16);
+      --surface: rgba(255, 252, 247, 0.88);
+      --surface-elev: rgba(255, 255, 255, 0.96);
+      --border: rgba(28, 38, 35, 0.1);
+      --text: #18211e;
+      --muted: #5d6e68;
+      --accent: #e8633c;
+      --accent-2: #d9822b;
+      --mint: #1d8f78;
+      --shadow: 0 10px 24px rgba(24, 33, 30, 0.08);
+    }
+
+    body[data-mood="evening"] {
+      --bg-base: #191518;
+      --bg-glow-1: rgba(255, 123, 84, 0.18);
+      --bg-glow-2: rgba(255, 178, 107, 0.12);
+      --surface: rgba(36, 29, 34, 0.88);
+      --surface-elev: rgba(48, 39, 45, 0.95);
+      --border: rgba(255, 232, 214, 0.1);
+      --text: #faf3ee;
+      --muted: #b5a39b;
+      --accent: #ff7b54;
+      --accent-2: #ffb26b;
+      --mint: #57c7ae;
+      --shadow: 0 14px 32px rgba(0, 0, 0, 0.36);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(circle at 12% 8%, var(--bg-glow-1), transparent 45%),
+        radial-gradient(circle at 88% 18%, var(--bg-glow-2), transparent 48%),
+        radial-gradient(circle at 50% 95%, var(--bg-glow-1), transparent 52%);
+      transition: background-color 0.35s ease, color 0.25s ease;
+      padding-bottom: 84px;
+    }
+
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(232, 99, 60, 0.28);
+    }
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-mint {
+      background: rgba(79, 209, 181, 0.16);
+      color: var(--mint);
+      border: 1px solid rgba(79, 209, 181, 0.35);
+    }
+
+    #splash {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 28px;
+    }
+    #splash.active { display: flex; flex-direction: column; }
+
+    .logo-frame {
+      width: 112px;
+      height: 112px;
+      border-radius: 30px;
+      background: var(--surface-elev);
+      border: 1.5px solid rgba(255, 123, 84, 0.45);
+      box-shadow: var(--shadow), 0 0 36px rgba(255, 123, 84, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .sparks { display: flex; gap: 14px; margin-bottom: -6px; }
+    .spark {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      animation: pulseSpark 1.8s infinite ease-in-out;
+    }
+    .spark:last-child { animation-delay: 0.35s; }
+    @keyframes pulseSpark {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.35); opacity: 1; }
+    }
+    .logo-letter { font-size: 46px; font-weight: 800; line-height: 1; }
+    .brand-title { font-size: 30px; font-weight: 800; letter-spacing: 0.5px; margin: 0 0 6px; }
+    .brand-sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+
+    .auth-wrap { max-width: 440px; margin: 0 auto; padding: 28px 18px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      margin-bottom: 14px;
+    }
+    .input, select, textarea {
+      width: 100%;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      outline: none;
+      margin-top: 6px;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip {
+      padding: 8px 13px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      background: var(--surface-elev);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .chip.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .mini-badge {
+      width: 36px; height: 36px; border-radius: 12px;
+      background: var(--surface-elev);
+      border: 1px solid rgba(255, 123, 84, 0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 17px; color: var(--accent);
+    }
+    .mood-bar { display: flex; gap: 4px; background: var(--surface-elev); padding: 3px; border-radius: 12px; border: 1px solid var(--border); }
+    .mood-btn {
+      border: none; background: transparent; color: var(--muted);
+      padding: 6px 8px; border-radius: 9px; font-size: 13px; cursor: pointer;
+    }
+    .mood-btn.active { background: var(--accent); color: #fff; }
+
+    .container { max-width: 560px; margin: 0 auto; padding: 14px 14px 20px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .post-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .author { font-weight: 700; font-size: 14.5px; }
+    .meta { font-size: 12px; color: var(--muted); }
+    .tag {
+      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+      background: rgba(79, 209, 181, 0.14); color: var(--mint);
+    }
+    .tag.cafe { background: rgba(255, 178, 107, 0.18); color: var(--accent-2); }
+    .tag.care { background: rgba(255, 123, 84, 0.18); color: var(--accent); }
+
+    .price-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+    .price-now { font-size: 18px; font-weight: 800; color: var(--accent-2); }
+    .price-old { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    }
+    .nav-item {
+      border: none; background: transparent; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 600; padding: 6px 4px; border-radius: 12px; cursor: pointer;
+    }
+    .nav-item.active { color: var(--accent); background: rgba(255, 123, 84, 0.12); }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(0, 0, 0, 0.62);
+      display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-sheet {
+      width: 100%; max-width: 540px; max-height: 88vh; overflow-y: auto;
+      background: var(--bg-base);
+      border-top: 1px solid var(--border);
+      border-radius: 24px 24px 0 0;
+      padding: 20px 18px 28px;
+    }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(20px);
+      background: var(--surface-elev); color: var(--text);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 70;
+      white-space: nowrap; max-width: 92vw; overflow: hidden; text-overflow: ellipsis;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .chat-box { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+    .msg { padding: 10px 13px; border-radius: 16px; font-size: 13.5px; max-width: 85%; }
+    .msg.them { background: var(--surface-elev); align-self: flex-start; border: 1px solid var(--border); }
+    .msg.me { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; align-self: flex-end; }
+    .msg.sat-invite {
+      background: rgba(79, 209, 181, 0.14);
+      border: 1px solid rgba(79, 209, 181, 0.4);
+      color: var(--text); align-self: stretch; max-width: 100%;
+    }
+  </style>
+</head>
+<body data-mood="irtysh">
+
+  <section id="splash" class="screen active">
+    <div class="logo-frame">
+      <div class="sparks">
+        <span class="spark"></span>
+        <span class="spark"></span>
+      </div>
+      <div class="logo-letter">Ä</div>
+    </div>
+    <h1 class="brand-title">SÄT</h1>
+    <p class="brand-sub">Өскемен • Живой пульс города в моменте</p>
+    <button class="btn btn-primary" onclick="goScreen('auth')">Войти в SÄT →</button>
+  </section>
+
+  <section id="auth" class="screen">
+    <div class="auth-wrap">
+      <div class="card">
+        <div class="meta">ШАГ 1 ИЗ 2 • ӨСКЕМЕН</div>
+        <h2 style="margin: 6px 0 12px;">Быстрый вход</h2>
+        <div class="actions">
+          <button class="btn btn-primary" style="flex:1" onclick="quickLogin('Google')">Войти через Google</button>
+          <button class="btn btn-ghost" style="flex:1" onclick="quickLogin('Apple')">Apple ID</button>
+        </div>
+        <div style="margin-top: 14px;">
+          <label class="meta">Или номер телефона (+7)</label>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <input id="phoneInput" class="input" style="margin-top:0" placeholder="+7 705 000 00 00" value="+7 705 412 88 10" />
+            <button class="btn btn-mint" onclick="fillCode()">Код</button>
+          </div>
+          <div id="codeHint" class="meta" style="margin-top:6px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="meta">ШАГ 2 ИЗ 2 • БЕЗ РАЙОНОВ, ТОЛЬКО ГОРОД</div>
+        <h3 style="margin: 6px 0 10px;">Кто ты в Өскемене?</h3>
+        <div class="chips" id="roleChips">
+          <button type="button" class="chip active" onclick="setRole('resident', this)">Житель УКа</button>
+          <button type="button" class="chip" onclick="setRole('cafe', this)">Кафе / Бизнес</button>
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label class="meta">Имя или название места</label>
+          <input id="nameInput" class="input" value="Алихан" placeholder="Например: Айдана или Кофейня «Иртыш»" />
+        </div>
+
+        <div style="margin-top: 14px;">
+          <label class="meta">Интересы и ритм</label>
+          <div class="chips" id="interestChips">
+            <button type="button" class="chip active" onclick="toggleChip(this)">Кофе и встречи</button>
+            <button type="button" class="chip active" onclick="toggleChip(this)">Сибины и выезды</button>
+            <button type="button" class="chip" onclick="toggleChip(this)">Новости города</button>
+            <button type="button" class="chip" onclick="toggleChip(this)">Работа и проекты</button>
+            <button type="button" class="chip" onclick="toggleChip(this)">Взаимопомощь</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:18px;" onclick="enterApp()">Открыть SÄT • Өскемен →</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="app" class="screen">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="mini-badge">Ä</div>
+        <div>
+          <div style="font-weight:800; font-size:15px;">SÄT • Өскемен</div>
+          <div id="userStatusLine" class="meta">Житель • Сәт-карма +12</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <div class="mood-bar" title="Атмосфера фона">
+          <button class="mood-btn" data-m="dawn" onclick="setMood('dawn')">🌅</button>
+          <button class="mood-btn active" data-m="irtysh" onclick="setMood('irtysh')">🏔</button>
+          <button class="mood-btn" data-m="evening" onclick="setMood('evening')">🕯</button>
+        </div>
+        <button class="btn btn-primary" style="padding:8px 12px; font-size:13px;" onclick="openCreateModal()">+ Сәт</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="tab-pulse" class="tab-panel active">
+        <div class="chips" style="margin-top:0; margin-bottom:14px;" id="filterChips">
+          <button class="chip active" onclick="setFilter('all', this)">Всё</button>
+          <button class="chip" onclick="setFilter('news', this)">Новости</button>
+          <button class="chip" onclick="setFilter('people', this)">Люди</button>
+          <button class="chip" onclick="setFilter('cafe', this)">Кафе и блюда</button>
+          <button class="chip" onclick="setFilter('care', this)">Забота</button>
+        </div>
+        <div id="feedList"></div>
+      </div>
+
+      <div id="tab-people" class="tab-panel">
+        <h3 style="margin:0 0 12px;">Жители Өскемена рядом</h3>
+        <div id="peopleList"></div>
+      </div>
+
+      <div id="tab-chats" class="tab-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+          <div class="chips" style="margin:0;">
+            <button id="subPrivateBtn" class="chip active" onclick="setChatMode('private')">Личные</button>
+            <button id="subCirclesBtn" class="chip" onclick="setChatMode('circles')">Сәт-круги</button>
+          </div>
+          <button class="btn btn-mint" style="padding:8px 12px; font-size:12px;" onclick="openCircleModal()">+ Круг</button>
+        </div>
+        <input id="chatSearch" class="input" style="margin-top:0; margin-bottom:12px;" placeholder="Поиск по чатам и кругам..." oninput="renderChats()" />
+        <div id="chatList"></div>
+      </div>
+
+      <div id="tab-profile" class="tab-panel">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h2 id="profileName" style="margin:0;">Алихан</h2>
+              <div id="profileRole" class="meta" style="margin-top:4px;">Житель Өскемена</div>
+            </div>
+            <span id="verifiedBadge" class="tag">Не проверен</span>
+          </div>
+          <div id="profileKarma" class="meta" style="margin-top:12px; font-weight:700; color:var(--mint);">Сәт-карма: +12 добрых отметок</div>
+          <div class="actions">
+            <button class="btn btn-mint" onclick="runSelfieCheck()">🤳 Проверка селфи-жестом (3 сек)</button>
+            <button class="btn btn-ghost" onclick="switchRoleQuick()">Сменить роль</button>
+          </div>
+          <div id="selfieStatus" class="meta" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 8px;">Маяк заботы и спокойствия</h3>
+          <p class="meta" style="margin:0 0 12px; line-height:1.45;">
+            При приглашении на встречу через <b>«⚡ Предложить Сәт»</b> можно включить тихий маяк для близкого человека и использовать кнопку <b>«Мягкий выход»</b>.
+          </p>
+          <label class="meta">Контакт доверия для встреч</label>
+          <input id="trustedContact" class="input" value="Айгерим (+7 777 ...)" onchange="saveState()" />
+        </div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="pulse" onclick="switchTab('pulse', this)"><span>⚡</span><span>Пульс</span></button>
+      <button class="nav-item" data-tab="people" onclick="switchTab('people', this)"><span>🧭</span><span>Люди</span></button>
+      <button class="nav-item" data-tab="chats" onclick="switchTab('chats', this)"><span>💬</span><span>Чаты</span></button>
+      <button class="nav-item" data-tab="profile" onclick="switchTab('profile', this)"><span>🛡️</span><span>Профиль</span></button>
+    </nav>
+  </section>
+
+  <div id="createModal" class="modal-backdrop" onclick="closeModals(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <h3 style="margin:0 0 12px;">Новый сигнал в Өскемене</h3>
+      <label class="meta">Формат</label>
+      <select id="newPostType">
+        <option value="people">Живой момент / Компания</option>
+        <option value="cafe">Блюдо или акция кафе</option>
+        <option value="news">Городская новость</option>
+        <option value="care">Взаимопомощь / Забота</option>
+      </select>
+
+      <div style="margin-top:12px;">
+        <label class="meta">Заголовок или блюдо</label>
+        <input id="newPostTitle" class="input" placeholder="Например: Свежий раф с кедровым орехом" />
+      </div>
+
+      <div id="cafeFields" style="display:none; margin-top:12px;">
+        <label class="meta">Цена сейчас (₸) и срок действия</label>
+        <div style="display:flex; gap:8px;">
+          <input id="newPostPrice" class="input" placeholder="1 200 ₸" />
+          <input id="newPostTimer" class="input" placeholder="2 часа" />
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label class="meta">Описание</label>
+        <textarea id="newPostBody" rows="3" placeholder="Расскажите, что происходит прямо сейчас..."></textarea>
+      </div>
+
+      <div class="actions" style="margin-top:16px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModalById('createModal')">Отмена</button>
+        <button class="btn btn-primary" style="flex:1" onclick="publishPost()">Опубликовать</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 id="chatTitle" style="margin:0;">Диалог</h3>
+          <div id="chatSubtitle" class="meta">Өскемен • Безопасный чат</div>
+        </div>
+        <button class="btn btn-ghost" style="padding:6px 12px;" onclick="closeModalById('chatModal')">✕</button>
+      </div>
+
+      <div class="actions" style="margin-top:10px;">
+        <button class="btn btn-mint" style="flex:1; font-size:12.5px;" onclick="proposeSat()">⚡ Предложить Сәт</button>
+        <button class="btn btn-ghost" style="font-size:12.5px;" onclick="softExit()">📞 Мягкий выход</button>
+      </div>
+
+      <div id="beaconBox" style="margin-top:10px; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:10px 12px; border-radius:14px; border:1px solid var(--border);">
+        <span class="meta" style="color:var(--text);">🛡️ Маяк безопасности для близких</span>
+        <input type="checkbox" id="beaconToggle" checked />
+      </div>
+
+      <div id="chatMessages" class="chat-box"></div>
+
+      <div style="display:flex; gap:8px;">
+        <input id="chatInput" class="input" style="margin-top:0" placeholder="Написать сообщение..." />
+        <button class="btn btn-primary" onclick="sendChatMsg()">→</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="circleModal" class="modal-backdrop" onclick="closeModals(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <h3 style="margin:0 0 12px;">Новый Сәт-круг</h3>
+      <label class="meta">Название группы</label>
+      <input id="circleNameInput" class="input" placeholder="Например: Утренний бег на Набережной" />
+      <div class="actions" style="margin-top:16px;">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModalById('circleModal')">Отмена</button>
+        <button class="btn btn-primary" style="flex:1" onclick="createCircle()">Создать круг</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'sat_oskemen_v1';
+
+    const defaultState = {
+      mood: 'irtysh',
+      role: 'resident',
+      userName: 'Алихан',
+      verified: false,
+      karma: 12,
+      filter: 'all',
+      chatMode: 'private',
+      activeChatId: null,
+      posts: [
+        {
+          id: 'p1', type: 'cafe', author: 'Кофейня «Иртыш»', verified: true,
+          time: 'Осталось 1 ч 40 мин', title: 'Фирменный латте + свежий круассан',
+          body: 'Тёплая выпечка к утреннему разговору и спокойный столик у окна.',
+          price: '1 350 ₸', oldPrice: '1 850 ₸', confirms: 14
+        },
+        {
+          id: 'p2', type: 'news', author: 'Пульс города', verified: true,
+          time: '35 мин назад', title: 'Набережная Иртыша: вечерняя прогулка и освещение',
+          body: 'Фонари вдоль прогулочной зоны включены, ветра почти нет.',
+          confirms: 22
+        },
+        {
+          id: 'p3', type: 'people', author: 'Дана • 450 м', verified: true,
+          time: 'Сейчас в моменте', title: 'Ищу компанию на кофе или настолки в 20:00',
+          body: 'Буду рада доброму разговору в уютном месте без суеты.',
+          confirms: 7
+        },
+        {
+          id: 'p4', type: 'care', author: 'Взаимопомощь УКа', verified: false,
+          time: '18 мин назад', title: 'Нужны провода прикурить авто около центра',
+          body: 'Остановился во дворе, буду благодарен за помощь на 5 минут.',
+          confirms: 5
+        }
+      ],
+      people: [
+        { id: 'u1', name: 'Дана', badge: '✓ Живой профиль', karma: '+24', note: 'Любит кофе, кино и выезды на природу', friend: false },
+        { id: 'u2', name: 'Мирас', badge: '✓ Свой в УКа', karma: '+19', note: 'Настольные игры, фото и прогулки', friend: true },
+        { id: 'u3', name: 'Аружан', badge: '✓ Живой профиль', karma: '+31', note: 'Организует тёплые встречи книжного круга', friend: false }
+      ],
+      chats: [
+        {
+          id: 'c1', kind: 'private', title: 'Дана', sub: 'В сети • Рядом в Өскемене',
+          messages: [
+            { sender: 'them', text: 'Привет! Видела твой момент — заглянешь сегодня на кофе?' }
+          ]
+        },
+        {
+          id: 'c2', kind: 'private', title: 'Мирас', sub: 'Сәт-карма +19 • Друг',
+          messages: [
+            { sender: 'them', text: 'Если соберётесь на настолки на неделе — маякни!' }
+          ]
+        },
+        {
+          id: 'g1', kind: 'circles', title: 'Сибины и выезды • Өскемен', sub: '18 участников • Сәт-круг',
+          messages: [
+            { sender: 'them', text: 'Кто планирует поездку на выходных — пишите в круг.' }
+          ]
+        },
+        {
+          id: 'g2', kind: 'circles', title: 'Кофе и тёплые встречи', sub: '26 участников • Сәт-круг',
+          messages: [
+            { sender: 'them', text: 'Делимся уютными местами и локальными бонусами в УКа.' }
+          ]
+        }
+      ]
+    };
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const parsed = JSON.parse(raw);
+        return {
+          ...structuredClone(defaultState),
+          ...parsed,
+          posts: Array.isArray(parsed.posts) && parsed.posts.length ? parsed.posts : structuredClone(defaultState.posts),
+          people: Array.isArray(parsed.people) && parsed.people.length ? parsed.people : structuredClone(defaultState.people),
+          chats: Array.isArray(parsed.chats) && parsed.chats.length ? parsed.chats : structuredClone(defaultState.chats)
+        };
+      } catch (e) {
+        return structuredClone(defaultState);
+      }
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function goScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function quickLogin(provider) {
+      showToast(`Вход через ${provider} выполнен`);
+    }
+
+    function fillCode() {
+      document.getElementById('codeHint').textContent = 'Код подтверждения: 7742 (подставлен автоматически)';
+    }
+
+    function setRole(role, btn) {
+      state.role = role;
+      document.querySelectorAll('#roleChips .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      if (role === 'cafe' && document.getElementById('nameInput').value === 'Алихан') {
+        document.getElementById('nameInput').value = 'Кофейня «Алтай»';
+      }
+    }
+
+    function toggleChip(btn) {
+      btn.classList.toggle('active');
+    }
+
+    function enterApp() {
+      const val = document.getElementById('nameInput').value.trim();
+      if (val) state.userName = val;
+      saveState();
+      goScreen('app');
+      setMood(state.mood);
+      renderAll();
+    }
+
+    function setMood(mood) {
+      state.mood = mood;
+      document.body.setAttribute('data-mood', mood);
+      document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.dataset.m === mood));
+      saveState();
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAll();
+    }
+
+    function setFilter(f, btn) {
+      state.filter = f;
+      document.querySelectorAll('#filterChips .chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderFeed();
+    }
+
+    function renderAll() {
+      document.getElementById('userStatusLine').textContent =
+        `${state.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель'} • Сәт-карма +${state.karma}`;
+      document.getElementById('profileName').textContent = state.userName;
+      document.getElementById('profileRole').textContent =
+        state.role === 'cafe' ? 'Заведение в Өскемене' : 'Житель Өскемена';
+      document.getElementById('profileKarma').textContent = `Сәт-карма: +${state.karma} добрых отметок`;
+      const vb = document.getElementById('verifiedBadge');
+      vb.textContent = state.verified ? '✓ Живой профиль' : 'Не проверен';
+      vb.className = state.verified ? 'tag' : 'tag care';
+
+      renderFeed();
+      renderPeople();
+      renderChats();
+    }
+
+    function renderFeed() {
+      const box = document.getElementById('feedList');
+      const items = state.filter === 'all' ? state.posts : state.posts.filter(p => p.type === state.filter);
+      box.innerHTML = items.map(p => {
+        const tagClass = p.type === 'cafe' ? 'tag cafe' : (p.type === 'care' ? 'tag care' : 'tag');
+        const tagLabel = p.type === 'cafe' ? 'Кафе • Момент' : (p.type === 'news' ? 'Новость' : (p.type === 'care' ? 'Забота' : 'Люди'));
+        return `
+          <article class="card">
+            <div class="post-head">
+              <div>
+                <div class="author">${escapeHtml(p.author)} ${p.verified ? '<span style="color:var(--mint)">✓</span>' : ''}</div>
+                <div class="meta">${escapeHtml(p.time)}</div>
+              </div>
+              <span class="${tagClass}">${tagLabel}</span>
+            </div>
+            <div style="font-weight:700; font-size:16px; margin-bottom:6px;">${escapeHtml(p.title)}</div>
+            <div class="meta" style="color:var(--text); line-height:1.45;">${escapeHtml(p.body)}</div>
+            ${p.price ? `
+              <div class="price-row">
+                <span class="price-now">${escapeHtml(p.price)}</span>
+                ${p.oldPrice ? `<span class="price-old">${escapeHtml(p.oldPrice)}</span>` : ''}
+              </div>
+            ` : ''}
+            <div class="actions">
+              <button class="btn btn-ghost" style="padding:8px 12px; font-size:12.5px;" onclick="confirmPost('${p.id}')">👍 Подтверждаю (${p.confirms})</button>
+              ${p.type === 'cafe'
+                ? `<button class="btn btn-mint" style="padding:8px 12px; font-size:12.5px;" onclick="claimBonus('${escapeHtml(p.title)}')">🎁 Забрать Сәт-бонус</button>
+                   <button class="btn btn-primary" style="padding:8px 12px; font-size:12.5px;" onclick="inviteFriendToDish('${escapeHtml(p.title)}')">Позвать друга</button>`
+                : `<button class="btn btn-primary" style="padding:8px 12px; font-size:12.5px;" onclick="openChatByTitle('${escapeHtml(p.author)}')">⚡ Написать / Сәт</button>`
+              }
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function confirmPost(id) {
+      const p = state.posts.find(x => x.id === id);
+      if (!p) return;
+      p.confirms += 1;
+      state.karma += 1;
+      saveState();
+      renderAll();
+      showToast('Отметка учтена • Сәт-карма +1');
+    }
+
+    function claimBonus(dish) {
+      showToast(`Сәт-код активирован: ${dish}`);
+    }
+
+    function inviteFriendToDish(dish) {
+      const target = state.chats.find(c => c.kind === 'private') || state.chats[0];
+      if (target) {
+        target.messages.push({
+          sender: 'me',
+          text: `Пойдём вместе на «${dish}» в Өскемене?`
+        });
+        saveState();
+        openChat(target.id);
+        showToast('Приглашение на блюдо отправлено в чат');
+      }
+    }
+
+    function renderPeople() {
+      const box = document.getElementById('peopleList');
+      box.innerHTML = state.people.map(u => `
+        <div class="card">
+          <div class="post-head">
+            <div>
+              <div class="author">${escapeHtml(u.name)}</div>
+              <div class="meta">${escapeHtml(u.badge)} • Карма ${escapeHtml(u.karma)}</div>
+            </div>
+            <button class="btn ${u.friend ? 'btn-mint' : 'btn-ghost'}" style="padding:8px 12px; font-size:12.5px;" onclick="toggleFriend('${u.id}')">
+              ${u.friend ? '✓ В друзьях' : '+ В друзья'}
+            </button>
+          </div>
+          <div class="meta" style="color:var(--text);">${escapeHtml(u.note)}</div>
+          <div class="actions">
+            <button class="btn btn-primary" style="padding:8px 14px; font-size:12.5px;" onclick="openChatByTitle('${escapeHtml(u.name)}')">💬 В чат</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleFriend(id) {
+      const u = state.people.find(x => x.id === id);
+      if (!u) return;
+      u.friend = !u.friend;
+      saveState();
+      renderPeople();
+      showToast(u.friend ? `${u.name} добавлен(а) в друзья` : `Убрано из друзей`);
+    }
+
+    function setChatMode(mode) {
+      state.chatMode = mode;
+      document.getElementById('subPrivateBtn').classList.toggle('active', mode === 'private');
+      document.getElementById('subCirclesBtn').classList.toggle('active', mode === 'circles');
+      saveState();
+      renderChats();
+    }
+
+    function renderChats() {
+      const q = (document.getElementById('chatSearch')?.value || '').trim().toLowerCase();
+      const list = state.chats.filter(c =>
+        c.kind === state.chatMode &&
+        (!q || c.title.toLowerCase().includes(q) || c.messages.some(m => m.text.toLowerCase().includes(q)))
+      );
+      const box = document.getElementById('chatList');
+      if (!list.length) {
+        box.innerHTML = '<div class="card meta">Ничего не найдено</div>';
+        return;
+      }
+      box.innerHTML = list.map(c => {
+        const last = c.messages[c.messages.length - 1]?.text || 'Нет сообщений';
+        return `
+          <div class="card" style="cursor:pointer;" onclick="openChat('${c.id}')">
+            <div class="post-head" style="margin-bottom:4px;">
+              <div class="author">${escapeHtml(c.title)}</div>
+              <span class="tag">${c.kind === 'circles' ? 'Круг' : 'Личный'}</span>
+            </div>
+            <div class="meta" style="margin-bottom:6px;">${escapeHtml(c.sub)}</div>
+            <div class="meta" style="color:var(--text);">${escapeHtml(last)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openChatByTitle(name) {
+      let chat = state.chats.find(c => c.title.toLowerCase().includes(name.toLowerCase()));
+      if (!chat) {
+        chat = {
+          id: 'c_' + Date.now(),
+          kind: 'private',
+          title: name,
+          sub: 'Өскемен • Новый диалог',
+          messages: [{ sender: 'them', text: `Привет! На связи в SÄT • Өскемен.` }]
+        };
+        state.chats.unshift(chat);
+        saveState();
+      }
+      openChat(chat.id);
+    }
+
+    function openChat(id) {
+      const chat = state.chats.find(c => c.id === id);
+      if (!chat) return;
+      state.activeChatId = id;
+      document.getElementById('chatTitle').textContent = chat.title;
+      document.getElementById('chatSubtitle').textContent = chat.sub;
+      renderChatMessages(chat);
+      document.getElementById('chatModal').classList.add('open');
+    }
+
+    function renderChatMessages(chat) {
+      const box = document.getElementById('chatMessages');
+      box.innerHTML = chat.messages.map(m => {
+        const cls = m.type === 'sat' ? 'msg sat-invite' : (m.sender === 'me' ? 'msg me' : 'msg them');
+        return `<div class="${cls}">${escapeHtml(m.text)}</div>`;
+      }).join('');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function sendChatMsg() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || !state.activeChatId) return;
+      const chat = state.chats.find(c => c.id === state.activeChatId);
+      if (!chat) return;
+      chat.messages.push({ sender: 'me', text });
+      input.value = '';
+      saveState();
+      renderChatMessages(chat);
+      renderChats();
+    }
+
+    function proposeSat() {
+      const chat = state.chats.find(c => c.id === state.activeChatId);
+      if (!chat) return;
+      const beaconOn = document.getElementById('beaconToggle').checked;
+      chat.messages.push({
+        sender: 'me',
+        type: 'sat',
+        text: `⚡ Предложен SÄT в Өскемене • ${beaconOn ? 'Маяк безопасности включён для близких' : 'Без маяка'}`
+      });
+      saveState();
+      renderChatMessages(chat);
+      showToast(beaconOn ? 'Сәт отправлен • Маяк безопасности активен' : 'Приглашение на Сәт отправлено');
+    }
+
+    function softExit() {
+      showToast('📞 Мягкий выход активирован: через 30 сек поступит вежливый звонок-повод');
+    }
+
+    function openCreateModal() {
+      document.getElementById('createModal').classList.add('open');
+    }
+
+    document.getElementById('newPostType').addEventListener('change', (e) => {
+      document.getElementById('cafeFields').style.display = e.target.value === 'cafe' ? 'block' : 'none';
+    });
+
+    function publishPost() {
+      const type = document.getElementById('newPostType').value;
+      const title = document.getElementById('newPostTitle').value.trim();
+      const body = document.getElementById('newPostBody').value.trim();
+      const price = document.getElementById('newPostPrice').value.trim();
+      const timer = document.getElementById('newPostTimer').value.trim();
+
+      if (!title) {
+        showToast('Введите заголовок или название блюда');
+        return;
+      }
+
+      state.posts.unshift({
+        id: 'p_' + Date.now(),
+        type,
+        author: state.userName,
+        verified: state.verified || type === 'cafe',
+        time: timer ? `Осталось ${timer}` : 'Только что',
+        title,
+        body: body || 'Актуально прямо сейчас в Өскемене.',
+        price: type === 'cafe' ? (price || '1 100 ₸') : '',
+        oldPrice: type === 'cafe' ? '1 500 ₸' : '',
+        confirms: 1
+      });
+
+      document.getElementById('newPostTitle').value = '';
+      document.getElementById('newPostBody').value = '';
+      closeModalById('createModal');
+      saveState();
+      renderFeed();
+      showToast('Опубликовано в ленте SÄT');
+    }
+
+    function openCircleModal() {
+      document.getElementById('circleModal').classList.add('open');
+    }
+
+    function createCircle() {
+      const name = document.getElementById('circleNameInput').value.trim();
+      if (!name) return;
+      state.chats.unshift({
+        id: 'g_' + Date.now(),
+        kind: 'circles',
+        title: name,
+        sub: '1 участник • Новый Сәт-круг',
+        messages: [{ sender: 'them', text: `Добро пожаловать в круг «${name}» в Өскемене!` }]
+      });
+      document.getElementById('circleNameInput').value = '';
+      closeModalById('circleModal');
+      setChatMode('circles');
+      saveState();
+      showToast('Новый Сәт-круг создан');
+    }
+
+    function runSelfieCheck() {
+      const status = document.getElementById('selfieStatus');
+      status.textContent = 'Смотрите в камеру и покажите знак ✌️ (3 сек)...';
+      setTimeout(() => {
+        state.verified = true;
+        state.karma += 5;
+        saveState();
+        renderAll();
+        status.textContent = '✓ Готово! Профиль подтверждён, временный кадр удалён.';
+        showToast('✓ Живой профиль подтверждён (+5 к карме)');
+      }, 1500);
+    }
+
+    function switchRoleQuick() {
+      state.role = state.role === 'resident' ? 'cafe' : 'resident';
+      saveState();
+      renderAll();
+      showToast(state.role === 'cafe' ? 'Режим: Кафе / Бизнес' : 'Режим: Житель Өскемена');
+    }
+
+    function closeModalById(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    function closeModals(e) {
+      if (e.target.classList.contains('modal-backdrop')) {
+        e.target.classList.remove('open');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    setMood(state.mood);
+  </script>
+</body>
+</html>

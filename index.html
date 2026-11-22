@@ -352,11 +352,17 @@
     }
     .modal-backdrop.open { display: flex; }
     .modal-sheet {
-      width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+      width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto;
       background: var(--bg-base);
       border-top: 1px solid var(--border);
       border-radius: 24px 24px 0 0;
-      padding: 18px 16px 26px;
+      padding: 18px 16px 24px;
+    }
+    .chat-sheet {
+      max-height: 95vh;
+      min-height: 78vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .toast {
@@ -369,7 +375,20 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .chat-box { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; padding-right: 2px; }
+    .chat-box {
+      flex: 1;
+      min-height: 360px;
+      max-height: 58vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
     .msg { padding: 9px 12px; border-radius: 16px; font-size: 13.5px; max-width: 84%; word-break: break-word; }
     .msg.them { background: var(--surface-elev); align-self: flex-start; border: 1px solid var(--border); }
     .msg.me { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; align-self: flex-end; }
@@ -384,6 +403,13 @@
     .rec-dot {
       display: inline-block; width: 9px; height: 9px; border-radius: 50%;
       background: var(--danger); animation: pulseSpark 0.9s infinite;
+    }
+    .voice-delay-box {
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -689,9 +715,9 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ЧАТА С ТЕКСТОМ, ФОТО И ГОЛОСОВЫМИ -->
+  <!-- МОДАЛКА БОЛЬШОГО ЧАТА С КАМЕРОЙ, ФОТО И ЗАДЕРЖКОЙ ГОЛОСОВОГО -->
   <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-sheet chat-sheet" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <h3 id="chatTitle" style="margin:0;">Диалог</h3>
@@ -708,15 +734,29 @@
       <div id="chatMessages" class="chat-box"></div>
 
       <div id="voiceRecStatus" class="meta" style="display:none; margin-bottom:6px; color:var(--danger); font-weight:700;">
-        <span class="rec-dot"></span> Идёт запись голоса... Нажмите на микрофон ещё раз для отправки
+        <span class="rec-dot"></span> Идёт запись голоса... Нажмите 🎤 ещё раз, чтобы завершить запись
       </div>
 
-      <div style="display:flex; gap:6px; align-items:center;">
+      <div id="voiceDelayPanel" class="voice-delay-box" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <span id="voiceDelayLabel" style="font-size:12.5px; font-weight:700; color:var(--accent-2);">Автоотправка через 3 сек...</span>
+          <button class="btn btn-ghost" style="padding:5px 9px; font-size:11.5px;" onclick="pauseVoiceDelay()">Пауза</button>
+        </div>
+        <audio id="voicePreviewAudio" controls preload="metadata" style="width:100%; height:34px; margin-bottom:8px;"></audio>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-ghost" style="flex:1; padding:8px; font-size:12px;" onclick="cancelPendingVoice()">Отменить</button>
+          <button class="btn btn-primary" style="flex:1; padding:8px; font-size:12px;" onclick="flushPendingVoice()">Отправить сейчас</button>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:5px; align-items:center;">
+        <input type="file" id="chatCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleChatPhoto(event)" />
         <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="handleChatPhoto(event)" />
-        <button class="btn btn-ghost" style="padding:10px 11px;" title="Отправить фото" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
-        <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 11px;" title="Голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
-        <input id="chatInput" class="input" style="margin-top:0; flex:1;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
-        <button class="btn btn-primary" style="padding:10px 13px;" onclick="sendChatMsg()">→</button>
+        <button class="btn btn-ghost" style="padding:10px 9px;" title="Снять на камеру" onclick="document.getElementById('chatCameraInput').click()">📸</button>
+        <button class="btn btn-ghost" style="padding:10px 9px;" title="Выбрать фото из галереи" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
+        <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 9px;" title="Голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
+        <input id="chatInput" class="input" style="margin-top:0; flex:1; min-width:0;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
+        <button class="btn btn-primary" style="padding:10px 12px;" onclick="sendChatMsg()">→</button>
       </div>
     </div>
   </div>
@@ -860,6 +900,10 @@
     let mediaRecorder = null;
     let audioChunks = [];
     let isRecordingVoice = false;
+    let pendingVoiceData = null;
+    let voiceSendTimer = null;
+    let voiceCountdownInterval = null;
+    let voiceSecondsLeft = 3;
 
     function showToast(msg) {
       const el = document.getElementById('toast');
@@ -1430,7 +1474,7 @@
       document.getElementById('chatTitle').textContent = chat ? getChatTitle(chat) : (fallbackTitle || 'Чат');
       document.getElementById('chatSubtitle').textContent = chat?.type === 'group'
         ? (chat.description || 'Групповой чат Өскемена')
-        : 'Личный диалог • Текст, фото и голосовые';
+        : 'Личный диалог • Текст, камера, фото и голос';
 
       if (activeMsgUnsub) activeMsgUnsub();
       const msgQuery = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
@@ -1443,9 +1487,24 @@
       document.getElementById('chatModal').classList.add('open');
     }
 
+    function clearVoiceTimers() {
+      if (voiceSendTimer) { clearTimeout(voiceSendTimer); voiceSendTimer = null; }
+      if (voiceCountdownInterval) { clearInterval(voiceCountdownInterval); voiceCountdownInterval = null; }
+    }
+
+    function hideVoiceDelayPanel() {
+      clearVoiceTimers();
+      pendingVoiceData = null;
+      const panel = document.getElementById('voiceDelayPanel');
+      if (panel) panel.style.display = 'none';
+      const audio = document.getElementById('voicePreviewAudio');
+      if (audio) { audio.pause(); audio.removeAttribute('src'); }
+    }
+
     function closeChatModal() {
       if (activeMsgUnsub) { activeMsgUnsub(); activeMsgUnsub = null; }
       if (isRecordingVoice) stopVoiceRecord(false);
+      hideVoiceDelayPanel();
       markChatRead(state.activeChatId);
       state.activeChatId = null;
       closeModalById('chatModal');
@@ -1455,7 +1514,7 @@
     function renderChatMessages() {
       const box = document.getElementById('chatMessages');
       if (!currentMessages.length) {
-        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, отправьте фото или запишите голосовое.</div>';
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, снимите на камеру или запишите голосовое.</div>';
         return;
       }
       box.innerHTML = currentMessages.map(m => {
@@ -1518,14 +1577,14 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const maxW = 680;
+          const maxW = 720;
           const scale = Math.min(1, maxW / img.width);
           canvas.width = Math.round(img.width * scale);
           canvas.height = Math.round(img.height * scale);
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.64);
-          await sendChatPayload({ kind: 'photo', mediaData: compressed }, '📷 Фотография');
+          const compressed = canvas.toDataURL('image/jpeg', 0.65);
+          await sendChatPayload({ kind: 'photo', mediaData: compressed }, '📸 Фотография');
           showToast('Фото отправлено');
         };
         img.src = ev.target.result;
@@ -1534,11 +1593,54 @@
       e.target.value = '';
     }
 
+    function schedulePendingVoice(dataUrl) {
+      clearVoiceTimers();
+      pendingVoiceData = dataUrl;
+      voiceSecondsLeft = 3;
+      const panel = document.getElementById('voiceDelayPanel');
+      const label = document.getElementById('voiceDelayLabel');
+      const audio = document.getElementById('voicePreviewAudio');
+      audio.src = dataUrl;
+      label.textContent = `Автоотправка через ${voiceSecondsLeft} сек...`;
+      panel.style.display = 'block';
+
+      voiceCountdownInterval = setInterval(() => {
+        voiceSecondsLeft -= 1;
+        if (voiceSecondsLeft > 0) {
+          label.textContent = `Автоотправка через ${voiceSecondsLeft} сек...`;
+        }
+      }, 1000);
+
+      voiceSendTimer = setTimeout(() => {
+        flushPendingVoice();
+      }, 3000);
+    }
+
+    function pauseVoiceDelay() {
+      if (!pendingVoiceData) return;
+      clearVoiceTimers();
+      document.getElementById('voiceDelayLabel').textContent = 'Пауза — проверьте запись и нажмите «Отправить сейчас»';
+    }
+
+    function cancelPendingVoice() {
+      hideVoiceDelayPanel();
+      showToast('Голосовое отменено');
+    }
+
+    async function flushPendingVoice() {
+      const dataUrl = pendingVoiceData;
+      hideVoiceDelayPanel();
+      if (!dataUrl) return;
+      await sendChatPayload({ kind: 'voice', mediaData: dataUrl }, '🎤 Голосовое сообщение');
+      showToast('Голосовое отправлено');
+    }
+
     async function toggleVoiceRecord() {
       if (isRecordingVoice) {
         stopVoiceRecord(true);
         return;
       }
+      hideVoiceDelayPanel();
       if (!navigator.mediaDevices || typeof MediaRecorder === 'undefined') {
         showToast('Голосовые записи не поддерживаются в этом браузере');
         return;
@@ -1555,10 +1657,10 @@
           if (!audioChunks.length) return;
           const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
           const reader = new FileReader();
-          reader.onloadend = async () => {
-            if (reader.result && reader.result.length < 900000) {
-              await sendChatPayload({ kind: 'voice', mediaData: reader.result }, '🎤 Голосовое сообщение');
-              showToast('Голосовое отправлено');
+          reader.onloadend = () => {
+            if (!reader.result) return;
+            if (reader.result.length < 900000) {
+              schedulePendingVoice(reader.result);
             } else {
               showToast('Запись слишком длинная — скажите покороче (до ~15–20 сек)');
             }
@@ -1844,7 +1946,8 @@
       confirmPost, deletePost, setPeopleFilter, sendFriendRequest,
       acceptFriend, declineFriend, openUserProfile, setChatMode,
       startDirectChat, openChat, closeChatModal, sendChatMsg,
-      handleChatPhoto, toggleVoiceRecord, proposeSat, softExit,
+      handleChatPhoto, pauseVoiceDelay, cancelPendingVoice, flushPendingVoice,
+      toggleVoiceRecord, proposeSat, softExit,
       openCircleModal, createCircle, toggleMapLayer, flyDistrict,
       locateMeOnMap, showPostOnMap, openCreateModal, setPickerToGps,
       publishPost, saveProfileEdits, switchRoleQuick, openSosModal,

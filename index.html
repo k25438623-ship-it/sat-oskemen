@@ -412,7 +412,6 @@
       margin-bottom: 8px;
     }
 
-    /* ЭКРАН ЗВОНКА */
     .call-panel {
       background: var(--surface-elev);
       border: 1px solid rgba(79, 209, 181, 0.45);
@@ -465,7 +464,7 @@
     </div>
     <h1 class="brand-title">SÄT • ӨСКЕМЕН</h1>
     <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, звонки, фото и голос в одном месте</p>
-    <button class="btn btn-primary" onclick="goScreen('auth')">Войти в SÄT →</button>
+    <button class="btn btn-primary" onclick="unlockSoundAndGo('auth')">Войти в SÄT →</button>
   </section>
 
   <!-- ЭКРАН ВХОДА И АНКЕТЫ -->
@@ -628,7 +627,7 @@
         <div id="chatList"></div>
       </div>
 
-      <!-- ВКЛАДКА 5: ПРОФИЛЬ И SOS -->
+      <!-- ВКЛАДКА 5: ПРОФИЛЬ, ЗВУКИ УВЕДОМЛЕНИЙ И SOS -->
       <div id="tab-profile" class="tab-panel">
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -660,6 +659,18 @@
             <button class="btn btn-ghost" onclick="switchRoleQuick()">Сменить роль</button>
             <button class="btn btn-danger" onclick="authLogout()">Выйти</button>
           </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 6px;">🔔 Звуки уведомлений приложения</h3>
+          <p class="meta" style="margin:0 0 10px;">У каждого события свой сигнал. Нажмите на любой, чтобы проверить звук или включить пуш-уведомления браузера:</p>
+          <div class="sos-grid">
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('message')">💬 Сообщение</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('audio_call')">📞 Аудиозвонок</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('video_call')">📹 Видеозвонок</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('post')">⚡ Публикация</button>
+          </div>
+          <button class="btn btn-mint" style="width:100%; margin-top:8px; font-size:12px;" onclick="requestSystemNotifyPermission()">🔔 Разрешить уведомления браузера</button>
         </div>
 
         <div class="card">
@@ -764,7 +775,6 @@
         </div>
       </div>
 
-      <!-- ПАНЕЛЬ АКТИВНОГО / ВХОДЯЩЕГО ЗВОНКА -->
       <div id="callPanel" class="call-panel" style="display:none; margin-top:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div id="callStatusText" style="font-weight:700; font-size:13px; color:var(--mint);">Соединение...</div>
@@ -888,7 +898,6 @@
       collection,
       addDoc,
       setDoc,
-      getDoc,
       deleteDoc,
       doc,
       updateDoc,
@@ -953,6 +962,8 @@
     let activeMsgUnsub = null;
     let activeCallUnsub = null;
     let currentMessages = [];
+    let postsInitialized = false;
+    let seenPostIds = new Set();
 
     let mainMap = null;
     let streetLayer = null;
@@ -972,14 +983,124 @@
     let voiceCountdownInterval = null;
     let voiceSecondsLeft = 3;
 
-    // WebRTC переменные
     let peerConnection = null;
     let localStream = null;
     let remoteStream = null;
     let currentCallMode = 'audio';
-    let currentCallRole = null; // 'caller' | 'callee'
+    let currentCallRole = null;
     let pendingCallDoc = null;
     let processedIceKeys = new Set();
+    let ringtoneInterval = null;
+    let toneAudioCtx = null;
+
+    function ensureAudioContext() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!toneAudioCtx) toneAudioCtx = new AudioCtx();
+      if (toneAudioCtx.state === 'suspended') {
+        toneAudioCtx.resume().catch(() => {});
+      }
+      return toneAudioCtx;
+    }
+
+    function playNote(freq, delaySec, durationSec, volume = 0.16, waveType = 'sine') {
+      try {
+        const ctx = ensureAudioContext();
+        if (!ctx) return;
+        const startAt = ctx.currentTime + delaySec;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = waveType;
+        osc.frequency.setValueAtTime(freq, startAt);
+        gain.gain.setValueAtTime(0.001, startAt);
+        gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.025);
+        gain.gain.exponentialRampToValueAtTime(0.001, startAt + durationSec);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startAt);
+        osc.stop(startAt + durationSec + 0.02);
+      } catch (e) {}
+    }
+
+    // Раздельные звуки для каждого события приложения
+    function playEventSound(kind) {
+      if (kind === 'message') {
+        playNote(660, 0, 0.14, 0.16, 'sine');
+        playNote(880, 0.15, 0.18, 0.16, 'sine');
+      } else if (kind === 'audio_call') {
+        playNote(480, 0, 0.45, 0.18, 'sine');
+        playNote(480, 0.65, 0.45, 0.18, 'sine');
+      } else if (kind === 'video_call') {
+        playNote(587.33, 0, 0.18, 0.18, 'triangle');
+        playNote(783.99, 0.2, 0.22, 0.18, 'triangle');
+        playNote(587.33, 0.55, 0.18, 0.18, 'triangle');
+        playNote(783.99, 0.75, 0.26, 0.18, 'triangle');
+      } else if (kind === 'post') {
+        playNote(523.25, 0, 0.12, 0.15, 'sine');
+        playNote(659.25, 0.13, 0.12, 0.15, 'sine');
+        playNote(783.99, 0.26, 0.2, 0.15, 'sine');
+      }
+    }
+
+    function previewSound(kind) {
+      playEventSound(kind);
+      const labels = {
+        message: 'Звук нового сообщения',
+        audio_call: 'Звук аудиозвонка',
+        video_call: 'Звук видеозвонка',
+        post: 'Звук новой публикации'
+      };
+      showToast(labels[kind] || 'Сигнал');
+    }
+
+    function sendSystemNotification(title, body) {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'granted' && document.hidden) {
+        try {
+          new Notification(title, { body });
+        } catch (e) {}
+      }
+    }
+
+    async function requestSystemNotifyPermission() {
+      if (!('Notification' in window)) {
+        showToast('Браузер не поддерживает системные уведомления');
+        return;
+      }
+      const perm = await Notification.requestPermission();
+      showToast(perm === 'granted' ? 'Уведомления включены!' : 'Разрешение не выдано');
+    }
+
+    function startDialTone(type) {
+      stopDialTone();
+      if (type === 'outgoing') {
+        playNote(425, 0, 0.9, 0.14, 'sine');
+        ringtoneInterval = setInterval(() => playNote(425, 0, 0.9, 0.14, 'sine'), 3200);
+      } else if (type === 'incoming') {
+        const ringBurst = () => {
+          playNote(523.25, 0, 0.25, 0.18, 'sine');
+          playNote(659.25, 0.28, 0.35, 0.18, 'sine');
+        };
+        ringBurst();
+        ringtoneInterval = setInterval(ringBurst, 2600);
+      }
+    }
+
+    function stopDialTone() {
+      if (ringtoneInterval) {
+        clearInterval(ringtoneInterval);
+        ringtoneInterval = null;
+      }
+    }
+
+    function unlockSoundAndGo(screenId) {
+      ensureAudioContext();
+      goScreen(screenId);
+    }
+
+    document.addEventListener('pointerdown', () => {
+      ensureAudioContext();
+    }, { passive: true });
 
     function showToast(msg) {
       const el = document.getElementById('toast');
@@ -1032,6 +1153,22 @@
 
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
       cloudPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (!postsInitialized) {
+        postsInitialized = true;
+        cloudPosts.forEach(p => seenPostIds.add(p.id));
+      } else {
+        snap.docChanges().forEach(ch => {
+          if (ch.type === 'added' && !seenPostIds.has(ch.doc.id)) {
+            seenPostIds.add(ch.doc.id);
+            const p = ch.doc.data();
+            if (currentUser && p.authorUid && p.authorUid !== currentUser.uid) {
+              playEventSound('post');
+              showToast(`⚡ Новый пост: ${p.title || 'SÄT Өскемен'}`);
+              sendSystemNotification('SÄT • Өскемен — Новая публикация', p.title || 'Появился новый пост в городе');
+            }
+          }
+        });
+      }
       renderFeed();
       renderMyPosts();
       updateMapMarkers();
@@ -1054,6 +1191,20 @@
         const tb = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
         return tb - ta;
       });
+      if (currentUser) {
+        snap.docChanges().forEach(ch => {
+          if (ch.type === 'added' || ch.type === 'modified') {
+            const c = ch.doc.data();
+            const isParticipant = c.type === 'group' || (Array.isArray(c.members) && c.members.includes(currentUser.uid));
+            const ts = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+            const seen = state.lastSeenByChat?.[ch.doc.id] || 0;
+            if (isParticipant && c.lastSenderUid && c.lastSenderUid !== currentUser.uid && ts > seen && ch.doc.id !== state.activeChatId) {
+              playEventSound('message');
+              sendSystemNotification('SÄT • Өскемен — Новое сообщение', c.lastMessage || 'Пришло новое сообщение');
+            }
+          }
+        });
+      }
       updateUnreadBadge();
       renderChats();
     });
@@ -1093,6 +1244,7 @@
     });
 
     async function authGoogle() {
+      ensureAudioContext();
       try {
         await signInWithPopup(auth, googleProvider);
         showToast('Вход через Google выполнен');
@@ -1106,6 +1258,7 @@
     }
 
     async function authRegister() {
+      ensureAudioContext();
       const email = document.getElementById('authEmail').value.trim();
       const pass = document.getElementById('authPass').value;
       if (!email || pass.length < 6) {
@@ -1121,6 +1274,7 @@
     }
 
     async function authLogin() {
+      ensureAudioContext();
       const email = document.getElementById('authEmail').value.trim();
       const pass = document.getElementById('authPass').value;
       if (!email || !pass) {
@@ -1456,7 +1610,6 @@
       document.getElementById('userProfileModal').classList.add('open');
     }
 
-    // --- ЛИЧНЫЕ И ГРУППОВЫЕ ЧАТЫ ---
     function setChatMode(mode) {
       state.chatMode = mode;
       document.getElementById('subPrivateBtn').classList.toggle('active', mode === 'private');
@@ -1540,6 +1693,7 @@
     }
 
     function openChat(chatId, fallbackTitle) {
+      ensureAudioContext();
       state.activeChatId = chatId;
       markChatRead(chatId);
       const chat = cloudChats.find(c => c.id === chatId);
@@ -1552,9 +1706,21 @@
       document.getElementById('audioCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
       document.getElementById('videoCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
 
+      let msgsReady = false;
       if (activeMsgUnsub) activeMsgUnsub();
       const msgQuery = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
       activeMsgUnsub = onSnapshot(msgQuery, (snap) => {
+        if (msgsReady && currentUser) {
+          snap.docChanges().forEach(ch => {
+            if (ch.type === 'added') {
+              const m = ch.doc.data();
+              if (m.senderUid && m.senderUid !== currentUser.uid) {
+                playEventSound('message');
+              }
+            }
+          });
+        }
+        msgsReady = true;
         currentMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         markChatRead(chatId);
         renderChatMessages();
@@ -1564,12 +1730,12 @@
       document.getElementById('chatModal').classList.add('open');
     }
 
-    // --- АУДИО И ВИДЕО ЗВОНКИ (WEBRTC + FIRESTORE) ---
     function listenChatCalls(chatId) {
       if (activeCallUnsub) { activeCallUnsub(); activeCallUnsub = null; }
       const callRef = doc(db, 'chats', chatId, 'calls', 'active');
       activeCallUnsub = onSnapshot(callRef, async (snap) => {
         if (!snap.exists()) {
+          stopDialTone();
           if (peerConnection || pendingCallDoc) {
             cleanupCallUI();
             showToast('Звонок завершён');
@@ -1579,10 +1745,15 @@
         const data = snap.data();
         if (!currentUser) return;
 
-        // Входящий вызов для собеседника
         if (data.status === 'ringing' && data.callerUid !== currentUser.uid && !peerConnection) {
           pendingCallDoc = data;
           currentCallMode = data.mode || 'audio';
+          playEventSound(currentCallMode === 'video' ? 'video_call' : 'audio_call');
+          startDialTone('incoming');
+          sendSystemNotification(
+            'SÄT • Өскемен — Входящий вызов',
+            `${currentCallMode === 'video' ? 'Видеозвонок' : 'Аудиозвонок'} от ${data.callerName || 'собеседника'}`
+          );
           document.getElementById('callPanel').style.display = 'block';
           document.getElementById('videoStage').style.display = 'none';
           document.getElementById('incomingCallControls').style.display = 'flex';
@@ -1591,8 +1762,8 @@
             `${currentCallMode === 'video' ? '📹 Входящий видеозвонок' : '📞 Входящий аудиозвонок'} от ${data.callerName || 'собеседника'}`;
         }
 
-        // Звонящий получает ответ (answer)
         if (currentCallRole === 'caller' && data.answer && peerConnection && !peerConnection.currentRemoteDescription) {
+          stopDialTone();
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
             document.getElementById('callStatusText').textContent =
@@ -1600,7 +1771,6 @@
           } catch (e) {}
         }
 
-        // Обмен ICE кандидатами
         if (peerConnection) {
           const remoteList = currentCallRole === 'caller' ? (data.calleeCandidates || []) : (data.callerCandidates || []);
           for (const cand of remoteList) {
@@ -1666,6 +1836,7 @@
     }
 
     async function startCall(mode) {
+      ensureAudioContext();
       if (!state.activeChatId || !currentUser) return;
       if (peerConnection) {
         showToast('Звонок уже активен');
@@ -1674,8 +1845,10 @@
       try {
         const chatId = state.activeChatId;
         await setupPeerConnection(chatId, mode, 'caller');
+        playEventSound(mode === 'video' ? 'video_call' : 'audio_call');
+        startDialTone('outgoing');
         document.getElementById('callStatusText').textContent =
-          mode === 'video' ? '📹 Вызов (видео)... ждём ответа' : '📞 Вызов (аудио)... ждём ответа';
+          mode === 'video' ? '📹 Гудки (видео)... ждём ответа' : '📞 Гудки (аудио)... ждём ответа';
 
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
@@ -1702,7 +1875,9 @@
     }
 
     async function answerIncomingCall() {
+      ensureAudioContext();
       if (!state.activeChatId || !pendingCallDoc) return;
+      stopDialTone();
       const chatId = state.activeChatId;
       const callData = pendingCallDoc;
       pendingCallDoc = null;
@@ -1747,6 +1922,7 @@
     }
 
     function cleanupCallUI() {
+      stopDialTone();
       if (localStream) {
         localStream.getTracks().forEach(t => t.stop());
         localStream = null;
@@ -1856,6 +2032,7 @@
     }
 
     async function sendChatMsg() {
+      ensureAudioContext();
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       if (!text) return;
@@ -1864,6 +2041,7 @@
     }
 
     function handleChatPhoto(e) {
+      ensureAudioContext();
       const file = e.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
@@ -1930,6 +2108,7 @@
     }
 
     async function toggleVoiceRecord() {
+      ensureAudioContext();
       if (isRecordingVoice) {
         stopVoiceRecord(true);
         return;
@@ -2020,7 +2199,6 @@
       }
     }
 
-    // --- КАРТА УСТЬ-КАМЕНОГОРСКА + 2ГИС ---
     function get2GisUrl(lat, lng) {
       return `https://2gis.kz/ustkam/geo/${Number(lng).toFixed(6)},${Number(lat).toFixed(6)}`;
     }
@@ -2120,7 +2298,6 @@
       setTimeout(() => flyDistrict(lat, lng, 16), 150);
     }
 
-    // --- СОЗДАНИЕ ПОСТА И ВЫБОР ТОЧКИ НА КАРТЕ ---
     function openCreateModal() {
       document.getElementById('createModal').classList.add('open');
       setTimeout(() => {
@@ -2161,6 +2338,7 @@
     });
 
     async function publishPost() {
+      ensureAudioContext();
       const type = document.getElementById('newPostType').value;
       const helpSubtype = document.getElementById('newHelpSubtype').value;
       const title = document.getElementById('newPostTitle').value.trim();
@@ -2174,7 +2352,7 @@
       }
 
       try {
-        await addDoc(collection(db, 'posts'), {
+        const docRef = await addDoc(collection(db, 'posts'), {
           type,
           helpSubtype: type === 'help' ? helpSubtype : '',
           author: getDisplayName(),
@@ -2189,6 +2367,7 @@
           confirms: 0,
           createdAt: serverTimestamp()
         });
+        seenPostIds.add(docRef.id);
         showToast('Опубликовано в SÄT Өскемен!');
       } catch (e) {
         showToast('Ошибка публикации: проверьте правила Firestore');
@@ -2235,13 +2414,14 @@
     }
 
     Object.assign(window, {
-      goScreen, authGoogle, authRegister, authLogin, authLogout,
+      unlockSoundAndGo, goScreen, authGoogle, authRegister, authLogin, authLogout,
       setRole, toggleChip, setMood, switchTab, setFilter,
       confirmPost, deletePost, setPeopleFilter, sendFriendRequest,
       acceptFriend, declineFriend, openUserProfile, setChatMode,
       startDirectChat, openChat, closeChatModal, sendChatMsg,
       handleChatPhoto, pauseVoiceDelay, cancelPendingVoice, flushPendingVoice,
       toggleVoiceRecord, startCall, answerIncomingCall, toggleCallMic, toggleCallCam, endCall,
+      previewSound, requestSystemNotifyPermission,
       proposeSat, softExit,
       openCircleModal, createCircle, toggleMapLayer, flyDistrict,
       locateMeOnMap, showPostOnMap, openCreateModal, setPickerToGps,

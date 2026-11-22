@@ -411,6 +411,40 @@
       padding: 10px 12px;
       margin-bottom: 8px;
     }
+
+    /* ЭКРАН ЗВОНКА */
+    .call-panel {
+      background: var(--surface-elev);
+      border: 1px solid rgba(79, 209, 181, 0.45);
+      border-radius: 18px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .video-stage {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0a0f0e;
+      margin: 8px 0;
+    }
+    .video-stage video#remoteVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .video-stage video#localVideo {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 92px;
+      height: 126px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,0.45);
+      background: #141c1a;
+    }
   </style>
 </head>
 <body data-mood="irtysh">
@@ -430,7 +464,7 @@
       <div class="logo-letter">Ä</div>
     </div>
     <h1 class="brand-title">SÄT • ӨСКЕМЕН</h1>
-    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, фото и голос в одном месте</p>
+    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, звонки, фото и голос в одном месте</p>
     <button class="btn btn-primary" onclick="goScreen('auth')">Войти в SÄT →</button>
   </section>
 
@@ -715,15 +749,41 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА БОЛЬШОГО ЧАТА С КАМЕРОЙ, ФОТО И ЗАДЕРЖКОЙ ГОЛОСОВОГО -->
+  <!-- МОДАЛКА БОЛЬШОГО ЧАТА СО ЗВОНКАМИ, КАМЕРОЙ И ГОЛОСОВЫМИ -->
   <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet chat-sheet" onclick="event.stopPropagation()">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h3 id="chatTitle" style="margin:0;">Диалог</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+        <div style="min-width:0;">
+          <h3 id="chatTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Диалог</h3>
           <div id="chatSubtitle" class="meta">Өскемен • Чат</div>
         </div>
-        <button class="btn btn-ghost" style="padding:6px 12px;" onclick="closeChatModal()">✕</button>
+        <div style="display:flex; gap:5px; flex-shrink:0;">
+          <button id="audioCallBtn" class="btn btn-mint" style="padding:7px 10px; font-size:12px;" onclick="startCall('audio')">📞 Аудио</button>
+          <button id="videoCallBtn" class="btn btn-primary" style="padding:7px 10px; font-size:12px;" onclick="startCall('video')">📹 Видео</button>
+          <button class="btn btn-ghost" style="padding:7px 11px;" onclick="closeChatModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- ПАНЕЛЬ АКТИВНОГО / ВХОДЯЩЕГО ЗВОНКА -->
+      <div id="callPanel" class="call-panel" style="display:none; margin-top:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div id="callStatusText" style="font-weight:700; font-size:13px; color:var(--mint);">Соединение...</div>
+          <span class="tag">WebRTC</span>
+        </div>
+        <div id="videoStage" class="video-stage" style="display:none;">
+          <video id="remoteVideo" autoplay playsinline></video>
+          <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+        <audio id="remoteAudio" autoplay playsinline></audio>
+        <div id="incomingCallControls" class="actions" style="display:none;">
+          <button class="btn btn-mint" style="flex:1;" onclick="answerIncomingCall()">✅ Ответить</button>
+          <button class="btn btn-danger" style="flex:1;" onclick="endCall()">❌ Отклонить</button>
+        </div>
+        <div id="activeCallControls" class="actions" style="display:none;">
+          <button id="muteMicBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallMic()">🎙 Микрофон</button>
+          <button id="muteCamBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallCam()">📷 Камера</button>
+          <button class="btn btn-danger" style="flex:1; font-size:12px;" onclick="endCall()">Завершить</button>
+        </div>
       </div>
 
       <div class="actions" style="margin-top:8px;">
@@ -828,6 +888,7 @@
       collection,
       addDoc,
       setDoc,
+      getDoc,
       deleteDoc,
       doc,
       updateDoc,
@@ -855,6 +916,11 @@
     const STORAGE_KEY = 'sat_oskemen_v3';
     const OSKEMEN_CENTER = [49.9483, 82.6285];
     const OSKEMEN_BOUNDS = [[49.84, 82.45], [50.06, 82.82]];
+    const RTC_SERVERS = {
+      iceServers: [
+        { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
+      ]
+    };
 
     let state = {
       mood: 'irtysh',
@@ -885,6 +951,7 @@
     let friendRequests = [];
     let cloudChats = [];
     let activeMsgUnsub = null;
+    let activeCallUnsub = null;
     let currentMessages = [];
 
     let mainMap = null;
@@ -904,6 +971,15 @@
     let voiceSendTimer = null;
     let voiceCountdownInterval = null;
     let voiceSecondsLeft = 3;
+
+    // WebRTC переменные
+    let peerConnection = null;
+    let localStream = null;
+    let remoteStream = null;
+    let currentCallMode = 'audio';
+    let currentCallRole = null; // 'caller' | 'callee'
+    let pendingCallDoc = null;
+    let processedIceKeys = new Set();
 
     function showToast(msg) {
       const el = document.getElementById('toast');
@@ -951,9 +1027,7 @@
           email: user.email || '',
           updatedAt: serverTimestamp()
         }, { merge: true });
-      } catch (e) {
-        console.warn('User profile sync error:', e.message);
-      }
+      } catch (e) {}
     }
 
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
@@ -1125,11 +1199,9 @@
 
     function renderAll() {
       const name = getDisplayName();
-      document.getElementById('userStatusLine').textContent =
-        `${state.district} • Карма ${state.karma}`;
+      document.getElementById('userStatusLine').textContent = `${state.district} • Карма ${state.karma}`;
       document.getElementById('profileName').textContent = name;
-      document.getElementById('profileRole').textContent =
-        `${state.role === 'cafe' ? 'Бизнес / Кафе' : 'Житель Өскемена'} • ${state.district}`;
+      document.getElementById('profileRole').textContent = `${state.role === 'cafe' ? 'Бизнес / Кафе' : 'Житель Өскемена'} • ${state.district}`;
       document.getElementById('profileEmailLine').textContent = currentUser ? `Аккаунт: ${currentUser.email}` : '';
       document.getElementById('profileKarma').textContent = `Сәт-карма: ${state.karma} отметок`;
 
@@ -1474,7 +1546,11 @@
       document.getElementById('chatTitle').textContent = chat ? getChatTitle(chat) : (fallbackTitle || 'Чат');
       document.getElementById('chatSubtitle').textContent = chat?.type === 'group'
         ? (chat.description || 'Групповой чат Өскемена')
-        : 'Личный диалог • Текст, камера, фото и голос';
+        : 'Личный диалог • Текст, звонки, камера, фото и голос';
+
+      const isDirect = !chat || chat.type === 'direct';
+      document.getElementById('audioCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
+      document.getElementById('videoCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
 
       if (activeMsgUnsub) activeMsgUnsub();
       const msgQuery = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
@@ -1484,7 +1560,223 @@
         renderChatMessages();
       });
 
+      listenChatCalls(chatId);
       document.getElementById('chatModal').classList.add('open');
+    }
+
+    // --- АУДИО И ВИДЕО ЗВОНКИ (WEBRTC + FIRESTORE) ---
+    function listenChatCalls(chatId) {
+      if (activeCallUnsub) { activeCallUnsub(); activeCallUnsub = null; }
+      const callRef = doc(db, 'chats', chatId, 'calls', 'active');
+      activeCallUnsub = onSnapshot(callRef, async (snap) => {
+        if (!snap.exists()) {
+          if (peerConnection || pendingCallDoc) {
+            cleanupCallUI();
+            showToast('Звонок завершён');
+          }
+          return;
+        }
+        const data = snap.data();
+        if (!currentUser) return;
+
+        // Входящий вызов для собеседника
+        if (data.status === 'ringing' && data.callerUid !== currentUser.uid && !peerConnection) {
+          pendingCallDoc = data;
+          currentCallMode = data.mode || 'audio';
+          document.getElementById('callPanel').style.display = 'block';
+          document.getElementById('videoStage').style.display = 'none';
+          document.getElementById('incomingCallControls').style.display = 'flex';
+          document.getElementById('activeCallControls').style.display = 'none';
+          document.getElementById('callStatusText').textContent =
+            `${currentCallMode === 'video' ? '📹 Входящий видеозвонок' : '📞 Входящий аудиозвонок'} от ${data.callerName || 'собеседника'}`;
+        }
+
+        // Звонящий получает ответ (answer)
+        if (currentCallRole === 'caller' && data.answer && peerConnection && !peerConnection.currentRemoteDescription) {
+          try {
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            document.getElementById('callStatusText').textContent =
+              currentCallMode === 'video' ? '📹 Видеозвонок идёт' : '📞 Аудиозвонок идёт';
+          } catch (e) {}
+        }
+
+        // Обмен ICE кандидатами
+        if (peerConnection) {
+          const remoteList = currentCallRole === 'caller' ? (data.calleeCandidates || []) : (data.callerCandidates || []);
+          for (const cand of remoteList) {
+            const key = JSON.stringify(cand);
+            if (!processedIceKeys.has(key)) {
+              processedIceKeys.add(key);
+              try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+              } catch (e) {}
+            }
+          }
+        }
+      });
+    }
+
+    async function setupPeerConnection(chatId, mode, role) {
+      currentCallMode = mode;
+      currentCallRole = role;
+      processedIceKeys = new Set();
+
+      localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: mode === 'video' ? { facingMode: 'user' } : false
+      });
+
+      peerConnection = new RTCPeerConnection(RTC_SERVERS);
+      remoteStream = new MediaStream();
+
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+      peerConnection.ontrack = (event) => {
+        event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+        if (mode === 'video') {
+          document.getElementById('remoteVideo').srcObject = remoteStream;
+        } else {
+          document.getElementById('remoteAudio').srcObject = remoteStream;
+        }
+      };
+
+      const callRef = doc(db, 'chats', chatId, 'calls', 'active');
+      const localCandidates = [];
+      peerConnection.onicecandidate = async (event) => {
+        if (event.candidate) {
+          localCandidates.push(event.candidate.toJSON());
+          const field = role === 'caller' ? 'callerCandidates' : 'calleeCandidates';
+          try {
+            await updateDoc(callRef, { [field]: localCandidates });
+          } catch (e) {}
+        }
+      };
+
+      document.getElementById('callPanel').style.display = 'block';
+      document.getElementById('incomingCallControls').style.display = 'none';
+      document.getElementById('activeCallControls').style.display = 'flex';
+      document.getElementById('muteCamBtn').style.display = mode === 'video' ? 'inline-flex' : 'none';
+
+      if (mode === 'video') {
+        document.getElementById('videoStage').style.display = 'block';
+        document.getElementById('localVideo').srcObject = localStream;
+      } else {
+        document.getElementById('videoStage').style.display = 'none';
+      }
+    }
+
+    async function startCall(mode) {
+      if (!state.activeChatId || !currentUser) return;
+      if (peerConnection) {
+        showToast('Звонок уже активен');
+        return;
+      }
+      try {
+        const chatId = state.activeChatId;
+        await setupPeerConnection(chatId, mode, 'caller');
+        document.getElementById('callStatusText').textContent =
+          mode === 'video' ? '📹 Вызов (видео)... ждём ответа' : '📞 Вызов (аудио)... ждём ответа';
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        await setDoc(doc(db, 'chats', chatId, 'calls', 'active'), {
+          status: 'ringing',
+          mode,
+          callerUid: currentUser.uid,
+          callerName: getDisplayName(),
+          offer: { type: offer.type, sdp: offer.sdp },
+          callerCandidates: [],
+          calleeCandidates: [],
+          createdAt: serverTimestamp()
+        });
+
+        await sendChatPayload({
+          kind: 'sat',
+          text: `${mode === 'video' ? '📹' : '📞'} ${getDisplayName()} начал(а) ${mode === 'video' ? 'видеозвонок' : 'аудиозвонок'}`
+        }, mode === 'video' ? '📹 Видеозвонок' : '📞 Аудиозвонок');
+      } catch (e) {
+        cleanupCallUI();
+        showToast('Нет доступа к микрофону/камере или не обновлены правила calls в Firestore');
+      }
+    }
+
+    async function answerIncomingCall() {
+      if (!state.activeChatId || !pendingCallDoc) return;
+      const chatId = state.activeChatId;
+      const callData = pendingCallDoc;
+      pendingCallDoc = null;
+      try {
+        await setupPeerConnection(chatId, callData.mode || 'audio', 'callee');
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(callData.offer));
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        await updateDoc(doc(db, 'chats', chatId, 'calls', 'active'), {
+          status: 'connected',
+          answer: { type: answer.type, sdp: answer.sdp }
+        });
+
+        document.getElementById('callStatusText').textContent =
+          (callData.mode === 'video') ? '📹 Видеозвонок идёт' : '📞 Аудиозвонок идёт';
+      } catch (e) {
+        cleanupCallUI();
+        showToast('Не удалось ответить на звонок');
+      }
+    }
+
+    function toggleCallMic() {
+      if (!localStream) return;
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (!audioTrack) return;
+      audioTrack.enabled = !audioTrack.enabled;
+      const btn = document.getElementById('muteMicBtn');
+      btn.textContent = audioTrack.enabled ? '🎙 Микрофон' : '🔇 Выкл.';
+      btn.classList.toggle('btn-danger', !audioTrack.enabled);
+    }
+
+    function toggleCallCam() {
+      if (!localStream) return;
+      const videoTrack = localStream.getVideoTracks()[0];
+      if (!videoTrack) return;
+      videoTrack.enabled = !videoTrack.enabled;
+      const btn = document.getElementById('muteCamBtn');
+      btn.textContent = videoTrack.enabled ? '📷 Камера' : '🚫 Без видео';
+      btn.classList.toggle('btn-danger', !videoTrack.enabled);
+    }
+
+    function cleanupCallUI() {
+      if (localStream) {
+        localStream.getTracks().forEach(t => t.stop());
+        localStream = null;
+      }
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      remoteStream = null;
+      currentCallRole = null;
+      pendingCallDoc = null;
+      processedIceKeys = new Set();
+      const panel = document.getElementById('callPanel');
+      if (panel) panel.style.display = 'none';
+      const rv = document.getElementById('remoteVideo');
+      const lv = document.getElementById('localVideo');
+      const ra = document.getElementById('remoteAudio');
+      if (rv) rv.srcObject = null;
+      if (lv) lv.srcObject = null;
+      if (ra) ra.srcObject = null;
+    }
+
+    async function endCall() {
+      const chatId = state.activeChatId;
+      cleanupCallUI();
+      if (chatId) {
+        try {
+          await deleteDoc(doc(db, 'chats', chatId, 'calls', 'active'));
+        } catch (e) {}
+      }
     }
 
     function clearVoiceTimers() {
@@ -1503,6 +1795,8 @@
 
     function closeChatModal() {
       if (activeMsgUnsub) { activeMsgUnsub(); activeMsgUnsub = null; }
+      if (activeCallUnsub) { activeCallUnsub(); activeCallUnsub = null; }
+      if (peerConnection || pendingCallDoc) endCall();
       if (isRecordingVoice) stopVoiceRecord(false);
       hideVoiceDelayPanel();
       markChatRead(state.activeChatId);
@@ -1514,7 +1808,7 @@
     function renderChatMessages() {
       const box = document.getElementById('chatMessages');
       if (!currentMessages.length) {
-        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, снимите на камеру или запишите голосовое.</div>';
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, позвоните, снимите на камеру или запишите голосовое.</div>';
         return;
       }
       box.innerHTML = currentMessages.map(m => {
@@ -1947,7 +2241,8 @@
       acceptFriend, declineFriend, openUserProfile, setChatMode,
       startDirectChat, openChat, closeChatModal, sendChatMsg,
       handleChatPhoto, pauseVoiceDelay, cancelPendingVoice, flushPendingVoice,
-      toggleVoiceRecord, proposeSat, softExit,
+      toggleVoiceRecord, startCall, answerIncomingCall, toggleCallMic, toggleCallCam, endCall,
+      proposeSat, softExit,
       openCircleModal, createCircle, toggleMapLayer, flyDistrict,
       locateMeOnMap, showPostOnMap, openCreateModal, setPickerToGps,
       publishPost, saveProfileEdits, switchRoleQuick, openSosModal,

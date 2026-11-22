@@ -364,6 +364,19 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    .incoming-chat-banner {
+      background: linear-gradient(135deg, rgba(79, 209, 181, 0.2), rgba(255, 123, 84, 0.16));
+      border: 1px solid var(--mint);
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .incoming-chat-banner.show { display: flex; }
+
     .chat-box {
       flex: 1;
       min-height: 360px;
@@ -383,7 +396,7 @@
     .msg.me { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; align-self: flex-end; }
     .msg-author { font-size: 10.5px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
     .msg img { max-width: 100%; border-radius: 12px; display: block; margin-top: 4px; }
-    .msg audio { width: 215px; height: 34px; margin-top: 4px; }
+    .msg audio { width: 225px; height: 36px; margin-top: 4px; }
     .msg.sat-invite {
       background: rgba(79, 209, 181, 0.14);
       border: 1px solid rgba(79, 209, 181, 0.4);
@@ -443,7 +456,7 @@
       <div class="logo-letter">Ä</div>
     </div>
     <h1 class="brand-title">SÄT • ӨСКЕМЕН</h1>
-    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, звонки, фото и голос в одном месте</p>
+    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, чистые звонки, фото и голос</p>
     <button class="btn btn-primary" onclick="unlockSoundAndGo('auth')">Войти в SÄT →</button>
   </section>
 
@@ -546,6 +559,15 @@
     </header>
 
     <main class="container">
+      <!-- БАННЕР НОВОГО ВХОДЯЩЕГО ЧАТА -->
+      <div id="incomingChatBanner" class="incoming-chat-banner">
+        <div style="min-width:0;">
+          <div id="incomingChatTitle" style="font-weight:800; font-size:13px; color:var(--mint);">💬 Новое сообщение</div>
+          <div id="incomingChatPreview" class="meta" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Открыть отдельный чат</div>
+        </div>
+        <button class="btn btn-primary" style="padding:7px 11px; font-size:12px; flex-shrink:0;" onclick="openBannerChat()">Открыть чат</button>
+      </div>
+
       <!-- ВКЛАДКА 1: ПУЛЬС -->
       <div id="tab-pulse" class="tab-panel active">
         <div class="chips" style="margin-top:0; margin-bottom:12px;" id="filterChips">
@@ -740,13 +762,13 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА БОЛЬШОГО ЧАТА СО ЗВОНКАМИ, КАМЕРОЙ И ГОЛОСОВЫМИ -->
+  <!-- МОДАЛКА ОТДЕЛЬНОГО ЧАТА С ЧИСТЫМ АУДИОЗВОНКОМ И ЧИСТЫМ ГОЛОСОВЫМ -->
   <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet chat-sheet" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
         <div style="min-width:0;">
           <h3 id="chatTitle" style="margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Диалог</h3>
-          <div id="chatSubtitle" class="meta">Өскемен • Чат</div>
+          <div id="chatSubtitle" class="meta">Өскемен • Отдельный чат</div>
         </div>
         <div style="display:flex; gap:5px; flex-shrink:0;">
           <button id="audioCallBtn" class="btn btn-mint" style="padding:7px 10px; font-size:12px;" onclick="startCall('audio')">📞 Аудио</button>
@@ -758,7 +780,7 @@
       <div id="callPanel" class="call-panel" style="display:none; margin-top:8px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div id="callStatusText" style="font-weight:700; font-size:13px; color:var(--mint);">Соединение...</div>
-          <span class="tag">WebRTC</span>
+          <span class="tag">HD Voice</span>
         </div>
         <div id="videoStage" class="video-stage" style="display:none;">
           <video id="remoteVideo" autoplay playsinline></video>
@@ -784,7 +806,7 @@
       <div id="chatMessages" class="chat-box"></div>
 
       <div id="voiceRecStatus" class="meta" style="display:none; margin-bottom:6px; color:var(--danger); font-weight:700;">
-        <span class="rec-dot"></span> Идёт запись голоса... Нажмите 🎤 ещё раз, чтобы завершить запись
+        <span class="rec-dot"></span> Запись чистого голоса... Нажмите 🎤 ещё раз
       </div>
 
       <div id="voiceDelayPanel" class="voice-delay-box" style="display:none;">
@@ -804,7 +826,7 @@
         <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="handleChatPhoto(event)" />
         <button class="btn btn-ghost" style="padding:10px 9px;" title="Снять на камеру" onclick="document.getElementById('chatCameraInput').click()">📸</button>
         <button class="btn btn-ghost" style="padding:10px 9px;" title="Выбрать фото из галереи" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
-        <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 9px;" title="Голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
+        <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 9px;" title="Чистое голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
         <input id="chatInput" class="input" style="margin-top:0; flex:1; min-width:0;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
         <button class="btn btn-primary" style="padding:10px 12px;" onclick="sendChatMsg()">→</button>
       </div>
@@ -945,6 +967,7 @@
     let currentMessages = [];
     let postsInitialized = false;
     let seenPostIds = new Set();
+    let bannerChatId = null;
 
     let mainMap = null;
     let streetLayer = null;
@@ -973,6 +996,15 @@
     let processedIceKeys = new Set();
     let ringtoneInterval = null;
     let toneAudioCtx = null;
+
+    function getCleanAudioConstraints() {
+      return {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+        channelCount: 1
+      };
+    }
 
     function ensureAudioContext() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -1101,6 +1133,32 @@
       return full || (currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник');
     }
 
+    function showIncomingChatBanner(chat, chatId) {
+      bannerChatId = chatId;
+      const title = getChatTitle(chat);
+      document.getElementById('incomingChatTitle').textContent = `💬 Новое сообщение • ${title}`;
+      document.getElementById('incomingChatPreview').textContent = chat.lastMessage || 'Открыть отдельный чат';
+      document.getElementById('incomingChatBanner').classList.add('show');
+    }
+
+    function hideIncomingChatBanner(chatId) {
+      if (!chatId || chatId === bannerChatId) {
+        bannerChatId = null;
+        document.getElementById('incomingChatBanner')?.classList.remove('show');
+      }
+    }
+
+    function openBannerChat() {
+      if (!bannerChatId) return;
+      const id = bannerChatId;
+      hideIncomingChatBanner(id);
+      if (state.chatMode === 'private') {
+        const ch = cloudChats.find(x => x.id === id);
+        if (ch?.type === 'group') setChatMode('circles');
+      }
+      openChat(id);
+    }
+
     async function syncUserProfile(user) {
       if (!user) return;
       if ((!state.firstName && !state.lastName) && user.displayName) {
@@ -1178,7 +1236,8 @@
             const seen = state.lastSeenByChat?.[ch.doc.id] || 0;
             if (isParticipant && c.lastSenderUid && c.lastSenderUid !== currentUser.uid && ts > seen && ch.doc.id !== state.activeChatId) {
               playEventSound('message');
-              sendSystemNotification('SÄT • Өскемен — Новое сообщение', c.lastMessage || 'Пришло новое сообщение');
+              showIncomingChatBanner(c, ch.doc.id);
+              sendSystemNotification(`SÄT • ${getChatTitle(c)}`, c.lastMessage || 'Пришло новое сообщение');
             }
           }
         });
@@ -1641,7 +1700,7 @@
               <div class="author">${escapeHtml(title)} ${hasUnread ? '<span style="color:var(--accent);">• Новое</span>' : ''}</div>
               <span class="tag">${c.type === 'group' ? 'Группа' : 'Личный'}</span>
             </div>
-            <div class="meta" style="color:var(--text);">${escapeHtml(c.lastMessage || 'Нажмите, чтобы открыть чат')}</div>
+            <div class="meta" style="color:var(--text);">${escapeHtml(c.lastMessage || 'Нажмите, чтобы открыть отдельный чат')}</div>
           </div>
         `;
       }).join('');
@@ -1679,6 +1738,7 @@
       if (!chatId) return;
       state.lastSeenByChat = state.lastSeenByChat || {};
       state.lastSeenByChat[chatId] = Date.now();
+      hideIncomingChatBanner(chatId);
       saveState();
       updateUnreadBadge();
     }
@@ -1691,7 +1751,7 @@
       document.getElementById('chatTitle').textContent = chat ? getChatTitle(chat) : (fallbackTitle || 'Чат');
       document.getElementById('chatSubtitle').textContent = chat?.type === 'group'
         ? (chat.description || 'Групповой чат Өскемена')
-        : 'Личный диалог • Текст, звонки, камера, фото и голос';
+        : 'Отдельный диалог • Текст, чистый звонок, камера, фото и голос';
 
       const isDirect = !chat || chat.type === 'direct';
       document.getElementById('audioCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
@@ -1758,7 +1818,7 @@
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
             document.getElementById('callStatusText').textContent =
-              currentCallMode === 'video' ? '📹 Видеозвонок идёт' : '📞 Аудиозвонок идёт';
+              currentCallMode === 'video' ? '📹 Видеозвонок идёт • чистый звук' : '📞 Аудиозвонок идёт • чистый звук';
           } catch (e) {}
         }
 
@@ -1783,7 +1843,7 @@
       processedIceKeys = new Set();
 
       localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: getCleanAudioConstraints(),
         video: mode === 'video' ? { facingMode: 'user' } : false
       });
 
@@ -1797,7 +1857,9 @@
         if (mode === 'video') {
           document.getElementById('remoteVideo').srcObject = remoteStream;
         } else {
-          document.getElementById('remoteAudio').srcObject = remoteStream;
+          const audioEl = document.getElementById('remoteAudio');
+          audioEl.srcObject = remoteStream;
+          audioEl.play().catch(() => {});
         }
       };
 
@@ -1885,7 +1947,7 @@
         });
 
         document.getElementById('callStatusText').textContent =
-          (callData.mode === 'video') ? '📹 Видеозвонок идёт' : '📞 Аудиозвонок идёт';
+          (callData.mode === 'video') ? '📹 Видеозвонок идёт • чистый звук' : '📞 Аудиозвонок идёт • чистый звук';
       } catch (e) {
         cleanupCallUI();
         showToast('Не удалось ответить на звонок');
@@ -1973,7 +2035,7 @@
     function renderChatMessages() {
       const box = document.getElementById('chatMessages');
       if (!currentMessages.length) {
-        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, позвоните, снимите на камеру или запишите голосовое.</div>';
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, позвоните, снимите на камеру или запишите чистое голосовое.</div>';
         return;
       }
       box.innerHTML = currentMessages.map(m => {
@@ -2096,6 +2158,12 @@
       showToast('Голосовое отправлено');
     }
 
+    function pickBestVoiceMimeType() {
+      if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+      const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
+      return candidates.find(m => MediaRecorder.isTypeSupported(m)) || '';
+    }
+
     async function toggleVoiceRecord() {
       ensureAudioContext();
       if (isRecordingVoice) {
@@ -2108,16 +2176,19 @@
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: getCleanAudioConstraints() });
         audioChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
+        const mimeType = pickBestVoiceMimeType();
+        const opts = { audioBitsPerSecond: 64000 };
+        if (mimeType) opts.mimeType = mimeType;
+        mediaRecorder = new MediaRecorder(stream, opts);
         mediaRecorder.ondataavailable = (ev) => {
           if (ev.data.size > 0) audioChunks.push(ev.data);
         };
         mediaRecorder.onstop = () => {
           stream.getTracks().forEach(t => t.stop());
           if (!audioChunks.length) return;
-          const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+          const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || mimeType || 'audio/webm' });
           const reader = new FileReader();
           reader.onloadend = () => {
             if (!reader.result) return;
@@ -2407,7 +2478,7 @@
       setRole, toggleChip, setMood, switchTab, setFilter,
       confirmPost, deletePost, setPeopleFilter, sendFriendRequest,
       acceptFriend, declineFriend, openUserProfile, setChatMode,
-      startDirectChat, openChat, closeChatModal, sendChatMsg,
+      startDirectChat, openChat, openBannerChat, closeChatModal, sendChatMsg,
       handleChatPhoto, pauseVoiceDelay, cancelPendingVoice, flushPendingVoice,
       toggleVoiceRecord, startCall, answerIncomingCall, toggleCallMic, toggleCallCam, endCall,
       previewSound, requestSystemNotifyPermission,

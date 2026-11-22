@@ -5,58 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>SÄT • Өскемен</title>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#141b19" />
+  <meta name="theme-color" content="#101816" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <style>
     :root {
-      --bg-base: #141b19;
-      --bg-glow-1: rgba(52, 168, 152, 0.16);
-      --bg-glow-2: rgba(255, 138, 92, 0.12);
-      --surface: rgba(28, 38, 35, 0.88);
-      --surface-elev: rgba(38, 51, 47, 0.96);
-      --border: rgba(255, 255, 255, 0.09);
-      --text: #f4f7f5;
-      --muted: #9fb0aa;
+      --bg-base: #101816;
+      --bg-glow-1: rgba(79, 209, 181, 0.22);
+      --bg-glow-2: rgba(255, 123, 84, 0.18);
+      --bg-glow-3: rgba(120, 144, 255, 0.12);
+      --grid-line: rgba(255, 255, 255, 0.035);
+      --surface: rgba(24, 34, 31, 0.82);
+      --surface-elev: rgba(34, 48, 44, 0.94);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f5f8f7;
+      --muted: #9eb0aa;
       --accent: #ff7b54;
       --accent-2: #ffb26b;
       --mint: #4fd1b5;
       --danger: #ff5c6c;
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+      --shadow: 0 14px 34px rgba(0, 0, 0, 0.34);
     }
 
     body[data-mood="dawn"] {
-      --bg-base: #f5efe6;
-      --bg-glow-1: rgba(255, 154, 102, 0.22);
-      --bg-glow-2: rgba(79, 179, 158, 0.16);
-      --surface: rgba(255, 252, 247, 0.9);
-      --surface-elev: rgba(255, 255, 255, 0.98);
-      --border: rgba(28, 38, 35, 0.1);
-      --text: #18211e;
-      --muted: #5d6e68;
-      --accent: #e8633c;
-      --accent-2: #d9822b;
-      --mint: #1d8f78;
+      --bg-base: #f4eee4;
+      --bg-glow-1: rgba(255, 145, 92, 0.28);
+      --bg-glow-2: rgba(58, 179, 155, 0.22);
+      --bg-glow-3: rgba(255, 206, 122, 0.24);
+      --grid-line: rgba(24, 33, 30, 0.04);
+      --surface: rgba(255, 252, 247, 0.86);
+      --surface-elev: rgba(255, 255, 255, 0.97);
+      --border: rgba(24, 33, 30, 0.1);
+      --text: #17211e;
+      --muted: #5c6d67;
+      --accent: #e85d35;
+      --accent-2: #e0862b;
+      --mint: #178c74;
       --danger: #d93848;
-      --shadow: 0 10px 24px rgba(24, 33, 30, 0.08);
+      --shadow: 0 12px 28px rgba(23, 33, 30, 0.09);
     }
 
     body[data-mood="evening"] {
-      --bg-base: #191518;
-      --bg-glow-1: rgba(255, 123, 84, 0.18);
-      --bg-glow-2: rgba(255, 178, 107, 0.12);
-      --surface: rgba(36, 29, 34, 0.9);
-      --surface-elev: rgba(48, 39, 45, 0.96);
-      --border: rgba(255, 232, 214, 0.1);
-      --text: #faf3ee;
-      --muted: #b5a39b;
-      --accent: #ff7b54;
-      --accent-2: #ffb26b;
-      --mint: #57c7ae;
-      --danger: #ff6473;
-      --shadow: 0 14px 32px rgba(0, 0, 0, 0.36);
+      --bg-base: #171219;
+      --bg-glow-1: rgba(255, 112, 92, 0.22);
+      --bg-glow-2: rgba(176, 107, 255, 0.16);
+      --bg-glow-3: rgba(255, 184, 108, 0.14);
+      --grid-line: rgba(255, 232, 220, 0.035);
+      --surface: rgba(33, 25, 36, 0.84);
+      --surface-elev: rgba(46, 36, 50, 0.95);
+      --border: rgba(255, 230, 220, 0.11);
+      --text: #fbf3f0;
+      --muted: #b7a3b0;
+      --accent: #ff7557;
+      --accent-2: #ffb56b;
+      --mint: #57d1b8;
+      --danger: #ff5e73;
+      --shadow: 0 16px 36px rgba(0, 0, 0, 0.42);
+    }
+
+    body[data-mood="neon"] {
+      --bg-base: #0c121d;
+      --bg-glow-1: rgba(0, 229, 195, 0.22);
+      --bg-glow-2: rgba(255, 86, 138, 0.2);
+      --bg-glow-3: rgba(84, 140, 255, 0.2);
+      --grid-line: rgba(120, 220, 255, 0.05);
+      --surface: rgba(16, 25, 39, 0.84);
+      --surface-elev: rgba(24, 36, 56, 0.95);
+      --border: rgba(120, 220, 255, 0.14);
+      --text: #f2f8ff;
+      --muted: #93a8c4;
+      --accent: #ff5d8f;
+      --accent-2: #ffb36b;
+      --mint: #2ce6c5;
+      --danger: #ff4d6d;
+      --shadow: 0 16px 38px rgba(4, 9, 20, 0.5);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -67,15 +91,56 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
       background-color: var(--bg-base);
-      background-image:
-        radial-gradient(circle at 12% 8%, var(--bg-glow-1), transparent 45%),
-        radial-gradient(circle at 88% 18%, var(--bg-glow-2), transparent 48%),
-        radial-gradient(circle at 50% 95%, var(--bg-glow-1), transparent 52%);
       transition: background-color 0.35s ease, color 0.25s ease;
-      padding-bottom: 86px;
+      padding-bottom: 88px;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    .screen { display: none; min-height: 100vh; }
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .ambient-bg::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: radial-gradient(circle at 50% 30%, black 20%, transparent 82%);
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(52px);
+      animation: driftOrb 14s ease-in-out infinite alternate;
+    }
+    .orb-1 {
+      width: 280px; height: 280px; top: -60px; left: -60px;
+      background: var(--bg-glow-1);
+    }
+    .orb-2 {
+      width: 300px; height: 300px; top: 18%; right: -80px;
+      background: var(--bg-glow-2);
+      animation-delay: -5s;
+    }
+    .orb-3 {
+      width: 320px; height: 320px; bottom: 40px; left: 15%;
+      background: var(--bg-glow-3);
+      animation-delay: -9s;
+    }
+    @keyframes driftOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(22px, -18px) scale(1.08); }
+      100% { transform: translate(-16px, 24px) scale(0.96); }
+    }
+
+    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
     .screen.active { display: block; }
 
     .btn {
@@ -89,20 +154,20 @@
       align-items: center;
       justify-content: center;
       gap: 7px;
-      transition: transform 0.12s ease, opacity 0.2s ease;
+      transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.2s ease;
       text-decoration: none;
     }
     .btn:active { transform: scale(0.97); }
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #fff;
-      box-shadow: 0 8px 20px rgba(232, 99, 60, 0.28);
+      box-shadow: 0 8px 22px rgba(232, 99, 60, 0.32);
     }
     .btn-google {
       background: #ffffff;
       color: #1f1f1f;
       border: 1px solid rgba(0,0,0,0.12);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
       font-size: 14.5px;
     }
     .btn-ghost {
@@ -113,7 +178,7 @@
     .btn-mint {
       background: rgba(79, 209, 181, 0.16);
       color: var(--mint);
-      border: 1px solid rgba(79, 209, 181, 0.35);
+      border: 1px solid rgba(79, 209, 181, 0.36);
     }
     .btn-danger {
       background: rgba(255, 92, 108, 0.16);
@@ -130,12 +195,12 @@
     #splash.active { display: flex; flex-direction: column; }
 
     .logo-frame {
-      width: 112px;
-      height: 112px;
-      border-radius: 30px;
-      background: var(--surface-elev);
-      border: 1.5px solid rgba(255, 123, 84, 0.45);
-      box-shadow: var(--shadow), 0 0 36px rgba(255, 123, 84, 0.2);
+      width: 116px;
+      height: 116px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, var(--surface-elev), var(--surface));
+      border: 1.5px solid rgba(255, 123, 84, 0.55);
+      box-shadow: var(--shadow), 0 0 42px rgba(255, 123, 84, 0.26);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -145,7 +210,7 @@
     .sparks { display: flex; gap: 14px; margin-bottom: -6px; }
     .spark {
       width: 9px; height: 9px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: linear-gradient(135deg, var(--accent), var(--mint));
       animation: pulseSpark 1.8s infinite ease-in-out;
     }
     .spark:last-child { animation-delay: 0.35s; }
@@ -153,19 +218,24 @@
       0%, 100% { transform: scale(1); opacity: 0.85; }
       50% { transform: scale(1.35); opacity: 1; }
     }
-    .logo-letter { font-size: 46px; font-weight: 800; line-height: 1; }
-    .brand-title { font-size: 30px; font-weight: 800; letter-spacing: 0.5px; margin: 0 0 6px; }
-    .brand-sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+    .logo-letter {
+      font-size: 48px; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, var(--text), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-title { font-size: 32px; font-weight: 900; letter-spacing: 0.6px; margin: 0 0 6px; }
+    .brand-sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; max-width: 320px; }
 
     .auth-wrap { max-width: 460px; margin: 0 auto; padding: 22px 16px; }
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 22px;
       padding: 16px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px);
       margin-bottom: 12px;
     }
     .input, select, textarea {
@@ -199,27 +269,27 @@
     .topbar {
       position: sticky; top: 0; z-index: 25;
       background: var(--surface);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--border);
-      padding: 10px 14px;
+      padding: 10px 12px;
       display: flex; align-items: center; justify-content: space-between; gap: 6px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 9px; }
+    .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .mini-badge {
-      width: 34px; height: 34px; border-radius: 11px;
-      background: var(--surface-elev);
-      border: 1px solid rgba(255, 123, 84, 0.35);
+      width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(255,123,84,0.22), rgba(79,209,181,0.18));
+      border: 1px solid rgba(255, 123, 84, 0.45);
       display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 16px; color: var(--accent);
+      font-weight: 900; font-size: 16px; color: var(--accent-2);
     }
-    .mood-bar { display: flex; gap: 3px; background: var(--surface-elev); padding: 3px; border-radius: 11px; border: 1px solid var(--border); }
+    .mood-bar { display: flex; gap: 2px; background: var(--surface-elev); padding: 3px; border-radius: 11px; border: 1px solid var(--border); }
     .mood-btn {
       border: none; background: transparent; color: var(--muted);
-      padding: 5px 7px; border-radius: 8px; font-size: 12.5px; cursor: pointer;
+      padding: 5px 6px; border-radius: 8px; font-size: 12px; cursor: pointer;
     }
     .mood-btn.active { background: var(--accent); color: #fff; }
 
-    .container { max-width: 580px; margin: 0 auto; padding: 12px 14px 22px; }
+    .container { max-width: 580px; margin: 0 auto; padding: 12px 14px 24px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
@@ -233,7 +303,7 @@
     }
     .tag.cafe { background: rgba(255, 178, 107, 0.18); color: var(--accent-2); }
     .tag.help { background: rgba(255, 92, 108, 0.18); color: var(--danger); }
-    .tag.vibe { background: rgba(255, 123, 84, 0.18); color: var(--accent); }
+    .tag.vibe { background: rgba(255, 123, 84, 0.2); color: var(--accent); }
 
     .price-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
     .price-now { font-size: 17px; font-weight: 800; color: var(--accent-2); }
@@ -243,7 +313,7 @@
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
       background: var(--surface);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
       display: grid; grid-template-columns: repeat(5, 1fr);
       padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
@@ -252,36 +322,32 @@
       border: none; background: transparent; color: var(--muted);
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       font-size: 10.5px; font-weight: 600; padding: 6px 2px; border-radius: 12px; cursor: pointer;
+      position: relative;
     }
-    .nav-item.active { color: var(--accent); background: rgba(255, 123, 84, 0.12); }
+    .nav-item.active { color: var(--accent); background: rgba(255, 123, 84, 0.14); }
+    .nav-badge {
+      position: absolute; top: 2px; right: 16%;
+      min-width: 16px; height: 16px; padding: 0 4px;
+      border-radius: 999px; background: var(--danger); color: #fff;
+      font-size: 10px; font-weight: 800; display: none;
+      align-items: center; justify-content: center;
+    }
+    .nav-badge.show { display: inline-flex; }
 
     #oskemenMap {
-      width: 100%;
-      height: 360px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      z-index: 1;
+      width: 100%; height: 350px; border-radius: 18px;
+      border: 1px solid var(--border); overflow: hidden; z-index: 1;
     }
     #pickerMap {
-      width: 100%;
-      height: 190px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      margin-top: 8px;
-      overflow: hidden;
+      width: 100%; height: 185px; border-radius: 14px;
+      border: 1px solid var(--border); margin-top: 8px; overflow: hidden;
     }
 
-    .sos-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
+    .sos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
 
     .modal-backdrop {
       position: fixed; inset: 0; z-index: 50;
-      background: rgba(0, 0, 0, 0.66);
+      background: rgba(0, 0, 0, 0.68);
       display: none; align-items: flex-end; justify-content: center;
     }
     .modal-backdrop.open { display: flex; }
@@ -294,7 +360,7 @@
     }
 
     .toast {
-      position: fixed; left: 50%; bottom: 86px; transform: translateX(-50%) translateY(20px);
+      position: fixed; left: 50%; bottom: 88px; transform: translateX(-50%) translateY(20px);
       background: var(--surface-elev); color: var(--text);
       border: 1px solid var(--border); box-shadow: var(--shadow);
       padding: 10px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
@@ -303,7 +369,7 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .chat-box { max-height: 290px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; padding-right: 2px; }
+    .chat-box { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; padding-right: 2px; }
     .msg { padding: 9px 12px; border-radius: 16px; font-size: 13.5px; max-width: 84%; word-break: break-word; }
     .msg.them { background: var(--surface-elev); align-self: flex-start; border: 1px solid var(--border); }
     .msg.me { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; align-self: flex-end; }
@@ -322,6 +388,11 @@
   </style>
 </head>
 <body data-mood="irtysh">
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
 
   <!-- ЭКРАН ЗАСТАВКИ -->
   <section id="splash" class="screen active">
@@ -332,8 +403,8 @@
       </div>
       <div class="logo-letter">Ä</div>
     </div>
-    <h1 class="brand-title">SÄT</h1>
-    <p class="brand-sub">Өскемен • Свой движ, встречи, помощь и связь рядом</p>
+    <h1 class="brand-title">SÄT • ӨСКЕМЕН</h1>
+    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, фото и голос в одном месте</p>
     <button class="btn btn-primary" onclick="goScreen('auth')">Войти в SÄT →</button>
   </section>
 
@@ -341,8 +412,8 @@
   <section id="auth" class="screen">
     <div class="auth-wrap">
       <div class="card">
-        <div class="meta">ШАГ 1 • БЫСТРЫЙ ВХОД В SÄT</div>
-        <h2 style="margin: 6px 0 12px;">Вход в сообщество Өскемена</h2>
+        <div class="meta">ШАГ 1 • ВХОД В АККАУНТ</div>
+        <h2 style="margin: 6px 0 12px;">Вход в SÄT Өскемен</h2>
 
         <button class="btn btn-google" style="width:100%; margin-bottom:12px;" onclick="authGoogle()">
           <span style="font-weight:900; color:#4285F4;">G</span> Войти через Google
@@ -366,8 +437,8 @@
       </div>
 
       <div class="card">
-        <div class="meta">ШАГ 2 • ДАННЫЕ ДЛЯ ПОИСКА ПО ФАМИЛИИ</div>
-        <h3 style="margin: 6px 0 10px;">Карточка участника</h3>
+        <div class="meta">ШАГ 2 • ПОИСК ПО ФАМИЛИИ И ВАЙБ</div>
+        <h3 style="margin: 6px 0 10px;">Твоя карточка в городе</h3>
 
         <div class="chips" id="roleChips">
           <button type="button" class="chip active" onclick="setRole('resident', this)">Житель Өскемена</button>
@@ -399,7 +470,7 @@
         </div>
 
         <div style="margin-top: 10px;">
-          <label class="meta">Что тебе интересно</label>
+          <label class="meta">Твои интересы</label>
           <div class="chips" id="interestChips">
             <button type="button" class="chip" onclick="toggleChip(this)">Прогулки и тусовки</button>
             <button type="button" class="chip" onclick="toggleChip(this)">Спорт и актив</button>
@@ -418,24 +489,25 @@
     <header class="topbar">
       <div class="topbar-left">
         <div class="mini-badge">Ä</div>
-        <div>
-          <div style="font-weight:800; font-size:14.5px;">SÄT • Өскемен</div>
-          <div id="userStatusLine" class="meta">Житель • Сәт-карма 0</div>
+        <div style="min-width:0;">
+          <div style="font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">SÄT • Өскемен</div>
+          <div id="userStatusLine" class="meta" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Карма 0</div>
         </div>
       </div>
-      <div style="display:flex; align-items:center; gap:5px;">
-        <button class="btn btn-danger" style="padding:7px 9px; font-size:12px;" onclick="openSosModal()">SOS</button>
-        <div class="mood-bar" title="Фон">
+      <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+        <button class="btn btn-danger" style="padding:7px 8px; font-size:11.5px;" onclick="openSosModal()">SOS</button>
+        <div class="mood-bar" title="Атмосфера и фон">
           <button class="mood-btn" data-m="dawn" onclick="setMood('dawn')">🌅</button>
           <button class="mood-btn active" data-m="irtysh" onclick="setMood('irtysh')">🏔</button>
           <button class="mood-btn" data-m="evening" onclick="setMood('evening')">🕯</button>
+          <button class="mood-btn" data-m="neon" onclick="setMood('neon')">⚡</button>
         </div>
-        <button class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="openCreateModal()">+ Сәт</button>
+        <button class="btn btn-primary" style="padding:7px 10px; font-size:12px;" onclick="openCreateModal()">+ Сәт</button>
       </div>
     </header>
 
     <main class="container">
-      <!-- ВКЛАДКА 1: ПУЛЬС (ЛЕНТА + ВСТРЕЧИ + ПОМОЩЬ + БИЗНЕС) -->
+      <!-- ВКЛАДКА 1: ПУЛЬС -->
       <div id="tab-pulse" class="tab-panel active">
         <div class="chips" style="margin-top:0; margin-bottom:12px;" id="filterChips">
           <button class="chip active" onclick="setFilter('all', this)">Всё</button>
@@ -453,7 +525,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div>
             <h3 style="margin:0;">Карта Өскемена</h3>
-            <div class="meta">Реальные улицы, районы, встречи, помощь и места</div>
+            <div class="meta">Точки встреч, помощи, мест и быстрый переход в 2ГИС</div>
           </div>
           <button class="btn btn-ghost" style="padding:7px 10px; font-size:12px;" onclick="toggleMapLayer()">🛰 Спутник</button>
         </div>
@@ -471,7 +543,7 @@
         <div id="mapSelectedPost" style="margin-top:10px;"></div>
       </div>
 
-      <!-- ВКЛАДКА 3: ЛЮДИ, ПОИСК ПО ФАМИЛИИ И ДРУЗЬЯ -->
+      <!-- ВКЛАДКА 3: ЛЮДИ И ПОИСК ПО ФАМИЛИИ -->
       <div id="tab-people" class="tab-panel">
         <h3 style="margin:0 0 8px;">Люди Өскемена</h3>
         <input id="peopleSearchInput" class="input" style="margin-top:0; margin-bottom:10px;" placeholder="Поиск по фамилии, имени, району или интересам..." oninput="renderPeople()" />
@@ -552,12 +624,15 @@
       <button class="nav-item active" data-tab="pulse" onclick="switchTab('pulse', this)"><span>⚡</span><span>Пульс</span></button>
       <button class="nav-item" data-tab="map" onclick="switchTab('map', this)"><span>🗺️</span><span>Карта</span></button>
       <button class="nav-item" data-tab="people" onclick="switchTab('people', this)"><span>🧭</span><span>Люди</span></button>
-      <button class="nav-item" data-tab="chats" onclick="switchTab('chats', this)"><span>💬</span><span>Чаты</span></button>
+      <button class="nav-item" data-tab="chats" onclick="switchTab('chats', this)">
+        <span id="unreadBadge" class="nav-badge">0</span>
+        <span>💬</span><span>Чаты</span>
+      </button>
       <button class="nav-item" data-tab="profile" onclick="switchTab('profile', this)"><span>🛡️</span><span>Профиль</span></button>
     </nav>
   </section>
 
-  <!-- МОДАЛКА СОЗДАНИЯ ПУБЛИКАЦИИ / ВСТРЕЧИ / ПОМОЩИ / РЕКЛАМЫ -->
+  <!-- МОДАЛКА СОЗДАНИЯ ПУБЛИКАЦИИ -->
   <div id="createModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <h3 style="margin:0 0 10px;">Новая публикация в Өскемене</h3>
@@ -614,7 +689,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ЛИЧНОГО / ГРУППОВОГО ЧАТА С ФОТО И ГОЛОСОВЫМИ -->
+  <!-- МОДАЛКА ЧАТА С ТЕКСТОМ, ФОТО И ГОЛОСОВЫМИ -->
   <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -638,7 +713,7 @@
 
       <div style="display:flex; gap:6px; align-items:center;">
         <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="handleChatPhoto(event)" />
-        <button class="btn btn-ghost" style="padding:10px 11px;" title="Отправить фото или снять на камеру" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
+        <button class="btn btn-ghost" style="padding:10px 11px;" title="Отправить фото" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
         <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 11px;" title="Голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
         <input id="chatInput" class="input" style="margin-top:0; flex:1;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
         <button class="btn btn-primary" style="padding:10px 13px;" onclick="sendChatMsg()">→</button>
@@ -646,7 +721,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ПРОФИЛЯ ДРУГОГО ЧЕЛОВЕКА И ЕГО ПУБЛИКАЦИЙ -->
+  <!-- МОДАЛКА ПРОФИЛЯ УЧАСТНИКА -->
   <div id="userProfileModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -737,7 +812,7 @@
     const db = getFirestore(fbApp);
     const googleProvider = new GoogleAuthProvider();
 
-    const STORAGE_KEY = 'sat_oskemen_v2';
+    const STORAGE_KEY = 'sat_oskemen_v3';
     const OSKEMEN_CENTER = [49.9483, 82.6285];
     const OSKEMEN_BOUNDS = [[49.84, 82.45], [50.06, 82.82]];
 
@@ -751,7 +826,8 @@
       filter: 'all',
       peopleFilter: 'all',
       chatMode: 'private',
-      activeChatId: null
+      activeChatId: null,
+      lastSeenByChat: {}
     };
 
     try {
@@ -855,9 +931,31 @@
     });
 
     onSnapshot(collection(db, 'chats'), (snap) => {
-      cloudChats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      cloudChats = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
+        const ta = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0;
+        const tb = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
+        return tb - ta;
+      });
+      updateUnreadBadge();
       renderChats();
     });
+
+    function updateUnreadBadge() {
+      const badge = document.getElementById('unreadBadge');
+      if (!badge || !currentUser) return;
+      let count = 0;
+      cloudChats.forEach(c => {
+        const isParticipant = c.type === 'group' || (Array.isArray(c.members) && c.members.includes(currentUser.uid));
+        if (!isParticipant) return;
+        if (c.lastSenderUid && c.lastSenderUid !== currentUser.uid) {
+          const ts = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+          const seen = state.lastSeenByChat?.[c.id] || 0;
+          if (ts > seen && c.id !== state.activeChatId) count += 1;
+        }
+      });
+      badge.textContent = String(count);
+      badge.classList.toggle('show', count > 0);
+    }
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
@@ -871,6 +969,8 @@
         await syncUserProfile(user);
         goScreen('app');
         renderAll();
+      } else {
+        updateUnreadBadge();
       }
     });
 
@@ -996,6 +1096,7 @@
       if (elFn && !elFn.value) elFn.value = state.firstName || '';
       if (elDist) elDist.value = state.district || 'Центр / пл. Республики';
 
+      updateUnreadBadge();
       renderFeed();
       renderPeople();
       renderChats();
@@ -1239,7 +1340,7 @@
       document.getElementById('userProfileModal').classList.add('open');
     }
 
-    // --- ЛИЧНЫЕ И ГРУППОВЫЕ ЧАТЫ (ОТДЕЛЬНО ОТ ЛЕНТЫ) ---
+    // --- ЛИЧНЫЕ И ГРУППОВЫЕ ЧАТЫ ---
     function setChatMode(mode) {
       state.chatMode = mode;
       document.getElementById('subPrivateBtn').classList.toggle('active', mode === 'private');
@@ -1271,10 +1372,13 @@
 
       box.innerHTML = myChats.map(c => {
         const title = getChatTitle(c);
+        const ts = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+        const seen = state.lastSeenByChat?.[c.id] || 0;
+        const hasUnread = c.lastSenderUid && c.lastSenderUid !== currentUser.uid && ts > seen;
         return `
-          <div class="card" style="cursor:pointer;" onclick="openChat('${c.id}')">
+          <div class="card" style="cursor:pointer; ${hasUnread ? 'border-color: var(--accent);' : ''}" onclick="openChat('${c.id}')">
             <div class="post-head" style="margin-bottom:4px;">
-              <div class="author">${escapeHtml(title)}</div>
+              <div class="author">${escapeHtml(title)} ${hasUnread ? '<span style="color:var(--accent);">• Новое</span>' : ''}</div>
               <span class="tag">${c.type === 'group' ? 'Группа' : 'Личный'}</span>
             </div>
             <div class="meta" style="color:var(--text);">${escapeHtml(c.lastMessage || 'Нажмите, чтобы открыть чат')}</div>
@@ -1311,18 +1415,28 @@
       }
     }
 
+    function markChatRead(chatId) {
+      if (!chatId) return;
+      state.lastSeenByChat = state.lastSeenByChat || {};
+      state.lastSeenByChat[chatId] = Date.now();
+      saveState();
+      updateUnreadBadge();
+    }
+
     function openChat(chatId, fallbackTitle) {
       state.activeChatId = chatId;
+      markChatRead(chatId);
       const chat = cloudChats.find(c => c.id === chatId);
       document.getElementById('chatTitle').textContent = chat ? getChatTitle(chat) : (fallbackTitle || 'Чат');
       document.getElementById('chatSubtitle').textContent = chat?.type === 'group'
         ? (chat.description || 'Групповой чат Өскемена')
-        : 'Личный диалог • Фото и голосовые';
+        : 'Личный диалог • Текст, фото и голосовые';
 
       if (activeMsgUnsub) activeMsgUnsub();
       const msgQuery = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
       activeMsgUnsub = onSnapshot(msgQuery, (snap) => {
         currentMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        markChatRead(chatId);
         renderChatMessages();
       });
 
@@ -1332,7 +1446,10 @@
     function closeChatModal() {
       if (activeMsgUnsub) { activeMsgUnsub(); activeMsgUnsub = null; }
       if (isRecordingVoice) stopVoiceRecord(false);
+      markChatRead(state.activeChatId);
+      state.activeChatId = null;
       closeModalById('chatModal');
+      renderChats();
     }
 
     function renderChatMessages() {
@@ -1348,7 +1465,7 @@
         if (m.kind === 'photo' && m.mediaData) {
           content = `<img src="${m.mediaData}" alt="Фото" />`;
         } else if (m.kind === 'voice' && m.mediaData) {
-          content = `<audio controls src="${m.mediaData}"></audio>`;
+          content = `<audio controls preload="metadata" src="${m.mediaData}"></audio>`;
         } else {
           content = escapeHtml(m.text || '');
         }
@@ -1363,7 +1480,10 @@
     }
 
     async function sendChatPayload(payload, previewText) {
-      if (!state.activeChatId || !currentUser) return;
+      if (!state.activeChatId || !currentUser) {
+        showToast('Войдите в аккаунт для отправки сообщений');
+        return;
+      }
       try {
         await addDoc(collection(db, 'chats', state.activeChatId, 'messages'), {
           senderUid: currentUser.uid,
@@ -1373,10 +1493,12 @@
         });
         await updateDoc(doc(db, 'chats', state.activeChatId), {
           lastMessage: previewText,
+          lastSenderUid: currentUser.uid,
           updatedAt: serverTimestamp()
         });
+        markChatRead(state.activeChatId);
       } catch (e) {
-        showToast('Ошибка отправки сообщения');
+        showToast('Ошибка отправки: проверьте правила Firestore');
       }
     }
 
@@ -1396,13 +1518,13 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const maxW = 720;
+          const maxW = 680;
           const scale = Math.min(1, maxW / img.width);
           canvas.width = Math.round(img.width * scale);
           canvas.height = Math.round(img.height * scale);
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.68);
+          const compressed = canvas.toDataURL('image/jpeg', 0.64);
           await sendChatPayload({ kind: 'photo', mediaData: compressed }, '📷 Фотография');
           showToast('Фото отправлено');
         };
@@ -1415,6 +1537,10 @@
     async function toggleVoiceRecord() {
       if (isRecordingVoice) {
         stopVoiceRecord(true);
+        return;
+      }
+      if (!navigator.mediaDevices || typeof MediaRecorder === 'undefined') {
+        showToast('Голосовые записи не поддерживаются в этом браузере');
         return;
       }
       try {
@@ -1434,7 +1560,7 @@
               await sendChatPayload({ kind: 'voice', mediaData: reader.result }, '🎤 Голосовое сообщение');
               showToast('Голосовое отправлено');
             } else {
-              showToast('Запись слишком длинная, сделайте короче');
+              showToast('Запись слишком длинная — скажите покороче (до ~15–20 сек)');
             }
           };
           reader.readAsDataURL(blob);
@@ -1444,7 +1570,7 @@
         document.getElementById('voiceRecStatus').style.display = 'block';
         document.getElementById('voiceBtn').classList.add('btn-danger');
       } catch (e) {
-        showToast('Нет доступа к микрофону в браузере');
+        showToast('Разрешите доступ к микрофону в Chrome');
       }
     }
 
@@ -1485,6 +1611,7 @@
           creatorUid: currentUser.uid,
           members: [currentUser.uid],
           lastMessage: 'Группа создана',
+          lastSenderUid: currentUser.uid,
           updatedAt: serverTimestamp()
         });
         document.getElementById('circleNameInput').value = '';
@@ -1497,7 +1624,11 @@
       }
     }
 
-    // --- ДОСТОВЕРНАЯ КАРТА УСТЬ-КАМЕНОГОРСКА (LEAFLET + OSM) ---
+    // --- КАРТА УСТЬ-КАМЕНОГОРСКА + 2ГИС ---
+    function get2GisUrl(lat, lng) {
+      return `https://2gis.kz/ustkam/geo/${Number(lng).toFixed(6)},${Number(lat).toFixed(6)}`;
+    }
+
     function initMainMap() {
       if (mainMap || typeof L === 'undefined') return;
       mainMap = L.map('oskemenMap', {
@@ -1575,11 +1706,12 @@
               </div>
               <div style="font-weight:700; margin-bottom:4px;">${escapeHtml(p.title)}</div>
               <div class="meta" style="color:var(--text);">${escapeHtml(p.body)}</div>
-              ${p.authorUid && p.authorUid !== currentUser?.uid ? `
-                <div class="actions">
+              <div class="actions">
+                <a class="btn btn-mint" style="padding:7px 12px; font-size:12px;" target="_blank" rel="noopener" href="${get2GisUrl(p.lat, p.lng)}">🧭 2ГИС</a>
+                ${p.authorUid && p.authorUid !== currentUser?.uid ? `
                   <button class="btn btn-primary" style="padding:7px 12px; font-size:12px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">💬 Написать автору</button>
-                </div>
-              ` : ''}
+                ` : ''}
+              </div>
             </div>
           `;
         });
@@ -1720,7 +1852,9 @@
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((r) => r.unregister());
+      }).catch(() => {});
     }
 
     setMood(state.mood);

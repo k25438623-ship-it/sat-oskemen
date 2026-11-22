@@ -17,9 +17,9 @@
       --bg-glow-2: rgba(255, 123, 84, 0.18);
       --bg-glow-3: rgba(120, 144, 255, 0.12);
       --grid-line: rgba(255, 255, 255, 0.035);
-      --surface: rgba(24, 34, 31, 0.82);
-      --surface-elev: rgba(34, 48, 44, 0.94);
-      --border: rgba(255, 255, 255, 0.1);
+      --surface: rgba(24, 34, 31, 0.88);
+      --surface-elev: rgba(34, 48, 44, 0.96);
+      --border: rgba(255, 255, 255, 0.12);
       --text: #f5f8f7;
       --muted: #9eb0aa;
       --accent: #ff7b54;
@@ -30,21 +30,21 @@
     }
 
     body[data-mood="dawn"] {
-      --bg-base: #f4eee4;
-      --bg-glow-1: rgba(255, 145, 92, 0.28);
-      --bg-glow-2: rgba(58, 179, 155, 0.22);
-      --bg-glow-3: rgba(255, 206, 122, 0.24);
-      --grid-line: rgba(24, 33, 30, 0.04);
-      --surface: rgba(255, 252, 247, 0.86);
-      --surface-elev: rgba(255, 255, 255, 0.97);
-      --border: rgba(24, 33, 30, 0.1);
-      --text: #17211e;
-      --muted: #5c6d67;
-      --accent: #e85d35;
-      --accent-2: #e0862b;
-      --mint: #178c74;
-      --danger: #d93848;
-      --shadow: 0 12px 28px rgba(23, 33, 30, 0.09);
+      --bg-base: #f2ece1;
+      --bg-glow-1: rgba(255, 138, 82, 0.24);
+      --bg-glow-2: rgba(23, 140, 116, 0.18);
+      --bg-glow-3: rgba(240, 185, 92, 0.22);
+      --grid-line: rgba(23, 33, 30, 0.045);
+      --surface: rgba(255, 253, 249, 0.92);
+      --surface-elev: rgba(255, 255, 255, 0.99);
+      --border: rgba(23, 33, 30, 0.15);
+      --text: #141e1b;
+      --muted: #4a5c56;
+      --accent: #df542c;
+      --accent-2: #d47a1e;
+      --mint: #127a64;
+      --danger: #cc2f40;
+      --shadow: 0 10px 26px rgba(20, 30, 27, 0.08);
     }
 
     body[data-mood="evening"] {
@@ -53,9 +53,9 @@
       --bg-glow-2: rgba(176, 107, 255, 0.16);
       --bg-glow-3: rgba(255, 184, 108, 0.14);
       --grid-line: rgba(255, 232, 220, 0.035);
-      --surface: rgba(33, 25, 36, 0.84);
-      --surface-elev: rgba(46, 36, 50, 0.95);
-      --border: rgba(255, 230, 220, 0.11);
+      --surface: rgba(33, 25, 36, 0.9);
+      --surface-elev: rgba(46, 36, 50, 0.96);
+      --border: rgba(255, 230, 220, 0.13);
       --text: #fbf3f0;
       --muted: #b7a3b0;
       --accent: #ff7557;
@@ -71,9 +71,9 @@
       --bg-glow-2: rgba(255, 86, 138, 0.2);
       --bg-glow-3: rgba(84, 140, 255, 0.2);
       --grid-line: rgba(120, 220, 255, 0.05);
-      --surface: rgba(16, 25, 39, 0.84);
-      --surface-elev: rgba(24, 36, 56, 0.95);
-      --border: rgba(120, 220, 255, 0.14);
+      --surface: rgba(16, 25, 39, 0.9);
+      --surface-elev: rgba(24, 36, 56, 0.96);
+      --border: rgba(120, 220, 255, 0.16);
       --text: #f2f8ff;
       --muted: #93a8c4;
       --accent: #ff5d8f;
@@ -132,6 +132,9 @@
     .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
     .screen.active { display: block; }
 
+    /* Экран входа остаётся статичным: без прокрутки-переключения */
+    #auth { overflow-y: auto; overscroll-behavior: contain; }
+
     .btn {
       border: none;
       border-radius: 14px;
@@ -150,29 +153,29 @@
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #fff;
-      box-shadow: 0 8px 22px rgba(232, 99, 60, 0.32);
+      box-shadow: 0 8px 22px rgba(232, 99, 60, 0.28);
     }
     .btn-google {
       background: #ffffff;
       color: #1f1f1f;
-      border: 1px solid rgba(0,0,0,0.12);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      border: 1px solid rgba(0,0,0,0.14);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.16);
       font-size: 14.5px;
     }
     .btn-ghost {
-      background: var(--surface);
+      background: var(--surface-elev);
       color: var(--text);
       border: 1px solid var(--border);
     }
     .btn-mint {
-      background: rgba(79, 209, 181, 0.16);
+      background: rgba(18, 122, 100, 0.14);
       color: var(--mint);
-      border: 1px solid rgba(79, 209, 181, 0.36);
+      border: 1px solid rgba(18, 122, 100, 0.34);
     }
     .btn-danger {
-      background: rgba(255, 92, 108, 0.16);
+      background: rgba(204, 47, 64, 0.14);
       color: var(--danger);
-      border: 1px solid rgba(255, 92, 108, 0.38);
+      border: 1px solid rgba(204, 47, 64, 0.35);
     }
 
     #splash {
@@ -216,11 +219,10 @@
     .brand-title { font-size: 32px; font-weight: 900; letter-spacing: 0.6px; margin: 0 0 6px; }
     .brand-sub { color: var(--muted); font-size: 14px; margin: 0 0 28px; max-width: 320px; }
 
-    .auth-wrap { max-width: 460px; margin: 0 auto; padding: 22px 16px; }
+    .auth-wrap { max-width: 460px; margin: 0 auto; padding: 22px 16px 36px; }
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-top: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 22px;
       padding: 16px;
       box-shadow: var(--shadow);
@@ -243,9 +245,9 @@
       padding: 7px 12px;
       border-radius: 999px;
       font-size: 12.5px;
-      font-weight: 600;
+      font-weight: 700;
       background: var(--surface-elev);
-      color: var(--muted);
+      color: var(--text);
       border: 1px solid var(--border);
       cursor: pointer;
     }
@@ -260,10 +262,10 @@
       background: var(--surface);
       backdrop-filter: blur(18px);
       border-bottom: 1px solid var(--border);
-      padding: 10px 12px;
-      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      padding: 9px 12px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
     }
-    .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
     .mini-badge {
       width: 34px; height: 34px; border-radius: 11px; flex-shrink: 0;
       background: linear-gradient(135deg, rgba(255,123,84,0.22), rgba(79,209,181,0.18));
@@ -271,12 +273,6 @@
       display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 16px; color: var(--accent-2);
     }
-    .mood-bar { display: flex; gap: 2px; background: var(--surface-elev); padding: 3px; border-radius: 11px; border: 1px solid var(--border); }
-    .mood-btn {
-      border: none; background: transparent; color: var(--muted);
-      padding: 5px 6px; border-radius: 8px; font-size: 12px; cursor: pointer;
-    }
-    .mood-btn.active { background: var(--accent); color: #fff; }
 
     .container { max-width: 580px; margin: 0 auto; padding: 12px 14px 24px; }
     .tab-panel { display: none; }
@@ -288,11 +284,11 @@
     .meta { font-size: 12px; color: var(--muted); }
     .tag {
       font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px;
-      background: rgba(79, 209, 181, 0.14); color: var(--mint); white-space: nowrap;
+      background: rgba(18, 122, 100, 0.15); color: var(--mint); white-space: nowrap;
     }
-    .tag.cafe { background: rgba(255, 178, 107, 0.18); color: var(--accent-2); }
-    .tag.help { background: rgba(255, 92, 108, 0.18); color: var(--danger); }
-    .tag.vibe { background: rgba(255, 123, 84, 0.2); color: var(--accent); }
+    .tag.cafe { background: rgba(212, 122, 30, 0.16); color: var(--accent-2); }
+    .tag.help { background: rgba(204, 47, 64, 0.16); color: var(--danger); }
+    .tag.vibe { background: rgba(223, 84, 44, 0.16); color: var(--accent); }
 
     .price-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
     .price-now { font-size: 17px; font-weight: 800; color: var(--accent-2); }
@@ -301,19 +297,29 @@
 
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
-      background: var(--surface);
+      background: var(--surface-elev);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--border);
       display: grid; grid-template-columns: repeat(5, 1fr);
       padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
     }
     .nav-item {
-      border: none; background: transparent; color: var(--muted);
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      font-size: 10.5px; font-weight: 600; padding: 6px 2px; border-radius: 12px; cursor: pointer;
+      border: none; background: transparent; color: var(--text);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 11px; font-weight: 700; padding: 6px 2px; border-radius: 12px; cursor: pointer;
       position: relative;
+      opacity: 0.72;
     }
-    .nav-item.active { color: var(--accent); background: rgba(255, 123, 84, 0.14); }
+    .nav-item svg {
+      width: 20px; height: 20px;
+      stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .nav-item.active {
+      color: var(--accent);
+      background: rgba(223, 84, 44, 0.14);
+      opacity: 1;
+    }
     .nav-badge {
       position: absolute; top: 2px; right: 16%;
       min-width: 16px; height: 16px; padding: 0 4px;
@@ -365,7 +371,7 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .incoming-chat-banner {
-      background: linear-gradient(135deg, rgba(79, 209, 181, 0.2), rgba(255, 123, 84, 0.16));
+      background: linear-gradient(135deg, rgba(18, 122, 100, 0.16), rgba(223, 84, 44, 0.14));
       border: 1px solid var(--mint);
       border-radius: 16px;
       padding: 10px 12px;
@@ -398,8 +404,8 @@
     .msg img { max-width: 100%; border-radius: 12px; display: block; margin-top: 4px; }
     .msg audio { width: 225px; height: 36px; margin-top: 4px; }
     .msg.sat-invite {
-      background: rgba(79, 209, 181, 0.14);
-      border: 1px solid rgba(79, 209, 181, 0.4);
+      background: rgba(18, 122, 100, 0.14);
+      border: 1px solid rgba(18, 122, 100, 0.36);
       color: var(--text); align-self: stretch; max-width: 100%;
     }
     .rec-dot {
@@ -416,7 +422,7 @@
 
     .call-panel {
       background: var(--surface-elev);
-      border: 1px solid rgba(79, 209, 181, 0.45);
+      border: 1px solid rgba(18, 122, 100, 0.45);
       border-radius: 18px;
       padding: 12px;
       margin-bottom: 10px;
@@ -456,16 +462,16 @@
       <div class="logo-letter">Ä</div>
     </div>
     <h1 class="brand-title">SÄT • ӨСКЕМЕН</h1>
-    <p class="brand-sub">Живой молодёжный пульс города, встречи, помощь, чистые звонки, фото и голос</p>
+    <p class="brand-sub">Живой пульс города, встречи, помощь, чистые звонки, фото и голос</p>
     <button class="btn btn-primary" onclick="unlockSoundAndGo('auth')">Войти в SÄT →</button>
   </section>
 
-  <!-- ЭКРАН ВХОДА И АНКЕТЫ -->
+  <!-- НЕПОДВИЖНЫЙ ЭКРАН ВХОДА -->
   <section id="auth" class="screen">
     <div class="auth-wrap">
       <div class="card">
-        <div class="meta">ШАГ 1 • ВХОД В АККАУНТ</div>
-        <h2 style="margin: 6px 0 12px;">Вход в SÄT Өскемен</h2>
+        <div class="meta">ВХОД В АККАУНТ</div>
+        <h2 style="margin: 6px 0 12px;">SÄT Өскемен</h2>
 
         <button class="btn btn-google" style="width:100%; margin-bottom:12px;" onclick="authGoogle()">
           <span style="font-weight:900; color:#4285F4;">G</span> Войти через Google
@@ -489,21 +495,21 @@
       </div>
 
       <div class="card">
-        <div class="meta">ШАГ 2 • ПОИСК ПО ФАМИЛИИ И ВАЙБ</div>
-        <h3 style="margin: 6px 0 10px;">Твоя карточка в городе</h3>
+        <div class="meta">КАРТОЧКА УЧАСТНИКА</div>
+        <h3 style="margin: 6px 0 10px;">Как вас узнают в городе</h3>
 
         <div class="chips" id="roleChips">
-          <button type="button" class="chip active" onclick="setRole('resident', this)">Житель Өскемена</button>
-          <button type="button" class="chip" onclick="setRole('cafe', this)">Бизнес / Кафе</button>
+          <button type="button" class="chip active" onclick="setRole('resident', this)">Житель / Студент</button>
+          <button type="button" class="chip" onclick="setRole('cafe', this)">Кафе / Бизнес</button>
         </div>
 
         <div style="display:flex; gap:8px; margin-top: 12px;">
           <div style="flex:1;">
-            <label class="meta">Фамилия *</label>
+            <label class="meta">Фамилия</label>
             <input id="lastNameInput" class="input" placeholder="Сериков" />
           </div>
           <div style="flex:1;">
-            <label class="meta">Имя *</label>
+            <label class="meta">Имя</label>
             <input id="firstNameInput" class="input" placeholder="Алихан" />
           </div>
         </div>
@@ -520,18 +526,6 @@
             <option value="Весь город">Весь город</option>
           </select>
         </div>
-
-        <div style="margin-top: 10px;">
-          <label class="meta">Твои интересы</label>
-          <div class="chips" id="interestChips">
-            <button type="button" class="chip" onclick="toggleChip(this)">Прогулки и тусовки</button>
-            <button type="button" class="chip" onclick="toggleChip(this)">Спорт и актив</button>
-            <button type="button" class="chip" onclick="toggleChip(this)">Кофе и встречи</button>
-            <button type="button" class="chip" onclick="toggleChip(this)">Идеи и проекты</button>
-            <button type="button" class="chip" onclick="toggleChip(this)">Взаимопомощь</button>
-            <button type="button" class="chip" onclick="toggleChip(this)">Авто / Дороги</button>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -543,18 +537,14 @@
         <div class="mini-badge">Ä</div>
         <div style="min-width:0;">
           <div style="font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">SÄT • Өскемен</div>
-          <div id="userStatusLine" class="meta" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Карма 0</div>
+          <div id="userStatusLine" class="meta" style="font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Центр • Карма 0</div>
         </div>
       </div>
-      <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
-        <button class="btn btn-danger" style="padding:7px 8px; font-size:11.5px;" onclick="openSosModal()">SOS</button>
-        <div class="mood-bar" title="Атмосфера и фон">
-          <button class="mood-btn" data-m="dawn" onclick="setMood('dawn')">🌅</button>
-          <button class="mood-btn active" data-m="irtysh" onclick="setMood('irtysh')">🏔</button>
-          <button class="mood-btn" data-m="evening" onclick="setMood('evening')">🕯</button>
-          <button class="mood-btn" data-m="neon" onclick="setMood('neon')">⚡</button>
-        </div>
-        <button class="btn btn-primary" style="padding:7px 10px; font-size:12px;" onclick="openCreateModal()">+ Сәт</button>
+      <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <button id="moodCycleBtn" class="btn btn-ghost" style="padding:7px 10px; font-size:12px;" onclick="cycleMood()" title="Сменить тему">
+          <span id="moodLabel">Иртыш</span>
+        </button>
+        <button class="btn btn-primary" style="padding:7px 11px; font-size:12px;" onclick="openCreateModal()">+ Сәт</button>
       </div>
     </header>
 
@@ -572,11 +562,9 @@
       <div id="tab-pulse" class="tab-panel active">
         <div class="chips" style="margin-top:0; margin-bottom:12px;" id="filterChips">
           <button class="chip active" onclick="setFilter('all', this)">Всё</button>
-          <button class="chip" onclick="setFilter('vibe', this)">🎉 Встречи / Актив</button>
-          <button class="chip" onclick="setFilter('help', this)">🤝 Нужна помощь</button>
-          <button class="chip" onclick="setFilter('friends', this)">👥 Друзья</button>
-          <button class="chip" onclick="setFilter('cafe', this)">🏪 Бизнес / Акции</button>
-          <button class="chip" onclick="setFilter('news', this)">📰 Новости</button>
+          <button class="chip" onclick="setFilter('help', this)">Помощь и город</button>
+          <button class="chip" onclick="setFilter('vibe', this)">Встречи и места</button>
+          <button class="chip" onclick="setFilter('subs', this)">Подписки</button>
         </div>
         <div id="feedList"></div>
       </div>
@@ -586,9 +574,9 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div>
             <h3 style="margin:0;">Карта Өскемена</h3>
-            <div class="meta">Точки встреч, помощи, мест и быстрый переход в 2ГИС</div>
+            <div class="meta">Точки постов и быстрый переход в 2ГИС</div>
           </div>
-          <button class="btn btn-ghost" style="padding:7px 10px; font-size:12px;" onclick="toggleMapLayer()">🛰 Спутник</button>
+          <button class="btn btn-ghost" style="padding:7px 10px; font-size:12px;" onclick="toggleMapLayer()">Спутник</button>
         </div>
 
         <div class="chips" style="margin-bottom:10px;">
@@ -597,31 +585,31 @@
           <button class="chip" onclick="flyDistrict(49.9075, 82.5890, 14)">КШТ</button>
           <button class="chip" onclick="flyDistrict(49.9535, 82.6075, 14)">Стрелка</button>
           <button class="chip" onclick="flyDistrict(49.9145, 82.6815, 14)">Аблакетка</button>
-          <button class="chip" onclick="locateMeOnMap()">📍 Где я</button>
+          <button class="chip" onclick="locateMeOnMap()">Где я</button>
         </div>
 
         <div id="oskemenMap"></div>
         <div id="mapSelectedPost" style="margin-top:10px;"></div>
       </div>
 
-      <!-- ВКЛАДКА 3: ЛЮДИ И ПОИСК ПО ФАМИЛИИ -->
+      <!-- ВКЛАДКА 3: ЛЮДИ И ПОИСК -->
       <div id="tab-people" class="tab-panel">
-        <h3 style="margin:0 0 8px;">Люди Өскемена</h3>
-        <input id="peopleSearchInput" class="input" style="margin-top:0; margin-bottom:10px;" placeholder="Поиск по фамилии, имени, району или интересам..." oninput="renderPeople()" />
+        <h3 style="margin:0 0 8px;">Люди и места Өскемена</h3>
+        <input id="peopleSearchInput" class="input" style="margin-top:0; margin-bottom:10px;" placeholder="Поиск по фамилии, имени или району..." oninput="renderPeople()" />
         <div class="chips" style="margin-bottom:12px;">
-          <button id="pplAllBtn" class="chip active" onclick="setPeopleFilter('all')">Все участники</button>
-          <button id="pplFriendsBtn" class="chip" onclick="setPeopleFilter('friends')">Мои друзья</button>
-          <button id="pplReqBtn" class="chip" onclick="setPeopleFilter('requests')">Заявки в друзья</button>
+          <button id="pplAllBtn" class="chip active" onclick="setPeopleFilter('all')">Все</button>
+          <button id="pplFriendsBtn" class="chip" onclick="setPeopleFilter('friends')">Подписки / Друзья</button>
+          <button id="pplReqBtn" class="chip" onclick="setPeopleFilter('requests')">Заявки</button>
         </div>
         <div id="peopleList"></div>
       </div>
 
-      <!-- ВКЛАДКА 4: ЛИЧНЫЕ И ГРУППОВЫЕ ЧАТЫ -->
+      <!-- ВКЛАДКА 4: ОТДЕЛЬНЫЕ ЧАТЫ И ГРУППЫ -->
       <div id="tab-chats" class="tab-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
           <div class="chips" style="margin:0;">
             <button id="subPrivateBtn" class="chip active" onclick="setChatMode('private')">Личные</button>
-            <button id="subCirclesBtn" class="chip" onclick="setChatMode('circles')">Группы / Круги</button>
+            <button id="subCirclesBtn" class="chip" onclick="setChatMode('circles')">Группы</button>
           </div>
           <button class="btn btn-mint" style="padding:8px 12px; font-size:12px;" onclick="openCircleModal()">+ Группа</button>
         </div>
@@ -629,15 +617,15 @@
         <div id="chatList"></div>
       </div>
 
-      <!-- ВКЛАДКА 5: ПРОФИЛЬ, ЗВУКИ УВЕДОМЛЕНИЙ И SOS -->
+      <!-- ВКЛАДКА 5: ПРОФИЛЬ, ЗВУКИ И SOS -->
       <div id="tab-profile" class="tab-panel">
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <h2 id="profileName" style="margin:0;">Участник</h2>
-              <div id="profileRole" class="meta" style="margin-top:4px;">Житель Өскемена</div>
+              <div id="profileRole" class="meta" style="margin-top:4px;">Житель / Студент</div>
             </div>
-            <span id="verifiedBadge" class="tag">Участник SÄT</span>
+            <span class="tag">SÄT</span>
           </div>
           <div id="profileEmailLine" class="meta" style="margin-top:6px;"></div>
           <div id="profileKarma" class="meta" style="margin-top:8px; font-weight:700; color:var(--mint);">Сәт-карма: 0 отметок</div>
@@ -657,32 +645,31 @@
           </select>
 
           <div class="actions">
-            <button class="btn btn-primary" onclick="saveProfileEdits()">Сохранить профиль</button>
+            <button class="btn btn-primary" onclick="saveProfileEdits()">Сохранить</button>
             <button class="btn btn-ghost" onclick="switchRoleQuick()">Сменить роль</button>
             <button class="btn btn-danger" onclick="authLogout()">Выйти</button>
           </div>
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 6px;">🔔 Звуки уведомлений приложения</h3>
-          <p class="meta" style="margin:0 0 10px;">У каждого события свой сигнал. Нажмите, чтобы послушать или включить пуш-уведомления:</p>
+          <h3 style="margin:0 0 6px;">Звуки уведомлений</h3>
+          <p class="meta" style="margin:0 0 10px;">Нажмите, чтобы проверить сигнал каждого события:</p>
           <div class="sos-grid">
-            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('message')">💬 Сообщение</button>
-            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('audio_call')">📞 Аудиозвонок</button>
-            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('video_call')">📹 Видеозвонок</button>
-            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('post')">⚡ Публикация</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('message')">Сообщение</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('audio_call')">Аудиозвонок</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('video_call')">Видеозвонок</button>
+            <button class="btn btn-ghost" style="font-size:12px;" onclick="previewSound('post')">Публикация</button>
           </div>
-          <button class="btn btn-mint" style="width:100%; margin-top:8px; font-size:12px;" onclick="requestSystemNotifyPermission()">🔔 Разрешить уведомления браузера</button>
+          <button class="btn btn-mint" style="width:100%; margin-top:8px; font-size:12px;" onclick="requestSystemNotifyPermission()">Разрешить уведомления браузера</button>
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 6px;">🚨 Экстренные службы РК (Өскемен)</h3>
-          <p class="meta" style="margin:0 0 10px;">Прямой набор на телефоне без интернета при угрозе жизни или безопасности:</p>
+          <h3 style="margin:0 0 6px;">Экстренные службы РК (Өскемен)</h3>
           <div class="sos-grid">
-            <a class="btn btn-danger" href="tel:102" onclick="return confirm('Позвонить в полицию (102)?')">🚓 102 • Полиция</a>
-            <a class="btn btn-danger" href="tel:103" onclick="return confirm('Позвонить в скорую помощь (103)?')">🚑 103 • Скорая</a>
-            <a class="btn btn-danger" href="tel:101" onclick="return confirm('Позвонить в пожарную службу (101)?')">🚒 101 • Пожарные</a>
-            <a class="btn btn-danger" href="tel:112" onclick="return confirm('Позвонить в единую службу спасения (112)?')">🆘 112 • Единый</a>
+            <a class="btn btn-danger" href="tel:102" onclick="return confirm('Позвонить в полицию (102)?')">102 • Полиция</a>
+            <a class="btn btn-danger" href="tel:103" onclick="return confirm('Позвонить в скорую помощь (103)?')">103 • Скорая</a>
+            <a class="btn btn-danger" href="tel:101" onclick="return confirm('Позвонить в пожарную службу (101)?')">101 • Пожарные</a>
+            <a class="btn btn-danger" href="tel:112" onclick="return confirm('Позвонить в службу спасения (112)?')">112 • Единый</a>
           </div>
         </div>
 
@@ -694,47 +681,49 @@
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" data-tab="pulse" onclick="switchTab('pulse', this)"><span>⚡</span><span>Пульс</span></button>
-      <button class="nav-item" data-tab="map" onclick="switchTab('map', this)"><span>🗺️</span><span>Карта</span></button>
-      <button class="nav-item" data-tab="people" onclick="switchTab('people', this)"><span>🧭</span><span>Люди</span></button>
+      <button class="nav-item active" data-tab="pulse" onclick="switchTab('pulse', this)">
+        <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
+        <span>Пульс</span>
+      </button>
+      <button class="nav-item" data-tab="map" onclick="switchTab('map', this)">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+        <span>Карта</span>
+      </button>
+      <button class="nav-item" data-tab="people" onclick="switchTab('people', this)">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Люди</span>
+      </button>
       <button class="nav-item" data-tab="chats" onclick="switchTab('chats', this)">
         <span id="unreadBadge" class="nav-badge">0</span>
-        <span>💬</span><span>Чаты</span>
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Чаты</span>
       </button>
-      <button class="nav-item" data-tab="profile" onclick="switchTab('profile', this)"><span>🛡️</span><span>Профиль</span></button>
+      <button class="nav-item" data-tab="profile" onclick="switchTab('profile', this)">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Профиль</span>
+      </button>
     </nav>
   </section>
 
   <!-- МОДАЛКА СОЗДАНИЯ ПУБЛИКАЦИИ -->
   <div id="createModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 style="margin:0 0 10px;">Новая публикация в Өскемене</h3>
-      <label class="meta">Категория</label>
+      <h3 style="margin:0 0 10px;">Новый Сәт в Өскемене</h3>
+      <label class="meta">Сценарий</label>
       <select id="newPostType">
-        <option value="vibe">🎉 Встречи, прогулки, спорт и движ</option>
-        <option value="people">⚡ Живой момент / Мысли</option>
-        <option value="help">🤝 Нужна помощь (авто, быт, находки)</option>
-        <option value="cafe">🏪 Реклама бизнеса / Акция заведения</option>
-        <option value="news">📰 Городская новость</option>
+        <option value="vibe">Встреча / Событие</option>
+        <option value="help">Помощь / Проблема города</option>
+        <option value="cafe">Кафе / Акция / Бизнес</option>
+        <option value="news">Новичку / Вопрос по городу</option>
       </select>
 
-      <div id="helpSubtypeBox" style="display:none; margin-top:10px;">
-        <label class="meta">Тип помощи</label>
-        <select id="newHelpSubtype">
-          <option value="Авто / Прикурить / Буксир">🚗 Авто / Прикурить / Буксир</option>
-          <option value="Бытовая помощь рядом">🏠 Бытовая помощь рядом</option>
-          <option value="Находки / Потеряшки">🔎 Находки / Потеряшки</option>
-          <option value="Нужен совет / Подсказать">💡 Нужен совет / Подсказать</option>
-        </select>
-      </div>
-
       <div style="margin-top:10px;">
-        <label class="meta">Заголовок</label>
-        <input id="newPostTitle" class="input" placeholder="Например: Кто пойдёт вечером на Набережную за кофе?" />
+        <label class="meta">Коротко о главном</label>
+        <input id="newPostTitle" class="input" placeholder="Например: Застрял на КШТ, нужен трос / Вечерний кофе на Набережной" />
       </div>
 
       <div id="cafeFields" style="display:none; margin-top:10px;">
-        <label class="meta">Цена / Акция и срок</label>
+        <label class="meta">Предложение и срок действия</label>
         <div style="display:flex; gap:8px;">
           <input id="newPostPrice" class="input" placeholder="1 200 ₸ / Скидка 20%" />
           <input id="newPostTimer" class="input" placeholder="Сегодня до 21:00" />
@@ -742,14 +731,14 @@
       </div>
 
       <div style="margin-top:10px;">
-        <label class="meta">Подробности</label>
-        <textarea id="newPostBody" rows="3" placeholder="Напиши время, место или детали — так проще откликнуться..."></textarea>
+        <label class="meta">Детали</label>
+        <textarea id="newPostBody" rows="3" placeholder="Район, время или подробности..."></textarea>
       </div>
 
       <div style="margin-top:10px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <label class="meta">Точка на карте Өскемена (необязательно)</label>
-          <button type="button" class="btn btn-ghost" style="padding:5px 10px; font-size:11.5px;" onclick="setPickerToGps()">📍 Моё GPS</button>
+          <label class="meta">Точка на карте Өскемена (по желанию)</label>
+          <button type="button" class="btn btn-ghost" style="padding:5px 10px; font-size:11.5px;" onclick="setPickerToGps()">Моё GPS</button>
         </div>
         <div id="pickerMap"></div>
         <div id="pickerCoordsLabel" class="meta" style="margin-top:4px;">Нажмите на карту, чтобы поставить метку</div>
@@ -762,7 +751,7 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА ОТДЕЛЬНОГО ЧАТА С ЧИСТЫМ АУДИОЗВОНКОМ И ЧИСТЫМ ГОЛОСОВЫМ -->
+  <!-- МОДАЛКА ОТДЕЛЬНОГО ЧАТА -->
   <div id="chatModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet chat-sheet" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
@@ -771,8 +760,8 @@
           <div id="chatSubtitle" class="meta">Өскемен • Отдельный чат</div>
         </div>
         <div style="display:flex; gap:5px; flex-shrink:0;">
-          <button id="audioCallBtn" class="btn btn-mint" style="padding:7px 10px; font-size:12px;" onclick="startCall('audio')">📞 Аудио</button>
-          <button id="videoCallBtn" class="btn btn-primary" style="padding:7px 10px; font-size:12px;" onclick="startCall('video')">📹 Видео</button>
+          <button id="audioCallBtn" class="btn btn-mint" style="padding:7px 10px; font-size:12px;" onclick="startCall('audio')">Аудио</button>
+          <button id="videoCallBtn" class="btn btn-primary" style="padding:7px 10px; font-size:12px;" onclick="startCall('video')">Видео</button>
           <button class="btn btn-ghost" style="padding:7px 11px;" onclick="closeChatModal()">✕</button>
         </div>
       </div>
@@ -788,19 +777,19 @@
         </div>
         <audio id="remoteAudio" autoplay playsinline></audio>
         <div id="incomingCallControls" class="actions" style="display:none;">
-          <button class="btn btn-mint" style="flex:1;" onclick="answerIncomingCall()">✅ Ответить</button>
-          <button class="btn btn-danger" style="flex:1;" onclick="endCall()">❌ Отклонить</button>
+          <button class="btn btn-mint" style="flex:1;" onclick="answerIncomingCall()">Ответить</button>
+          <button class="btn btn-danger" style="flex:1;" onclick="endCall()">Отклонить</button>
         </div>
         <div id="activeCallControls" class="actions" style="display:none;">
-          <button id="muteMicBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallMic()">🎙 Микрофон</button>
-          <button id="muteCamBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallCam()">📷 Камера</button>
+          <button id="muteMicBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallMic()">Микрофон</button>
+          <button id="muteCamBtn" class="btn btn-ghost" style="flex:1; font-size:12px;" onclick="toggleCallCam()">Камера</button>
           <button class="btn btn-danger" style="flex:1; font-size:12px;" onclick="endCall()">Завершить</button>
         </div>
       </div>
 
       <div class="actions" style="margin-top:8px;">
-        <button class="btn btn-mint" style="flex:1; font-size:12px;" onclick="proposeSat()">⚡ Предложить Сәт</button>
-        <button class="btn btn-ghost" style="font-size:12px;" onclick="softExit()">📞 Мягкий выход</button>
+        <button class="btn btn-mint" style="flex:1; font-size:12px;" onclick="proposeSat()">Предложить Сәт</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="softExit()">Мягкий выход</button>
       </div>
 
       <div id="chatMessages" class="chat-box"></div>
@@ -825,7 +814,7 @@
         <input type="file" id="chatCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleChatPhoto(event)" />
         <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="handleChatPhoto(event)" />
         <button class="btn btn-ghost" style="padding:10px 9px;" title="Снять на камеру" onclick="document.getElementById('chatCameraInput').click()">📸</button>
-        <button class="btn btn-ghost" style="padding:10px 9px;" title="Выбрать фото из галереи" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
+        <button class="btn btn-ghost" style="padding:10px 9px;" title="Фото из галереи" onclick="document.getElementById('chatPhotoInput').click()">📷</button>
         <button id="voiceBtn" class="btn btn-ghost" style="padding:10px 9px;" title="Чистое голосовое сообщение" onclick="toggleVoiceRecord()">🎤</button>
         <input id="chatInput" class="input" style="margin-top:0; flex:1; min-width:0;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
         <button class="btn btn-primary" style="padding:10px 12px;" onclick="sendChatMsg()">→</button>
@@ -844,7 +833,7 @@
         <button class="btn btn-ghost" style="padding:6px 12px;" onclick="closeModalById('userProfileModal')">✕</button>
       </div>
       <div id="modalUserActions" class="actions" style="margin-top:12px;"></div>
-      <h4 style="margin:16px 0 8px;">Публикации участника</h4>
+      <h4 style="margin:16px 0 8px;">Публикации</h4>
       <div id="modalUserPosts"></div>
     </div>
   </div>
@@ -852,31 +841,14 @@
   <!-- МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
   <div id="circleModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 style="margin:0 0 10px;">Создать группу / Сәт-круг</h3>
-      <label class="meta">Название группы</label>
+      <h3 style="margin:0 0 10px;">Создать группу</h3>
+      <label class="meta">Название</label>
       <input id="circleNameInput" class="input" placeholder="Например: Настолки / Кино / Бег Өскемен" />
-      <label class="meta" style="display:block; margin-top:10px;">Описание темы</label>
+      <label class="meta" style="display:block; margin-top:10px;">Описание</label>
       <input id="circleDescInput" class="input" placeholder="Для встреч, идей, спорта или взаимопомощи" />
       <div class="actions" style="margin-top:16px;">
         <button class="btn btn-ghost" style="flex:1" onclick="closeModalById('circleModal')">Отмена</button>
-        <button class="btn btn-primary" style="flex:1" onclick="createCircle()">Создать группу</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА ЭКСТРЕННЫХ СЛУЖБ -->
-  <div id="sosModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0; color:var(--danger);">🚨 Экстренные службы РК</h3>
-        <button class="btn btn-ghost" style="padding:6px 12px;" onclick="closeModalById('sosModal')">✕</button>
-      </div>
-      <p class="meta" style="margin:8px 0 12px;">Нажмите для вызова через телефонную связь:</p>
-      <div class="sos-grid">
-        <a class="btn btn-danger" href="tel:102" onclick="return confirm('Вызвать полицию (102)?')">🚓 102 • Полиция</a>
-        <a class="btn btn-danger" href="tel:103" onclick="return confirm('Вызвать скорую (103)?')">🚑 103 • Скорая</a>
-        <a class="btn btn-danger" href="tel:101" onclick="return confirm('Вызвать пожарных (101)?')">🚒 101 • Пожарные</a>
-        <a class="btn btn-danger" href="tel:112" onclick="return confirm('Вызвать службу спасения (112)?')">🆘 112 • Единый</a>
+        <button class="btn btn-primary" style="flex:1" onclick="createCircle()">Создать</button>
       </div>
     </div>
   </div>
@@ -925,13 +897,20 @@
     const db = getFirestore(fbApp);
     const googleProvider = new GoogleAuthProvider();
 
-    const STORAGE_KEY = 'sat_oskemen_v3';
+    const STORAGE_KEY = 'sat_oskemen_v4';
     const OSKEMEN_CENTER = [49.9483, 82.6285];
     const OSKEMEN_BOUNDS = [[49.84, 82.45], [50.06, 82.82]];
     const RTC_SERVERS = {
       iceServers: [
         { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
       ]
+    };
+    const MOOD_ORDER = ['irtysh', 'dawn', 'evening', 'neon'];
+    const MOOD_NAMES = {
+      irtysh: 'Иртыш',
+      dawn: 'Рассвет',
+      evening: 'Вечер',
+      neon: 'Неон'
     };
 
     let state = {
@@ -957,7 +936,21 @@
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
+    function shortDistrictLabel(dist) {
+      const map = {
+        'Центр / пл. Республики': 'Центр',
+        'Набережная Иртыша': 'Набережная',
+        'КШТ (Левый берег)': 'КШТ',
+        'Стрелка / Ульбинский мост': 'Стрелка',
+        'Аблакетка': 'Аблакетка',
+        'Защита / Согра': 'Защита',
+        'Весь город': 'Өскемен'
+      };
+      return map[dist] || dist || 'Өскемен';
+    }
+
     let currentUser = null;
+    let authReady = false;
     let cloudPosts = [];
     let cloudUsers = [];
     let friendRequests = [];
@@ -1057,10 +1050,10 @@
     function previewSound(kind) {
       playEventSound(kind);
       const labels = {
-        message: 'Звук нового сообщения',
-        audio_call: 'Звук аудиозвонка',
-        video_call: 'Звук видеозвонка',
-        post: 'Звук новой публикации'
+        message: 'Сигнал сообщения',
+        audio_call: 'Сигнал аудиозвонка',
+        video_call: 'Сигнал видеозвонка',
+        post: 'Сигнал публикации'
       };
       showToast(labels[kind] || 'Сигнал');
     }
@@ -1074,11 +1067,11 @@
 
     async function requestSystemNotifyPermission() {
       if (!('Notification' in window)) {
-        showToast('Браузер не поддерживает системные уведомления');
+        showToast('Браузер не поддерживает уведомления');
         return;
       }
       const perm = await Notification.requestPermission();
-      showToast(perm === 'granted' ? 'Уведомления включены!' : 'Разрешение не выдано');
+      showToast(perm === 'granted' ? 'Уведомления включены' : 'Разрешение не выдано');
     }
 
     function startDialTone(type) {
@@ -1105,6 +1098,11 @@
 
     function unlockSoundAndGo(screenId) {
       ensureAudioContext();
+      if (screenId === 'auth' && currentUser) {
+        goScreen('app');
+        renderAll();
+        return;
+      }
       goScreen(screenId);
     }
 
@@ -1136,7 +1134,7 @@
     function showIncomingChatBanner(chat, chatId) {
       bannerChatId = chatId;
       const title = getChatTitle(chat);
-      document.getElementById('incomingChatTitle').textContent = `💬 Новое сообщение • ${title}`;
+      document.getElementById('incomingChatTitle').textContent = `Новое сообщение • ${title}`;
       document.getElementById('incomingChatPreview').textContent = chat.lastMessage || 'Открыть отдельный чат';
       document.getElementById('incomingChatBanner').classList.add('show');
     }
@@ -1152,10 +1150,9 @@
       if (!bannerChatId) return;
       const id = bannerChatId;
       hideIncomingChatBanner(id);
-      if (state.chatMode === 'private') {
-        const ch = cloudChats.find(x => x.id === id);
-        if (ch?.type === 'group') setChatMode('circles');
-      }
+      const ch = cloudChats.find(x => x.id === id);
+      if (ch?.type === 'group') setChatMode('circles');
+      else setChatMode('private');
       openChat(id);
     }
 
@@ -1168,7 +1165,6 @@
         saveState();
       }
       const fullName = getDisplayName();
-      const interests = Array.from(document.querySelectorAll('#interestChips .chip.active')).map(c => c.textContent.trim());
       try {
         await setDoc(doc(db, 'users', user.uid), {
           uid: user.uid,
@@ -1179,7 +1175,6 @@
           lastNameLower: (state.lastName || '').toLowerCase(),
           role: state.role || 'resident',
           district: state.district || 'Центр / пл. Республики',
-          interests,
           karma: state.karma || 0,
           email: user.email || '',
           updatedAt: serverTimestamp()
@@ -1199,8 +1194,8 @@
             const p = ch.doc.data();
             if (currentUser && p.authorUid && p.authorUid !== currentUser.uid) {
               playEventSound('post');
-              showToast(`⚡ Новый пост: ${p.title || 'SÄT Өскемен'}`);
-              sendSystemNotification('SÄT • Өскемен — Новая публикация', p.title || 'Появился новый пост в городе');
+              showToast(`Новый пост: ${p.title || 'SÄT Өскемен'}`);
+              sendSystemNotification('SÄT • Өскемен', p.title || 'Новый пост в городе');
             }
           }
         });
@@ -1237,7 +1232,7 @@
             if (isParticipant && c.lastSenderUid && c.lastSenderUid !== currentUser.uid && ts > seen && ch.doc.id !== state.activeChatId) {
               playEventSound('message');
               showIncomingChatBanner(c, ch.doc.id);
-              sendSystemNotification(`SÄT • ${getChatTitle(c)}`, c.lastMessage || 'Пришло новое сообщение');
+              sendSystemNotification(`SÄT • ${getChatTitle(c)}`, c.lastMessage || 'Новое сообщение');
             }
           }
         });
@@ -1277,9 +1272,13 @@
         state.district = document.getElementById('districtInput')?.value || state.district;
         saveState();
         await syncUserProfile(user);
-        goScreen('app');
+        if (!authReady) {
+          authReady = true;
+          goScreen('app');
+        }
         renderAll();
       } else {
+        authReady = true;
         updateUnreadBadge();
       }
     });
@@ -1288,7 +1287,8 @@
       ensureAudioContext();
       try {
         await signInWithPopup(auth, googleProvider);
-        showToast('Вход через Google выполнен');
+        goScreen('app');
+        showToast('Вход выполнен');
       } catch (e) {
         if (
           e.code === 'auth/popup-blocked' ||
@@ -1299,10 +1299,10 @@
           try {
             await signInWithRedirect(auth, googleProvider);
           } catch (err) {
-            showToast('Ошибка Google-входа: ' + (err.code || err.message));
+            showToast('Ошибка входа: ' + (err.code || err.message));
           }
         } else {
-          showToast('Ошибка Google-входа: ' + (e.code || e.message));
+          showToast('Ошибка входа: ' + (e.code || e.message));
         }
       }
     }
@@ -1317,7 +1317,8 @@
       }
       try {
         await createUserWithEmailAndPassword(auth, email, pass);
-        showToast('Аккаунт создан!');
+        goScreen('app');
+        showToast('Аккаунт создан');
       } catch (e) {
         showToast('Ошибка: ' + (e.code || e.message));
       }
@@ -1333,6 +1334,7 @@
       }
       try {
         await signInWithEmailAndPassword(auth, email, pass);
+        goScreen('app');
         showToast('Вход выполнен');
       } catch (e) {
         showToast('Ошибка входа: ' + (e.code || e.message));
@@ -1348,6 +1350,7 @@
     function goScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
     function setRole(role, btn) {
@@ -1357,15 +1360,19 @@
       saveState();
     }
 
-    function toggleChip(btn) {
-      btn.classList.toggle('active');
-    }
-
     function setMood(mood) {
       state.mood = mood;
       document.body.setAttribute('data-mood', mood);
-      document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.dataset.m === mood));
+      const lbl = document.getElementById('moodLabel');
+      if (lbl) lbl.textContent = MOOD_NAMES[mood] || 'Иртыш';
       saveState();
+    }
+
+    function cycleMood() {
+      const idx = MOOD_ORDER.indexOf(state.mood);
+      const next = MOOD_ORDER[(idx + 1) % MOOD_ORDER.length];
+      setMood(next);
+      showToast(`Тема: ${MOOD_NAMES[next]}`);
     }
 
     function switchTab(tab, btn) {
@@ -1403,9 +1410,9 @@
 
     function renderAll() {
       const name = getDisplayName();
-      document.getElementById('userStatusLine').textContent = `${state.district} • Карма ${state.karma}`;
+      document.getElementById('userStatusLine').textContent = `${shortDistrictLabel(state.district)} • Карма ${state.karma}`;
       document.getElementById('profileName').textContent = name;
-      document.getElementById('profileRole').textContent = `${state.role === 'cafe' ? 'Бизнес / Кафе' : 'Житель Өскемена'} • ${state.district}`;
+      document.getElementById('profileRole').textContent = `${state.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель / Студент'} • ${state.district}`;
       document.getElementById('profileEmailLine').textContent = currentUser ? `Аккаунт: ${currentUser.email}` : '';
       document.getElementById('profileKarma').textContent = `Сәт-карма: ${state.karma} отметок`;
 
@@ -1423,39 +1430,51 @@
       renderMyPosts();
     }
 
-    function getPostBadge(type, helpSubtype) {
-      if (type === 'cafe') return { cls: 'tag cafe', label: '🏪 Бизнес / Акция' };
-      if (type === 'help') return { cls: 'tag help', label: `🤝 Помощь${helpSubtype ? ' • ' + helpSubtype : ''}` };
-      if (type === 'vibe') return { cls: 'tag vibe', label: '🎉 Встречи / Актив' };
-      if (type === 'news') return { cls: 'tag', label: '📰 Новость' };
-      return { cls: 'tag', label: '⚡ Сәт' };
+    function getPostBadge(type) {
+      if (type === 'cafe') return { cls: 'tag cafe', label: 'Кафе / Акция' };
+      if (type === 'help') return { cls: 'tag help', label: 'Помощь и город' };
+      if (type === 'vibe') return { cls: 'tag vibe', label: 'Встреча' };
+      return { cls: 'tag', label: 'Новичку / Вопрос' };
     }
 
     function renderFeed() {
       const box = document.getElementById('feedList');
       if (!box) return;
-      const friends = getFriendUids();
+      const subs = getFriendUids();
       let items = cloudPosts;
-      if (state.filter === 'friends') {
-        items = cloudPosts.filter(p => p.authorUid && friends.has(p.authorUid));
+      if (state.filter === 'subs') {
+        items = cloudPosts.filter(p => p.authorUid && subs.has(p.authorUid));
       } else if (state.filter !== 'all') {
         items = cloudPosts.filter(p => p.type === state.filter);
       }
 
       if (!items.length) {
-        box.innerHTML = '<div class="card"><div style="font-weight:700; margin-bottom:6px;">Здесь пока нет публикаций</div><div class="meta">Нажмите «+ Сәт» вверху, чтобы кинуть клич на встречу, попросить о помощи или поделиться новостью.</div></div>';
+        box.innerHTML = `
+          <div class="card">
+            <div style="font-weight:800; font-size:15px; margin-bottom:6px;">В ленте пока тихо</div>
+            <div class="meta" style="line-height:1.45;">Поделитесь встречей, проблемой города, вопросом новичка или предложением кафе.</div>
+            <div class="actions" style="margin-top:12px;">
+              <button class="btn btn-primary" onclick="openCreateModal()">+ Создать Сәт</button>
+            </div>
+          </div>
+        `;
         return;
       }
 
       box.innerHTML = items.map(p => {
-        const badge = getPostBadge(p.type, p.helpSubtype);
+        const badge = getPostBadge(p.type);
         const isMine = currentUser && p.authorUid === currentUser.uid;
+        const isSubbed = p.authorUid && subs.has(p.authorUid);
+        const primaryBtnLabel = p.type === 'cafe'
+          ? 'Написать в кафе'
+          : (p.type === 'help' ? 'Откликнуться' : 'Написать');
+
         return `
           <article class="card">
             <div class="post-head">
               <div>
                 <div class="author" onclick="openUserProfile('${escapeHtml(p.authorUid || '')}', '${escapeHtml(p.author)}')">${escapeHtml(p.author)}</div>
-                <div class="meta">${escapeHtml(p.district || 'Өскемен')} • ${escapeHtml(p.time || 'Недавно')}</div>
+                <div class="meta">${escapeHtml(p.district || 'Өскемен')} • ${escapeHtml(p.time || 'Сейчас')}</div>
               </div>
               <span class="${badge.cls}">${escapeHtml(badge.label)}</span>
             </div>
@@ -1463,13 +1482,12 @@
             <div class="meta" style="color:var(--text); line-height:1.45;">${escapeHtml(p.body)}</div>
             ${p.price ? `<div class="price-row"><span class="price-now">${escapeHtml(p.price)}</span></div>` : ''}
             <div class="actions">
-              <button class="btn btn-ghost" style="padding:7px 11px; font-size:12px;" onclick="confirmPost('${p.id}')">👍 Подтверждаю (${Number(p.confirms || 0)})</button>
+              <button class="btn btn-ghost" style="padding:7px 11px; font-size:12px;" onclick="confirmPost('${p.id}')">Подтвердить (${Number(p.confirms || 0)})</button>
               ${!isMine && p.authorUid ? `
-                <button class="btn ${p.type === 'help' ? 'btn-danger' : 'btn-primary'}" style="padding:7px 12px; font-size:12px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">
-                  ${p.type === 'help' ? '🤝 Откликнуться' : '💬 Написать'}
-                </button>
+                <button class="btn btn-primary" style="padding:7px 12px; font-size:12px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">${primaryBtnLabel}</button>
+                ${!isSubbed ? `<button class="btn btn-ghost" style="padding:7px 11px; font-size:12px;" onclick="sendFriendRequest('${p.authorUid}', '${escapeHtml(p.author)}')">Подписаться</button>` : `<span class="tag">Подписка</span>`}
               ` : ''}
-              ${p.lat && p.lng ? `<button class="btn btn-mint" style="padding:7px 11px; font-size:12px;" onclick="showPostOnMap(${p.lat}, ${p.lng})">🗺️ На карте</button>` : ''}
+              ${p.lat && p.lng ? `<button class="btn btn-mint" style="padding:7px 11px; font-size:12px;" onclick="showPostOnMap(${p.lat}, ${p.lng})">Карта</button>` : ''}
               ${isMine ? `<button class="btn btn-danger" style="padding:7px 11px; font-size:12px;" onclick="deletePost('${p.id}')">Удалить</button>` : ''}
             </div>
           </article>
@@ -1504,7 +1522,7 @@
       if (!box || !currentUser) return;
       const mine = cloudPosts.filter(p => p.authorUid === currentUser.uid);
       if (!mine.length) {
-        box.innerHTML = '<div class="meta">У вас пока нет публикаций.</div>';
+        box.innerHTML = '<div class="meta">Публикаций пока нет.</div>';
         return;
       }
       box.innerHTML = mine.map(p => `
@@ -1549,23 +1567,23 @@
         if (state.peopleFilter === 'friends' && fs.status !== 'accepted') return false;
         if (state.peopleFilter === 'requests' && fs.status !== 'incoming') return false;
         if (!q) return true;
-        const hay = `${u.lastName || ''} ${u.firstName || ''} ${u.fullName || ''} ${u.district || ''} ${(u.interests || []).join(' ')}`.toLowerCase();
+        const hay = `${u.lastName || ''} ${u.firstName || ''} ${u.fullName || ''} ${u.district || ''}`.toLowerCase();
         return hay.includes(q);
       });
 
       if (!filtered.length) {
-        box.innerHTML = '<div class="card"><div style="font-weight:700; margin-bottom:4px;">Никого не найдено</div><div class="meta">Попробуйте ввести другую фамилию или переключить вкладку фильтра выше.</div></div>';
+        box.innerHTML = '<div class="card"><div style="font-weight:700; margin-bottom:4px;">Никого не найдено</div><div class="meta">Попробуйте другой запрос или фильтр.</div></div>';
         return;
       }
 
       box.innerHTML = filtered.map(u => {
         const fs = getFriendStatus(u.uid);
-        const title = `${u.lastName || ''} ${u.firstName || ''}`.trim() || u.fullName || 'Житель Өскемена';
-        let friendBtnHtml = `<button class="btn btn-ghost" style="padding:7px 11px; font-size:12px;" onclick="sendFriendRequest('${u.uid}', '${escapeHtml(title)}')">+ В друзья</button>`;
+        const title = `${u.lastName || ''} ${u.firstName || ''}`.trim() || u.fullName || 'Участник';
+        let friendBtnHtml = `<button class="btn btn-ghost" style="padding:7px 11px; font-size:12px;" onclick="sendFriendRequest('${u.uid}', '${escapeHtml(title)}')">Подписаться</button>`;
         if (fs.status === 'accepted') {
-          friendBtnHtml = `<span class="tag">✓ В друзьях</span>`;
+          friendBtnHtml = `<span class="tag">Подписка</span>`;
         } else if (fs.status === 'outgoing') {
-          friendBtnHtml = `<span class="meta">Заявка отправлена</span>`;
+          friendBtnHtml = `<span class="meta">Запрос отправлен</span>`;
         } else if (fs.status === 'incoming') {
           friendBtnHtml = `
             <button class="btn btn-mint" style="padding:7px 11px; font-size:12px;" onclick="acceptFriend('${fs.id}')">Принять</button>
@@ -1578,13 +1596,12 @@
             <div class="post-head">
               <div>
                 <div class="author" onclick="openUserProfile('${u.uid}', '${escapeHtml(title)}')">${escapeHtml(title)}</div>
-                <div class="meta">${escapeHtml(u.district || 'Өскемен')} • ${u.role === 'cafe' ? 'Бизнес' : 'Житель'}</div>
+                <div class="meta">${escapeHtml(u.district || 'Өскемен')} • ${u.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель / Студент'}</div>
               </div>
               <div style="display:flex; gap:6px; align-items:center;">${friendBtnHtml}</div>
             </div>
-            ${(u.interests && u.interests.length) ? `<div class="meta" style="margin-bottom:8px;">Интересы: ${escapeHtml(u.interests.join(', '))}</div>` : ''}
             <div class="actions">
-              <button class="btn btn-primary" style="padding:7px 13px; font-size:12px;" onclick="startDirectChat('${u.uid}', '${escapeHtml(title)}')">💬 Написать</button>
+              <button class="btn btn-primary" style="padding:7px 13px; font-size:12px;" onclick="startDirectChat('${u.uid}', '${escapeHtml(title)}')">Написать</button>
               <button class="btn btn-ghost" style="padding:7px 13px; font-size:12px;" onclick="openUserProfile('${u.uid}', '${escapeHtml(title)}')">Публикации</button>
             </div>
           </div>
@@ -1604,23 +1621,23 @@
           status: 'pending',
           createdAt: serverTimestamp()
         });
-        showToast('Заявка в друзья отправлена');
+        showToast('Запрос на подписку отправлен');
       } catch (e) {
-        showToast('Не удалось отправить заявку');
+        showToast('Не удалось отправить запрос');
       }
     }
 
     async function acceptFriend(reqId) {
       try {
         await updateDoc(doc(db, 'friendRequests', reqId), { status: 'accepted' });
-        showToast('Теперь вы друзья!');
+        showToast('Подписка оформлена');
       } catch (e) {}
     }
 
     async function declineFriend(reqId) {
       try {
         await deleteDoc(doc(db, 'friendRequests', reqId));
-        showToast('Заявка отклонена');
+        showToast('Запрос отклонен');
       } catch (e) {}
     }
 
@@ -1630,15 +1647,15 @@
       const name = u ? (`${u.lastName || ''} ${u.firstName || ''}`.trim() || u.fullName) : fallbackName;
       document.getElementById('modalUserName').textContent = name || 'Участник';
       document.getElementById('modalUserMeta').textContent = u
-        ? `${u.district || 'Өскемен'} • ${u.role === 'cafe' ? 'Бизнес / Кафе' : 'Житель Өскемена'}`
-        : 'Житель Өскемена';
+        ? `${u.district || 'Өскемен'} • ${u.role === 'cafe' ? 'Кафе / Бизнес' : 'Житель / Студент'}`
+        : 'Житель / Студент';
 
       const actBox = document.getElementById('modalUserActions');
       if (currentUser && uid !== currentUser.uid) {
         const fs = getFriendStatus(uid);
         actBox.innerHTML = `
-          <button class="btn btn-primary" onclick="closeModalById('userProfileModal'); startDirectChat('${uid}', '${escapeHtml(name)}')">💬 Написать в чат</button>
-          ${fs.status === 'none' ? `<button class="btn btn-mint" onclick="sendFriendRequest('${uid}', '${escapeHtml(name)}')">+ В друзья</button>` : ''}
+          <button class="btn btn-primary" onclick="closeModalById('userProfileModal'); startDirectChat('${uid}', '${escapeHtml(name)}')">Написать</button>
+          ${fs.status === 'none' ? `<button class="btn btn-mint" onclick="sendFriendRequest('${uid}', '${escapeHtml(name)}')">Подписаться</button>` : ''}
         `;
       } else {
         actBox.innerHTML = '';
@@ -1647,7 +1664,7 @@
       const postsBox = document.getElementById('modalUserPosts');
       const userPosts = cloudPosts.filter(p => p.authorUid === uid);
       if (!userPosts.length) {
-        postsBox.innerHTML = '<div class="meta">У этого участника пока нет публикаций.</div>';
+        postsBox.innerHTML = '<div class="meta">Публикаций пока нет.</div>';
       } else {
         postsBox.innerHTML = userPosts.map(p => `
           <div class="card" style="padding:12px;">
@@ -1685,7 +1702,7 @@
       });
 
       if (!myChats.length) {
-        box.innerHTML = `<div class="card"><div style="font-weight:700; margin-bottom:4px;">${state.chatMode === 'circles' ? 'Групп пока нет' : 'Личных диалогов пока нет'}</div><div class="meta">${state.chatMode === 'circles' ? 'Нажмите «+ Группа», чтобы создать общий чат по интересам или району.' : 'Откройте вкладку «Люди» или нажмите «Написать» в любом посте.'}</div></div>`;
+        box.innerHTML = `<div class="card"><div style="font-weight:700; margin-bottom:4px;">${state.chatMode === 'circles' ? 'Групп пока нет' : 'Диалогов пока нет'}</div><div class="meta">${state.chatMode === 'circles' ? 'Нажмите «+ Группа», чтобы создать общий чат.' : 'Выберите человека или кафе в ленте либо во вкладке «Люди».'}</div></div>`;
         return;
       }
 
@@ -1700,7 +1717,7 @@
               <div class="author">${escapeHtml(title)} ${hasUnread ? '<span style="color:var(--accent);">• Новое</span>' : ''}</div>
               <span class="tag">${c.type === 'group' ? 'Группа' : 'Личный'}</span>
             </div>
-            <div class="meta" style="color:var(--text);">${escapeHtml(c.lastMessage || 'Нажмите, чтобы открыть отдельный чат')}</div>
+            <div class="meta" style="color:var(--text);">${escapeHtml(c.lastMessage || 'Открыть диалог')}</div>
           </div>
         `;
       }).join('');
@@ -1724,7 +1741,7 @@
           members: [currentUser.uid, otherUid],
           memberNames: {
             [currentUser.uid]: getDisplayName(),
-            [otherUid]: otherName || 'Житель Өскемена'
+            [otherUid]: otherName || 'Участник'
           },
           updatedAt: serverTimestamp()
         }, { merge: true });
@@ -1751,7 +1768,7 @@
       document.getElementById('chatTitle').textContent = chat ? getChatTitle(chat) : (fallbackTitle || 'Чат');
       document.getElementById('chatSubtitle').textContent = chat?.type === 'group'
         ? (chat.description || 'Групповой чат Өскемена')
-        : 'Отдельный диалог • Текст, чистый звонок, камера, фото и голос';
+        : 'Отдельный диалог';
 
       const isDirect = !chat || chat.type === 'direct';
       document.getElementById('audioCallBtn').style.display = isDirect ? 'inline-flex' : 'none';
@@ -1802,7 +1819,7 @@
           playEventSound(currentCallMode === 'video' ? 'video_call' : 'audio_call');
           startDialTone('incoming');
           sendSystemNotification(
-            'SÄT • Өскемен — Входящий вызов',
+            'SÄT • Өскемен',
             `${currentCallMode === 'video' ? 'Видеозвонок' : 'Аудиозвонок'} от ${data.callerName || 'собеседника'}`
           );
           document.getElementById('callPanel').style.display = 'block';
@@ -1810,7 +1827,7 @@
           document.getElementById('incomingCallControls').style.display = 'flex';
           document.getElementById('activeCallControls').style.display = 'none';
           document.getElementById('callStatusText').textContent =
-            `${currentCallMode === 'video' ? '📹 Входящий видеозвонок' : '📞 Входящий аудиозвонок'} от ${data.callerName || 'собеседника'}`;
+            `${currentCallMode === 'video' ? 'Входящий видеозвонок' : 'Входящий аудиозвонок'} • ${data.callerName || 'собеседник'}`;
         }
 
         if (currentCallRole === 'caller' && data.answer && peerConnection && !peerConnection.currentRemoteDescription) {
@@ -1818,7 +1835,7 @@
           try {
             await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
             document.getElementById('callStatusText').textContent =
-              currentCallMode === 'video' ? '📹 Видеозвонок идёт • чистый звук' : '📞 Аудиозвонок идёт • чистый звук';
+              currentCallMode === 'video' ? 'Видеозвонок идёт' : 'Аудиозвонок идёт • чистый звук';
           } catch (e) {}
         }
 
@@ -1901,7 +1918,7 @@
         playEventSound(mode === 'video' ? 'video_call' : 'audio_call');
         startDialTone('outgoing');
         document.getElementById('callStatusText').textContent =
-          mode === 'video' ? '📹 Гудки (видео)... ждём ответа' : '📞 Гудки (аудио)... ждём ответа';
+          mode === 'video' ? 'Гудки (видео)...' : 'Гудки (аудио)...';
 
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
@@ -1919,11 +1936,11 @@
 
         await sendChatPayload({
           kind: 'sat',
-          text: `${mode === 'video' ? '📹' : '📞'} ${getDisplayName()} начал(а) ${mode === 'video' ? 'видеозвонок' : 'аудиозвонок'}`
-        }, mode === 'video' ? '📹 Видеозвонок' : '📞 Аудиозвонок');
+          text: `${getDisplayName()} начал(а) ${mode === 'video' ? 'видеозвонок' : 'аудиозвонок'}`
+        }, mode === 'video' ? 'Видеозвонок' : 'Аудиозвонок');
       } catch (e) {
         cleanupCallUI();
-        showToast('Нет доступа к микрофону/камере или не обновлены правила calls в Firestore');
+        showToast('Нет доступа к микрофону/камере или проверьте правила calls');
       }
     }
 
@@ -1947,7 +1964,7 @@
         });
 
         document.getElementById('callStatusText').textContent =
-          (callData.mode === 'video') ? '📹 Видеозвонок идёт • чистый звук' : '📞 Аудиозвонок идёт • чистый звук';
+          (callData.mode === 'video') ? 'Видеозвонок идёт' : 'Аудиозвонок идёт • чистый звук';
       } catch (e) {
         cleanupCallUI();
         showToast('Не удалось ответить на звонок');
@@ -1960,7 +1977,7 @@
       if (!audioTrack) return;
       audioTrack.enabled = !audioTrack.enabled;
       const btn = document.getElementById('muteMicBtn');
-      btn.textContent = audioTrack.enabled ? '🎙 Микрофон' : '🔇 Выкл.';
+      btn.textContent = audioTrack.enabled ? 'Микрофон' : 'Выкл.';
       btn.classList.toggle('btn-danger', !audioTrack.enabled);
     }
 
@@ -1970,7 +1987,7 @@
       if (!videoTrack) return;
       videoTrack.enabled = !videoTrack.enabled;
       const btn = document.getElementById('muteCamBtn');
-      btn.textContent = videoTrack.enabled ? '📷 Камера' : '🚫 Без видео';
+      btn.textContent = videoTrack.enabled ? 'Камера' : 'Без видео';
       btn.classList.toggle('btn-danger', !videoTrack.enabled);
     }
 
@@ -2035,7 +2052,7 @@
     function renderChatMessages() {
       const box = document.getElementById('chatMessages');
       if (!currentMessages.length) {
-        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, позвоните, снимите на камеру или запишите чистое голосовое.</div>';
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:12px;">Сообщений пока нет. Напишите текст, позвоните, снимите на камеру или запишите голосовое.</div>';
         return;
       }
       box.innerHTML = currentMessages.map(m => {
@@ -2107,7 +2124,7 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           const compressed = canvas.toDataURL('image/jpeg', 0.65);
-          await sendChatPayload({ kind: 'photo', mediaData: compressed }, '📸 Фотография');
+          await sendChatPayload({ kind: 'photo', mediaData: compressed }, 'Фотография');
           showToast('Фото отправлено');
         };
         img.src = ev.target.result;
@@ -2154,7 +2171,7 @@
       const dataUrl = pendingVoiceData;
       hideVoiceDelayPanel();
       if (!dataUrl) return;
-      await sendChatPayload({ kind: 'voice', mediaData: dataUrl }, '🎤 Голосовое сообщение');
+      await sendChatPayload({ kind: 'voice', mediaData: dataUrl }, 'Голосовое сообщение');
       showToast('Голосовое отправлено');
     }
 
@@ -2222,12 +2239,12 @@
     async function proposeSat() {
       await sendChatPayload({
         kind: 'sat',
-        text: `⚡ ${getDisplayName()} предлагает встретиться / созвониться (SÄT Өскемен)`
-      }, '⚡ Предложение Сәт');
+        text: `${getDisplayName()} предлагает встретиться / созвониться (SÄT Өскемен)`
+      }, 'Предложение Сәт');
     }
 
     function softExit() {
-      showToast('📞 Мягкий выход активирован: звонок-повод через 30 сек');
+      showToast('Мягкий выход активирован: звонок-повод через 30 сек');
     }
 
     function openCircleModal() {
@@ -2328,7 +2345,7 @@
         }).addTo(markersLayer);
         m.bindPopup(`<b>${escapeHtml(p.title)}</b><br>${escapeHtml(p.author)}`);
         m.on('click', () => {
-          const badge = getPostBadge(p.type, p.helpSubtype);
+          const badge = getPostBadge(p.type);
           document.getElementById('mapSelectedPost').innerHTML = `
             <div class="card">
               <div class="post-head">
@@ -2341,9 +2358,9 @@
               <div style="font-weight:700; margin-bottom:4px;">${escapeHtml(p.title)}</div>
               <div class="meta" style="color:var(--text);">${escapeHtml(p.body)}</div>
               <div class="actions">
-                <a class="btn btn-mint" style="padding:7px 12px; font-size:12px;" target="_blank" rel="noopener" href="${get2GisUrl(p.lat, p.lng)}">🧭 2ГИС</a>
+                <a class="btn btn-mint" style="padding:7px 12px; font-size:12px;" target="_blank" rel="noopener" href="${get2GisUrl(p.lat, p.lng)}">2ГИС</a>
                 ${p.authorUid && p.authorUid !== currentUser?.uid ? `
-                  <button class="btn btn-primary" style="padding:7px 12px; font-size:12px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">💬 Написать автору</button>
+                  <button class="btn btn-primary" style="padding:7px 12px; font-size:12px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">Написать</button>
                 ` : ''}
               </div>
             </div>
@@ -2394,31 +2411,28 @@
 
     document.getElementById('newPostType').addEventListener('change', (e) => {
       document.getElementById('cafeFields').style.display = e.target.value === 'cafe' ? 'block' : 'none';
-      document.getElementById('helpSubtypeBox').style.display = e.target.value === 'help' ? 'block' : 'none';
     });
 
     async function publishPost() {
       ensureAudioContext();
       const type = document.getElementById('newPostType').value;
-      const helpSubtype = document.getElementById('newHelpSubtype').value;
       const title = document.getElementById('newPostTitle').value.trim();
       const body = document.getElementById('newPostBody').value.trim();
       const price = document.getElementById('newPostPrice').value.trim();
       const timer = document.getElementById('newPostTimer').value.trim();
 
       if (!title) {
-        showToast('Введите заголовок публикации');
+        showToast('Напишите коротко о главном');
         return;
       }
 
       try {
         const docRef = await addDoc(collection(db, 'posts'), {
           type,
-          helpSubtype: type === 'help' ? helpSubtype : '',
           author: getDisplayName(),
           authorUid: currentUser ? currentUser.uid : null,
           district: state.district || 'Өскемен',
-          time: timer ? `Актуально: ${timer}` : 'Только что',
+          time: timer ? `До ${timer}` : 'Только что',
           title,
           body: body || 'Актуально в Өскемене.',
           price: type === 'cafe' ? price : '',
@@ -2428,7 +2442,7 @@
           createdAt: serverTimestamp()
         });
         seenPostIds.add(docRef.id);
-        showToast('Опубликовано в SÄT Өскемен!');
+        showToast('Опубликовано в SÄT Өскемен');
       } catch (e) {
         showToast('Ошибка публикации: проверьте правила Firestore');
       }
@@ -2447,7 +2461,7 @@
       saveState();
       await syncUserProfile(currentUser);
       renderAll();
-      showToast('Профиль обновлён');
+      showToast('Профиль сохранён');
     }
 
     async function switchRoleQuick() {
@@ -2455,11 +2469,7 @@
       saveState();
       await syncUserProfile(currentUser);
       renderAll();
-      showToast(state.role === 'cafe' ? 'Режим: Бизнес / Кафе' : 'Режим: Житель Өскемена');
-    }
-
-    function openSosModal() {
-      document.getElementById('sosModal').classList.add('open');
+      showToast(state.role === 'cafe' ? 'Режим: Кафе / Бизнес' : 'Режим: Житель / Студент');
     }
 
     function closeModalById(id) {
@@ -2475,7 +2485,7 @@
 
     Object.assign(window, {
       unlockSoundAndGo, goScreen, authGoogle, authRegister, authLogin, authLogout,
-      setRole, toggleChip, setMood, switchTab, setFilter,
+      setRole, setMood, cycleMood, switchTab, setFilter,
       confirmPost, deletePost, setPeopleFilter, sendFriendRequest,
       acceptFriend, declineFriend, openUserProfile, setChatMode,
       startDirectChat, openChat, openBannerChat, closeChatModal, sendChatMsg,
@@ -2485,7 +2495,7 @@
       proposeSat, softExit,
       openCircleModal, createCircle, toggleMapLayer, flyDistrict,
       locateMeOnMap, showPostOnMap, openCreateModal, setPickerToGps,
-      publishPost, saveProfileEdits, switchRoleQuick, openSosModal,
+      publishPost, saveProfileEdits, switchRoleQuick,
       closeModalById, closeModals
     });
 

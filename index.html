@@ -203,7 +203,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
     .brand-row { display: flex; align-items: center; gap: 10px; }
     .mini-logo {
@@ -236,7 +236,7 @@
     }
     .meta { font-size: 13px; color: var(--muted); }
 
-    .input, textarea {
+    .input, textarea, select {
       width: 100%;
       background: rgba(16, 32, 25, 0.88);
       color: var(--text);
@@ -488,7 +488,7 @@
       max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      background: rgba(14, 29, 23, 0.9);
+      background: rgba(14, 29, 23, 0.92);
       backdrop-filter: blur(10px);
       color: var(--text);
       border-top: 1px solid var(--border-strong);
@@ -603,12 +603,57 @@
       display: block;
       cursor: pointer;
     }
-    .msg-audio {
+
+    /* Кастомный защищённый голосовой плеер без возможности скачать чужое аудио */
+    .voice-player {
       margin-top: 6px;
-      width: 220px;
-      max-width: 100%;
-      height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: rgba(7, 17, 13, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
+    .voice-play-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #6cf0b5;
+      color: #072015;
+      font-weight: 900;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .voice-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      min-width: 72px;
+    }
+    .voice-fill {
+      height: 100%;
+      width: 0%;
+      background: #6cf0b5;
+      transition: width 0.12s linear;
+    }
+    .voice-dur {
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0.92;
+    }
+
     .voice-status-bar,
     .voice-draft-bar,
     .edit-mode-bar {
@@ -674,6 +719,14 @@
       cursor: pointer;
     }
     .chat-row-card:active { transform: scale(0.99); }
+
+    .ticket-box {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(16, 32, 25, 0.85);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
 
     .list-item {
       display: flex;
@@ -751,9 +804,12 @@
         <div class="mini-logo">Ä</div>
         <div class="brand-text">SÄT</div>
       </div>
-      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapers()">
-        <span id="wpActiveName" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Обои</span>
-      </button>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button type="button" class="btn btn-ghost" style="padding: 8px 11px; font-size: 12.5px;" onclick="openSupportModal()">Помощь</button>
+        <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openWallpapers()">
+          <span id="wpActiveName" style="max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Обои</span>
+        </button>
+      </div>
     </header>
 
     <main class="container">
@@ -864,6 +920,16 @@
           </div>
           <div id="profileChatsList"></div>
         </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Техподдержка и идеи</h3>
+              <div class="meta">Сообщения о проблемах и предложения по улучшению приходят создателю SÄT</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Написать</button>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -963,6 +1029,37 @@
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
       <div id="wallpapersList" class="wp-list"></div>
+    </div>
+  </div>
+
+  <div id="supportModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Техподдержка и идеи для SÄT</h3>
+          <div class="meta">Все обращения и предложения отправляются создателю приложения</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
+      </div>
+
+      <label class="meta" style="display: block; margin-top: 12px;">Тип обращения</label>
+      <select id="supportKindSelect">
+        <option value="support">Техподдержка (ошибка или вопрос)</option>
+        <option value="add_idea">Предложение: что добавить</option>
+        <option value="remove_idea">Предложение: что убрать или изменить</option>
+      </select>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Ваше сообщение</label>
+      <textarea id="supportTextInput" rows="3" placeholder="Опишите проблему или напишите, что стоит добавить/убрать..."></textarea>
+
+      <div class="actions" style="margin-top: 12px;">
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Отправить создателю</button>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <div style="font-weight: 800; font-size: 14.5px; color: #6cf0b5;">Отправленные обращения и идеи</div>
+        <div id="supportTicketsBox"></div>
+      </div>
     </div>
   </div>
 
@@ -1079,7 +1176,7 @@
             <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="sendVoiceDraft()">Отправить</button>
           </div>
         </div>
-        <audio id="voiceDraftAudio" controls preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
+        <audio id="voiceDraftAudio" controls controlsList="nodownload" preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
       </div>
 
       <div id="editModeBar" class="edit-mode-bar">
@@ -1224,7 +1321,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v3';
+    const STORE_KEY = 'sat_clean_state_v4';
     let state = {
       name: '',
       bio: '',
@@ -1236,20 +1333,46 @@
       storyLabel: '',
       cachedFriends: [],
       cachedUsers: [],
-      cachedRequests: []
+      cachedRequests: [],
+      cachedTickets: [],
+      lastUid: ''
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v3') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
       if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
       if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
+      if (!Array.isArray(state.cachedTickets)) state.cachedTickets = [];
     } catch (e) {}
 
     function persist() {
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify({
+          ...state,
+          photos: (state.photos || []).slice(0, 12)
+        }));
+      } catch (e) {
+        try {
+          localStorage.setItem(STORE_KEY, JSON.stringify({
+            name: state.name,
+            bio: state.bio,
+            photos: (state.photos || []).slice(0, 5),
+            cachedFriends: state.cachedFriends,
+            lastUid: state.lastUid
+          }));
+        } catch (err) {}
+      }
+    }
+
+    function addSavedPhoto(dataUrl) {
+      if (!dataUrl) return;
+      if (!state.photos.includes(dataUrl)) {
+        state.photos = [dataUrl, ...state.photos].slice(0, 20);
+        persist();
+      }
     }
 
     let currentUser = null;
@@ -1257,6 +1380,7 @@
     let users = state.cachedUsers.length ? [...state.cachedUsers] : [];
     let friendsDocs = state.cachedRequests.length ? [...state.cachedRequests] : [];
     let chats = [];
+    let supportTickets = state.cachedTickets.length ? [...state.cachedTickets] : [];
     let pickTarget = 'avatar';
     let draftPostPhoto = '';
     let draftPostDest = 'pulse';
@@ -1274,6 +1398,11 @@
     let voiceStream = null;
     let voiceStartMs = 0;
     let pendingVoiceDraft = null;
+
+    // Воспроизведение голосовых без скачивания
+    const voiceAudioMap = new Map();
+    let playingVoiceMsgId = null;
+    let voiceProgressTimer = null;
 
     let pc = null;
     let localCallStream = null;
@@ -1355,13 +1484,16 @@
     async function syncProfileCloud(user) {
       if (!user) return;
       checkOwnStoryExpiry();
+      const uid = user.uid;
+      state.lastUid = uid;
+      persist();
       try {
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
+        await setDoc(doc(db, 'users', uid), {
+          uid,
           fullName: myDisplayName(),
           bio: state.bio || 'Мой профиль SÄT',
           photoData: myAvatarUrl(),
-          savedPhotos: state.photos || [],
+          savedPhotos: (state.photos || []).slice(0, 12),
           storyData: state.story || '',
           storyCreatedAt: state.storyStart || 0,
           storyExpiresAt: state.storyEnd || 0,
@@ -1378,10 +1510,28 @@
       currentUser = user;
       document.getElementById('sessionHint').style.display = 'none';
       if (user) {
+        state.lastUid = user.uid;
         if (!state.name && user.displayName) {
           state.name = user.displayName;
-          persist();
         }
+        const meCloud = users.find(u => u.uid === user.uid);
+        if (meCloud) {
+          if (!state.name && meCloud.fullName) state.name = meCloud.fullName;
+          if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
+          if (!state.avatar && meCloud.photoData) state.avatar = meCloud.photoData;
+          if (Array.isArray(meCloud.savedPhotos) && meCloud.savedPhotos.length) {
+            const merged = [...state.photos];
+            meCloud.savedPhotos.forEach(ph => { if (ph && !merged.includes(ph)) merged.push(ph); });
+            state.photos = merged.slice(0, 20);
+          }
+          if (!state.story && meCloud.storyData && storyAlive(meCloud.storyData, meCloud.storyExpiresAt)) {
+            state.story = meCloud.storyData;
+            state.storyStart = meCloud.storyCreatedAt;
+            state.storyEnd = meCloud.storyExpiresAt;
+            state.storyLabel = meCloud.storyTimeLabel || '';
+          }
+        }
+        persist();
         await syncProfileCloud(user);
         goToProfileStart();
       } else {
@@ -1452,6 +1602,7 @@
           bar.style.transform = 'translate(-50%, 16px)';
           txt.textContent = 'Обновляем...';
           checkOwnStoryExpiry();
+          if (currentUser) syncProfileCloud(currentUser);
           renderEverything();
           if (openPeerUid) renderPeerPageContent();
           setTimeout(() => {
@@ -1479,13 +1630,17 @@
         state.cachedUsers = freshUsers.slice(0, 100);
         persist();
       }
-      if (currentUser) {
-        const me = users.find(u => u.uid === currentUser.uid);
+      const activeUid = currentUser?.uid || state.lastUid;
+      if (activeUid) {
+        const me = users.find(u => u.uid === activeUid);
         if (me) {
+          if (me.fullName && !state.name) state.name = me.fullName;
           if (me.photoData && !state.avatar) state.avatar = me.photoData;
           if (me.bio && !state.bio) state.bio = me.bio;
-          if (Array.isArray(me.savedPhotos) && me.savedPhotos.length > state.photos.length) {
-            state.photos = me.savedPhotos;
+          if (Array.isArray(me.savedPhotos) && me.savedPhotos.length) {
+            const merged = [...state.photos];
+            me.savedPhotos.forEach(ph => { if (ph && !merged.includes(ph)) merged.push(ph); });
+            state.photos = merged.slice(0, 20);
           }
           if (me.storyData && storyAlive(me.storyData, me.storyExpiresAt)) {
             state.story = me.storyData;
@@ -1493,6 +1648,7 @@
             state.storyEnd = me.storyExpiresAt;
             state.storyLabel = me.storyTimeLabel || '';
           }
+          persist();
         }
       }
       renderMyProfile();
@@ -1520,6 +1676,13 @@
       });
       renderGroupsTab();
       renderProfileChatsList();
+    }, () => {});
+
+    onSnapshot(query(collection(db, 'supportTickets'), orderBy('createdAt', 'desc')), (snap) => {
+      supportTickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      state.cachedTickets = supportTickets.slice(0, 50);
+      persist();
+      renderSupportTickets();
     }, () => {});
 
     onSnapshot(collection(db, 'calls'), (snap) => {
@@ -1576,6 +1739,75 @@
       renderFriendsTab();
       renderGroupsTab();
       renderProfileChatsList();
+      renderSupportTickets();
+    }
+
+    // ТЕХПОДДЕРЖКА И ИДЕИ ДЛЯ СОЗДАТЕЛЯ
+    function openSupportModal() {
+      renderSupportTickets();
+      document.getElementById('supportModal').classList.add('open');
+    }
+
+    async function submitSupportTicket() {
+      const kind = document.getElementById('supportKindSelect').value;
+      const text = document.getElementById('supportTextInput').value.trim();
+      if (!text) {
+        toast('Напишите сообщение или идею');
+        return;
+      }
+      const now = Date.now();
+      const kindLabel = kind === 'add_idea'
+        ? 'Что добавить'
+        : (kind === 'remove_idea' ? 'Что убрать' : 'Техподдержка');
+
+      const item = {
+        id: 'sup_' + now,
+        senderUid: getMyUid() || 'guest',
+        senderName: myDisplayName(),
+        kind,
+        kindLabel,
+        text,
+        time: formatTime(now)
+      };
+
+      supportTickets = [item, ...supportTickets];
+      state.cachedTickets = supportTickets.slice(0, 50);
+      persist();
+      renderSupportTickets();
+      document.getElementById('supportTextInput').value = '';
+
+      try {
+        await addDoc(collection(db, 'supportTickets'), {
+          senderUid: item.senderUid,
+          senderName: item.senderName,
+          kind: item.kind,
+          kindLabel: item.kindLabel,
+          text: item.text,
+          time: item.time,
+          createdAt: serverTimestamp()
+        });
+      } catch (e) {}
+
+      toast('Отправлено создателю SÄT');
+    }
+
+    function renderSupportTickets() {
+      const box = document.getElementById('supportTicketsBox');
+      if (!box) return;
+      if (!supportTickets.length) {
+        box.innerHTML = '<div class="meta" style="margin-top: 8px;">Пока нет отправленных сообщений.</div>';
+        return;
+      }
+      box.innerHTML = supportTickets.slice(0, 12).map(t => `
+        <div class="ticket-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <span class="tag">${esc(t.kindLabel || 'Обращение')}</span>
+            <span class="meta">${esc(t.time || '')}</span>
+          </div>
+          <div style="font-size: 13.5px; margin-top: 6px; font-weight: 700;">${esc(t.senderName || 'Участник')}</div>
+          <div style="font-size: 14px; margin-top: 4px; line-height: 1.4;">${esc(t.text || '')}</div>
+        </div>
+      `).join('');
     }
 
     function getChatDisplayTitle(c) {
@@ -1685,19 +1917,19 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const maxD = pickTarget === 'avatar' ? 420 : 960;
+          const maxD = pickTarget === 'avatar' ? 420 : 900;
           const sc = Math.min(1, maxD / Math.max(img.width || 1, img.height || 1));
           canvas.width = Math.max(1, Math.round((img.width || 600) * sc));
           canvas.height = Math.max(1, Math.round((img.height || 600) * sc));
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
 
           if (pickTarget === 'avatar') {
             state.avatar = dataUrl;
-            persist();
+            addSavedPhoto(dataUrl);
             renderMyProfile();
             await syncProfileCloud(currentUser);
-            toast('Фото профиля обновлено');
+            toast('Фото профиля сохранено');
           } else if (pickTarget === 'story') {
             const now = Date.now();
             state.story = dataUrl;
@@ -1709,11 +1941,10 @@
             await syncProfileCloud(currentUser);
             toast('Сторис опубликована на 3 часа');
           } else if (pickTarget === 'gallery_add') {
-            state.photos = [dataUrl, ...state.photos].slice(0, 30);
-            persist();
+            addSavedPhoto(dataUrl);
             renderMyProfile();
             await syncProfileCloud(currentUser);
-            toast('Фото добавлено на страницу');
+            toast('Фото сохранено в галерее профиля');
           } else if (pickTarget === 'post') {
             draftPostPhoto = dataUrl;
             document.getElementById('postPreviewImg').src = dataUrl;
@@ -1721,6 +1952,8 @@
             document.getElementById('postPhotoLabel').textContent = 'Фото загружено — заменить';
             toast('Фото загружено');
           } else if (pickTarget === 'chat_photo') {
+            addSavedPhoto(dataUrl);
+            await syncProfileCloud(currentUser);
             await sendPhotoToChat(dataUrl);
           }
         };
@@ -1824,8 +2057,7 @@
       const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
 
       if (draftPostPhoto) {
-        state.photos = [draftPostPhoto, ...state.photos].slice(0, 30);
-        persist();
+        addSavedPhoto(draftPostPhoto);
         renderMyProfile();
         await syncProfileCloud(currentUser);
       }
@@ -1833,7 +2065,7 @@
       const item = {
         id: 'tmp_' + now,
         author: myDisplayName(),
-        authorUid: currentUser ? currentUser.uid : 'me',
+        authorUid: currentUser ? currentUser.uid : (state.lastUid || 'me'),
         authorPhoto: myAvatarUrl(),
         caption,
         body: text,
@@ -2371,6 +2603,7 @@
       activeChatId = id;
       cancelEditMessage();
       discardVoiceDraft();
+      stopAllVoicePlayback();
       const c = chats.find(x => x.id === id);
       const displayTitle = c ? getChatDisplayTitle(c) : (title || 'Чат');
       document.getElementById('chatHeaderTitle').textContent = displayTitle;
@@ -2392,9 +2625,70 @@
       cancelVoiceState();
       discardVoiceDraft();
       cancelEditMessage();
+      stopAllVoicePlayback();
       if (chatUnsub) { chatUnsub(); chatUnsub = null; }
       activeChatId = null;
       document.getElementById('chatScreen').classList.remove('open');
+    }
+
+    function stopAllVoicePlayback() {
+      clearInterval(voiceProgressTimer);
+      voiceProgressTimer = null;
+      playingVoiceMsgId = null;
+      voiceAudioMap.forEach((audioEl) => {
+        try { audioEl.pause(); audioEl.currentTime = 0; } catch (e) {}
+      });
+      voiceAudioMap.clear();
+    }
+
+    function toggleVoicePlay(msgId, audioData) {
+      if (!msgId || !audioData) return;
+      let audioEl = voiceAudioMap.get(msgId);
+      if (!audioEl) {
+        audioEl = new Audio(audioData);
+        audioEl.preload = 'auto';
+        audioEl.addEventListener('ended', () => {
+          playingVoiceMsgId = null;
+          clearInterval(voiceProgressTimer);
+          const btn = document.getElementById('vpBtn_' + msgId);
+          const fill = document.getElementById('vpFill_' + msgId);
+          if (btn) btn.textContent = '▶';
+          if (fill) fill.style.width = '0%';
+        });
+        voiceAudioMap.set(msgId, audioEl);
+      }
+
+      if (playingVoiceMsgId && playingVoiceMsgId !== msgId) {
+        const prevEl = voiceAudioMap.get(playingVoiceMsgId);
+        const prevBtn = document.getElementById('vpBtn_' + playingVoiceMsgId);
+        if (prevEl) { try { prevEl.pause(); } catch (e) {} }
+        if (prevBtn) prevBtn.textContent = '▶';
+      }
+
+      if (!audioEl.paused) {
+        audioEl.pause();
+        playingVoiceMsgId = null;
+        clearInterval(voiceProgressTimer);
+        const btn = document.getElementById('vpBtn_' + msgId);
+        if (btn) btn.textContent = '▶';
+        return;
+      }
+
+      audioEl.play().then(() => {
+        playingVoiceMsgId = msgId;
+        const btn = document.getElementById('vpBtn_' + msgId);
+        if (btn) btn.textContent = '❚❚';
+        clearInterval(voiceProgressTimer);
+        voiceProgressTimer = setInterval(() => {
+          const cur = voiceAudioMap.get(playingVoiceMsgId);
+          const fill = document.getElementById('vpFill_' + playingVoiceMsgId);
+          if (cur && fill && cur.duration && isFinite(cur.duration)) {
+            fill.style.width = Math.min(100, (cur.currentTime / cur.duration) * 100) + '%';
+          }
+        }, 120);
+      }).catch(() => {
+        toast('Не удалось воспроизвести запись');
+      });
     }
 
     function insertEmoji(em) {
@@ -2438,12 +2732,16 @@
           `;
         }
         if (m.kind === 'voice' && m.audioData) {
-          const durLabel = m.durationSec ? ` (${Number(m.durationSec)} сек)` : '';
+          const durSec = Number(m.durationSec || 1);
+          const safeId = esc(m.id);
           return `
-            <div class="msg ${mine ? 'me' : 'them'}">
+            <div class="msg ${mine ? 'me' : 'them'}" oncontextmenu="return false;">
               ${whoHtml}
-              <div style="font-size:12.5px; font-weight:700;">Голосовое сообщение${esc(durLabel)}</div>
-              <audio class="msg-audio" controls preload="metadata" src="${m.audioData}"></audio>
+              <div class="voice-player" oncontextmenu="return false;">
+                <button type="button" id="vpBtn_${safeId}" class="voice-play-btn" onclick="toggleVoicePlay('${safeId}', '${m.audioData}')">▶</button>
+                <div class="voice-track"><div id="vpFill_${safeId}" class="voice-fill"></div></div>
+                <span class="voice-dur">${durSec} сек</span>
+              </div>
               ${toolsHtml}
             </div>
           `;
@@ -2994,6 +3292,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab,
+      openSupportModal, submitSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,
@@ -3004,7 +3303,7 @@
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
-      startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft,
+      startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft, toggleVoicePlay,
       toggleAudioCall, acceptIncomingCall, hangupCall,
       openEditProfileModal, saveProfileData,
       hideModal, closeBackdrop
@@ -3019,6 +3318,7 @@
 
     renderFriendsTab();
     renderProfileChatsList();
+    renderSupportTickets();
   </script>
 </body>
 </html>

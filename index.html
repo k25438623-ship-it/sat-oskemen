@@ -555,6 +555,7 @@
       padding: 20px 18px 28px;
     }
     #photoPickerModal { z-index: 80; }
+    #captionBox { z-index: 85; }
 
     .viewer-screen {
       position: fixed;
@@ -1198,6 +1199,16 @@
     </div>
   </div>
 
+  <div id="captionBox" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="captionBoxTitle" style="margin: 0 0 10px; font-size: 18px;">Подпись к фото</h3>
+      <input id="captionInput" class="input" maxlength="120" placeholder="Напишите подпись..." onkeydown="if(event.key==='Enter') applyCaptionNow()" />
+      <div class="actions" style="margin-top: 12px;">
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="applyCaptionNow()">Готово</button>
+      </div>
+    </div>
+  </div>
+
   <div id="wallpapersModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1564,11 +1575,47 @@
       recordAppError(String(reason));
     });
 
-    function addSavedPhoto(dataUrl) {
+    function normalizePhotos(list) {
+      if (!Array.isArray(list)) return [];
+      return list
+        .map((x) => {
+          if (!x) return null;
+          if (typeof x === 'string') return { src: x, caption: '' };
+          if (typeof x === 'object' && x.src) return { src: x.src, caption: String(x.caption || '') };
+          return null;
+        })
+        .filter(Boolean);
+    }
+
+    function addSavedPhoto(dataUrl, caption = '') {
       if (!dataUrl) return;
-      if (!state.photos.includes(dataUrl)) {
-        state.photos = [dataUrl, ...state.photos].slice(0, 20);
-        persist();
+      const cap = String(caption || '').trim().slice(0, 120);
+      const list = normalizePhotos(state.photos).filter(p => p.src !== dataUrl);
+      state.photos = [{ src: dataUrl, caption: cap }, ...list].slice(0, 20);
+      persist();
+    }
+
+    let _capResolver = null;
+    function askPhotoCaption(titleText = 'Подпись к фото') {
+      return new Promise((resolve) => {
+        _capResolver = resolve;
+        const tEl = document.getElementById('captionBoxTitle');
+        if (tEl) tEl.textContent = titleText;
+        const inp = document.getElementById('captionInput');
+        if (inp) inp.value = '';
+        document.getElementById('captionBox').classList.add('open');
+        setTimeout(() => inp && inp.focus(), 60);
+      });
+    }
+
+    function applyCaptionNow() {
+      const inp = document.getElementById('captionInput');
+      const val = (inp ? inp.value : '').trim().slice(0, 120);
+      hideModal('captionBox');
+      if (_capResolver) {
+        const fn = _capResolver;
+        _capResolver = null;
+        fn(val);
       }
     }
 
@@ -1764,7 +1811,7 @@
           fullName: myDisplayName(),
           bio: state.bio || 'Мой профиль SÄT',
           photoData: myAvatarUrl(),
-          savedPhotos: (state.photos || []).slice(0, 12),
+          savedPhotos: normalizePhotos(state.photos).slice(0, 12),
           storyData: state.story || '',
           storyCreatedAt: state.storyStart || 0,
           storyExpiresAt: state.storyEnd || 0,
@@ -1796,9 +1843,10 @@
           if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
           if (!state.avatar && meCloud.photoData) state.avatar = meCloud.photoData;
           if (Array.isArray(meCloud.savedPhotos) && meCloud.savedPhotos.length) {
-            const merged = [...state.photos];
-            meCloud.savedPhotos.forEach(ph => { if (ph && !merged.includes(ph)) merged.push(ph); });
-            state.photos = merged.slice(0, 20);
+            const localList = normalizePhotos(state.photos);
+            const cloudList = normalizePhotos(meCloud.savedPhotos);
+            cloudList.forEach(ph => { if (!localList.some(x => x.src === ph.src)) localList.push(ph); });
+            state.photos = localList.slice(0, 20);
           }
           if (!state.story && meCloud.storyData && storyAlive(meCloud.storyData, meCloud.storyExpiresAt)) {
             state.story = meCloud.storyData;
@@ -1918,9 +1966,10 @@
           if (me.photoData && !state.avatar) state.avatar = me.photoData;
           if (me.bio && !state.bio) state.bio = me.bio;
           if (Array.isArray(me.savedPhotos) && me.savedPhotos.length) {
-            const merged = [...state.photos];
-            me.savedPhotos.forEach(ph => { if (ph && !merged.includes(ph)) merged.push(ph); });
-            state.photos = merged.slice(0, 20);
+            const localList = normalizePhotos(state.photos);
+            const cloudList = normalizePhotos(me.savedPhotos);
+            cloudList.forEach(ph => { if (!localList.some(x => x.src === ph.src)) localList.push(ph); });
+            state.photos = localList.slice(0, 20);
           }
           if (me.storyData && storyAlive(me.storyData, me.storyExpiresAt)) {
             state.story = me.storyData;
@@ -2317,15 +2366,19 @@
         banner.style.display = 'none';
       }
 
+      const galleryList = normalizePhotos(state.photos);
       const pGrid = document.getElementById('myPhotosBox');
-      if (!state.photos.length) {
+      if (!galleryList.length) {
         pGrid.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет. Нажмите «+ Фото».</div>';
       } else {
-        pGrid.innerHTML = state.photos.map((src, i) => `
-          <div class="photo-cell" onclick="openImageViewer('${src}', '${esc(name)}', 'Фото #${i + 1}')">
-            <img src="${src}" alt="" draggable="false" />
-          </div>
-        `).join('');
+        pGrid.innerHTML = galleryList.map((item, i) => {
+          const subText = item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}`;
+          return `
+            <div class="photo-cell" onclick="openImageViewer('${item.src}', '${esc(name)}', '${esc(subText)}')">
+              <img src="${item.src}" alt="" draggable="false" />
+            </div>
+          `;
+        }).join('');
       }
     }
 
@@ -2378,17 +2431,19 @@
             await syncProfileCloud(currentUser);
             toast('Фото профиля сохранено');
           } else if (pickTarget === 'story') {
+            const cap = await askPhotoCaption('Подпись к сторис');
             const now = Date.now();
             state.story = dataUrl;
             state.storyStart = now;
             state.storyEnd = now + STORY_TTL;
-            state.storyLabel = formatTime(now);
+            state.storyLabel = cap ? `${formatTime(now)} • ${cap}` : formatTime(now);
             persist();
             renderMyProfile();
             await syncProfileCloud(currentUser);
             toast('Сторис опубликована на 3 часа');
           } else if (pickTarget === 'gallery_add') {
-            addSavedPhoto(dataUrl);
+            const cap = await askPhotoCaption('Подпись к фотографии');
+            addSavedPhoto(dataUrl, cap);
             renderMyProfile();
             await syncProfileCloud(currentUser);
             toast('Фото сохранено в галерее профиля');
@@ -2510,7 +2565,7 @@
       const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
 
       if (draftPostPhoto) {
-        addSavedPhoto(draftPostPhoto);
+        addSavedPhoto(draftPostPhoto, caption);
         renderMyProfile();
         await syncProfileCloud(currentUser);
       }
@@ -2777,8 +2832,8 @@
         }).join('');
       }
 
-      const fromPosts = userPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: getPostTime(p) }));
-      const fromSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
+      const fromPosts = userPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: p.caption ? `${getPostTime(p)} • ${p.caption}` : getPostTime(p) }));
+      const fromSaved = normalizePhotos(u.savedPhotos).map(ph => ({ src: ph.src, time: ph.caption || '' }));
       const allPhotos = [...fromPosts, ...fromSaved];
       const photosBox = document.getElementById('peerPhotosGrid');
       if (!allPhotos.length) {
@@ -3854,6 +3909,7 @@
       toggleStudioSection, switchStudioTab, clearRecordedErrors,
       openSupportModal, submitSupportTicket, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
+      askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,

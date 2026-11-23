@@ -482,7 +482,7 @@
       max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      background: rgba(14, 29, 23, 0.86);
+      background: rgba(14, 29, 23, 0.9);
       backdrop-filter: blur(10px);
       color: var(--text);
       border-top: 1px solid var(--border-strong);
@@ -512,6 +512,7 @@
       pointer-events: none;
     }
 
+    /* Полноэкранный чат */
     .chat-screen {
       position: fixed;
       inset: 0;
@@ -520,20 +521,42 @@
       height: 100dvh;
       display: none;
       flex-direction: column;
-      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-      background: rgba(7, 17, 13, 0.72);
-      backdrop-filter: blur(8px);
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(7, 17, 13, 0.94);
+      backdrop-filter: blur(12px);
     }
     .chat-screen.open { display: flex; }
     .chat-wrap {
       width: 100%;
-      max-width: 620px;
+      max-width: 640px;
       height: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       min-height: 0;
+      gap: 8px;
     }
+    .chat-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14, 29, 23, 0.95);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      border-radius: 18px;
+    }
+    .call-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(24, 155, 98, 0.22);
+      border: 1px solid var(--border-strong);
+    }
+    .call-banner.active { display: flex; }
     .chat-list {
       flex: 1;
       min-height: 0;
@@ -541,16 +564,67 @@
       display: flex;
       flex-direction: column;
       gap: 9px;
-      margin: 10px 0;
       padding: 12px;
       border-radius: 18px;
-      background: rgba(12, 24, 19, 0.85);
+      background: rgba(12, 24, 19, 0.88);
       border: 1px solid var(--border);
     }
-    .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 84%; word-break: break-word; }
-    .msg.them { background: rgba(24, 46, 36, 0.9); align-self: flex-start; border: 1px solid var(--border); }
+    .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 85%; word-break: break-word; }
+    .msg.them { background: rgba(24, 46, 36, 0.92); align-self: flex-start; border: 1px solid var(--border); }
     .msg.me { background: linear-gradient(135deg, #1ea86b, #0f6b43); color: #ffffff; align-self: flex-end; }
     .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
+    .msg-photo {
+      margin-top: 6px;
+      border-radius: 12px;
+      max-width: 240px;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+    }
+    .msg-audio {
+      margin-top: 6px;
+      width: 220px;
+      max-width: 100%;
+      height: 36px;
+    }
+    .voice-status-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      background: rgba(24, 155, 98, 0.18);
+      border: 1px solid var(--border-strong);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #6cf0b5;
+    }
+    .voice-status-bar.show { display: flex; }
+    .chat-composer {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: rgba(14, 29, 23, 0.92);
+      border: 1px solid var(--border);
+      padding: 8px;
+      border-radius: 18px;
+    }
+
+    .chat-row-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 16px;
+      background: rgba(16, 32, 25, 0.82);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .chat-row-card:active { transform: scale(0.99); }
 
     .list-item {
       display: flex;
@@ -730,6 +804,18 @@
             <div id="groupsBox"></div>
           </div>
         </div>
+
+        <!-- ВСЕ ЧАТЫ В ПРОФИЛЕ ВНИЗУ -->
+        <div id="myChatsCard" class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Чаты</h3>
+              <div class="meta">Нажмите на чат с другом или группу — откроется на весь экран</div>
+            </div>
+            <span class="tag" id="chatsCountBadge">0</span>
+          </div>
+          <div id="profileChatsList"></div>
+        </div>
       </div>
     </main>
 
@@ -905,21 +991,46 @@
     <div style="text-align: center; font-size: 13px; opacity: 0.75;">Нажмите в любое место, чтобы закрыть</div>
   </div>
 
+  <!-- ПОЛНОЭКРАННЫЙ ЧАТ С ГОЛОСОВЫМИ (ПАУЗА 2 СЕК), ФОТО И ЗВОНКОМ -->
   <div id="chatScreen" class="chat-screen">
     <div class="chat-wrap">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); background: rgba(12, 24, 19, 0.92); padding: 10px 12px; border-radius: 16px;">
-        <div style="min-width: 0;">
-          <h3 id="chatHeaderTitle" style="margin: 0; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
-          <div id="chatHeaderSub" class="meta">SÄT</div>
+      <div class="chat-topbar">
+        <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13.5px;" onclick="closeChat()">← Чаты</button>
+        <div style="min-width: 0; flex: 1;">
+          <h3 id="chatHeaderTitle" style="margin: 0; font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
+          <div id="chatHeaderSub" class="meta">Шумоподавление активно</div>
         </div>
-        <button type="button" class="btn btn-ghost" style="padding: 8px 12px;" onclick="closeChat()">✕</button>
+        <button id="callToggleBtn" type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="toggleAudioCall()">Позвонить</button>
       </div>
+
+      <div id="callBanner" class="call-banner">
+        <div>
+          <div id="callStatusTitle" style="font-weight: 800; font-size: 14px; color: #6cf0b5;">Вызов...</div>
+          <div id="callStatusSub" class="meta">Голосовой вызов с шумоподавлением</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button id="acceptCallBtn" type="button" class="btn btn-primary" style="display: none; padding: 7px 12px; font-size: 12.5px;" onclick="acceptIncomingCall()">Ответить</button>
+          <button type="button" class="btn btn-danger" style="padding: 7px 12px; font-size: 12.5px;" onclick="hangupCall()">Завершить</button>
+        </div>
+      </div>
+      <audio id="remoteAudioEl" autoplay playsinline style="display: none;"></audio>
 
       <div id="chatMessagesBox" class="chat-list"></div>
 
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <input id="chatMsgInput" class="input" style="margin-top: 0; flex: 1;" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter') sendMessage()" />
-        <button type="button" class="btn btn-primary" style="padding: 12px 16px;" onclick="sendMessage()">Отправить</button>
+      <div id="voiceStatusBar" class="voice-status-bar">
+        <span id="voiceStatusText">Пауза перед записью: 2 сек...</span>
+        <button id="voiceStopBtn" type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Отправить / Стоп</button>
+      </div>
+
+      <div class="chat-composer">
+        <button type="button" class="btn btn-ghost" style="padding: 10px; font-size: 12.5px;" title="Фото с камеры" onclick="openPhotoPicker('chat_photo')">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+        <button id="voiceBtn" type="button" class="btn btn-mint" style="padding: 10px 11px; font-size: 12.5px;" title="Голосовое (пауза 2 сек)" onclick="startVoiceWithPause()">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <input id="chatMsgInput" class="input" style="margin-top: 0; flex: 1; padding: 10px 12px;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button type="button" class="btn btn-primary" style="padding: 10px 14px; font-size: 13.5px;" onclick="sendMessage()">➤</button>
       </div>
     </div>
   </div>
@@ -1076,6 +1187,22 @@
     let chatUnsub = null;
     let chatMsgs = [];
 
+    // Голосовые сообщения с паузой 2 сек
+    let voicePauseTimer = null;
+    let voiceRecorder = null;
+    let voiceChunks = [];
+    let voiceStream = null;
+    let voiceStartMs = 0;
+
+    // Звонок WebRTC без видео + гудки
+    let pc = null;
+    let localCallStream = null;
+    let callDocId = null;
+    let callUnsub = null;
+    let ringtoneInterval = null;
+    let ringtoneCtx = null;
+    let incomingCallData = null;
+
     document.getElementById('sessionHint').style.display = 'block';
 
     function esc(s) {
@@ -1092,7 +1219,7 @@
       el.textContent = msg;
       el.classList.add('show');
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('show'), 2500);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
     }
 
     function formatTime(ms) {
@@ -1206,6 +1333,7 @@
     }
 
     async function logoutUser() {
+      hangupCall();
       await signOut(auth);
       showScreen('splash');
       toast('Вы вышли');
@@ -1289,6 +1417,7 @@
       }
       renderMyProfile();
       renderFriendsTab();
+      renderProfileChatsList();
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
@@ -1310,6 +1439,35 @@
         return tb - ta;
       });
       renderGroupsTab();
+      renderProfileChatsList();
+    }, () => {});
+
+    onSnapshot(collection(db, 'calls'), (snap) => {
+      const myUid = getMyUid();
+      if (!myUid) return;
+      snap.docChanges().forEach((chg) => {
+        const data = chg.doc.data();
+        if (!data) return;
+        const docId = chg.doc.id;
+        if (chg.type === 'added' || chg.type === 'modified') {
+          if (data.toUid === myUid && data.status === 'ringing' && !callDocId) {
+            incomingCallData = { id: docId, ...data };
+            if (!activeChatId && data.chatId) {
+              openChatRoom(data.chatId, data.fromName || 'Собеседник');
+            }
+            const banner = document.getElementById('callBanner');
+            document.getElementById('callStatusTitle').textContent = `Входящий звонок: ${data.fromName || 'Участник'}`;
+            document.getElementById('callStatusSub').textContent = 'Нажмите «Ответить» для связи с шумоподавлением';
+            document.getElementById('acceptCallBtn').style.display = 'inline-flex';
+            banner.classList.add('active');
+            startRingtone();
+          }
+          if (callDocId === docId && data.status === 'ended') {
+            cleanupCallLocal(false);
+            toast('Звонок завершён');
+          }
+        }
+      });
     }, () => {});
 
     function switchMainTab(tab, btn) {
@@ -1337,6 +1495,45 @@
       renderMyPosts();
       renderFriendsTab();
       renderGroupsTab();
+      renderProfileChatsList();
+    }
+
+    function getChatDisplayTitle(c) {
+      if (c.type === 'group') return c.title || 'Группа';
+      const myUid = getMyUid();
+      const names = c.memberNames || {};
+      const otherEntry = Object.entries(names).find(([uid]) => uid && uid !== myUid);
+      if (otherEntry && otherEntry[1]) return otherEntry[1];
+      return c.title || 'Личный чат';
+    }
+
+    function renderProfileChatsList() {
+      const box = document.getElementById('profileChatsList');
+      const badge = document.getElementById('chatsCountBadge');
+      if (!box) return;
+
+      const myUid = getMyUid();
+      const myChats = chats.filter(c => Array.isArray(c.members) ? (!myUid || c.members.includes(myUid)) : true);
+      if (badge) badge.textContent = String(myChats.length);
+
+      if (!myChats.length) {
+        box.innerHTML = '<div class="meta" style="margin-top: 10px;">Чатов пока нет. Откройте вкладку «Друзья» или «Группы», чтобы начать переписку.</div>';
+        return;
+      }
+
+      box.innerHTML = myChats.map(c => {
+        const title = getChatDisplayTitle(c);
+        const sub = c.lastMessage || (c.type === 'group' ? (c.description || 'Группа') : 'Нажмите, чтобы открыть чат');
+        return `
+          <div class="chat-row-card" onclick="openChatRoom('${esc(c.id)}', '${esc(title)}')">
+            <div style="min-width: 0; flex: 1;">
+              <div style="font-weight: 800; font-size: 15px; color: #eef8f3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(title)}</div>
+              <div class="meta" style="margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(sub)}</div>
+            </div>
+            <span class="tag">Открыть</span>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderMyProfile() {
@@ -1379,7 +1576,8 @@
         avatar: 'Фото профиля',
         story: 'Сторис (на 3 часа)',
         post: 'Фото для публикации',
-        gallery_add: 'Добавить фото на страницу'
+        gallery_add: 'Добавить фото на страницу',
+        chat_photo: 'Отправить фото в чат'
       };
       document.getElementById('pickerModalTitle').textContent = titles[target] || 'Выберите фото';
       document.getElementById('photoPickerModal').classList.add('open');
@@ -1407,12 +1605,12 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const maxD = pickTarget === 'avatar' ? 420 : 860;
+          const maxD = pickTarget === 'avatar' ? 420 : 960;
           const sc = Math.min(1, maxD / Math.max(img.width || 1, img.height || 1));
           canvas.width = Math.max(1, Math.round((img.width || 600) * sc));
           canvas.height = Math.max(1, Math.round((img.height || 600) * sc));
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
 
           if (pickTarget === 'avatar') {
             state.avatar = dataUrl;
@@ -1442,12 +1640,37 @@
             document.getElementById('postPreviewWrap').style.display = 'block';
             document.getElementById('postPhotoLabel').textContent = 'Фото загружено — заменить';
             toast('Фото загружено');
+          } else if (pickTarget === 'chat_photo') {
+            await sendPhotoToChat(dataUrl);
           }
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
       e.target.value = '';
+    }
+
+    async function sendPhotoToChat(dataUrl) {
+      const myUid = getMyUid();
+      if (!activeChatId || !myUid || !dataUrl) return;
+      try {
+        await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+          senderUid: myUid,
+          senderName: myDisplayName(),
+          kind: 'photo',
+          text: '',
+          photoData: dataUrl,
+          createdAt: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'chats', activeChatId), {
+          lastMessage: 'Фотография',
+          lastSenderUid: myUid,
+          updatedAt: serverTimestamp()
+        });
+        toast('Фото отправлено в чат');
+      } catch (e) {
+        toast('Не удалось отправить фото');
+      }
     }
 
     function onMyAvatarTap() {
@@ -2050,8 +2273,12 @@
     function openChatRoom(id, title) {
       activeChatId = id;
       const c = chats.find(x => x.id === id);
-      document.getElementById('chatHeaderTitle').textContent = c?.title || title || 'Чат';
-      document.getElementById('chatHeaderSub').textContent = c?.type === 'group' ? (c.description || 'Группа') : 'Личный чат';
+      const displayTitle = c ? getChatDisplayTitle(c) : (title || 'Чат');
+      document.getElementById('chatHeaderTitle').textContent = displayTitle;
+      document.getElementById('chatHeaderSub').textContent = c?.type === 'group' ? (c.description || 'Группа') : 'Голос с шумоподавлением • Фото';
+
+      const callBtn = document.getElementById('callToggleBtn');
+      callBtn.style.display = (c?.type === 'group') ? 'none' : 'inline-flex';
 
       if (chatUnsub) chatUnsub();
       const q = query(collection(db, 'chats', id, 'messages'), orderBy('createdAt', 'asc'));
@@ -2063,6 +2290,7 @@
     }
 
     function closeChat() {
+      cancelVoiceState();
       if (chatUnsub) { chatUnsub(); chatUnsub = null; }
       activeChatId = null;
       document.getElementById('chatScreen').classList.remove('open');
@@ -2071,14 +2299,33 @@
     function renderChatBox() {
       const box = document.getElementById('chatMessagesBox');
       if (!chatMsgs.length) {
-        box.innerHTML = '<div class="meta" style="text-align:center; padding:14px;">Сообщений пока нет. Напишите первым.</div>';
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:14px;">Сообщений пока нет. Напишите первым или отправьте голос/фото.</div>';
         return;
       }
       box.innerHTML = chatMsgs.map(m => {
         const mine = currentUser && m.senderUid === currentUser.uid;
+        const whoHtml = (!mine && m.senderName) ? `<div class="msg-who">${esc(m.senderName)}</div>` : '';
+        if (m.kind === 'photo' && m.photoData) {
+          return `
+            <div class="msg ${mine ? 'me' : 'them'}">
+              ${whoHtml}
+              <img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(m.createdAt?.toMillis ? m.createdAt.toMillis() : Date.now()))}')" />
+            </div>
+          `;
+        }
+        if (m.kind === 'voice' && m.audioData) {
+          const durLabel = m.durationSec ? ` (${Number(m.durationSec)} сек)` : '';
+          return `
+            <div class="msg ${mine ? 'me' : 'them'}">
+              ${whoHtml}
+              <div style="font-size:12.5px; font-weight:700;">Голосовое сообщение${esc(durLabel)}</div>
+              <audio class="msg-audio" controls preload="metadata" src="${m.audioData}"></audio>
+            </div>
+          `;
+        }
         return `
           <div class="msg ${mine ? 'me' : 'them'}">
-            ${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}
+            ${whoHtml}
             ${esc(m.text || '')}
           </div>
         `;
@@ -2106,6 +2353,361 @@
           updatedAt: serverTimestamp()
         });
       } catch (e) {}
+    }
+
+    // ГОЛОСОВЫЕ СООБЩЕНИЯ С ПАУЗОЙ 2 СЕКУНДЫ
+    function cancelVoiceState() {
+      clearTimeout(voicePauseTimer);
+      voicePauseTimer = null;
+      if (voiceRecorder && voiceRecorder.state !== 'inactive') {
+        try { voiceRecorder.stop(); } catch (e) {}
+      }
+      voiceRecorder = null;
+      if (voiceStream) {
+        voiceStream.getTracks().forEach(tr => tr.stop());
+        voiceStream = null;
+      }
+      const bar = document.getElementById('voiceStatusBar');
+      if (bar) bar.classList.remove('show');
+    }
+
+    async function startVoiceWithPause() {
+      const myUid = getMyUid();
+      if (!activeChatId || !myUid) return;
+      if (voicePauseTimer || (voiceRecorder && voiceRecorder.state === 'recording')) {
+        stopVoiceRecordingNow();
+        return;
+      }
+
+      const bar = document.getElementById('voiceStatusBar');
+      const stText = document.getElementById('voiceStatusText');
+      bar.classList.add('show');
+      stText.textContent = 'Пауза перед записью: 2 сек...';
+
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            channelCount: 1
+          }
+        });
+      } catch (err) {
+        bar.classList.remove('show');
+        toast('Разрешите доступ к микрофону в браузере');
+        return;
+      }
+
+      voiceStream = stream;
+      stText.textContent = 'Пауза 1 сек — приготовьтесь говорить...';
+
+      voicePauseTimer = setTimeout(() => {
+        voicePauseTimer = null;
+        if (!voiceStream || !activeChatId) {
+          cancelVoiceState();
+          return;
+        }
+        try {
+          const mimeTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+          const chosenMime = mimeTypes.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+          voiceRecorder = chosenMime ? new MediaRecorder(voiceStream, { mimeType: chosenMime }) : new MediaRecorder(voiceStream);
+          voiceChunks = [];
+          voiceStartMs = Date.now();
+
+          voiceRecorder.ondataavailable = (ev) => {
+            if (ev.data && ev.data.size > 0) voiceChunks.push(ev.data);
+          };
+
+          voiceRecorder.onstop = async () => {
+            const blobType = voiceRecorder?.mimeType || 'audio/webm';
+            const durSec = Math.max(1, Math.round((Date.now() - voiceStartMs) / 1000));
+            if (voiceStream) {
+              voiceStream.getTracks().forEach(tr => tr.stop());
+              voiceStream = null;
+            }
+            voiceRecorder = null;
+            bar.classList.remove('show');
+
+            const blob = new Blob(voiceChunks, { type: blobType });
+            voiceChunks = [];
+            if (!blob.size || !activeChatId) return;
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+              const audioData = String(reader.result || '');
+              if (!audioData || audioData.length > 950000) {
+                toast('Запись слишком длинная — сделайте покороче');
+                return;
+              }
+              try {
+                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+                  senderUid: getMyUid(),
+                  senderName: myDisplayName(),
+                  kind: 'voice',
+                  text: '',
+                  audioData,
+                  durationSec: durSec,
+                  createdAt: serverTimestamp()
+                });
+                await updateDoc(doc(db, 'chats', activeChatId), {
+                  lastMessage: `Голосовое (${durSec} сек)`,
+                  lastSenderUid: getMyUid(),
+                  updatedAt: serverTimestamp()
+                });
+                toast('Голосовое отправлено');
+              } catch (e) {
+                toast('Ошибка отправки голосового');
+              }
+            };
+            reader.readAsDataURL(blob);
+          };
+
+          voiceRecorder.start();
+          stText.textContent = 'Идёт запись голоса... Нажмите «Отправить / Стоп»';
+        } catch (err) {
+          cancelVoiceState();
+          toast('Запись голоса не поддерживается на этом устройстве');
+        }
+      }, 2000);
+    }
+
+    function stopVoiceRecordingNow() {
+      if (voicePauseTimer) {
+        clearTimeout(voicePauseTimer);
+        voicePauseTimer = null;
+      }
+      if (voiceRecorder && voiceRecorder.state === 'recording') {
+        voiceRecorder.stop();
+      } else {
+        cancelVoiceState();
+      }
+    }
+
+    // АУДИОЗВОНОК С ШУМОПОДАВЛЕНИЕМ И ТЕЛЕФОННЫМИ ГУДКАМИ
+    function startRingtone() {
+      stopRingtone();
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        ringtoneCtx = new AudioCtx();
+        const playTone = () => {
+          if (!ringtoneCtx) return;
+          const osc = ringtoneCtx.createOscillator();
+          const gain = ringtoneCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(425, ringtoneCtx.currentTime);
+          gain.gain.setValueAtTime(0.08, ringtoneCtx.currentTime);
+          osc.connect(gain);
+          gain.connect(ringtoneCtx.destination);
+          osc.start();
+          osc.stop(ringtoneCtx.currentTime + 1.0);
+        };
+        playTone();
+        ringtoneInterval = setInterval(playTone, 4000);
+      } catch (e) {}
+    }
+
+    function stopRingtone() {
+      if (ringtoneInterval) {
+        clearInterval(ringtoneInterval);
+        ringtoneInterval = null;
+      }
+      if (ringtoneCtx) {
+        try { ringtoneCtx.close(); } catch (e) {}
+        ringtoneCtx = null;
+      }
+    }
+
+    async function getCleanVoiceStream() {
+      return await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1
+        },
+        video: false
+      });
+    }
+
+    function createPeerConnection(docId) {
+      const connection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+      if (localCallStream) {
+        localCallStream.getTracks().forEach(track => connection.addTrack(track, localCallStream));
+      }
+      connection.ontrack = (ev) => {
+        const audioEl = document.getElementById('remoteAudioEl');
+        if (audioEl && ev.streams && ev.streams[0]) {
+          audioEl.srcObject = ev.streams[0];
+          audioEl.play().catch(() => {});
+        }
+      };
+      connection.onicecandidate = async (ev) => {
+        if (ev.candidate && docId) {
+          const candObj = ev.candidate.toJSON ? ev.candidate.toJSON() : {
+            candidate: ev.candidate.candidate,
+            sdpMid: ev.candidate.sdpMid,
+            sdpMLineIndex: ev.candidate.sdpMLineIndex
+          };
+          try {
+            await updateDoc(doc(db, 'calls', docId), {
+              candidates: arrayUnion(candObj)
+            });
+          } catch (e) {}
+        }
+      };
+      return connection;
+    }
+
+    async function toggleAudioCall() {
+      if (callDocId || incomingCallData) {
+        await hangupCall();
+        return;
+      }
+      const myUid = getMyUid();
+      const chat = chats.find(x => x.id === activeChatId);
+      if (!myUid || !chat || !Array.isArray(chat.members)) return;
+      const peerUid = chat.members.find(u => u && u !== myUid);
+      if (!peerUid) {
+        toast('Выберите собеседника для звонка');
+        return;
+      }
+
+      try {
+        localCallStream = await getCleanVoiceStream();
+      } catch (e) {
+        toast('Нет доступа к микрофону для звонка');
+        return;
+      }
+
+      const newDocId = 'call_' + [myUid, peerUid].sort().join('_') + '_' + Date.now();
+      callDocId = newDocId;
+      pc = createPeerConnection(newDocId);
+
+      const banner = document.getElementById('callBanner');
+      document.getElementById('acceptCallBtn').style.display = 'none';
+      document.getElementById('callStatusTitle').textContent = 'Идут гудки вызова...';
+      document.getElementById('callStatusSub').textContent = 'Ожидание ответа • Шумоподавление включено';
+      document.getElementById('callToggleBtn').textContent = 'Сбросить';
+      banner.classList.add('active');
+      startRingtone();
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      await setDoc(doc(db, 'calls', newDocId), {
+        chatId: activeChatId,
+        fromUid: myUid,
+        fromName: myDisplayName(),
+        toUid: peerUid,
+        status: 'ringing',
+        offer: { type: offer.type, sdp: offer.sdp },
+        candidates: [],
+        createdAt: serverTimestamp()
+      });
+
+      let addedIceCount = 0;
+      callUnsub = onSnapshot(doc(db, 'calls', newDocId), async (snap) => {
+        const d = snap.data();
+        if (!d) return;
+        if (d.status === 'active' && d.answer && pc && !pc.currentRemoteDescription) {
+          stopRingtone();
+          document.getElementById('callStatusTitle').textContent = 'Разговор идёт';
+          document.getElementById('callStatusSub').textContent = 'Чёткий голос • Шумоподавление активно';
+          await pc.setRemoteDescription(new RTCSessionDescription(d.answer));
+        }
+        if (Array.isArray(d.candidates) && pc && pc.remoteDescription) {
+          for (let i = addedIceCount; i < d.candidates.length; i++) {
+            try { await pc.addIceCandidate(new RTCIceCandidate(d.candidates[i])); } catch (e) {}
+          }
+          addedIceCount = d.candidates.length;
+        }
+        if (d.status === 'ended') {
+          cleanupCallLocal(false);
+        }
+      }, () => {});
+    }
+
+    async function acceptIncomingCall() {
+      if (!incomingCallData) return;
+      const callInfo = incomingCallData;
+      incomingCallData = null;
+      stopRingtone();
+
+      try {
+        localCallStream = await getCleanVoiceStream();
+      } catch (e) {
+        toast('Разрешите микрофон, чтобы ответить на звонок');
+        return;
+      }
+
+      callDocId = callInfo.id;
+      pc = createPeerConnection(callDocId);
+      document.getElementById('acceptCallBtn').style.display = 'none';
+      document.getElementById('callStatusTitle').textContent = 'Разговор идёт';
+      document.getElementById('callStatusSub').textContent = 'Чёткий голос • Шумоподавление активно';
+      document.getElementById('callToggleBtn').textContent = 'Сбросить';
+
+      await pc.setRemoteDescription(new RTCSessionDescription(callInfo.offer));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      await updateDoc(doc(db, 'calls', callDocId), {
+        status: 'active',
+        answer: { type: answer.type, sdp: answer.sdp }
+      });
+
+      let addedIceCount = 0;
+      callUnsub = onSnapshot(doc(db, 'calls', callDocId), async (snap) => {
+        const d = snap.data();
+        if (!d) return;
+        if (Array.isArray(d.candidates) && pc && pc.remoteDescription) {
+          for (let i = addedIceCount; i < d.candidates.length; i++) {
+            try { await pc.addIceCandidate(new RTCIceCandidate(d.candidates[i])); } catch (e) {}
+          }
+          addedIceCount = d.candidates.length;
+        }
+        if (d.status === 'ended') {
+          cleanupCallLocal(false);
+        }
+      }, () => {});
+    }
+
+    function cleanupCallLocal(notifyRemote) {
+      stopRingtone();
+      const idToEnd = callDocId || incomingCallData?.id;
+      callDocId = null;
+      incomingCallData = null;
+      if (callUnsub) { callUnsub(); callUnsub = null; }
+      if (pc) {
+        try { pc.close(); } catch (e) {}
+        pc = null;
+      }
+      if (localCallStream) {
+        localCallStream.getTracks().forEach(tr => tr.stop());
+        localCallStream = null;
+      }
+      const audioEl = document.getElementById('remoteAudioEl');
+      if (audioEl) audioEl.srcObject = null;
+      const banner = document.getElementById('callBanner');
+      if (banner) banner.classList.remove('active');
+      const acceptBtn = document.getElementById('acceptCallBtn');
+      if (acceptBtn) acceptBtn.style.display = 'none';
+      const callBtn = document.getElementById('callToggleBtn');
+      if (callBtn) callBtn.textContent = 'Позвонить';
+
+      if (notifyRemote && idToEnd) {
+        updateDoc(doc(db, 'calls', idToEnd), { status: 'ended' }).catch(() => {});
+      }
+    }
+
+    async function hangupCall() {
+      cleanupCallLocal(true);
+      toast('Звонок завершён');
     }
 
     function openEditProfileModal() {
@@ -2148,6 +2750,8 @@
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage,
+      startVoiceWithPause, stopVoiceRecordingNow,
+      toggleAudioCall, acceptIncomingCall, hangupCall,
       openEditProfileModal, saveProfileData,
       hideModal, closeBackdrop
     });
@@ -2160,6 +2764,7 @@
     }
 
     renderFriendsTab();
+    renderProfileChatsList();
   </script>
 </body>
 </html>

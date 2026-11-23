@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>SÄT</title>
-  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0f6b43" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <style>
     :root {
       --surface: #ffffff;
@@ -1123,7 +1121,7 @@
       { id: 'wp10', name: 'Льняной покой', top: '#fafcf9', base: '#f1f5f2', bot: '#e3ebe5', dot: 'rgba(15,107,67,0.04)', size: '26px 26px' }
     ];
 
-    const STORAGE_KEY = 'sat_profile_state_v3';
+    const STORAGE_KEY = 'sat_profile_state_v4';
     let state = {
       wallpaperId: 'wp1',
       displayName: '',
@@ -1396,7 +1394,7 @@
       renderFeed();
       renderMyPosts();
       if (activePeerUid) openUserProfile(activePeerUid);
-    });
+    }, () => {});
 
     onSnapshot(collection(db, 'users'), (snap) => {
       cloudUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1420,13 +1418,13 @@
       renderMyPhotos();
       renderFriendsSection();
       if (activePeerUid) openUserProfile(activePeerUid);
-    });
+    }, () => {});
 
     onSnapshot(collection(db, 'friendRequests'), (snap) => {
       friendRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderFriendsSection();
       if (activePeerUid) openUserProfile(activePeerUid);
-    });
+    }, () => {});
 
     onSnapshot(collection(db, 'chats'), (snap) => {
       cloudChats = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
@@ -1435,7 +1433,7 @@
         return tb - ta;
       });
       renderGroupsSection();
-    });
+    }, () => {});
 
     /* НАВИГАЦИЯ */
     function switchTab(tab, btn) {
@@ -1678,11 +1676,28 @@
         await syncUserToCloud(currentUser);
       }
 
+      const localPost = {
+        id: 'local_' + nowMs,
+        author: getUserName(),
+        authorUid: currentUser ? currentUser.uid : 'local_user',
+        authorPhoto: getUserPhoto(),
+        body,
+        photoData: pendingPostPhotoData || '',
+        visibility,
+        sentAtMs: nowMs,
+        time: sentTimeStr,
+        confirms: 0
+      };
+
+      cloudPosts = [localPost, ...cloudPosts];
+      renderFeed();
+      renderMyPosts();
+
       try {
         await addDoc(collection(db, 'posts'), {
-          author: getUserName(),
+          author: localPost.author,
           authorUid: currentUser ? currentUser.uid : null,
-          authorPhoto: getUserPhoto(),
+          authorPhoto: localPost.authorPhoto,
           body,
           photoData: pendingPostPhotoData || '',
           visibility,
@@ -1691,13 +1706,12 @@
           confirms: 0,
           createdAt: serverTimestamp()
         });
-        document.getElementById('newPostBody').value = '';
-        clearPostPhoto();
-        closeModalById('createPostModal');
-        showToast(visibility === 'pulse' ? 'Отправлено в Пульс и на вашу страницу' : 'Сохранено у вас на странице');
-      } catch (e) {
-        showToast('Не удалось отправить публикацию');
-      }
+      } catch (e) {}
+
+      document.getElementById('newPostBody').value = '';
+      clearPostPhoto();
+      closeModalById('createPostModal');
+      showToast(visibility === 'pulse' ? 'Отправлено в Пульс и на вашу страницу' : 'Сохранено у вас на странице');
     }
 
     function getPostTimeLabel(p) {
@@ -1753,8 +1767,9 @@
 
     function renderMyPosts() {
       const box = document.getElementById('myPostsList');
-      if (!box || !currentUser) return;
-      const mine = cloudPosts.filter(p => p.authorUid === currentUser.uid);
+      if (!box) return;
+      const uid = currentUser ? currentUser.uid : 'local_user';
+      const mine = cloudPosts.filter(p => p.authorUid === uid || (currentUser && p.authorUid === currentUser.uid));
       if (!mine.length) {
         box.innerHTML = '<div class="meta">Публикаций пока нет. Нажмите «Новая публикация» выше.</div>';
         return;
@@ -1778,18 +1793,23 @@
     }
 
     async function confirmPost(id) {
-      try {
-        await updateDoc(doc(db, 'posts', id), { confirms: increment(1) });
-        showToast('Отмечено');
-      } catch (e) {}
+      cloudPosts = cloudPosts.map(p => p.id === id ? { ...p, confirms: Number(p.confirms || 0) + 1 } : p);
+      renderFeed();
+      if (!String(id).startsWith('local_')) {
+        try { await updateDoc(doc(db, 'posts', id), { confirms: increment(1) }); } catch (e) {}
+      }
+      showToast('Отмечено');
     }
 
     async function deletePost(id) {
       if (!confirm('Удалить публикацию?')) return;
-      try {
-        await deleteDoc(doc(db, 'posts', id));
-        showToast('Удалено');
-      } catch (e) {}
+      cloudPosts = cloudPosts.filter(p => p.id !== id);
+      renderFeed();
+      renderMyPosts();
+      if (!String(id).startsWith('local_')) {
+        try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
+      }
+      showToast('Удалено');
     }
 
     /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА */
@@ -2097,7 +2117,7 @@
       activeMsgUnsub = onSnapshot(msgQuery, (snap) => {
         currentMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         renderChatMessages();
-      });
+      }, () => {});
       document.getElementById('chatModal').classList.add('open');
     }
 
@@ -2191,6 +2211,11 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then((regs) => {
         regs.forEach((r) => r.unregister());
+      }).catch(() => {});
+    }
+    if ('caches' in window) {
+      caches.keys().then((keys) => {
+        keys.forEach((k) => caches.delete(k));
       }).catch(() => {});
     }
 

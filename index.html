@@ -384,6 +384,12 @@
     }
     .mini-ava img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .user-name { font-weight: 700; font-size: 15.5px; color: var(--text); }
+    .post-caption {
+      margin-top: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #6cf0b5;
+    }
     .post-img-wrap {
       margin-top: 10px;
       border-radius: 16px;
@@ -533,7 +539,7 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
-      gap: 8px;
+      gap: 7px;
     }
     .chat-topbar {
       display: flex;
@@ -575,17 +581,17 @@
     .msg-edited { font-size: 11px; opacity: 0.78; margin-top: 4px; font-style: italic; }
     .msg-tools { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .msg-tool-btn {
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      background: rgba(9, 22, 16, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(9, 22, 16, 0.52);
       color: #ffffff;
       border-radius: 10px;
-      padding: 3px 9px;
+      padding: 4px 10px;
       font-size: 11.5px;
       font-weight: 700;
       cursor: pointer;
     }
     .msg-tool-btn.del {
-      border-color: rgba(255, 130, 145, 0.55);
+      border-color: rgba(255, 130, 145, 0.6);
       color: #ffd0d5;
     }
     .msg-photo {
@@ -622,6 +628,29 @@
     .voice-status-bar.show,
     .voice-draft-bar.show,
     .edit-mode-bar.show { display: flex; }
+
+    .emoji-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 6px;
+      border-radius: 14px;
+      background: rgba(14, 29, 23, 0.85);
+      border: 1px solid var(--border);
+    }
+    .emoji-btn {
+      border: none;
+      background: rgba(24, 46, 36, 0.85);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 5px 9px;
+      font-size: 17px;
+      line-height: 1.1;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .emoji-btn:active { transform: scale(0.94); }
+
     .chat-composer {
       display: flex;
       gap: 6px;
@@ -940,7 +969,10 @@
   <div id="newPostModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
-      <label class="meta">Текст сообщения</label>
+      <label class="meta">Подпись к публикации</label>
+      <input id="postCaptionInput" class="input" placeholder="Например: Вечерний Өскемен / Важное / Настроение..." />
+
+      <label class="meta" style="display: block; margin-top: 10px;">Текст сообщения</label>
       <textarea id="postTextInput" rows="3" placeholder="Напишите ваше сообщение..."></textarea>
 
       <div style="margin-top: 12px;">
@@ -1039,7 +1071,6 @@
         <button id="voiceStopBtn" type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Остановить</button>
       </div>
 
-      <!-- Предпросмотр голосового перед отправкой: прослушать, отправить или удалить -->
       <div id="voiceDraftBar" class="voice-draft-bar">
         <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
           <span id="voiceDraftLabel">Голосовое готово — прослушайте перед отправкой</span>
@@ -1051,13 +1082,25 @@
         <audio id="voiceDraftAudio" controls preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
       </div>
 
-      <!-- Строка быстрого редактирования сообщения -->
       <div id="editModeBar" class="edit-mode-bar">
         <span>Редактирование сообщения</span>
         <div style="display: flex; gap: 6px;">
           <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="cancelEditMessage()">Отмена</button>
           <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()">Сохранить</button>
         </div>
+      </div>
+
+      <div id="emojiBar" class="emoji-bar" aria-label="Смайлики">
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😂')">😂</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🙏')">🙏</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('✨')">✨</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😍')">😍</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😢')">😢</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
       </div>
 
       <div class="chat-composer">
@@ -1075,7 +1118,6 @@
 
   <div id="toast" class="toast"></div>
 
-  <!-- Простой переключатель из 5 фонов -->
   <script>
     (function () {
       const SIMPLE_BACKGROUNDS = [
@@ -1226,7 +1268,6 @@
     let chatMsgs = [];
     let editingMsgId = null;
 
-    // Голосовые сообщения с паузой 2 сек и черновиком перед отправкой
     let voicePauseTimer = null;
     let voiceRecorder = null;
     let voiceChunks = [];
@@ -1234,7 +1275,6 @@
     let voiceStartMs = 0;
     let pendingVoiceDraft = null;
 
-    // Звонок WebRTC без видео + гудки
     let pc = null;
     let localCallStream = null;
     let callDocId = null;
@@ -1773,9 +1813,10 @@
     }
 
     async function submitNewPost() {
+      const caption = document.getElementById('postCaptionInput').value.trim();
       const text = document.getElementById('postTextInput').value.trim();
-      if (!text && !draftPostPhoto) {
-        toast('Напишите сообщение или загрузите фото');
+      if (!caption && !text && !draftPostPhoto) {
+        toast('Добавьте подпись, текст или фото');
         return;
       }
       const now = Date.now();
@@ -1794,6 +1835,7 @@
         author: myDisplayName(),
         authorUid: currentUser ? currentUser.uid : 'me',
         authorPhoto: myAvatarUrl(),
+        caption,
         body: text,
         photoData: draftPostPhoto || '',
         visibility: vis,
@@ -1811,6 +1853,7 @@
           author: item.author,
           authorUid: currentUser ? currentUser.uid : null,
           authorPhoto: item.authorPhoto,
+          caption,
           body: text,
           photoData: draftPostPhoto || '',
           visibility: vis,
@@ -1821,6 +1864,7 @@
         });
       } catch (e) {}
 
+      document.getElementById('postCaptionInput').value = '';
       document.getElementById('postTextInput').value = '';
       clearPostAttachment();
       hideModal('newPostModal');
@@ -1833,6 +1877,11 @@
       return p.time || formatTime(Date.now());
     }
 
+    function canManagePost(p) {
+      const myUid = getMyUid();
+      return Boolean(myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_');
+    }
+
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       const list = posts.filter(p => (p.visibility || 'pulse') === 'pulse');
@@ -1842,7 +1891,7 @@
       }
 
       box.innerHTML = list.map(p => {
-        const isMe = currentUser && p.authorUid === currentUser.uid;
+        const isMine = canManagePost(p);
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const uid = p.authorUid || 'unknown';
@@ -1860,17 +1909,18 @@
               </div>
               <span class="tag">Пульс</span>
             </div>
-            ${p.body ? `<div style="font-size: 15px; line-height: 1.48;">${esc(p.body)}</div>` : ''}
+            ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
+            ${p.body ? `<div style="font-size: 15px; line-height: 1.48; margin-top: 6px;">${esc(p.body)}</div>` : ''}
             ${p.photoData ? `
               <div class="post-img-wrap" onclick="openImageViewer('${p.photoData}', '${esc(author)}', '${esc(t)}')">
                 <img src="${p.photoData}" alt="" draggable="false" />
               </div>
             ` : ''}
             <div class="actions">
-              <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="likePost('${p.id}')">Поддержать (${Number(p.confirms || 0)})</button>
+              <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="likePost('${esc(p.id)}')">Поддержать (${Number(p.confirms || 0)})</button>
               <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">Страница</button>
-              ${!isMe && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(author)}')">Написать</button>` : ''}
-              ${isMe ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${p.id}')">Удалить</button>` : ''}
+              ${!isMine && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(author)}')">Написать</button>` : ''}
+              ${isMine ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${esc(p.id)}')">Удалить</button>` : ''}
             </div>
           </article>
         `;
@@ -1879,8 +1929,8 @@
 
     function renderMyPosts() {
       const box = document.getElementById('myPostsBox');
-      const myUid = currentUser ? currentUser.uid : 'me';
-      const mine = posts.filter(p => p.authorUid === myUid || (currentUser && p.authorUid === currentUser.uid));
+      const myUid = getMyUid();
+      const mine = posts.filter(p => (myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_'));
       if (!mine.length) {
         box.innerHTML = '<div class="meta">У вас пока нет публикаций.</div>';
         return;
@@ -1893,9 +1943,10 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
               <div>
                 <div class="meta">Отправлено: ${esc(t)} • ${esc(where)}</div>
+                ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
                 ${p.body ? `<div style="font-size: 14.5px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
               </div>
-              <button type="button" class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="removePost('${p.id}')">Удалить</button>
+              <button type="button" class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="removePost('${esc(p.id)}')">Удалить</button>
             </div>
             ${p.photoData ? `
               <div class="post-img-wrap" style="max-height: 240px;" onclick="openImageViewer('${p.photoData}', '${esc(myDisplayName())}', '${esc(t)}')">
@@ -1917,14 +1968,19 @@
     }
 
     async function removePost(id) {
-      if (!confirm('Удалить публикацию?')) return;
+      if (!id) return;
       posts = posts.filter(p => p.id !== id);
       renderPulse();
       renderMyPosts();
       if (!String(id).startsWith('tmp_')) {
-        try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
+        try {
+          await deleteDoc(doc(db, 'posts', id));
+        } catch (e) {
+          toast('Не удалось удалить из базы');
+          return;
+        }
       }
-      toast('Удалено');
+      toast('Публикация удалена');
     }
 
     function openPersonPage(uid, fallbackName) {
@@ -2012,6 +2068,7 @@
           return `
             <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
               <div class="meta">Отправлено: ${esc(t)}</div>
+              ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
               ${p.body ? `<div style="font-size: 15px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
               ${p.photoData ? `
                 <div class="post-img-wrap" style="max-height: 260px;" onclick="openImageViewer('${p.photoData}', '${esc(name)}', '${esc(t)}')">
@@ -2340,6 +2397,19 @@
       document.getElementById('chatScreen').classList.remove('open');
     }
 
+    function insertEmoji(em) {
+      const inp = document.getElementById('chatMsgInput');
+      if (!inp) return;
+      const start = inp.selectionStart ?? inp.value.length;
+      const end = inp.selectionEnd ?? inp.value.length;
+      inp.value = inp.value.slice(0, start) + em + inp.value.slice(end);
+      inp.focus();
+      const nextPos = start + em.length;
+      if (inp.setSelectionRange) {
+        try { inp.setSelectionRange(nextPos, nextPos); } catch (e) {}
+      }
+    }
+
     function renderChatBox() {
       const box = document.getElementById('chatMessagesBox');
       if (!chatMsgs.length) {
@@ -2348,7 +2418,7 @@
       }
       const myUid = getMyUid();
       box.innerHTML = chatMsgs.map(m => {
-        const mine = Boolean(myUid && m.senderUid === myUid);
+        const mine = Boolean(myUid && m.senderUid === myUid) || String(m.id).startsWith('tmp_');
         const whoHtml = (!mine && m.senderName) ? `<div class="msg-who">${esc(m.senderName)}</div>` : '';
         const editedHtml = m.edited ? `<div class="msg-edited">изменено</div>` : '';
         const editBtnHtml = (mine && m.kind !== 'photo' && m.kind !== 'voice')
@@ -2401,6 +2471,10 @@
     }
 
     function cancelEditMessage() {
+      if (editingMsgId) {
+        const inp = document.getElementById('chatMsgInput');
+        if (inp) inp.value = '';
+      }
       editingMsgId = null;
       const bar = document.getElementById('editModeBar');
       if (bar) bar.classList.remove('show');
@@ -2415,38 +2489,58 @@
         return;
       }
       const id = editingMsgId;
+      const chatId = activeChatId;
       inp.value = '';
       cancelEditMessage();
-      try {
-        await updateDoc(doc(db, 'chats', activeChatId, 'messages', id), {
-          text: nextText,
-          edited: true,
-          updatedAt: serverTimestamp()
-        });
-        toast('Сообщение изменено');
-      } catch (e) {
-        toast('Не удалось сохранить изменение');
+
+      chatMsgs = chatMsgs.map(m => m.id === id ? { ...m, text: nextText, edited: true } : m);
+      renderChatBox();
+
+      if (!String(id).startsWith('tmp_')) {
+        try {
+          await updateDoc(doc(db, 'chats', chatId, 'messages', id), {
+            text: nextText,
+            edited: true,
+            updatedAt: serverTimestamp()
+          });
+          await updateDoc(doc(db, 'chats', chatId), {
+            lastMessage: nextText,
+            updatedAt: serverTimestamp()
+          });
+          toast('Изменения сохранены');
+        } catch (e) {
+          toast('Не удалось сохранить изменение');
+        }
+      } else {
+        toast('Изменения сохранены');
       }
     }
 
     async function deleteChatMessage(msgId) {
       if (!msgId || !activeChatId) return;
+      const chatId = activeChatId;
       if (editingMsgId === msgId) cancelEditMessage();
+
       chatMsgs = chatMsgs.filter(m => m.id !== msgId);
       renderChatBox();
-      try {
-        await deleteDoc(doc(db, 'chats', activeChatId, 'messages', msgId));
-        const lastMsg = chatMsgs[chatMsgs.length - 1];
-        const preview = !lastMsg
-          ? 'Сообщений нет'
-          : (lastMsg.kind === 'photo' ? 'Фотография' : (lastMsg.kind === 'voice' ? `Голосовое (${Number(lastMsg.durationSec || 1)} сек)` : (lastMsg.text || 'Сообщение')));
-        await updateDoc(doc(db, 'chats', activeChatId), {
-          lastMessage: preview,
-          updatedAt: serverTimestamp()
-        });
+
+      if (!String(msgId).startsWith('tmp_')) {
+        try {
+          await deleteDoc(doc(db, 'chats', chatId, 'messages', msgId));
+          const lastMsg = chatMsgs[chatMsgs.length - 1];
+          const preview = !lastMsg
+            ? 'Сообщений нет'
+            : (lastMsg.kind === 'photo' ? 'Фотография' : (lastMsg.kind === 'voice' ? `Голосовое (${Number(lastMsg.durationSec || 1)} сек)` : (lastMsg.text || 'Сообщение')));
+          await updateDoc(doc(db, 'chats', chatId), {
+            lastMessage: preview,
+            updatedAt: serverTimestamp()
+          });
+          toast('Сообщение удалено');
+        } catch (e) {
+          toast('Не удалось удалить сообщение');
+        }
+      } else {
         toast('Сообщение удалено');
-      } catch (e) {
-        toast('Ошибка удаления');
       }
     }
 
@@ -2459,16 +2553,28 @@
       const text = inp.value.trim();
       const myUid = getMyUid();
       if (!text || !activeChatId || !myUid) return;
+      const chatId = activeChatId;
       inp.value = '';
+
+      const tmpId = 'tmp_msg_' + Date.now();
+      chatMsgs = [...chatMsgs, {
+        id: tmpId,
+        senderUid: myUid,
+        senderName: myDisplayName(),
+        kind: 'text',
+        text
+      }];
+      renderChatBox();
+
       try {
-        await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+        await addDoc(collection(db, 'chats', chatId, 'messages'), {
           senderUid: myUid,
           senderName: myDisplayName(),
           kind: 'text',
           text,
           createdAt: serverTimestamp()
         });
-        await updateDoc(doc(db, 'chats', activeChatId), {
+        await updateDoc(doc(db, 'chats', chatId), {
           lastMessage: text,
           lastSenderUid: myUid,
           updatedAt: serverTimestamp()
@@ -2476,7 +2582,6 @@
       } catch (e) {}
     }
 
-    // ГОЛОСОВЫЕ СООБЩЕНИЯ С ПАУЗОЙ 2 СЕК И ПРОСЛУШИВАНИЕМ ДО ОТПРАВКИ
     function cancelVoiceState() {
       clearTimeout(voicePauseTimer);
       voicePauseTimer = null;
@@ -2610,9 +2715,11 @@
       const myUid = getMyUid();
       if (!pendingVoiceDraft || !activeChatId || !myUid) return;
       const { audioData, durSec } = pendingVoiceDraft;
+      const chatId = activeChatId;
       discardVoiceDraft();
+
       try {
-        await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+        await addDoc(collection(db, 'chats', chatId, 'messages'), {
           senderUid: myUid,
           senderName: myDisplayName(),
           kind: 'voice',
@@ -2621,7 +2728,7 @@
           durationSec: durSec,
           createdAt: serverTimestamp()
         });
-        await updateDoc(doc(db, 'chats', activeChatId), {
+        await updateDoc(doc(db, 'chats', chatId), {
           lastMessage: `Голосовое (${durSec} сек)`,
           lastSenderUid: myUid,
           updatedAt: serverTimestamp()
@@ -2632,7 +2739,6 @@
       }
     }
 
-    // АУДИОЗВОНОК С ШУМОПОДАВЛЕНИЕМ И ТЕЛЕФОННЫМИ ГУДКАМИ
     function startRingtone() {
       stopRingtone();
       try {
@@ -2896,7 +3002,7 @@
       openPersonPage, closePeerScreen, switchPeerSubtab, openPeerStoryViewer,
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
-      openDirectChat, openChatRoom, closeChat, sendMessage,
+      openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
       startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft,
       toggleAudioCall, acceptIncomingCall, hangupCall,

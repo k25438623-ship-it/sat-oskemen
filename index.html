@@ -604,7 +604,6 @@
       cursor: pointer;
     }
 
-    /* Кастомный защищённый голосовой плеер без возможности скачать чужое аудио */
     .voice-player {
       margin-top: 6px;
       display: flex;
@@ -925,7 +924,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
               <h3 style="margin: 0; font-size: 17px;">Техподдержка и идеи</h3>
-              <div class="meta">Сообщения о проблемах и предложения по улучшению приходят создателю SÄT</div>
+              <div class="meta">Обращения сохраняются в Firestore (supportTickets) для создателя SÄT</div>
             </div>
             <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Написать</button>
           </div>
@@ -1037,7 +1036,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h3 style="margin: 0; font-size: 18px;">Техподдержка и идеи для SÄT</h3>
-          <div class="meta">Все обращения и предложения отправляются создателю приложения</div>
+          <div class="meta">Обращения сохраняются в Firestore (supportTickets) для создателя приложения</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
       </div>
@@ -1053,11 +1052,14 @@
       <textarea id="supportTextInput" rows="3" placeholder="Опишите проблему или напишите, что стоит добавить/убрать..."></textarea>
 
       <div class="actions" style="margin-top: 12px;">
-        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Отправить создателю</button>
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Отправить в базу</button>
       </div>
 
       <div style="margin-top: 16px;">
-        <div style="font-weight: 800; font-size: 14.5px; color: #6cf0b5;">Отправленные обращения и идеи</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <div style="font-weight: 800; font-size: 14.5px; color: #6cf0b5;">Обращения и идеи (supportTickets)</div>
+          <span class="tag" id="ticketsCountBadge">0</span>
+        </div>
         <div id="supportTicketsBox"></div>
       </div>
     </div>
@@ -1321,7 +1323,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v4';
+    const STORE_KEY = 'sat_clean_state_v5';
     let state = {
       name: '',
       bio: '',
@@ -1339,7 +1341,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v3') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v4') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
@@ -1399,7 +1401,6 @@
     let voiceStartMs = 0;
     let pendingVoiceDraft = null;
 
-    // Воспроизведение голосовых без скачивания
     const voiceAudioMap = new Map();
     let playingVoiceMsgId = null;
     let voiceProgressTimer = null;
@@ -1742,7 +1743,6 @@
       renderSupportTickets();
     }
 
-    // ТЕХПОДДЕРЖКА И ИДЕИ ДЛЯ СОЗДАТЕЛЯ
     function openSupportModal() {
       renderSupportTickets();
       document.getElementById('supportModal').classList.add('open');
@@ -1760,8 +1760,8 @@
         ? 'Что добавить'
         : (kind === 'remove_idea' ? 'Что убрать' : 'Техподдержка');
 
-      const item = {
-        id: 'sup_' + now,
+      const localItem = {
+        id: 'tmp_sup_' + now,
         senderUid: getMyUid() || 'guest',
         senderName: myDisplayName(),
         kind,
@@ -1770,7 +1770,7 @@
         time: formatTime(now)
       };
 
-      supportTickets = [item, ...supportTickets];
+      supportTickets = [localItem, ...supportTickets];
       state.cachedTickets = supportTickets.slice(0, 50);
       persist();
       renderSupportTickets();
@@ -1778,27 +1778,42 @@
 
       try {
         await addDoc(collection(db, 'supportTickets'), {
-          senderUid: item.senderUid,
-          senderName: item.senderName,
-          kind: item.kind,
-          kindLabel: item.kindLabel,
-          text: item.text,
-          time: item.time,
+          senderUid: localItem.senderUid,
+          senderName: localItem.senderName,
+          kind: localItem.kind,
+          kindLabel: localItem.kindLabel,
+          text: localItem.text,
+          time: localItem.time,
           createdAt: serverTimestamp()
         });
-      } catch (e) {}
+        toast('Отправлено в supportTickets');
+      } catch (e) {
+        toast('Сохранено локально');
+      }
+    }
 
-      toast('Отправлено создателю SÄT');
+    async function deleteSupportTicket(id) {
+      if (!id) return;
+      supportTickets = supportTickets.filter(t => t.id !== id);
+      state.cachedTickets = supportTickets.slice(0, 50);
+      persist();
+      renderSupportTickets();
+      if (!String(id).startsWith('tmp_sup_')) {
+        try { await deleteDoc(doc(db, 'supportTickets', id)); } catch (e) {}
+      }
+      toast('Запись удалена');
     }
 
     function renderSupportTickets() {
       const box = document.getElementById('supportTicketsBox');
+      const badge = document.getElementById('ticketsCountBadge');
       if (!box) return;
+      if (badge) badge.textContent = String(supportTickets.length);
       if (!supportTickets.length) {
-        box.innerHTML = '<div class="meta" style="margin-top: 8px;">Пока нет отправленных сообщений.</div>';
+        box.innerHTML = '<div class="meta" style="margin-top: 8px;">Пока нет обращений.</div>';
         return;
       }
-      box.innerHTML = supportTickets.slice(0, 12).map(t => `
+      box.innerHTML = supportTickets.slice(0, 20).map(t => `
         <div class="ticket-box">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <span class="tag">${esc(t.kindLabel || 'Обращение')}</span>
@@ -1806,6 +1821,9 @@
           </div>
           <div style="font-size: 13.5px; margin-top: 6px; font-weight: 700;">${esc(t.senderName || 'Участник')}</div>
           <div style="font-size: 14px; margin-top: 4px; line-height: 1.4;">${esc(t.text || '')}</div>
+          <div class="actions" style="margin-top: 8px;">
+            <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
+          </div>
         </div>
       `).join('');
     }
@@ -3292,7 +3310,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab,
-      openSupportModal, submitSupportTicket,
+      openSupportModal, submitSupportTicket, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,

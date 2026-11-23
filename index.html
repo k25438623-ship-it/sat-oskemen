@@ -184,6 +184,11 @@
       color: #6cf0b5;
       border: 1px solid var(--border-strong);
     }
+    .btn-gold {
+      background: rgba(242, 201, 107, 0.18);
+      color: var(--gold);
+      border: 1px solid rgba(242, 201, 107, 0.42);
+    }
     .btn-ghost {
       background: rgba(18, 36, 28, 0.78);
       color: var(--text);
@@ -407,6 +412,7 @@
       border: 1px solid var(--border);
       background: rgba(20, 38, 30, 0.7);
       cursor: pointer;
+      position: relative;
     }
     .photo-cell img {
       width: 100%;
@@ -414,6 +420,24 @@
       object-fit: cover;
       display: block;
       pointer-events: none;
+    }
+    .photo-del-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(12, 18, 15, 0.82);
+      color: #ff8c98;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
     }
 
     .post-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
@@ -474,6 +498,19 @@
       white-space: nowrap;
     }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+    .comments-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .comment-item {
+      padding: 9px 11px;
+      border-radius: 13px;
+      background: rgba(16, 32, 25, 0.85);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
 
     .wp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
     .wp-item {
@@ -1059,6 +1096,7 @@
               <h3 style="margin: 0; font-size: 16px;">Мои фотографии</h3>
               <button type="button" class="btn btn-mint" style="padding: 6px 11px; font-size: 12.5px;" onclick="openPhotoPicker('gallery_add')">+ Фото</button>
             </div>
+            <div class="meta" style="margin-bottom: 6px;">Только фото, добавленные вами в альбом</div>
             <div id="myPhotosBox" class="photo-grid"></div>
           </div>
 
@@ -1286,10 +1324,10 @@
       <div style="margin-top: 14px;">
         <label class="meta">Куда отправить?</label>
         <div class="grid-2" style="margin-top: 6px;">
-          <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">Отправить в Пульс</button>
-          <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">У себя на странице</button>
+          <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">В Пульс</button>
+          <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
         </div>
-        <div id="destHelpText" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, и запись сохранится у вас на странице.</div>
+        <div id="destHelpText" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, можно ставить карму и писать комментарии.</div>
       </div>
 
       <div class="actions" style="margin-top: 16px;">
@@ -1513,7 +1551,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v9';
+    const STORE_KEY = 'sat_clean_state_v10';
 
     let state = {
       name: '',
@@ -1534,7 +1572,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v8') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v9') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
@@ -1544,11 +1582,23 @@
       if (!Array.isArray(state.cachedErrors)) state.cachedErrors = [];
     } catch (e) {}
 
+    function normalizePhotos(list) {
+      if (!Array.isArray(list)) return [];
+      return list
+        .map((x) => {
+          if (!x) return null;
+          if (typeof x === 'string') return { src: x, caption: '' };
+          if (typeof x === 'object' && x.src) return { src: x.src, caption: String(x.caption || '') };
+          return null;
+        })
+        .filter(Boolean);
+    }
+
     function persist() {
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify({
           ...state,
-          photos: (state.photos || []).slice(0, 12),
+          photos: normalizePhotos(state.photos).slice(0, 12),
           cachedErrors: (state.cachedErrors || []).slice(0, 30)
         }));
       } catch (e) {}
@@ -1575,24 +1625,27 @@
       recordAppError(String(reason));
     });
 
-    function normalizePhotos(list) {
-      if (!Array.isArray(list)) return [];
-      return list
-        .map((x) => {
-          if (!x) return null;
-          if (typeof x === 'string') return { src: x, caption: '' };
-          if (typeof x === 'object' && x.src) return { src: x.src, caption: String(x.caption || '') };
-          return null;
-        })
-        .filter(Boolean);
-    }
-
     function addSavedPhoto(dataUrl, caption = '') {
       if (!dataUrl) return;
       const cap = String(caption || '').trim().slice(0, 120);
       const list = normalizePhotos(state.photos).filter(p => p.src !== dataUrl);
       state.photos = [{ src: dataUrl, caption: cap }, ...list].slice(0, 20);
       persist();
+    }
+
+    async function deleteGalleryPhoto(idx, ev) {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+      const list = normalizePhotos(state.photos);
+      if (idx < 0 || idx >= list.length) return;
+      list.splice(idx, 1);
+      state.photos = list;
+      persist();
+      renderMyProfile();
+      await syncProfileCloud(currentUser);
+      toast('Фото удалено из альбома');
     }
 
     let _capResolver = null;
@@ -1638,6 +1691,10 @@
     let editingMsgId = null;
     let studioTab = 'inbox';
     let studioCollapsed = false;
+
+    const openCommentsPostIds = new Set();
+    const commentsByPostId = new Map();
+    const commentUnsubs = new Map();
 
     let voicePauseTimer = null;
     let voiceRecorder = null;
@@ -2375,6 +2432,7 @@
           const subText = item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}`;
           return `
             <div class="photo-cell" onclick="openImageViewer('${item.src}', '${esc(name)}', '${esc(subText)}')">
+              <button type="button" class="photo-del-btn" title="Удалить фото" onclick="deleteGalleryPhoto(${i}, event)">✕</button>
               <img src="${item.src}" alt="" draggable="false" />
             </div>
           `;
@@ -2388,7 +2446,7 @@
         avatar: 'Фото профиля',
         story: 'Сторис (на 3 часа)',
         post: 'Фото для публикации',
-        gallery_add: 'Добавить фото на страницу',
+        gallery_add: 'Добавить фото в альбом',
         chat_photo: 'Отправить фото в чат'
       };
       document.getElementById('pickerModalTitle').textContent = titles[target] || 'Выберите фото';
@@ -2446,16 +2504,14 @@
             addSavedPhoto(dataUrl, cap);
             renderMyProfile();
             await syncProfileCloud(currentUser);
-            toast('Фото сохранено в галерее профиля');
+            toast('Фото добавлено в «Мои фотографии»');
           } else if (pickTarget === 'post') {
             draftPostPhoto = dataUrl;
             document.getElementById('postPreviewImg').src = dataUrl;
             document.getElementById('postPreviewWrap').style.display = 'block';
             document.getElementById('postPhotoLabel').textContent = 'Фото загружено — заменить';
-            toast('Фото загружено');
+            toast('Фото прикреплено к публикации');
           } else if (pickTarget === 'chat_photo') {
-            addSavedPhoto(dataUrl);
-            await syncProfileCloud(currentUser);
             await sendPhotoToChat(dataUrl);
           }
         };
@@ -2540,8 +2596,8 @@
       document.getElementById('destBtnPulse').classList.toggle('active', d === 'pulse');
       document.getElementById('destBtnSelf').classList.toggle('active', d === 'self');
       document.getElementById('destHelpText').textContent = d === 'pulse'
-        ? 'Увидят все в Пульсе, и запись сохранится у вас на странице.'
-        : 'Сохранится у вас на странице — увидят гости вашей страницы.';
+        ? 'Увидят все в Пульсе, можно ставить карму и писать комментарии.'
+        : 'Сохранится только на вашей странице — гости смогут зайти и прочитать.';
     }
 
     function clearPostAttachment() {
@@ -2564,12 +2620,6 @@
       const timeStr = formatTime(now);
       const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
 
-      if (draftPostPhoto) {
-        addSavedPhoto(draftPostPhoto, caption);
-        renderMyProfile();
-        await syncProfileCloud(currentUser);
-      }
-
       const item = {
         id: 'tmp_' + now,
         author: myDisplayName(),
@@ -2583,7 +2633,7 @@
         visibility: vis,
         sentAtMs: now,
         time: timeStr,
-        confirms: 0
+        karma: 0
       };
 
       posts = [item, ...posts];
@@ -2603,7 +2653,7 @@
           visibility: vis,
           sentAtMs: now,
           time: timeStr,
-          confirms: 0,
+          karma: 0,
           createdAt: serverTimestamp()
         });
       } catch (e) {
@@ -2614,7 +2664,7 @@
       document.getElementById('postTextInput').value = '';
       clearPostAttachment();
       hideModal('newPostModal');
-      toast(vis === 'pulse' ? 'Отправлено в Пульс' : 'Сохранено на вашей странице');
+      toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
     }
 
     function getPostTime(p) {
@@ -2626,6 +2676,68 @@
     function canManagePost(p) {
       const myUid = getMyUid();
       return Boolean(myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_');
+    }
+
+    function toggleCommentsPanel(postId) {
+      if (!postId) return;
+      if (openCommentsPostIds.has(postId)) {
+        openCommentsPostIds.delete(postId);
+        renderPulse();
+        return;
+      }
+      openCommentsPostIds.add(postId);
+      if (!String(postId).startsWith('tmp_') && !commentUnsubs.has(postId)) {
+        const q = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
+        const unsub = onSnapshot(q, (snap) => {
+          const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          commentsByPostId.set(postId, list);
+          renderPulse();
+        }, (err) => {
+          recordAppError('Комментарии: ' + (err?.message || err));
+        });
+        commentUnsubs.set(postId, unsub);
+      }
+      renderPulse();
+    }
+
+    async function addPostComment(postId) {
+      if (!postId) return;
+      const inp = document.getElementById('cmtInput_' + postId);
+      const text = (inp ? inp.value : '').trim();
+      if (!text) {
+        toast('Напишите комментарий');
+        return;
+      }
+      if (inp) inp.value = '';
+      const now = Date.now();
+      const cmtObj = {
+        id: 'tmp_cmt_' + now,
+        authorUid: getMyUid() || 'guest',
+        authorName: myDisplayName(),
+        text,
+        time: formatTime(now)
+      };
+
+      const prev = commentsByPostId.get(postId) || [];
+      commentsByPostId.set(postId, [...prev, cmtObj]);
+      renderPulse();
+
+      if (!String(postId).startsWith('tmp_')) {
+        try {
+          await addDoc(collection(db, 'posts', postId, 'comments'), {
+            authorUid: cmtObj.authorUid,
+            authorName: cmtObj.authorName,
+            text,
+            time: cmtObj.time,
+            createdAt: serverTimestamp()
+          });
+          toast('Комментарий добавлен');
+        } catch (e) {
+          recordAppError('Отправка комментария: ' + (e?.message || e));
+        }
+      } else {
+        toast('Комментарий добавлен');
+      }
     }
 
     function renderPulse() {
@@ -2647,6 +2759,30 @@
         const uid = p.authorUid || 'unknown';
         const author = p.author || 'Участник';
         const badge = p.categoryLabel || 'Пульс';
+        const karmaVal = Number(p.karma ?? p.confirms ?? 0);
+        const cmtList = commentsByPostId.get(p.id) || [];
+        const isCmtOpen = openCommentsPostIds.has(p.id);
+        const safeId = esc(p.id);
+
+        const commentsHtml = isCmtOpen ? `
+          <div class="comments-box">
+            ${cmtList.length
+              ? cmtList.map(c => `
+                <div class="comment-item">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-weight:800; font-size:13px; color:#6cf0b5;">${esc(c.authorName || 'Участник')}</span>
+                    <span class="meta" style="font-size:11px;">${esc(c.time || '')}</span>
+                  </div>
+                  <div style="font-size:14px; margin-top:4px; line-height:1.38;">${esc(c.text || '')}</div>
+                </div>
+              `).join('')
+              : '<div class="meta" style="margin-bottom:8px;">Комментариев пока нет. Напишите первым!</div>'}
+            <div style="display:flex; gap:6px; align-items:center;">
+              <input id="cmtInput_${safeId}" class="input" style="margin-top:0; flex:1; padding:9px 12px; font-size:14px;" placeholder="Написать комментарий..." onkeydown="if(event.key==='Enter') addPostComment('${safeId}')" />
+              <button type="button" class="btn btn-primary" style="padding:9px 13px; font-size:13px;" onclick="addPostComment('${safeId}')">➤</button>
+            </div>
+          </div>
+        ` : '';
 
         return `
           <article class="card">
@@ -2668,11 +2804,13 @@
               </div>
             ` : ''}
             <div class="actions">
-              <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="likePost('${esc(p.id)}')">Поддержать (${Number(p.confirms || 0)})</button>
+              <button type="button" class="btn btn-gold" style="padding: 8px 12px; font-size: 13px;" onclick="giveKarma('${safeId}')">+1 Карма (${karmaVal})</button>
+              <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="toggleCommentsPanel('${safeId}')">Комментарии (${cmtList.length})</button>
               <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">Страница</button>
               ${!isMine && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(author)}')">Написать</button>` : ''}
-              ${isMine ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${esc(p.id)}')">Удалить</button>` : ''}
+              ${isMine ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${safeId}')">Удалить</button>` : ''}
             </div>
+            ${commentsHtml}
           </article>
         `;
       }).join('');
@@ -2688,7 +2826,8 @@
       }
       box.innerHTML = mine.map(p => {
         const t = getPostTime(p);
-        const where = (p.visibility || 'pulse') === 'pulse' ? 'Пульс и страница' : 'У себя на странице';
+        const karmaVal = Number(p.karma ?? p.confirms ?? 0);
+        const where = (p.visibility || 'pulse') === 'pulse' ? `В Пульсе • Карма: ${karmaVal}` : 'Только на вашей странице';
         return `
           <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
@@ -2709,13 +2848,20 @@
       }).join('');
     }
 
-    async function likePost(id) {
-      posts = posts.map(p => p.id === id ? { ...p, confirms: Number(p.confirms || 0) + 1 } : p);
+    async function giveKarma(id) {
+      posts = posts.map(p => {
+        if (p.id !== id) return p;
+        const nextK = Number(p.karma ?? p.confirms ?? 0) + 1;
+        return { ...p, karma: nextK, confirms: nextK };
+      });
       renderPulse();
+      renderMyPosts();
       if (!String(id).startsWith('tmp_')) {
-        try { await updateDoc(doc(db, 'posts', id), { confirms: increment(1) }); } catch (e) {}
+        try {
+          await updateDoc(doc(db, 'posts', id), { karma: increment(1), confirms: increment(1) });
+        } catch (e) {}
       }
-      toast('Отмечено');
+      toast('+1 к карме');
     }
 
     async function removePost(id) {
@@ -2817,9 +2963,10 @@
       } else {
         postsBox.innerHTML = userPosts.map(p => {
           const t = getPostTime(p);
+          const karmaVal = Number(p.karma ?? p.confirms ?? 0);
           return `
             <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
-              <div class="meta">Отправлено: ${esc(t)}</div>
+              <div class="meta">Отправлено: ${esc(t)} • Карма: ${karmaVal}</div>
               ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
               ${p.body ? `<div style="font-size: 15px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
               ${p.photoData ? `
@@ -2832,9 +2979,7 @@
         }).join('');
       }
 
-      const fromPosts = userPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: p.caption ? `${getPostTime(p)} • ${p.caption}` : getPostTime(p) }));
-      const fromSaved = normalizePhotos(u.savedPhotos).map(ph => ({ src: ph.src, time: ph.caption || '' }));
-      const allPhotos = [...fromPosts, ...fromSaved];
+      const allPhotos = normalizePhotos(u.savedPhotos).map(ph => ({ src: ph.src, time: ph.caption || '' }));
       const photosBox = document.getElementById('peerPhotosGrid');
       if (!allPhotos.length) {
         photosBox.innerHTML = '<div class="meta" style="grid-column: 1 / -1; padding: 12px 0;">Фотографий пока нет.</div>';
@@ -3909,11 +4054,11 @@
       toggleStudioSection, switchStudioTab, clearRecordedErrors,
       openSupportModal, submitSupportTicket, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
-      askPhotoCaption, applyCaptionNow,
+      deleteGalleryPhoto, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
-      likePost, removePost,
+      giveKarma, toggleCommentsPanel, addPostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, openPeerStoryViewer,
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,

@@ -512,7 +512,6 @@
       pointer-events: none;
     }
 
-    /* Полноэкранный чат */
     .chat-screen {
       position: fixed;
       inset: 0;
@@ -573,6 +572,22 @@
     .msg.them { background: rgba(24, 46, 36, 0.92); align-self: flex-start; border: 1px solid var(--border); }
     .msg.me { background: linear-gradient(135deg, #1ea86b, #0f6b43); color: #ffffff; align-self: flex-end; }
     .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
+    .msg-edited { font-size: 11px; opacity: 0.78; margin-top: 4px; font-style: italic; }
+    .msg-tools { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+    .msg-tool-btn {
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(9, 22, 16, 0.45);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 3px 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .msg-tool-btn.del {
+      border-color: rgba(255, 130, 145, 0.55);
+      color: #ffd0d5;
+    }
     .msg-photo {
       margin-top: 6px;
       border-radius: 12px;
@@ -588,7 +603,9 @@
       max-width: 100%;
       height: 36px;
     }
-    .voice-status-bar {
+    .voice-status-bar,
+    .voice-draft-bar,
+    .edit-mode-bar {
       display: none;
       align-items: center;
       justify-content: space-between;
@@ -597,11 +614,14 @@
       border-radius: 14px;
       background: rgba(24, 155, 98, 0.18);
       border: 1px solid var(--border-strong);
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
       color: #6cf0b5;
+      flex-wrap: wrap;
     }
-    .voice-status-bar.show { display: flex; }
+    .voice-status-bar.show,
+    .voice-draft-bar.show,
+    .edit-mode-bar.show { display: flex; }
     .chat-composer {
       display: flex;
       gap: 6px;
@@ -805,7 +825,6 @@
           </div>
         </div>
 
-        <!-- ВСЕ ЧАТЫ В ПРОФИЛЕ ВНИЗУ -->
         <div id="myChatsCard" class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
@@ -836,7 +855,6 @@
     </nav>
   </section>
 
-  <!-- ОТДЕЛЬНЫЙ ЭКРАН-ВКЛАДКА СТРАНИЦЫ ВЫБРАННОГО ЧЕЛОВЕКА -->
   <section id="peerProfileScreen" class="screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
@@ -991,7 +1009,6 @@
     <div style="text-align: center; font-size: 13px; opacity: 0.75;">Нажмите в любое место, чтобы закрыть</div>
   </div>
 
-  <!-- ПОЛНОЭКРАННЫЙ ЧАТ С ГОЛОСОВЫМИ (ПАУЗА 2 СЕК), ФОТО И ЗВОНКОМ -->
   <div id="chatScreen" class="chat-screen">
     <div class="chat-wrap">
       <div class="chat-topbar">
@@ -1019,11 +1036,32 @@
 
       <div id="voiceStatusBar" class="voice-status-bar">
         <span id="voiceStatusText">Пауза перед записью: 2 сек...</span>
-        <button id="voiceStopBtn" type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Отправить / Стоп</button>
+        <button id="voiceStopBtn" type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Остановить</button>
+      </div>
+
+      <!-- Предпросмотр голосового перед отправкой: прослушать, отправить или удалить -->
+      <div id="voiceDraftBar" class="voice-draft-bar">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <span id="voiceDraftLabel">Голосовое готово — прослушайте перед отправкой</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="discardVoiceDraft()">Удалить</button>
+            <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="sendVoiceDraft()">Отправить</button>
+          </div>
+        </div>
+        <audio id="voiceDraftAudio" controls preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
+      </div>
+
+      <!-- Строка быстрого редактирования сообщения -->
+      <div id="editModeBar" class="edit-mode-bar">
+        <span>Редактирование сообщения</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="cancelEditMessage()">Отмена</button>
+          <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()">Сохранить</button>
+        </div>
       </div>
 
       <div class="chat-composer">
-        <button type="button" class="btn btn-ghost" style="padding: 10px; font-size: 12.5px;" title="Фото с камеры" onclick="openPhotoPicker('chat_photo')">
+        <button type="button" class="btn btn-ghost" style="padding: 10px; font-size: 12.5px;" title="Фото с камеры или галереи" onclick="openPhotoPicker('chat_photo')">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </button>
         <button id="voiceBtn" type="button" class="btn btn-mint" style="padding: 10px 11px; font-size: 12.5px;" title="Голосовое (пауза 2 сек)" onclick="startVoiceWithPause()">
@@ -1186,13 +1224,15 @@
     let activeChatId = null;
     let chatUnsub = null;
     let chatMsgs = [];
+    let editingMsgId = null;
 
-    // Голосовые сообщения с паузой 2 сек
+    // Голосовые сообщения с паузой 2 сек и черновиком перед отправкой
     let voicePauseTimer = null;
     let voiceRecorder = null;
     let voiceChunks = [];
     let voiceStream = null;
     let voiceStartMs = 0;
+    let pendingVoiceDraft = null;
 
     // Звонок WebRTC без видео + гудки
     let pc = null;
@@ -2272,6 +2312,8 @@
 
     function openChatRoom(id, title) {
       activeChatId = id;
+      cancelEditMessage();
+      discardVoiceDraft();
       const c = chats.find(x => x.id === id);
       const displayTitle = c ? getChatDisplayTitle(c) : (title || 'Чат');
       document.getElementById('chatHeaderTitle').textContent = displayTitle;
@@ -2291,6 +2333,8 @@
 
     function closeChat() {
       cancelVoiceState();
+      discardVoiceDraft();
+      cancelEditMessage();
       if (chatUnsub) { chatUnsub(); chatUnsub = null; }
       activeChatId = null;
       document.getElementById('chatScreen').classList.remove('open');
@@ -2302,14 +2346,24 @@
         box.innerHTML = '<div class="meta" style="text-align:center; padding:14px;">Сообщений пока нет. Напишите первым или отправьте голос/фото.</div>';
         return;
       }
+      const myUid = getMyUid();
       box.innerHTML = chatMsgs.map(m => {
-        const mine = currentUser && m.senderUid === currentUser.uid;
+        const mine = Boolean(myUid && m.senderUid === myUid);
         const whoHtml = (!mine && m.senderName) ? `<div class="msg-who">${esc(m.senderName)}</div>` : '';
+        const editedHtml = m.edited ? `<div class="msg-edited">изменено</div>` : '';
+        const editBtnHtml = (mine && m.kind !== 'photo' && m.kind !== 'voice')
+          ? `<button type="button" class="msg-tool-btn" onclick="beginEditMessage('${esc(m.id)}')">Ред.</button>`
+          : '';
+        const toolsHtml = mine
+          ? `<div class="msg-tools">${editBtnHtml}<button type="button" class="msg-tool-btn del" onclick="deleteChatMessage('${esc(m.id)}')">Удалить</button></div>`
+          : '';
+
         if (m.kind === 'photo' && m.photoData) {
           return `
             <div class="msg ${mine ? 'me' : 'them'}">
               ${whoHtml}
               <img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(m.createdAt?.toMillis ? m.createdAt.toMillis() : Date.now()))}')" />
+              ${toolsHtml}
             </div>
           `;
         }
@@ -2320,20 +2374,87 @@
               ${whoHtml}
               <div style="font-size:12.5px; font-weight:700;">Голосовое сообщение${esc(durLabel)}</div>
               <audio class="msg-audio" controls preload="metadata" src="${m.audioData}"></audio>
+              ${toolsHtml}
             </div>
           `;
         }
         return `
           <div class="msg ${mine ? 'me' : 'them'}">
             ${whoHtml}
-            ${esc(m.text || '')}
+            <div>${esc(m.text || '')}</div>
+            ${editedHtml}
+            ${toolsHtml}
           </div>
         `;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
 
+    function beginEditMessage(msgId) {
+      const target = chatMsgs.find(x => x.id === msgId);
+      if (!target) return;
+      editingMsgId = msgId;
+      const inp = document.getElementById('chatMsgInput');
+      inp.value = target.text || '';
+      inp.focus();
+      document.getElementById('editModeBar').classList.add('show');
+    }
+
+    function cancelEditMessage() {
+      editingMsgId = null;
+      const bar = document.getElementById('editModeBar');
+      if (bar) bar.classList.remove('show');
+    }
+
+    async function saveEditedMessage() {
+      const inp = document.getElementById('chatMsgInput');
+      const nextText = inp.value.trim();
+      if (!editingMsgId || !activeChatId) return;
+      if (!nextText) {
+        toast('Текст не может быть пустым');
+        return;
+      }
+      const id = editingMsgId;
+      inp.value = '';
+      cancelEditMessage();
+      try {
+        await updateDoc(doc(db, 'chats', activeChatId, 'messages', id), {
+          text: nextText,
+          edited: true,
+          updatedAt: serverTimestamp()
+        });
+        toast('Сообщение изменено');
+      } catch (e) {
+        toast('Не удалось сохранить изменение');
+      }
+    }
+
+    async function deleteChatMessage(msgId) {
+      if (!msgId || !activeChatId) return;
+      if (editingMsgId === msgId) cancelEditMessage();
+      chatMsgs = chatMsgs.filter(m => m.id !== msgId);
+      renderChatBox();
+      try {
+        await deleteDoc(doc(db, 'chats', activeChatId, 'messages', msgId));
+        const lastMsg = chatMsgs[chatMsgs.length - 1];
+        const preview = !lastMsg
+          ? 'Сообщений нет'
+          : (lastMsg.kind === 'photo' ? 'Фотография' : (lastMsg.kind === 'voice' ? `Голосовое (${Number(lastMsg.durationSec || 1)} сек)` : (lastMsg.text || 'Сообщение')));
+        await updateDoc(doc(db, 'chats', activeChatId), {
+          lastMessage: preview,
+          updatedAt: serverTimestamp()
+        });
+        toast('Сообщение удалено');
+      } catch (e) {
+        toast('Ошибка удаления');
+      }
+    }
+
     async function sendMessage() {
+      if (editingMsgId) {
+        await saveEditedMessage();
+        return;
+      }
       const inp = document.getElementById('chatMsgInput');
       const text = inp.value.trim();
       const myUid = getMyUid();
@@ -2355,7 +2476,7 @@
       } catch (e) {}
     }
 
-    // ГОЛОСОВЫЕ СООБЩЕНИЯ С ПАУЗОЙ 2 СЕКУНДЫ
+    // ГОЛОСОВЫЕ СООБЩЕНИЯ С ПАУЗОЙ 2 СЕК И ПРОСЛУШИВАНИЕМ ДО ОТПРАВКИ
     function cancelVoiceState() {
       clearTimeout(voicePauseTimer);
       voicePauseTimer = null;
@@ -2371,6 +2492,17 @@
       if (bar) bar.classList.remove('show');
     }
 
+    function discardVoiceDraft() {
+      pendingVoiceDraft = null;
+      const bar = document.getElementById('voiceDraftBar');
+      const audioEl = document.getElementById('voiceDraftAudio');
+      if (audioEl) {
+        audioEl.pause();
+        audioEl.removeAttribute('src');
+      }
+      if (bar) bar.classList.remove('show');
+    }
+
     async function startVoiceWithPause() {
       const myUid = getMyUid();
       if (!activeChatId || !myUid) return;
@@ -2378,6 +2510,7 @@
         stopVoiceRecordingNow();
         return;
       }
+      discardVoiceDraft();
 
       const bar = document.getElementById('voiceStatusBar');
       const stText = document.getElementById('voiceStatusText');
@@ -2420,7 +2553,7 @@
             if (ev.data && ev.data.size > 0) voiceChunks.push(ev.data);
           };
 
-          voiceRecorder.onstop = async () => {
+          voiceRecorder.onstop = () => {
             const blobType = voiceRecorder?.mimeType || 'audio/webm';
             const durSec = Math.max(1, Math.round((Date.now() - voiceStartMs) / 1000));
             if (voiceStream) {
@@ -2435,37 +2568,25 @@
             if (!blob.size || !activeChatId) return;
 
             const reader = new FileReader();
-            reader.onload = async () => {
+            reader.onload = () => {
               const audioData = String(reader.result || '');
               if (!audioData || audioData.length > 950000) {
                 toast('Запись слишком длинная — сделайте покороче');
                 return;
               }
-              try {
-                await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-                  senderUid: getMyUid(),
-                  senderName: myDisplayName(),
-                  kind: 'voice',
-                  text: '',
-                  audioData,
-                  durationSec: durSec,
-                  createdAt: serverTimestamp()
-                });
-                await updateDoc(doc(db, 'chats', activeChatId), {
-                  lastMessage: `Голосовое (${durSec} сек)`,
-                  lastSenderUid: getMyUid(),
-                  updatedAt: serverTimestamp()
-                });
-                toast('Голосовое отправлено');
-              } catch (e) {
-                toast('Ошибка отправки голосового');
-              }
+              pendingVoiceDraft = { audioData, durSec };
+              const draftBar = document.getElementById('voiceDraftBar');
+              const draftAudio = document.getElementById('voiceDraftAudio');
+              const draftLabel = document.getElementById('voiceDraftLabel');
+              if (draftLabel) draftLabel.textContent = `Прослушайте запись (${durSec} сек) перед отправкой`;
+              if (draftAudio) draftAudio.src = audioData;
+              if (draftBar) draftBar.classList.add('show');
             };
             reader.readAsDataURL(blob);
           };
 
           voiceRecorder.start();
-          stText.textContent = 'Идёт запись голоса... Нажмите «Отправить / Стоп»';
+          stText.textContent = 'Идёт запись голоса... Нажмите «Остановить»';
         } catch (err) {
           cancelVoiceState();
           toast('Запись голоса не поддерживается на этом устройстве');
@@ -2482,6 +2603,32 @@
         voiceRecorder.stop();
       } else {
         cancelVoiceState();
+      }
+    }
+
+    async function sendVoiceDraft() {
+      const myUid = getMyUid();
+      if (!pendingVoiceDraft || !activeChatId || !myUid) return;
+      const { audioData, durSec } = pendingVoiceDraft;
+      discardVoiceDraft();
+      try {
+        await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+          senderUid: myUid,
+          senderName: myDisplayName(),
+          kind: 'voice',
+          text: '',
+          audioData,
+          durationSec: durSec,
+          createdAt: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'chats', activeChatId), {
+          lastMessage: `Голосовое (${durSec} сек)`,
+          lastSenderUid: myUid,
+          updatedAt: serverTimestamp()
+        });
+        toast('Голосовое отправлено');
+      } catch (e) {
+        toast('Ошибка отправки голосового');
       }
     }
 
@@ -2750,7 +2897,8 @@
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage,
-      startVoiceWithPause, stopVoiceRecordingNow,
+      beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
+      startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft,
       toggleAudioCall, acceptIncomingCall, hangupCall,
       openEditProfileModal, saveProfileData,
       hideModal, closeBackdrop

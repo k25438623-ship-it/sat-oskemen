@@ -8,16 +8,16 @@
   <meta name="theme-color" content="#0f6b43" />
   <style>
     :root {
-      --surface: #ffffff;
-      --surface-soft: #eef6f1;
-      --border: rgba(15, 107, 67, 0.16);
-      --border-strong: rgba(15, 107, 67, 0.34);
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface-soft: rgba(238, 246, 241, 0.86);
+      --border: rgba(15, 107, 67, 0.18);
+      --border-strong: rgba(15, 107, 67, 0.36);
       --text: #12241b;
       --muted: #4f6b5d;
       --green: #0f6b43;
       --green-dark: #0a5233;
       --green-light: #198754;
-      --green-soft: rgba(15, 107, 67, 0.11);
+      --green-soft: rgba(15, 107, 67, 0.12);
       --danger: #c93748;
       --shadow: 0 10px 28px rgba(15, 75, 48, 0.08);
     }
@@ -34,7 +34,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
       background-color: #f3f9f5;
-      background-image: radial-gradient(rgba(15, 107, 67, 0.05) 1px, transparent 1px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%);
+      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1px, transparent 1px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%);
       background-size: 22px 22px, cover;
       padding-bottom: 92px;
       position: relative;
@@ -60,7 +60,7 @@
       left: 50%;
       transform: translate(-50%, -64px);
       z-index: 95;
-      background: var(--surface);
+      background: #ffffff;
       border: 1.5px solid var(--border-strong);
       box-shadow: var(--shadow);
       color: var(--green);
@@ -88,7 +88,7 @@
       to { transform: rotate(360deg); }
     }
 
-    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
+    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; background: transparent; }
     .screen.active { display: block; }
 
     /* Стартовый экран SÄT */
@@ -97,7 +97,7 @@
       justify-content: center;
       text-align: center;
       padding: 28px 20px;
-      background: radial-gradient(circle at 50% 28%, #ffffff 0%, #f1f8f3 58%, #e2efe7 100%);
+      background: radial-gradient(circle at 50% 28%, rgba(255,255,255,0.92) 0%, rgba(241,248,243,0.86) 58%, rgba(226,239,231,0.92) 100%);
     }
     #splash.active { display: flex; flex-direction: column; }
 
@@ -145,7 +145,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px 18px;
-      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #f2f9f4 60%, #e3f0e8 100%);
+      background: radial-gradient(circle at 50% 25%, rgba(255,255,255,0.92) 0%, rgba(242,249,244,0.86) 60%, rgba(227,240,232,0.92) 100%);
     }
     #auth.active { display: flex; flex-direction: column; }
 
@@ -212,9 +212,9 @@
       border: 1px solid var(--border-strong);
     }
     .btn-danger {
-      background: rgba(201, 55, 72, 0.1);
+      background: rgba(201, 55, 72, 0.12);
       color: var(--danger);
-      border: 1px solid rgba(201, 55, 72, 0.26);
+      border: 1px solid rgba(201, 55, 72, 0.28);
     }
 
     /* Верхняя шапка */
@@ -222,7 +222,7 @@
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
@@ -262,6 +262,7 @@
 
     .card {
       background: var(--surface);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 16px;
@@ -272,7 +273,7 @@
 
     .input, select, textarea {
       width: 100%;
-      background: var(--surface-soft);
+      background: rgba(255, 255, 255, 0.92);
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -491,7 +492,7 @@
       left: 0;
       right: 0;
       z-index: 30;
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(18px);
       border-top: 1px solid var(--border);
       display: grid;
@@ -655,7 +656,7 @@
       margin: 10px 0;
       padding: 12px;
       border-radius: 18px;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid var(--border);
     }
     .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 84%; word-break: break-word; }
@@ -872,7 +873,7 @@
     </nav>
   </section>
 
-  <!-- ПОЛНОЭКРАННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА -->
+  <!-- ПОЛНОЭКРАННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫТ ПОЛНЫЙ ДОСТУП КО ВСЕМУ) -->
   <section id="peerPageModal" class="peer-fullscreen">
     <header class="topbar">
       <button class="btn btn-ghost" style="padding: 8px 13px; font-size: 13.5px;" onclick="closePeerPage()">← Назад</button>
@@ -888,7 +889,7 @@
           </div>
           <div style="min-width: 0; flex: 1;">
             <h2 id="peerPageName" style="margin: 0; font-size: 20px;">Участник</h2>
-            <div id="peerPageInfo" class="meta" style="margin-top: 4px;">Участник SÄT</div>
+            <div id="peerPageInfo" class="meta" style="margin-top: 4px;">Страница участника SÄT</div>
             <div id="peerPageStoryBadge" style="display: none; margin-top: 6px;">
               <span class="tag" style="cursor: pointer;" onclick="openPeerStory()">Активная сторис (до 3 ч)</span>
             </div>
@@ -914,12 +915,17 @@
       </div>
 
       <div class="card">
+        <h3 style="margin: 0 0 8px; font-size: 16px;">Друзья пользователя</h3>
+        <div id="peerPageFriends"></div>
+      </div>
+
+      <div class="card">
         <h3 style="margin: 0 0 8px; font-size: 16px;">Фотографии на странице</h3>
         <div id="peerPagePhotos" class="photo-grid"></div>
       </div>
 
       <div class="card">
-        <h3 style="margin: 0 0 10px; font-size: 16px;">Публикации</h3>
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Публикации пользователя</h3>
         <div id="peerPagePosts"></div>
       </div>
     </div>
@@ -1109,19 +1115,19 @@
 
     // 10 стильных светло-зелёных обоев интерфейса
     const WALLPAPERS = [
-      { id: 'wp1', name: 'Утренний лист', top: '#f7fbf8', base: '#f3f9f5', bot: '#e5f2ea', dot: 'rgba(15,107,67,0.05)', size: '22px 22px' },
-      { id: 'wp2', name: 'Мягкая мята', top: '#f4fbf8', base: '#eaf7f1', bot: '#d8efe4', dot: 'rgba(15,120,76,0.06)', size: '26px 26px' },
-      { id: 'wp3', name: 'Тёплый алебастр', top: '#fcfbf7', base: '#f6f4ec', bot: '#ebe7d8', dot: 'rgba(25,110,70,0.04)', size: '24px 24px' },
-      { id: 'wp4', name: 'Светлый шалфей', top: '#f6faf7', base: '#ecf3ee', bot: '#dce8e0', dot: 'rgba(15,107,67,0.06)', size: '20px 20px' },
-      { id: 'wp5', name: 'Фисташковый свет', top: '#f8fcf5', base: '#eff7e8', bot: '#e0eed4', dot: 'rgba(35,125,65,0.05)', size: '28px 28px' },
-      { id: 'wp6', name: 'Изумрудный туман', top: '#f5fbf9', base: '#e8f5f0', bot: '#d5ece3', dot: 'rgba(12,112,72,0.06)', size: '22px 22px' },
-      { id: 'wp7', name: 'Жемчужный рассвет', top: '#ffffff', base: '#f5f8f6', bot: '#e8efeb', dot: 'rgba(15,107,67,0.035)', size: '30px 30px' },
-      { id: 'wp8', name: 'Песочный бриз', top: '#fbf9f4', base: '#f5f0e6', bot: '#eae2d2', dot: 'rgba(15,107,67,0.045)', size: '24px 24px' },
-      { id: 'wp9', name: 'Светлый нефрит', top: '#f3faf7', base: '#e6f3ed', bot: '#d2e8de', dot: 'rgba(10,104,66,0.065)', size: '18px 18px' },
-      { id: 'wp10', name: 'Льняной покой', top: '#fafcf9', base: '#f1f5f2', bot: '#e3ebe5', dot: 'rgba(15,107,67,0.04)', size: '26px 26px' }
+      { id: 'wp1', name: 'Утренний лист', top: '#f7fbf8', base: '#f3f9f5', bot: '#e5f2ea', dot: 'rgba(15,107,67,0.06)', size: '22px 22px' },
+      { id: 'wp2', name: 'Мягкая мята', top: '#e8f8f0', base: '#d6f2e4', bot: '#bce7d1', dot: 'rgba(15,120,76,0.09)', size: '24px 24px' },
+      { id: 'wp3', name: 'Тёплый алебастр', top: '#fdfaf0', base: '#f5efe0', bot: '#e8dec6', dot: 'rgba(25,110,70,0.07)', size: '22px 22px' },
+      { id: 'wp4', name: 'Светлый шалфей', top: '#eef6f0', base: '#dcebe1', bot: '#c5dcd0', dot: 'rgba(15,107,67,0.09)', size: '20px 20px' },
+      { id: 'wp5', name: 'Фисташковый свет', top: '#f2fceb', base: '#e2f4d4', bot: '#cce8b8', dot: 'rgba(35,125,65,0.08)', size: '26px 26px' },
+      { id: 'wp6', name: 'Изумрудный туман', top: '#e7f8f3', base: '#d1efe6', bot: '#b5e3d5', dot: 'rgba(12,112,72,0.09)', size: '22px 22px' },
+      { id: 'wp7', name: 'Жемчужный рассвет', top: '#ffffff', base: '#eef4f0', bot: '#dce7e0', dot: 'rgba(15,107,67,0.06)', size: '28px 28px' },
+      { id: 'wp8', name: 'Песочный бриз', top: '#fcf7ec', base: '#f3ead8', bot: '#e6d8be', dot: 'rgba(15,107,67,0.07)', size: '24px 24px' },
+      { id: 'wp9', name: 'Светлый нефрит', top: '#e3f7ee', base: '#c9ece0', bot: '#a9decb', dot: 'rgba(10,104,66,0.1)', size: '18px 18px' },
+      { id: 'wp10', name: 'Льняной покой', top: '#f7faf7', base: '#e8efe9', bot: '#d6e2d8', dot: 'rgba(15,107,67,0.07)', size: '24px 24px' }
     ];
 
-    const STORAGE_KEY = 'sat_profile_state_v5';
+    const STORAGE_KEY = 'sat_profile_state_v6';
     let state = {
       wallpaperId: 'wp1',
       displayName: '',
@@ -1167,9 +1173,26 @@
       state.wallpaperId = wp.id;
       saveState();
 
+      const bgStyle = `radial-gradient(${wp.dot} 1.2px, transparent 1.2px), linear-gradient(165deg, ${wp.top} 0%, ${wp.base} 52%, ${wp.bot} 100%)`;
+      const sizeStyle = `${wp.size}, cover`;
+
       document.body.style.backgroundColor = wp.base;
-      document.body.style.backgroundImage = `radial-gradient(${wp.dot} 1px, transparent 1px), linear-gradient(165deg, ${wp.top} 0%, ${wp.base} 52%, ${wp.bot} 100%)`;
-      document.body.style.backgroundSize = `${wp.size}, cover`;
+      document.body.style.backgroundImage = bgStyle;
+      document.body.style.backgroundSize = sizeStyle;
+
+      const peerEl = document.getElementById('peerPageModal');
+      if (peerEl) {
+        peerEl.style.backgroundColor = wp.base;
+        peerEl.style.backgroundImage = bgStyle;
+        peerEl.style.backgroundSize = sizeStyle;
+      }
+
+      const chatEl = document.getElementById('chatModal');
+      if (chatEl) {
+        chatEl.style.backgroundColor = wp.base;
+        chatEl.style.backgroundImage = bgStyle;
+        chatEl.style.backgroundSize = sizeStyle;
+      }
 
       const grid = document.getElementById('wallpapersGrid');
       if (grid) {
@@ -1812,7 +1835,7 @@
       showToast('Удалено');
     }
 
-    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА */
+    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫТ ДОСТУП КО ВСЕМУ) */
     function openUserProfile(uid, fallbackName) {
       if (!uid) return;
       activePeerUid = uid;
@@ -1851,13 +1874,17 @@
       const extraSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
       const allPeerPhotos = [...photosFromPosts, ...extraSaved];
 
-      const peerFriendsCount = friendRequests.filter(r =>
-        r.status === 'accepted' && (r.fromUid === uid || r.toUid === uid)
-      ).length;
+      const peerFriendUids = new Set();
+      friendRequests.forEach(r => {
+        if (r.status === 'accepted') {
+          if (r.fromUid === uid) peerFriendUids.add(r.toUid);
+          if (r.toUid === uid) peerFriendUids.add(r.fromUid);
+        }
+      });
 
       document.getElementById('peerStatPosts').textContent = String(peerPosts.length);
       document.getElementById('peerStatPhotos').textContent = String(allPeerPhotos.length);
-      document.getElementById('peerStatFriends').textContent = String(peerFriendsCount);
+      document.getElementById('peerStatFriends').textContent = String(peerFriendUids.size);
 
       const actBox = document.getElementById('peerPageActions');
       if (currentUser && uid !== currentUser.uid) {
@@ -1878,6 +1905,24 @@
         actBox.innerHTML = '';
       }
 
+      /* Друзья пользователя */
+      const friendsBox = document.getElementById('peerPageFriends');
+      const peerFriendsList = Array.from(peerFriendUids).map(fUid => {
+        const fu = cloudUsers.find(x => x.uid === fUid);
+        return { uid: fUid, name: fu?.fullName || 'Участник' };
+      });
+      if (!peerFriendsList.length) {
+        friendsBox.innerHTML = '<div class="meta">Друзей пока нет.</div>';
+      } else {
+        friendsBox.innerHTML = peerFriendsList.map(fr => `
+          <div class="list-row">
+            <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${fr.uid}', '${escapeHtml(fr.name)}')">${escapeHtml(fr.name)}</div>
+            <button class="btn btn-ghost" style="padding: 6px 11px; font-size: 12.5px;" onclick="openUserProfile('${fr.uid}', '${escapeHtml(fr.name)}')">Открыть</button>
+          </div>
+        `).join('');
+      }
+
+      /* Фотографии пользователя */
       const photosBox = document.getElementById('peerPagePhotos');
       if (!allPeerPhotos.length) {
         photosBox.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет.</div>';
@@ -1889,6 +1934,7 @@
         `).join('');
       }
 
+      /* Публикации пользователя */
       const postsBox = document.getElementById('peerPagePosts');
       if (!peerPosts.length) {
         postsBox.innerHTML = '<div class="meta">Публикаций пока нет.</div>';

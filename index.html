@@ -5,21 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>SÄT</title>
-  <meta name="theme-color" content="#0f6b43" />
+  <meta name="theme-color" content="#0b1f17" />
   <style>
     :root {
-      --card-bg: rgba(255, 255, 255, 0.88);
-      --soft-bg: rgba(236, 246, 240, 0.92);
-      --border: rgba(15, 107, 67, 0.2);
-      --border-strong: rgba(15, 107, 67, 0.42);
-      --text: #11241a;
-      --muted: #4b695a;
-      --green: #0f6b43;
-      --green-dark: #094d2f;
-      --green-light: #198754;
-      --green-soft: rgba(15, 107, 67, 0.12);
-      --danger: #c93748;
-      --shadow: 0 8px 24px rgba(12, 68, 43, 0.08);
+      --border: rgba(94, 224, 165, 0.25);
+      --border-strong: rgba(94, 224, 165, 0.45);
+      --text: #eef8f3;
+      --muted: #9ec2b1;
+      --green: #189b62;
+      --green-dark: #0a4d30;
+      --green-soft: rgba(24, 155, 98, 0.18);
+      --danger: #ff6b7a;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     }
 
     * {
@@ -35,11 +32,22 @@
       overscroll-behavior-y: contain;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
+      background: #07130e;
     }
 
     body {
       padding-bottom: 92px;
       overflow-x: hidden;
+    }
+
+    #satLiveSceneCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
     }
 
     .ico {
@@ -60,10 +68,10 @@
       left: 50%;
       transform: translate(-50%, -64px);
       z-index: 120;
-      background: #ffffff;
+      background: rgba(12, 26, 20, 0.94);
       border: 1.5px solid var(--border-strong);
       box-shadow: var(--shadow);
-      color: var(--green);
+      color: #63e6ab;
       border-radius: 999px;
       padding: 8px 16px;
       font-size: 13px;
@@ -78,7 +86,7 @@
       width: 15px;
       height: 15px;
       border: 2.5px solid var(--green-soft);
-      border-top-color: var(--green);
+      border-top-color: #63e6ab;
       border-radius: 50%;
     }
     .ptr-bar.spinning .ptr-spin {
@@ -86,7 +94,7 @@
     }
     @keyframes spinAnim { to { transform: rotate(360deg); } }
 
-    .screen { display: none; min-height: 100vh; }
+    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
     .screen.active { display: block; }
 
     #splash {
@@ -95,6 +103,8 @@
       text-align: center;
       padding: 28px 20px;
       background: radial-gradient(circle at 50% 28%, #ffffff 0%, #eff8f2 58%, #dfeee5 100%);
+      color: #11241a;
+      z-index: 5;
     }
     #splash.active { display: flex; flex-direction: column; }
 
@@ -112,15 +122,17 @@
       margin: 0 auto 20px;
     }
     .logo-dots { display: flex; gap: 16px; margin-bottom: -4px; }
-    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
-    .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: var(--green); }
-    .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: var(--green); }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #0f6b43; }
+    .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: #0f6b43; }
+    .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: #0f6b43; }
 
     #auth {
       align-items: center;
       justify-content: center;
       padding: 24px 18px;
       background: radial-gradient(circle at 50% 25%, #ffffff 0%, #eff8f2 60%, #dfeee5 100%);
+      color: #11241a;
+      z-index: 5;
     }
     #auth.active { display: flex; flex-direction: column; }
 
@@ -128,7 +140,7 @@
       width: 100%;
       max-width: 390px;
       background: #ffffff;
-      border: 1.5px solid var(--border-strong);
+      border: 1.5px solid rgba(15, 107, 67, 0.35);
       border-radius: 28px;
       padding: 32px 22px;
       box-shadow: 0 18px 42px rgba(15, 95, 58, 0.12);
@@ -150,9 +162,9 @@
     }
     .btn:active { transform: scale(0.97); }
     .btn-primary {
-      background: linear-gradient(135deg, var(--green-light), var(--green));
+      background: linear-gradient(135deg, #1ea86b, #0f6b43);
       color: #ffffff;
-      box-shadow: 0 8px 20px rgba(15, 107, 67, 0.22);
+      box-shadow: 0 8px 20px rgba(15, 107, 67, 0.3);
     }
     .btn-google {
       background: linear-gradient(135deg, #168253, #0d623d);
@@ -167,33 +179,34 @@
       height: 28px;
       border-radius: 50%;
       background: #ffffff;
-      color: var(--green);
+      color: #0f6b43;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
     }
     .btn-mint {
-      background: var(--green-soft);
-      color: var(--green);
+      background: rgba(30, 168, 107, 0.18);
+      color: #6cf0b5;
       border: 1px solid var(--border-strong);
     }
     .btn-ghost {
-      background: var(--soft-bg);
+      background: rgba(20, 40, 31, 0.78);
       color: var(--text);
       border: 1px solid var(--border);
     }
     .btn-danger {
-      background: rgba(201, 55, 72, 0.12);
+      background: rgba(255, 107, 122, 0.16);
       color: var(--danger);
-      border: 1px solid rgba(201, 55, 72, 0.28);
+      border: 1px solid rgba(255, 107, 122, 0.32);
     }
 
     .topbar {
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(10, 22, 17, 0.78);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
       display: flex;
@@ -206,23 +219,24 @@
       width: 36px;
       height: 36px;
       border-radius: 12px;
-      background: var(--green-soft);
+      background: rgba(30, 168, 107, 0.2);
       border: 1.5px solid var(--border-strong);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
       font-size: 19px;
-      color: var(--green);
+      color: #6cf0b5;
     }
-    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: var(--green); }
+    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: #6cf0b5; }
 
     .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 28px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
     .card {
-      background: var(--card-bg);
+      background: rgba(12, 24, 19, 0.68);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 16px;
@@ -233,7 +247,7 @@
 
     .input, textarea {
       width: 100%;
-      background: #ffffff;
+      background: rgba(16, 32, 25, 0.88);
       color: var(--text);
       border: 1px solid var(--border-strong);
       border-radius: 14px;
@@ -256,22 +270,22 @@
       cursor: pointer;
     }
     .ava-ring.has-story {
-      background: linear-gradient(135deg, #19a366, #0a5233, #c89632);
+      background: linear-gradient(135deg, #2ce69b, #0f6b43, #e6b84c);
       padding: 3.5px;
     }
     .ava-circle {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: var(--soft-bg);
-      color: var(--green);
+      background: rgba(20, 42, 33, 0.9);
+      color: #6cf0b5;
       font-size: 28px;
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 2px solid #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.25);
     }
     .ava-circle img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .ava-cam {
@@ -281,9 +295,9 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--green);
+      background: #189b62;
       color: #ffffff;
-      border: 2px solid #ffffff;
+      border: 2px solid #0c1813;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -295,7 +309,7 @@
 
     .sub-btn {
       border: 1px solid var(--border);
-      background: var(--card-bg);
+      background: rgba(14, 28, 22, 0.74);
       color: var(--text);
       border-radius: 13px;
       padding: 10px 6px;
@@ -305,9 +319,9 @@
       text-align: center;
     }
     .sub-btn.active {
-      background: var(--green);
+      background: linear-gradient(135deg, #1ea86b, #0f6b43);
       color: #ffffff;
-      border-color: var(--green);
+      border-color: transparent;
     }
 
     .photo-grid {
@@ -321,7 +335,7 @@
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: var(--soft-bg);
+      background: rgba(20, 38, 30, 0.7);
       cursor: pointer;
     }
     .photo-cell img {
@@ -338,8 +352,8 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: var(--green-soft);
-      color: var(--green);
+      background: rgba(30, 168, 107, 0.2);
+      color: #6cf0b5;
       font-weight: 800;
       font-size: 16px;
       display: flex;
@@ -369,26 +383,26 @@
       font-weight: 700;
       padding: 5px 11px;
       border-radius: 999px;
-      background: var(--green-soft);
-      color: var(--green);
+      background: rgba(30, 168, 107, 0.2);
+      color: #6cf0b5;
       white-space: nowrap;
     }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
     .wp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
     .wp-item {
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       border-radius: 18px;
-      padding: 14px 12px;
+      padding: 13px 12px;
       cursor: pointer;
-      min-height: 82px;
+      min-height: 86px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
     .wp-item.active {
-      border-color: var(--green);
-      box-shadow: 0 0 0 3px rgba(15, 107, 67, 0.22);
+      border-color: #6cf0b5;
+      box-shadow: 0 0 0 2px rgba(108, 240, 181, 0.3);
     }
 
     .bottom-nav {
@@ -397,12 +411,12 @@
       left: 0;
       right: 0;
       z-index: 30;
-      background: rgba(255, 255, 255, 0.96);
+      background: rgba(10, 22, 17, 0.86);
+      backdrop-filter: blur(14px);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
-      box-shadow: 0 -6px 20px rgba(15, 75, 48, 0.07);
     }
     .nav-btn {
       border: none;
@@ -428,9 +442,9 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .nav-btn.active { color: var(--green); background: var(--green-soft); }
+    .nav-btn.active { color: #6cf0b5; background: rgba(30, 168, 107, 0.18); }
     .nav-empty { display: flex; align-items: center; justify-content: center; pointer-events: none; }
-    .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(15, 107, 67, 0.16); }
+    .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(108, 240, 181, 0.25); }
 
     .peer-screen {
       position: fixed;
@@ -442,6 +456,7 @@
       display: none;
       flex-direction: column;
       padding-bottom: 36px;
+      background: transparent;
     }
     .peer-screen.open { display: flex; }
 
@@ -449,7 +464,7 @@
       position: fixed;
       inset: 0;
       z-index: 65;
-      background: rgba(12, 28, 20, 0.55);
+      background: rgba(0, 0, 0, 0.65);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -460,8 +475,9 @@
       max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      background: #ffffff;
-      border-top: 1px solid var(--border);
+      background: #0e1d17;
+      color: var(--text);
+      border-top: 1px solid var(--border-strong);
       border-radius: 26px 26px 0 0;
       padding: 20px 18px 28px;
     }
@@ -471,7 +487,7 @@
       position: fixed;
       inset: 0;
       z-index: 95;
-      background: #0c1712;
+      background: #070f0c;
       color: #ffffff;
       display: none;
       flex-direction: column;
@@ -497,6 +513,8 @@
       display: none;
       flex-direction: column;
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      background: rgba(7, 17, 13, 0.72);
+      backdrop-filter: blur(8px);
     }
     .chat-screen.open { display: flex; }
     .chat-wrap {
@@ -518,12 +536,12 @@
       margin: 10px 0;
       padding: 12px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.94);
+      background: rgba(12, 24, 19, 0.85);
       border: 1px solid var(--border);
     }
     .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 84%; word-break: break-word; }
-    .msg.them { background: var(--soft-bg); align-self: flex-start; border: 1px solid var(--border); }
-    .msg.me { background: var(--green); color: #ffffff; align-self: flex-end; }
+    .msg.them { background: rgba(24, 46, 36, 0.9); align-self: flex-start; border: 1px solid var(--border); }
+    .msg.me { background: linear-gradient(135deg, #1ea86b, #0f6b43); color: #ffffff; align-self: flex-end; }
     .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
 
     .list-item {
@@ -541,7 +559,7 @@
       left: 50%;
       bottom: 94px;
       transform: translateX(-50%) translateY(20px);
-      background: var(--green-dark);
+      background: #147a4d;
       color: #ffffff;
       padding: 11px 18px;
       border-radius: 999px;
@@ -558,93 +576,9 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
-
-  <!-- Стили живых тёмных обоев -->
-  <style id="liveDarkWallpaperStyle">
-    body.sat-dark-mode {
-      color: #eef7f2 !important;
-    }
-    body.sat-dark-mode .topbar,
-    body.sat-dark-mode .bottom-nav,
-    body.sat-dark-mode .modal-box,
-    body.sat-dark-mode .chat-list {
-      background: rgba(12, 24, 19, 0.92) !important;
-      color: #eef7f2 !important;
-      border-color: rgba(82, 214, 154, 0.24) !important;
-    }
-    body.sat-dark-mode .card {
-      background: rgba(14, 28, 22, 0.78) !important;
-      color: #eef7f2 !important;
-      border-color: rgba(82, 214, 154, 0.24) !important;
-    }
-    body.sat-dark-mode .input,
-    body.sat-dark-mode textarea {
-      background: rgba(20, 38, 30, 0.9) !important;
-      color: #f3fbf7 !important;
-      border-color: rgba(82, 214, 154, 0.35) !important;
-    }
-    body.sat-dark-mode .meta {
-      color: #9ec0b0 !important;
-    }
-    body.sat-dark-mode .btn-ghost {
-      background: rgba(25, 48, 38, 0.88) !important;
-      color: #eef7f2 !important;
-      border-color: rgba(82, 214, 154, 0.24) !important;
-    }
-    body.sat-dark-mode .sub-btn {
-      background: rgba(16, 32, 25, 0.85) !important;
-      color: #dff3e9 !important;
-      border-color: rgba(82, 214, 154, 0.24) !important;
-    }
-    body.sat-dark-mode .sub-btn.active,
-    body.sat-dark-mode .btn-primary {
-      background: linear-gradient(135deg, #168a57, #0b5233) !important;
-      color: #ffffff !important;
-    }
-    body.sat-dark-mode .nav-btn {
-      color: #9ab9aa !important;
-    }
-    body.sat-dark-mode .nav-btn.active {
-      color: #5be0a4 !important;
-      background: rgba(34, 177, 114, 0.16) !important;
-    }
-    body.sat-dark-mode .user-name {
-      color: #f2fbf6 !important;
-    }
-    #liveWallpaperCanvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    .live-aura {
-      position: absolute;
-      width: 340px;
-      height: 340px;
-      border-radius: 50%;
-      filter: blur(65px);
-      opacity: 0.42;
-      animation: satAuraFloat 9s ease-in-out infinite alternate;
-    }
-    .live-aura-1 { top: -70px; left: -60px; }
-    .live-aura-2 { bottom: 60px; right: -70px; animation-delay: -4.5s; }
-    @keyframes satAuraFloat {
-      0% { transform: translate(0px, 0px) scale(1); }
-      50% { transform: translate(24px, -18px) scale(1.12); }
-      100% { transform: translate(-18px, 22px) scale(0.95); }
-    }
-    .screen, .peer-screen, .chat-screen {
-      position: relative;
-      z-index: 1;
-    }
-  </style>
 </head>
 <body>
-  <div id="liveWallpaperCanvas" aria-hidden="true">
-    <div id="liveAuraOne" class="live-aura live-aura-1"></div>
-    <div id="liveAuraTwo" class="live-aura live-aura-2"></div>
-  </div>
+  <canvas id="satLiveSceneCanvas" aria-hidden="true"></canvas>
 
   <div id="ptrBar" class="ptr-bar">
     <div class="ptr-spin"></div>
@@ -661,7 +595,7 @@
     </div>
     <h1 class="brand-name">SÄT</h1>
     <button type="button" class="btn btn-primary" style="min-width: 210px; padding: 15px 28px; font-size: 17px;" onclick="enterAppFlow()">Войти</button>
-    <div id="sessionHint" class="meta" style="margin-top: 14px; display: none;">Проверяем вход...</div>
+    <div id="sessionHint" class="meta" style="margin-top: 14px; color: #4b695a; display: none;">Проверяем вход...</div>
   </section>
 
   <section id="auth" class="screen">
@@ -673,8 +607,8 @@
         </div>
         <div class="logo-letter" style="font-size: 40px;">Ä</div>
       </div>
-      <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: var(--green); letter-spacing: 2px;">SÄT</h2>
-      <p class="meta" style="margin: 0 0 24px; font-size: 14.5px;">Быстрый вход в одно касание без анкет</p>
+      <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: #0f6b43; letter-spacing: 2px;">SÄT</h2>
+      <p style="margin: 0 0 24px; font-size: 14.5px; color: #4b695a;">Быстрый вход в одно касание без анкет</p>
       <button type="button" class="btn btn-google" onclick="loginWithGoogle()">
         <span class="g-circle">G</span>
         <span>Продолжить через Google</span>
@@ -689,8 +623,7 @@
         <div class="brand-text">SÄT</div>
       </div>
       <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapers()">
-        <span id="wpSwatch" style="width:12px; height:12px; border-radius:50%; background:#143627; border:1px solid #5be0a4; display:inline-block;"></span>
-        <span>Обои</span>
+        <span id="wpActiveName" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Живые обои</span>
       </button>
     </header>
 
@@ -742,7 +675,7 @@
           <div id="myStoryBanner" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <div>
-                <div style="font-weight: 700; font-size: 15px; color: var(--green);">Ваша сторис (действует 3 часа)</div>
+                <div style="font-weight: 700; font-size: 15px; color: #6cf0b5;">Ваша сторис (действует 3 часа)</div>
                 <div id="myStoryTimerText" class="meta">Активна</div>
               </div>
               <div style="display: flex; gap: 8px;">
@@ -768,7 +701,10 @@
 
         <div id="mySubFriends" style="display: none;">
           <div class="card">
-            <h3 style="margin: 0 0 8px; font-size: 16px;">Мои друзья</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 16px;">Мои друзья</h3>
+              <button type="button" class="btn btn-ghost" style="padding: 6px 11px; font-size: 12.5px;" onclick="refreshFriendsView()">Обновить</button>
+            </div>
             <div id="myFriendsBox"></div>
           </div>
 
@@ -811,7 +747,7 @@
   <section id="peerProfileScreen" class="peer-screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
-      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--green);">Страница</div>
+      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: #6cf0b5;">Страница</div>
       <div style="width: 74px;"></div>
     </header>
 
@@ -881,8 +817,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Живые обои (10 вариантов)</h3>
-          <div class="meta">Нажмите на любые обои — фон изменится сразу</div>
+          <h3 style="margin: 0; font-size: 18px;">Живые обои городов</h3>
+          <div class="meta">Нажмите — фон за карточками оживёт сразу</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
@@ -964,7 +900,7 @@
 
   <div id="chatScreen" class="chat-screen">
     <div class="chat-wrap">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.92); padding: 10px 12px; border-radius: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); background: rgba(12, 24, 19, 0.92); padding: 10px 12px; border-radius: 16px;">
         <div style="min-width: 0;">
           <h3 id="chatHeaderTitle" style="margin: 0; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
           <div id="chatHeaderSub" class="meta">SÄT</div>
@@ -985,96 +921,242 @@
 
   <script>
     (function () {
-      const DARK_WALLPAPERS = [
-        { id: 'd1', name: 'Өскеменская мечеть', tag: 'Ночь и свет куполов', c1: '#07140f', c2: '#0c2219', c3: '#133326', aura1: 'rgba(34, 197, 126, 0.45)', aura2: 'rgba(218, 178, 76, 0.28)' },
-        { id: 'd2', name: 'Катон-Карагай', tag: 'Горный туман и кедры', c1: '#06130e', c2: '#0b2118', c3: '#143627', aura1: 'rgba(46, 204, 135, 0.42)', aura2: 'rgba(130, 224, 185, 0.25)' },
-        { id: 'd3', name: 'Иртыш ночью', tag: 'Тёмная вода и блики', c1: '#061116', c2: '#0b1e26', c3: '#112e3a', aura1: 'rgba(28, 184, 152, 0.38)', aura2: 'rgba(84, 168, 214, 0.25)' },
-        { id: 'd4', name: 'Алтайские вершины', tag: 'Звёздный хребет', c1: '#081018', c2: '#0f1c29', c3: '#172b3d', aura1: 'rgba(64, 196, 158, 0.34)', aura2: 'rgba(120, 165, 240, 0.26)' },
-        { id: 'd5', name: 'Рахмановские ключи', tag: 'Тихая горная долина', c1: '#07150e', c2: '#0d2419', c3: '#173b29', aura1: 'rgba(56, 212, 140, 0.4)', aura2: 'rgba(195, 175, 92, 0.22)' },
-        { id: 'd6', name: 'Ночной изумруд', tag: 'Глубокий зелёный', c1: '#05120c', c2: '#092418', c3: '#0f3825', aura1: 'rgba(22, 185, 114, 0.46)', aura2: 'rgba(16, 130, 82, 0.35)' },
-        { id: 'd7', name: 'Полумесяц над степью', tag: 'Тёплое золотое сияние', c1: '#12110a', c2: '#1e1c10', c3: '#2b2716', aura1: 'rgba(212, 170, 68, 0.34)', aura2: 'rgba(34, 165, 112, 0.28)' },
-        { id: 'd8', name: 'Бухтарминский вечер', tag: 'Спокойный горизонт', c1: '#091114', c2: '#101d22', c3: '#182b33', aura1: 'rgba(42, 186, 145, 0.35)', aura2: 'rgba(220, 155, 85, 0.22)' },
-        { id: 'd9', name: 'Тёмный нефрит', tag: 'Бархатный отблеск', c1: '#061410', c2: '#0b261e', c3: '#123b2f', aura1: 'rgba(26, 204, 150, 0.42)', aura2: 'rgba(72, 224, 178, 0.22)' },
-        { id: 'd10', name: 'Тихая ночь', tag: 'Мягкий отдых для глаз', c1: '#090e0c', c2: '#111916', c3: '#182420', aura1: 'rgba(45, 165, 118, 0.3)', aura2: 'rgba(95, 140, 120, 0.22)' }
+      const CITIES = [
+        { id: 'oskemen', name: 'Өскемен', desc: 'Ночной Иртыш, сопки и огни', sky1: '#05120d', sky2: '#0c261c', glow: 'rgba(46, 214, 142, 0.28)', water: true, style: 'oskemen' },
+        { id: 'katon', name: 'Катон-Карагай', desc: 'Горные пики, туман и звёзды', sky1: '#040f0b', sky2: '#0a2118', glow: 'rgba(66, 224, 158, 0.26)', water: false, style: 'mountains' },
+        { id: 'almaty', name: 'Алматы', desc: 'Огни предгорий и ночной хребет', sky1: '#070e18', sky2: '#102238', glow: 'rgba(245, 178, 72, 0.24)', water: false, style: 'almaty' },
+        { id: 'astana', name: 'Астана', desc: 'Байтерек и огни мегаполиса', sky1: '#060c1a', sky2: '#0f1f3d', glow: 'rgba(72, 184, 245, 0.26)', water: true, style: 'astana' },
+        { id: 'turkestan', name: 'Туркестан', desc: 'Ночной купол и золотой месяц', sky1: '#120e07', sky2: '#261d0e', glow: 'rgba(235, 185, 76, 0.28)', water: false, style: 'mosque' },
+        { id: 'istanbul', name: 'Стамбул', desc: 'Босфор, минареты и огни на воде', sky1: '#07111a', sky2: '#102536', glow: 'rgba(235, 168, 72, 0.25)', water: true, style: 'istanbul' },
+        { id: 'mecca', name: 'Мекка', desc: 'Звёздная ночь и тёплое сияние', sky1: '#0b0c09', sky2: '#1a1c12', glow: 'rgba(232, 192, 88, 0.3)', water: false, style: 'mecca' },
+        { id: 'tokyo', name: 'Токио', desc: 'Ночные небоскрёбы и неоновые огни', sky1: '#070a18', sky2: '#121836', glow: 'rgba(46, 224, 184, 0.28)', water: false, style: 'skyline' },
+        { id: 'paris', name: 'Париж', desc: 'Вечерняя башня и огни Сены', sky1: '#0d0c18', sky2: '#1d1a33', glow: 'rgba(242, 188, 92, 0.26)', water: true, style: 'paris' },
+        { id: 'aurora', name: 'Северное сияние', desc: 'Живые изумрудные волны в небе', sky1: '#030d0a', sky2: '#08221a', glow: 'rgba(42, 238, 152, 0.34)', water: true, style: 'aurora' }
       ];
 
-      function applyDarkLiveWallpaper(id) {
-        const wp = DARK_WALLPAPERS.find(function (x) { return x.id === id; }) || DARK_WALLPAPERS[0];
-        try { localStorage.setItem('sat_wp_direct', wp.id); } catch (e) {}
+      let activeCity = CITIES[0];
+      const canvas = document.getElementById('satLiveSceneCanvas');
+      const ctx = canvas ? canvas.getContext('2d') : null;
+      let W = 360, H = 740;
 
-        document.body.classList.add('sat-dark-mode');
+      const stars = Array.from({ length: 55 }, function () {
+        return {
+          x: Math.random(),
+          y: Math.random() * 0.58,
+          r: 0.7 + Math.random() * 1.5,
+          sp: 0.8 + Math.random() * 2.2,
+          ph: Math.random() * Math.PI * 2
+        };
+      });
 
-        const grad = 'radial-gradient(circle at 20% 15%, rgba(255,255,255,0.04) 0%, transparent 45%), linear-gradient(165deg, ' + wp.c1 + ' 0%, ' + wp.c2 + ' 52%, ' + wp.c3 + ' 100%)';
-        const targets = [
-          document.documentElement,
-          document.body,
-          document.getElementById('app'),
-          document.getElementById('tab-pulse'),
-          document.getElementById('tab-profile'),
-          document.getElementById('peerProfileScreen'),
-          document.getElementById('chatScreen')
-        ];
-        targets.forEach(function (el) {
-          if (!el) return;
-          el.style.setProperty('background-color', wp.c2, 'important');
-          el.style.setProperty('background-image', grad, 'important');
-          el.style.setProperty('background-size', 'cover', 'important');
+      const cityLights = Array.from({ length: 42 }, function () {
+        return {
+          x: Math.random(),
+          y: 0.64 + Math.random() * 0.14,
+          w: 1.5 + Math.random() * 2.5,
+          ph: Math.random() * Math.PI * 2,
+          gold: Math.random() > 0.35
+        };
+      });
+
+      function resizeCanvas() {
+        if (!canvas) return;
+        W = window.innerWidth || 360;
+        H = window.innerHeight || 740;
+        canvas.width = W;
+        canvas.height = H;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      function drawSilhouette(t) {
+        const horizon = H * 0.76;
+        ctx.fillStyle = 'rgba(4, 11, 8, 0.88)';
+
+        if (activeCity.style === 'oskemen' || activeCity.style === 'mountains' || activeCity.style === 'almaty') {
+          ctx.beginPath();
+          ctx.moveTo(0, horizon);
+          ctx.lineTo(0, horizon - H * 0.14);
+          ctx.lineTo(W * 0.18, horizon - H * 0.24);
+          ctx.lineTo(W * 0.36, horizon - H * 0.12);
+          ctx.lineTo(W * 0.58, horizon - H * 0.28);
+          ctx.lineTo(W * 0.82, horizon - H * 0.15);
+          ctx.lineTo(W, horizon - H * 0.21);
+          ctx.lineTo(W, horizon);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        if (activeCity.style === 'oskemen' || activeCity.style === 'mosque' || activeCity.style === 'istanbul' || activeCity.style === 'mecca') {
+          const cx = W * 0.5;
+          ctx.beginPath();
+          ctx.arc(cx, horizon - 26, 36, Math.PI, 0);
+          ctx.lineTo(cx + 42, horizon);
+          ctx.lineTo(cx - 42, horizon);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillRect(cx - 64, horizon - 88, 7, 88);
+          ctx.fillRect(cx + 57, horizon - 88, 7, 88);
+
+          ctx.fillStyle = 'rgba(245, 208, 108, 0.85)';
+          ctx.beginPath();
+          ctx.arc(W * 0.78, H * 0.16, 14, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = activeCity.sky1;
+          ctx.beginPath();
+          ctx.arc(W * 0.78 + 6, H * 0.16 - 3, 12, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (activeCity.style === 'astana') {
+          const cx = W * 0.5;
+          ctx.fillRect(cx - 7, horizon - 115, 14, 115);
+          ctx.fillStyle = 'rgba(245, 204, 86, 0.85)';
+          ctx.beginPath();
+          ctx.arc(cx, horizon - 122, 16, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (activeCity.style === 'paris') {
+          const cx = W * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(cx - 32, horizon);
+          ctx.lineTo(cx - 4, horizon - 145);
+          ctx.lineTo(cx + 4, horizon - 145);
+          ctx.lineTo(cx + 32, horizon);
+          ctx.closePath();
+          ctx.fill();
+        } else if (activeCity.style === 'skyline') {
+          const bars = [0.1, 0.24, 0.4, 0.56, 0.72, 0.86];
+          const heights = [75, 120, 95, 140, 105, 80];
+          bars.forEach(function (bx, idx) {
+            ctx.fillRect(W * bx - 16, horizon - heights[idx], 32, heights[idx]);
+          });
+        }
+
+        cityLights.forEach(function (l) {
+          const alpha = 0.25 + 0.65 * (0.5 + 0.5 * Math.sin(t * 2 + l.ph));
+          ctx.fillStyle = l.gold ? 'rgba(255, 212, 102,' + alpha + ')' : 'rgba(110, 245, 185,' + alpha + ')';
+          ctx.fillRect(l.x * W, l.y * H, l.w, 2);
         });
 
-        const a1 = document.getElementById('liveAuraOne');
-        const a2 = document.getElementById('liveAuraTwo');
-        if (a1) a1.style.background = wp.aura1;
-        if (a2) a2.style.background = wp.aura2;
+        const fogX = Math.sin(t * 0.35) * 35;
+        const fogGrad = ctx.createLinearGradient(0, horizon - 35, 0, horizon + 10);
+        fogGrad.addColorStop(0, 'rgba(140, 235, 195, 0)');
+        fogGrad.addColorStop(0.5, 'rgba(140, 235, 195, 0.08)');
+        fogGrad.addColorStop(1, 'rgba(140, 235, 195, 0)');
+        ctx.fillStyle = fogGrad;
+        ctx.fillRect(fogX - 40, horizon - 35, W + 80, 45);
 
-        const swatch = document.getElementById('wpSwatch');
-        if (swatch) swatch.style.background = 'linear-gradient(135deg, ' + wp.c3 + ', ' + wp.c1 + ')';
+        if (activeCity.water) {
+          const waterGrad = ctx.createLinearGradient(0, horizon, 0, H);
+          waterGrad.addColorStop(0, 'rgba(6, 18, 14, 0.92)');
+          waterGrad.addColorStop(1, 'rgba(3, 9, 7, 0.98)');
+          ctx.fillStyle = waterGrad;
+          ctx.fillRect(0, horizon, W, H - horizon);
+
+          for (let i = 0; i < 18; i++) {
+            const wy = horizon + 10 + i * ((H - horizon) / 18);
+            const wx = ((i * 53 + Math.sin(t * 1.4 + i) * 28) % W + W) % W;
+            const len = 18 + (i % 4) * 12;
+            ctx.fillStyle = 'rgba(110, 240, 185, 0.16)';
+            ctx.fillRect(wx, wy, len, 1.5);
+          }
+        } else {
+          ctx.fillStyle = 'rgba(4, 11, 8, 0.96)';
+          ctx.fillRect(0, horizon, W, H - horizon);
+        }
+      }
+
+      function renderFrame(nowMs) {
+        if (!ctx) return;
+        const t = nowMs * 0.001;
+
+        const sky = ctx.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, activeCity.sky1);
+        sky.addColorStop(0.75, activeCity.sky2);
+        sky.addColorStop(1, '#040b08');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, W, H);
+
+        const gx = W * 0.5 + Math.sin(t * 0.5) * 45;
+        const gy = H * 0.32 + Math.cos(t * 0.4) * 25;
+        const radial = ctx.createRadialGradient(gx, gy, 10, gx, gy, W * 0.65);
+        radial.addColorStop(0, activeCity.glow);
+        radial.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = radial;
+        ctx.fillRect(0, 0, W, H);
+
+        if (activeCity.style === 'aurora') {
+          for (let w = 0; w < 3; w++) {
+            ctx.beginPath();
+            ctx.moveTo(0, H * 0.25);
+            for (let x = 0; x <= W; x += 24) {
+              const y = H * (0.2 + w * 0.06) + Math.sin(x * 0.012 + t * (1.1 + w * 0.3)) * 24;
+              ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(65, 245, 165, 0.22)';
+            ctx.lineWidth = 14;
+            ctx.stroke();
+          }
+        }
+
+        stars.forEach(function (s) {
+          const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
+          ctx.fillStyle = 'rgba(235, 252, 244,' + a + ')';
+          ctx.beginPath();
+          ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        drawSilhouette(t);
+        requestAnimationFrame(renderFrame);
+      }
+
+      function setCityWallpaper(id) {
+        activeCity = CITIES.find(function (c) { return c.id === id; }) || CITIES[0];
+        try { localStorage.setItem('sat_live_city_wp', activeCity.id); } catch (e) {}
+
+        const badge = document.getElementById('wpActiveName');
+        if (badge) badge.textContent = activeCity.name;
 
         const list = document.getElementById('wallpapersList');
         if (list) {
-          list.innerHTML = DARK_WALLPAPERS.map(function (item) {
-            const active = item.id === wp.id;
-            return '<div class="wp-item ' + (active ? 'active' : '') + '" data-wp-pick="' + item.id + '" style="background: linear-gradient(145deg, ' + item.c2 + ', ' + item.c3 + '); color: #eef7f2; border-color: ' + (active ? '#5be0a4' : 'rgba(82,214,154,0.28)') + ';">' +
-              '<div style="font-weight:800;font-size:14.5px;color:#f2fbf6;pointer-events:none;">' + item.name + '</div>' +
-              '<div style="font-size:11.5px;color:#9ec0b0;margin-top:2px;pointer-events:none;">' + item.tag + '</div>' +
-              '<div class="wp-status" style="font-size:12px;font-weight:700;color:#5be0a4;margin-top:8px;pointer-events:none;">' + (active ? 'Выбрано' : 'Применить') + '</div>' +
+          list.innerHTML = CITIES.map(function (c) {
+            const cur = c.id === activeCity.id;
+            return '<div class="wp-item ' + (cur ? 'active' : '') + '" data-city-wp="' + c.id + '" style="background: linear-gradient(155deg, ' + c.sky1 + ', ' + c.sky2 + ');">' +
+              '<div style="font-weight:800;font-size:14.5px;color:#eef8f3;pointer-events:none;">' + c.name + '</div>' +
+              '<div style="font-size:11.5px;color:#9ec2b1;margin-top:3px;pointer-events:none;">' + c.desc + '</div>' +
+              '<div style="font-size:12px;font-weight:700;color:#6cf0b5;margin-top:8px;pointer-events:none;">' + (cur ? 'Активно' : 'Включить') + '</div>' +
             '</div>';
           }).join('');
         }
       }
 
       window.openWallpapers = function () {
-        let savedId = 'd1';
-        try { savedId = localStorage.getItem('sat_wp_direct') || 'd1'; } catch (e) {}
-        applyDarkLiveWallpaper(savedId);
+        let saved = 'oskemen';
+        try { saved = localStorage.getItem('sat_live_city_wp') || 'oskemen'; } catch (e) {}
+        setCityWallpaper(saved);
         const modal = document.getElementById('wallpapersModal');
         if (modal) modal.classList.add('open');
       };
 
-      window.pickWallpaper = function (id) {
-        applyDarkLiveWallpaper(id);
-        const wp = DARK_WALLPAPERS.find(function (x) { return x.id === id; });
-        const t = document.getElementById('toast');
-        if (t && wp) {
-          t.textContent = 'Обои: ' + wp.name;
-          t.classList.add('show');
-          clearTimeout(window._wpToastT);
-          window._wpToastT = setTimeout(function () { t.classList.remove('show'); }, 2200);
-        }
-      };
-
       document.addEventListener('click', function (ev) {
-        const card = ev.target && ev.target.closest ? ev.target.closest('[data-wp-pick]') : null;
+        const card = ev.target && ev.target.closest ? ev.target.closest('[data-city-wp]') : null;
         if (card) {
-          const picked = card.getAttribute('data-wp-pick');
-          if (picked) window.pickWallpaper(picked);
+          const picked = card.getAttribute('data-city-wp');
+          setCityWallpaper(picked);
+          const t = document.getElementById('toast');
+          if (t) {
+            t.textContent = 'Живые обои: ' + activeCity.name;
+            t.classList.add('show');
+            clearTimeout(window._wpT);
+            window._wpT = setTimeout(function () { t.classList.remove('show'); }, 2200);
+          }
         }
       });
 
-      document.addEventListener('DOMContentLoaded', function () {
-        let savedId = 'd1';
-        try { savedId = localStorage.getItem('sat_wp_direct') || 'd1'; } catch (e) {}
-        applyDarkLiveWallpaper(savedId);
-      });
+      let initial = 'oskemen';
+      try { initial = localStorage.getItem('sat_live_city_wp') || 'oskemen'; } catch (e) {}
+      setCityWallpaper(initial);
+      requestAnimationFrame(renderFrame);
     })();
   </script>
 
@@ -1123,7 +1205,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v2';
+    const STORE_KEY = 'sat_clean_state_v3';
     let state = {
       name: '',
       bio: '',
@@ -1132,13 +1214,19 @@
       story: '',
       storyStart: 0,
       storyEnd: 0,
-      storyLabel: ''
+      storyLabel: '',
+      cachedFriends: [],
+      cachedUsers: [],
+      cachedRequests: []
     };
 
     try {
       const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
+      if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
+      if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
+      if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
     } catch (e) {}
 
     function persist() {
@@ -1147,8 +1235,8 @@
 
     let currentUser = null;
     let posts = [];
-    let users = [];
-    let friendsDocs = [];
+    let users = state.cachedUsers.length ? [...state.cachedUsers] : [];
+    let friendsDocs = state.cachedRequests.length ? [...state.cachedRequests] : [];
     let chats = [];
     let pickTarget = 'avatar';
     let draftPostPhoto = '';
@@ -1349,7 +1437,12 @@
     }, () => {});
 
     onSnapshot(collection(db, 'users'), (snap) => {
-      users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const freshUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (freshUsers.length) {
+        users = freshUsers;
+        state.cachedUsers = freshUsers.slice(0, 100);
+        persist();
+      }
       if (currentUser) {
         const me = users.find(u => u.uid === currentUser.uid);
         if (me) {
@@ -1372,7 +1465,12 @@
     }, () => {});
 
     onSnapshot(collection(db, 'friendRequests'), (snap) => {
-      friendsDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const freshReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      if (freshReqs.length) {
+        friendsDocs = freshReqs;
+        state.cachedRequests = freshReqs.slice(0, 200);
+        persist();
+      }
       renderFriendsTab();
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
@@ -1402,6 +1500,7 @@
       document.getElementById('mySubPosts').style.display = sub === 'posts' ? 'block' : 'none';
       document.getElementById('mySubFriends').style.display = sub === 'friends' ? 'block' : 'none';
       document.getElementById('mySubGroups').style.display = sub === 'groups' ? 'block' : 'none';
+      if (sub === 'friends') renderFriendsTab();
     }
 
     function renderEverything() {
@@ -1894,30 +1993,76 @@
       }
     }
 
+    function getMyUid() {
+      return currentUser?.uid || state.lastUid || '';
+    }
+
     function getFriendRel(otherUid) {
-      if (!currentUser) return { status: 'none' };
+      const myUid = getMyUid();
+      if (!myUid) return { status: 'none' };
       const r = friendsDocs.find(x =>
-        (x.fromUid === currentUser.uid && x.toUid === otherUid) ||
-        (x.toUid === currentUser.uid && x.fromUid === otherUid)
+        (x.fromUid === myUid && x.toUid === otherUid) ||
+        (x.toUid === myUid && x.fromUid === otherUid)
       );
       if (!r) return { status: 'none' };
       if (r.status === 'accepted') return { status: 'accepted', id: r.id };
-      if (r.fromUid === currentUser.uid) return { status: 'outgoing', id: r.id };
+      if (r.fromUid === myUid) return { status: 'outgoing', id: r.id };
       return { status: 'incoming', id: r.id };
+    }
+
+    function refreshFriendsView() {
+      renderFriendsTab();
+      toast('Список друзей обновлён');
     }
 
     function renderFriendsTab() {
       const myBox = document.getElementById('myFriendsBox');
       const otherBox = document.getElementById('otherPeopleBox');
-      if (!myBox || !otherBox || !currentUser) return;
+      if (!myBox || !otherBox) return;
 
-      const others = users.filter(u => u.uid !== currentUser.uid);
-      const myFriends = others.filter(u => getFriendRel(u.uid).status === 'accepted');
+      const myUid = getMyUid();
+      if (currentUser?.uid) {
+        state.lastUid = currentUser.uid;
+        persist();
+      }
 
-      if (!myFriends.length) {
+      const acceptedMap = new Map();
+      friendsDocs.forEach(r => {
+        if (r.status !== 'accepted') return;
+        let otherUid = '';
+        let fallbackName = '';
+        if (myUid && r.fromUid === myUid) {
+          otherUid = r.toUid;
+          fallbackName = r.toName || '';
+        } else if (myUid && r.toUid === myUid) {
+          otherUid = r.fromUid;
+          fallbackName = r.fromName || '';
+        } else if (!myUid) {
+          otherUid = r.toUid || r.fromUid;
+          fallbackName = r.toName || r.fromName || '';
+        }
+        if (otherUid && otherUid !== myUid) {
+          const profile = users.find(u => u.uid === otherUid) || {};
+          acceptedMap.set(otherUid, {
+            uid: otherUid,
+            fullName: profile.fullName || fallbackName || 'Участник',
+            photoData: profile.photoData || ''
+          });
+        }
+      });
+
+      const myFriends = Array.from(acceptedMap.values());
+      if (myFriends.length) {
+        state.cachedFriends = myFriends;
+        persist();
+      }
+
+      const listToShow = myFriends.length ? myFriends : state.cachedFriends;
+
+      if (!listToShow.length) {
         myBox.innerHTML = '<div class="meta">Друзей пока нет. Добавьте людей ниже.</div>';
       } else {
-        myBox.innerHTML = myFriends.map(u => {
+        myBox.innerHTML = listToShow.map(u => {
           const nm = u.fullName || 'Участник';
           const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
           return `
@@ -1935,16 +2080,17 @@
         }).join('');
       }
 
+      const others = users.filter(u => u.uid && u.uid !== myUid);
       const q = (document.getElementById('searchPeopleInput')?.value || '').trim().toLowerCase();
-      const list = others.filter(u => {
-        if (getFriendRel(u.uid).status === 'accepted') return false;
+      const candidates = others.filter(u => {
+        if (acceptedMap.has(u.uid)) return false;
         return !q || (u.fullName || '').toLowerCase().includes(q);
       });
 
-      if (!list.length) {
+      if (!candidates.length) {
         otherBox.innerHTML = '<div class="meta">Новых пользователей пока нет.</div>';
       } else {
-        otherBox.innerHTML = list.map(u => {
+        otherBox.innerHTML = candidates.map(u => {
           const nm = u.fullName || 'Участник';
           const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
           const rel = getFriendRel(u.uid);
@@ -1966,11 +2112,12 @@
     }
 
     async function addFriend(toUid, toName) {
-      if (!currentUser) return;
-      const id = [currentUser.uid, toUid].sort().join('_');
+      const myUid = getMyUid();
+      if (!myUid) return;
+      const id = [myUid, toUid].sort().join('_');
       try {
         await setDoc(doc(db, 'friendRequests', id), {
-          fromUid: currentUser.uid,
+          fromUid: myUid,
           fromName: myDisplayName(),
           toUid,
           toName,
@@ -2050,13 +2197,14 @@
     }
 
     async function openDirectChat(otherUid, otherName) {
-      if (!currentUser || !otherUid || otherUid === currentUser.uid) return;
-      const id = 'dm_' + [currentUser.uid, otherUid].sort().join('_');
+      const myUid = getMyUid();
+      if (!myUid || !otherUid || otherUid === myUid) return;
+      const id = 'dm_' + [myUid, otherUid].sort().join('_');
       try {
         await setDoc(doc(db, 'chats', id), {
           type: 'direct',
-          members: [currentUser.uid, otherUid],
-          memberNames: { [currentUser.uid]: myDisplayName(), [otherUid]: otherName || 'Участник' },
+          members: [myUid, otherUid],
+          memberNames: { [myUid]: myDisplayName(), [otherUid]: otherName || 'Участник' },
           updatedAt: serverTimestamp()
         }, { merge: true });
         openChatRoom(id, otherName);
@@ -2105,11 +2253,12 @@
     async function sendMessage() {
       const inp = document.getElementById('chatMsgInput');
       const text = inp.value.trim();
-      if (!text || !activeChatId || !currentUser) return;
+      const myUid = getMyUid();
+      if (!text || !activeChatId || !myUid) return;
       inp.value = '';
       try {
         await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-          senderUid: currentUser.uid,
+          senderUid: myUid,
           senderName: myDisplayName(),
           kind: 'text',
           text,
@@ -2117,7 +2266,7 @@
         });
         await updateDoc(doc(db, 'chats', activeChatId), {
           lastMessage: text,
-          lastSenderUid: currentUser.uid,
+          lastSenderUid: myUid,
           updatedAt: serverTimestamp()
         });
       } catch (e) {}
@@ -2160,7 +2309,7 @@
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       likePost, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, openPeerStoryViewer,
-      addFriend, acceptFriendReq,
+      refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage,
       openEditProfileModal, saveProfileData,
@@ -2173,6 +2322,8 @@
     if ('caches' in window) {
       caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
     }
+
+    renderFriendsTab();
   </script>
 </body>
 </html>

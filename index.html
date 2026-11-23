@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>SÄT</title>
   <meta name="theme-color" content="#0b1f17" />
@@ -26,6 +26,13 @@
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    input, textarea, select {
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     html, body {
@@ -151,7 +158,6 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      user-select: none;
       touch-action: manipulation;
     }
     .btn:active { transform: scale(0.97); }
@@ -315,9 +321,6 @@
       flex-shrink: 0;
       position: relative;
       cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
       touch-action: manipulation;
     }
     .ava-ring.has-story {
@@ -337,9 +340,6 @@
       justify-content: center;
       overflow: hidden;
       border: 2px solid rgba(255, 255, 255, 0.25);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
       touch-action: manipulation;
     }
     .ava-circle img {
@@ -347,17 +347,11 @@
       height: 100%;
       object-fit: cover;
       pointer-events: none;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
     }
 
     #peerAvatarRing,
     #peerAvatarCircle,
     #peerAvatarCircle img {
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      -webkit-touch-callout: none !important;
       touch-action: manipulation !important;
     }
     #peerAvatarCircle img {
@@ -606,6 +600,7 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 18px 16px 24px;
+      touch-action: none;
     }
     .viewer-screen.open { display: flex; }
     .viewer-stage {
@@ -615,22 +610,15 @@
       justify-content: center;
       overflow: hidden;
       margin: 10px 0;
+      touch-action: none;
     }
     .viewer-screen img {
       max-width: 100%;
-      max-height: 68vh;
+      max-height: 70vh;
       object-fit: contain;
       border-radius: 16px;
-      transition: transform 0.18s ease;
       transform-origin: center center;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .viewer-zoom-bar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 8px;
+      pointer-events: none;
     }
 
     .chat-screen {
@@ -720,9 +708,6 @@
       border-radius: 12px;
       background: rgba(7, 17, 13, 0.42);
       border: 1px solid rgba(255, 255, 255, 0.16);
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
     }
     .voice-play-btn {
       width: 32px;
@@ -1401,15 +1386,10 @@
       </div>
       <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
     </div>
-    <div class="viewer-stage" onclick="onViewerStageTap(event)">
+    <div id="viewerStage" class="viewer-stage">
       <img id="viewerImage" src="" alt="" draggable="false" />
     </div>
-    <div class="viewer-zoom-bar">
-      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="zoomViewer(0.35)">Увеличить (+)</button>
-      <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 13.5px;" onclick="resetViewerZoom()">100%</button>
-      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="zoomViewer(-0.35)">Уменьшить (−)</button>
-    </div>
-    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Масштаб: 100% • Нажмите дважды для увеличения</div>
+    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Растяните двумя пальцами • Двигайте влево/вправо</div>
   </div>
 
   <div id="chatScreen" class="chat-screen">
@@ -1587,7 +1567,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v13';
+    const STORE_KEY = 'sat_clean_state_v14';
 
     let state = {
       name: '',
@@ -1609,7 +1589,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v12') || localStorage.getItem('sat_clean_state_v11') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v13') || localStorage.getItem('sat_clean_state_v12') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
@@ -1744,8 +1724,17 @@
     let studioTab = 'inbox';
     let studioCollapsed = false;
 
-    let viewerZoom = 1;
-    let lastViewerTap = 0;
+    let vScale = 1;
+    let vPanX = 0;
+    let vPanY = 0;
+    let vStartScale = 1;
+    let vStartDist = 0;
+    let vStartX = 0;
+    let vStartY = 0;
+    let vPanOriginX = 0;
+    let vPanOriginY = 0;
+    let vMode = 'none';
+    let vLastTap = 0;
 
     const openCommentsPostIds = new Set();
     const commentsByPostId = new Map();
@@ -2680,33 +2669,37 @@
       toast('Сторис удалена');
     }
 
-    function applyViewerZoom(val) {
-      viewerZoom = Math.min(3.5, Math.max(1, Number(val.toFixed(2))));
+    function applyViewerTransform() {
+      vScale = Math.min(4.5, Math.max(1, Number(vScale.toFixed(2))));
+      if (vScale <= 1.01) {
+        vScale = 1;
+        vPanX = 0;
+        vPanY = 0;
+      } else {
+        const limitX = Math.max(120, 220 * (vScale - 1));
+        const limitY = Math.max(100, 180 * (vScale - 1));
+        vPanX = Math.min(limitX, Math.max(-limitX, vPanX));
+        vPanY = Math.min(limitY, Math.max(-limitY, vPanY));
+      }
       const img = document.getElementById('viewerImage');
       const lbl = document.getElementById('viewerScaleLabel');
-      if (img) img.style.transform = `scale(${viewerZoom})`;
-      if (lbl) lbl.textContent = `Масштаб: ${Math.round(viewerZoom * 100)}% • Нажмите дважды для увеличения`;
-    }
-
-    function zoomViewer(delta) {
-      applyViewerZoom(viewerZoom + delta);
-    }
-
-    function resetViewerZoom() {
-      applyViewerZoom(1);
-    }
-
-    function onViewerStageTap(ev) {
-      if (ev.target.tagName !== 'IMG') {
-        closeFullViewer();
-        return;
+      if (img) {
+        img.style.transition = vMode === 'none' ? 'transform 0.14s ease' : 'none';
+        img.style.transform = `translate3d(${Math.round(vPanX)}px, ${Math.round(vPanY)}px, 0) scale(${vScale})`;
       }
-      ev.stopPropagation();
-      const now = Date.now();
-      if (now - lastViewerTap < 320) {
-        applyViewerZoom(viewerZoom > 1.05 ? 1 : 2);
+      if (lbl) {
+        lbl.textContent = vScale > 1
+          ? `Приближение: ${Math.round(vScale * 100)}% • Двигайте влево/вправо и вверх/вниз`
+          : 'Растяните двумя пальцами • Двигайте влево/вправо';
       }
-      lastViewerTap = now;
+    }
+
+    function resetViewerTransform() {
+      vMode = 'none';
+      vScale = 1;
+      vPanX = 0;
+      vPanY = 0;
+      applyViewerTransform();
     }
 
     function openImageViewer(src, title, sub) {
@@ -2714,14 +2707,109 @@
       document.getElementById('viewerTitle').textContent = title || 'Фото';
       document.getElementById('viewerSub').textContent = sub || '';
       document.getElementById('viewerImage').src = src;
-      applyViewerZoom(1);
+      resetViewerTransform();
       document.getElementById('fullViewer').classList.add('open');
     }
 
     function closeFullViewer() {
-      applyViewerZoom(1);
+      resetViewerTransform();
       document.getElementById('fullViewer').classList.remove('open');
     }
+
+    function getTouchDist(t1, t2) {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    }
+
+    (function bindViewerTouchGestures() {
+      const stage = document.getElementById('viewerStage');
+      if (!stage) return;
+
+      stage.addEventListener('touchstart', (e) => {
+        if (!document.getElementById('fullViewer')?.classList.contains('open')) return;
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          vMode = 'pinch';
+          vStartDist = Math.max(10, getTouchDist(e.touches[0], e.touches[1]));
+          vStartScale = vScale;
+          vStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          vStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          vPanOriginX = vPanX;
+          vPanOriginY = vPanY;
+        } else if (e.touches.length === 1) {
+          const t = e.touches[0];
+          const now = Date.now();
+          if (now - vLastTap < 300) {
+            e.preventDefault();
+            vMode = 'none';
+            if (vScale > 1.05) {
+              vScale = 1;
+              vPanX = 0;
+              vPanY = 0;
+            } else {
+              vScale = 2.2;
+            }
+            applyViewerTransform();
+            vLastTap = 0;
+            return;
+          }
+          vLastTap = now;
+          vStartX = t.clientX;
+          vStartY = t.clientY;
+          vPanOriginX = vPanX;
+          vPanOriginY = vPanY;
+          vMode = 'pan';
+        }
+      }, { passive: false });
+
+      stage.addEventListener('touchmove', (e) => {
+        if (!document.getElementById('fullViewer')?.classList.contains('open')) return;
+        if (vMode === 'pinch' && e.touches.length === 2) {
+          e.preventDefault();
+          const dist = Math.max(10, getTouchDist(e.touches[0], e.touches[1]));
+          vScale = vStartScale * (dist / vStartDist);
+          const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          vPanX = vPanOriginX + (cx - vStartX);
+          vPanY = vPanOriginY + (cy - vStartY);
+          applyViewerTransform();
+        } else if (vMode === 'pan' && e.touches.length === 1) {
+          e.preventDefault();
+          const t = e.touches[0];
+          const dx = t.clientX - vStartX;
+          const dy = t.clientY - vStartY;
+          if (vScale > 1) {
+            vPanX = vPanOriginX + dx;
+            vPanY = vPanOriginY + dy;
+          } else {
+            vPanX = vPanOriginX + dx * 0.65;
+            vPanY = vPanOriginY + dy * 0.45;
+          }
+          applyViewerTransform();
+        }
+      }, { passive: false });
+
+      stage.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+          const movedDist = Math.hypot((e.changedTouches[0]?.clientX || vStartX) - vStartX, (e.changedTouches[0]?.clientY || vStartY) - vStartY);
+          if (vScale <= 1.02) {
+            vPanX = 0;
+            vPanY = 0;
+          }
+          if (vScale <= 1 && movedDist < 10 && vLastTap === 0) {
+            closeFullViewer();
+            return;
+          }
+          vMode = 'none';
+          applyViewerTransform();
+        } else if (e.touches.length === 1) {
+          vMode = 'pan';
+          vStartX = e.touches[0].clientX;
+          vStartY = e.touches[0].clientY;
+          vPanOriginX = vPanX;
+          vPanOriginY = vPanY;
+        }
+      }, { passive: false });
+    })();
 
     function openNewPostModal() {
       choosePostDest('pulse');
@@ -4259,7 +4347,7 @@
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       deleteGalleryPhoto, saveChatPhotoToGallery, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
-      openImageViewer, closeFullViewer, zoomViewer, resetViewerZoom, onViewerStageTap,
+      openImageViewer, closeFullViewer,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       giveKarma, toggleCommentsPanel, addPostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,

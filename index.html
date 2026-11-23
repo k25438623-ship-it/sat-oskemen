@@ -558,15 +558,94 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
-  <style id="dynamicWallpaperStyle">
-    body, #app, #peerProfileScreen, #chatScreen {
-      background-color: #f3f9f5 !important;
-      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1.3px, transparent 1.3px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%) !important;
-      background-size: 22px 22px, cover !important;
+
+  <!-- Стили живых тёмных обоев -->
+  <style id="liveDarkWallpaperStyle">
+    body.sat-dark-mode {
+      color: #eef7f2 !important;
+    }
+    body.sat-dark-mode .topbar,
+    body.sat-dark-mode .bottom-nav,
+    body.sat-dark-mode .modal-box,
+    body.sat-dark-mode .chat-list {
+      background: rgba(12, 24, 19, 0.92) !important;
+      color: #eef7f2 !important;
+      border-color: rgba(82, 214, 154, 0.24) !important;
+    }
+    body.sat-dark-mode .card {
+      background: rgba(14, 28, 22, 0.78) !important;
+      color: #eef7f2 !important;
+      border-color: rgba(82, 214, 154, 0.24) !important;
+    }
+    body.sat-dark-mode .input,
+    body.sat-dark-mode textarea {
+      background: rgba(20, 38, 30, 0.9) !important;
+      color: #f3fbf7 !important;
+      border-color: rgba(82, 214, 154, 0.35) !important;
+    }
+    body.sat-dark-mode .meta {
+      color: #9ec0b0 !important;
+    }
+    body.sat-dark-mode .btn-ghost {
+      background: rgba(25, 48, 38, 0.88) !important;
+      color: #eef7f2 !important;
+      border-color: rgba(82, 214, 154, 0.24) !important;
+    }
+    body.sat-dark-mode .sub-btn {
+      background: rgba(16, 32, 25, 0.85) !important;
+      color: #dff3e9 !important;
+      border-color: rgba(82, 214, 154, 0.24) !important;
+    }
+    body.sat-dark-mode .sub-btn.active,
+    body.sat-dark-mode .btn-primary {
+      background: linear-gradient(135deg, #168a57, #0b5233) !important;
+      color: #ffffff !important;
+    }
+    body.sat-dark-mode .nav-btn {
+      color: #9ab9aa !important;
+    }
+    body.sat-dark-mode .nav-btn.active {
+      color: #5be0a4 !important;
+      background: rgba(34, 177, 114, 0.16) !important;
+    }
+    body.sat-dark-mode .user-name {
+      color: #f2fbf6 !important;
+    }
+    #liveWallpaperCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .live-aura {
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      filter: blur(65px);
+      opacity: 0.42;
+      animation: satAuraFloat 9s ease-in-out infinite alternate;
+    }
+    .live-aura-1 { top: -70px; left: -60px; }
+    .live-aura-2 { bottom: 60px; right: -70px; animation-delay: -4.5s; }
+    @keyframes satAuraFloat {
+      0% { transform: translate(0px, 0px) scale(1); }
+      50% { transform: translate(24px, -18px) scale(1.12); }
+      100% { transform: translate(-18px, 22px) scale(0.95); }
+    }
+    .screen, .peer-screen, .chat-screen {
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
 <body>
+  <div id="liveWallpaperCanvas" aria-hidden="true">
+    <div id="liveAuraOne" class="live-aura live-aura-1"></div>
+    <div id="liveAuraTwo" class="live-aura live-aura-2"></div>
+  </div>
+
   <div id="ptrBar" class="ptr-bar">
     <div class="ptr-spin"></div>
     <span id="ptrText">Обновление...</span>
@@ -610,7 +689,7 @@
         <div class="brand-text">SÄT</div>
       </div>
       <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapers()">
-        <span id="wpSwatch" style="width:12px; height:12px; border-radius:50%; background:#d0f2e2; border:1px solid #0f6b43; display:inline-block;"></span>
+        <span id="wpSwatch" style="width:12px; height:12px; border-radius:50%; background:#143627; border:1px solid #5be0a4; display:inline-block;"></span>
         <span>Обои</span>
       </button>
     </header>
@@ -802,7 +881,7 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Обои интерфейса (10 вариантов)</h3>
+          <h3 style="margin: 0; font-size: 18px;">Живые обои (10 вариантов)</h3>
           <div class="meta">Нажмите на любые обои — фон изменится сразу</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
@@ -904,6 +983,101 @@
 
   <div id="toast" class="toast"></div>
 
+  <script>
+    (function () {
+      const DARK_WALLPAPERS = [
+        { id: 'd1', name: 'Өскеменская мечеть', tag: 'Ночь и свет куполов', c1: '#07140f', c2: '#0c2219', c3: '#133326', aura1: 'rgba(34, 197, 126, 0.45)', aura2: 'rgba(218, 178, 76, 0.28)' },
+        { id: 'd2', name: 'Катон-Карагай', tag: 'Горный туман и кедры', c1: '#06130e', c2: '#0b2118', c3: '#143627', aura1: 'rgba(46, 204, 135, 0.42)', aura2: 'rgba(130, 224, 185, 0.25)' },
+        { id: 'd3', name: 'Иртыш ночью', tag: 'Тёмная вода и блики', c1: '#061116', c2: '#0b1e26', c3: '#112e3a', aura1: 'rgba(28, 184, 152, 0.38)', aura2: 'rgba(84, 168, 214, 0.25)' },
+        { id: 'd4', name: 'Алтайские вершины', tag: 'Звёздный хребет', c1: '#081018', c2: '#0f1c29', c3: '#172b3d', aura1: 'rgba(64, 196, 158, 0.34)', aura2: 'rgba(120, 165, 240, 0.26)' },
+        { id: 'd5', name: 'Рахмановские ключи', tag: 'Тихая горная долина', c1: '#07150e', c2: '#0d2419', c3: '#173b29', aura1: 'rgba(56, 212, 140, 0.4)', aura2: 'rgba(195, 175, 92, 0.22)' },
+        { id: 'd6', name: 'Ночной изумруд', tag: 'Глубокий зелёный', c1: '#05120c', c2: '#092418', c3: '#0f3825', aura1: 'rgba(22, 185, 114, 0.46)', aura2: 'rgba(16, 130, 82, 0.35)' },
+        { id: 'd7', name: 'Полумесяц над степью', tag: 'Тёплое золотое сияние', c1: '#12110a', c2: '#1e1c10', c3: '#2b2716', aura1: 'rgba(212, 170, 68, 0.34)', aura2: 'rgba(34, 165, 112, 0.28)' },
+        { id: 'd8', name: 'Бухтарминский вечер', tag: 'Спокойный горизонт', c1: '#091114', c2: '#101d22', c3: '#182b33', aura1: 'rgba(42, 186, 145, 0.35)', aura2: 'rgba(220, 155, 85, 0.22)' },
+        { id: 'd9', name: 'Тёмный нефрит', tag: 'Бархатный отблеск', c1: '#061410', c2: '#0b261e', c3: '#123b2f', aura1: 'rgba(26, 204, 150, 0.42)', aura2: 'rgba(72, 224, 178, 0.22)' },
+        { id: 'd10', name: 'Тихая ночь', tag: 'Мягкий отдых для глаз', c1: '#090e0c', c2: '#111916', c3: '#182420', aura1: 'rgba(45, 165, 118, 0.3)', aura2: 'rgba(95, 140, 120, 0.22)' }
+      ];
+
+      function applyDarkLiveWallpaper(id) {
+        const wp = DARK_WALLPAPERS.find(function (x) { return x.id === id; }) || DARK_WALLPAPERS[0];
+        try { localStorage.setItem('sat_wp_direct', wp.id); } catch (e) {}
+
+        document.body.classList.add('sat-dark-mode');
+
+        const grad = 'radial-gradient(circle at 20% 15%, rgba(255,255,255,0.04) 0%, transparent 45%), linear-gradient(165deg, ' + wp.c1 + ' 0%, ' + wp.c2 + ' 52%, ' + wp.c3 + ' 100%)';
+        const targets = [
+          document.documentElement,
+          document.body,
+          document.getElementById('app'),
+          document.getElementById('tab-pulse'),
+          document.getElementById('tab-profile'),
+          document.getElementById('peerProfileScreen'),
+          document.getElementById('chatScreen')
+        ];
+        targets.forEach(function (el) {
+          if (!el) return;
+          el.style.setProperty('background-color', wp.c2, 'important');
+          el.style.setProperty('background-image', grad, 'important');
+          el.style.setProperty('background-size', 'cover', 'important');
+        });
+
+        const a1 = document.getElementById('liveAuraOne');
+        const a2 = document.getElementById('liveAuraTwo');
+        if (a1) a1.style.background = wp.aura1;
+        if (a2) a2.style.background = wp.aura2;
+
+        const swatch = document.getElementById('wpSwatch');
+        if (swatch) swatch.style.background = 'linear-gradient(135deg, ' + wp.c3 + ', ' + wp.c1 + ')';
+
+        const list = document.getElementById('wallpapersList');
+        if (list) {
+          list.innerHTML = DARK_WALLPAPERS.map(function (item) {
+            const active = item.id === wp.id;
+            return '<div class="wp-item ' + (active ? 'active' : '') + '" data-wp-pick="' + item.id + '" style="background: linear-gradient(145deg, ' + item.c2 + ', ' + item.c3 + '); color: #eef7f2; border-color: ' + (active ? '#5be0a4' : 'rgba(82,214,154,0.28)') + ';">' +
+              '<div style="font-weight:800;font-size:14.5px;color:#f2fbf6;pointer-events:none;">' + item.name + '</div>' +
+              '<div style="font-size:11.5px;color:#9ec0b0;margin-top:2px;pointer-events:none;">' + item.tag + '</div>' +
+              '<div class="wp-status" style="font-size:12px;font-weight:700;color:#5be0a4;margin-top:8px;pointer-events:none;">' + (active ? 'Выбрано' : 'Применить') + '</div>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      window.openWallpapers = function () {
+        let savedId = 'd1';
+        try { savedId = localStorage.getItem('sat_wp_direct') || 'd1'; } catch (e) {}
+        applyDarkLiveWallpaper(savedId);
+        const modal = document.getElementById('wallpapersModal');
+        if (modal) modal.classList.add('open');
+      };
+
+      window.pickWallpaper = function (id) {
+        applyDarkLiveWallpaper(id);
+        const wp = DARK_WALLPAPERS.find(function (x) { return x.id === id; });
+        const t = document.getElementById('toast');
+        if (t && wp) {
+          t.textContent = 'Обои: ' + wp.name;
+          t.classList.add('show');
+          clearTimeout(window._wpToastT);
+          window._wpToastT = setTimeout(function () { t.classList.remove('show'); }, 2200);
+        }
+      };
+
+      document.addEventListener('click', function (ev) {
+        const card = ev.target && ev.target.closest ? ev.target.closest('[data-wp-pick]') : null;
+        if (card) {
+          const picked = card.getAttribute('data-wp-pick');
+          if (picked) window.pickWallpaper(picked);
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        let savedId = 'd1';
+        try { savedId = localStorage.getItem('sat_wp_direct') || 'd1'; } catch (e) {}
+        applyDarkLiveWallpaper(savedId);
+      });
+    })();
+  </script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
     import {
@@ -949,23 +1123,8 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-
-    const WALLPAPERS = [
-      { id: 'w1', name: 'Утренний сад', c1: '#f7fbf8', c2: '#eff8f2', c3: '#dfeee5', dot: 'rgba(15,107,67,0.06)' },
-      { id: 'w2', name: 'Свежая мята', c1: '#d8f8e8', c2: '#b8eed4', c3: '#91dfc0', dot: 'rgba(15,120,76,0.12)' },
-      { id: 'w3', name: 'Тёплый шёлк', c1: '#fdf8e6', c2: '#f6ebd0', c3: '#ead9b3', dot: 'rgba(140,100,30,0.09)' },
-      { id: 'w4', name: 'Шалфей и роса', c1: '#e3f5ea', c2: '#c7e5d4', c3: '#a4d0b8', dot: 'rgba(15,107,67,0.11)' },
-      { id: 'w5', name: 'Фисташковый свет', c1: '#ebfce0', c2: '#d4f2be', c3: '#b7e39b', dot: 'rgba(35,125,65,0.1)' },
-      { id: 'w6', name: 'Изумрудный туман', c1: '#d8f7ee', c2: '#b6ebdc', c3: '#8fdcc6', dot: 'rgba(12,112,72,0.11)' },
-      { id: 'w7', name: 'Белый жемчуг', c1: '#ffffff', c2: '#e9f0ec', c3: '#d1dfd7', dot: 'rgba(15,107,67,0.07)' },
-      { id: 'w8', name: 'Песочный рассвет', c1: '#fcf3df', c2: '#f2e2c2', c3: '#e3cca2', dot: 'rgba(130,85,25,0.09)' },
-      { id: 'w9', name: 'Нефритовый лист', c1: '#d1f6e5', c2: '#a9e6cb', c3: '#7fd4b0', dot: 'rgba(10,104,66,0.12)' },
-      { id: 'w10', name: 'Льняное утро', c1: '#f2f8f4', c2: '#dce8e0', c3: '#c3d6ca', dot: 'rgba(15,107,67,0.09)' }
-    ];
-
     const STORE_KEY = 'sat_clean_state_v2';
     let state = {
-      wpId: 'w1',
       name: '',
       bio: '',
       avatar: '',
@@ -1002,57 +1161,6 @@
     let chatMsgs = [];
 
     document.getElementById('sessionHint').style.display = 'block';
-
-    function applyWallpaper(id) {
-      const wp = WALLPAPERS.find(x => x.id === id) || WALLPAPERS[0];
-      state.wpId = wp.id;
-      persist();
-
-      const bgValue = `radial-gradient(${wp.dot} 1.4px, transparent 1.4px), linear-gradient(165deg, ${wp.c1} 0%, ${wp.c2} 52%, ${wp.c3} 100%)`;
-      const sizeValue = '22px 22px, cover';
-
-      [document.body, document.getElementById('app'), document.getElementById('peerProfileScreen'), document.getElementById('chatScreen')].forEach(el => {
-        if (!el) return;
-        el.style.setProperty('background-color', wp.c2, 'important');
-        el.style.setProperty('background-image', bgValue, 'important');
-        el.style.setProperty('background-size', sizeValue, 'important');
-      });
-
-      const swatch = document.getElementById('wpSwatch');
-      if (swatch) {
-        swatch.style.background = `linear-gradient(135deg, ${wp.c1}, ${wp.c3})`;
-      }
-
-      const list = document.getElementById('wallpapersList');
-      if (list) {
-        list.querySelectorAll('.wp-item').forEach(el => {
-          const isCur = el.dataset.id === wp.id;
-          el.classList.toggle('active', isCur);
-          const lbl = el.querySelector('.wp-status');
-          if (lbl) lbl.textContent = isCur ? 'Выбрано' : 'Нажмите, чтобы применить';
-        });
-      }
-    }
-
-    function openWallpapers() {
-      const list = document.getElementById('wallpapersList');
-      list.innerHTML = WALLPAPERS.map(wp => {
-        const isCur = wp.id === state.wpId;
-        return `
-          <div class="wp-item ${isCur ? 'active' : ''}" data-id="${wp.id}" style="background: linear-gradient(145deg, ${wp.c1}, ${wp.c3});" onclick="pickWallpaper('${wp.id}')">
-            <div style="font-weight: 800; font-size: 14.5px; color: #11241a;">${esc(wp.name)}</div>
-            <div class="wp-status" style="font-size: 12px; font-weight: 700; color: #0f6b43; margin-top: 8px;">${isCur ? 'Выбрано' : 'Нажмите, чтобы применить'}</div>
-          </div>
-        `;
-      }).join('');
-      document.getElementById('wallpapersModal').classList.add('open');
-    }
-
-    function pickWallpaper(id) {
-      applyWallpaper(id);
-      const wp = WALLPAPERS.find(x => x.id === id);
-      toast(`Обои применены: ${wp ? wp.name : ''}`);
-    }
 
     function esc(s) {
       return String(s || '')
@@ -1119,7 +1227,6 @@
       const profNav = document.querySelector('.nav-btn[data-tab="profile"]');
       switchMainTab('profile', profNav);
       renderEverything();
-      applyWallpaper(state.wpId);
     }
 
     async function syncProfileCloud(user) {
@@ -2047,7 +2154,6 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab,
-      openWallpapers, pickWallpaper,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,
@@ -2067,8 +2173,6 @@
     if ('caches' in window) {
       caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
     }
-
-    applyWallpaper(state.wpId);
   </script>
 </body>
 </html>

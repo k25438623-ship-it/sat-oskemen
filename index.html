@@ -8,36 +8,37 @@
   <meta name="theme-color" content="#0f6b43" />
   <style>
     :root {
-      --surface: rgba(255, 255, 255, 0.82);
-      --surface-soft: rgba(238, 246, 241, 0.86);
-      --border: rgba(15, 107, 67, 0.18);
-      --border-strong: rgba(15, 107, 67, 0.36);
-      --text: #12241b;
-      --muted: #4f6b5d;
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --soft-bg: rgba(236, 246, 240, 0.92);
+      --border: rgba(15, 107, 67, 0.2);
+      --border-strong: rgba(15, 107, 67, 0.42);
+      --text: #11241a;
+      --muted: #4b695a;
       --green: #0f6b43;
-      --green-dark: #0a5233;
+      --green-dark: #094d2f;
       --green-light: #198754;
       --green-soft: rgba(15, 107, 67, 0.12);
       --danger: #c93748;
-      --shadow: 0 10px 28px rgba(15, 75, 48, 0.08);
+      --shadow: 0 8px 24px rgba(12, 68, 43, 0.08);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
 
     html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
       overscroll-behavior-y: contain;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
     }
 
     body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      color: var(--text);
-      background-color: #f3f9f5;
-      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1px, transparent 1px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%);
-      background-size: 22px 22px, cover;
       padding-bottom: 92px;
-      position: relative;
       overflow-x: hidden;
     }
 
@@ -53,13 +54,13 @@
     }
     .ico-sm { width: 16px; height: 16px; }
 
-    /* Индикатор обновления свайпом вниз (Pull-to-Refresh) */
-    .ptr-indicator {
+    /* Индикатор обновления свайпом вниз */
+    .ptr-bar {
       position: fixed;
       top: 0;
       left: 50%;
       transform: translate(-50%, -64px);
-      z-index: 95;
+      z-index: 120;
       background: #ffffff;
       border: 1.5px solid var(--border-strong);
       box-shadow: var(--shadow);
@@ -74,122 +75,98 @@
       transition: transform 0.2s ease;
       pointer-events: none;
     }
-    .ptr-spinner {
-      width: 16px;
-      height: 16px;
+    .ptr-spin {
+      width: 15px;
+      height: 15px;
       border: 2.5px solid var(--green-soft);
       border-top-color: var(--green);
       border-radius: 50%;
     }
-    .ptr-indicator.spinning .ptr-spinner {
-      animation: spinLoader 0.75s linear infinite;
+    .ptr-bar.spinning .ptr-spin {
+      animation: spinAnim 0.7s linear infinite;
     }
-    @keyframes spinLoader {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spinAnim { to { transform: rotate(360deg); } }
 
-    .screen { display: none; min-height: 100vh; position: relative; z-index: 1; background: transparent; }
+    .screen { display: none; min-height: 100vh; }
     .screen.active { display: block; }
 
-    /* Стартовый экран SÄT */
+    /* Экран входа SÄT */
     #splash {
       align-items: center;
       justify-content: center;
       text-align: center;
       padding: 28px 20px;
-      background: radial-gradient(circle at 50% 28%, rgba(255,255,255,0.92) 0%, rgba(241,248,243,0.86) 58%, rgba(226,239,231,0.92) 100%);
+      background: radial-gradient(circle at 50% 28%, #ffffff 0%, #eff8f2 58%, #dfeee5 100%);
     }
     #splash.active { display: flex; flex-direction: column; }
 
-    .logo-frame {
-      width: 124px;
-      height: 124px;
+    .logo-box {
+      width: 122px;
+      height: 122px;
       border-radius: 34px;
       background: #ffffff;
       border: 2px solid rgba(15, 107, 67, 0.28);
-      box-shadow: 0 18px 42px rgba(15, 107, 67, 0.14), inset 0 0 0 6px rgba(15, 107, 67, 0.04);
+      box-shadow: 0 16px 38px rgba(15, 107, 67, 0.14);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 22px;
+      margin: 0 auto 20px;
     }
-    .logo-dots {
-      display: flex;
-      gap: 16px;
-      margin-bottom: -4px;
-    }
-    .logo-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-    .logo-letter {
-      font-size: 56px;
-      font-weight: 900;
-      line-height: 1;
-      color: var(--green);
-      letter-spacing: -1px;
-    }
-    .brand-title {
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      margin: 0 0 28px;
-      color: var(--green);
-    }
+    .logo-dots { display: flex; gap: 16px; margin-bottom: -4px; }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--green); }
+    .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: var(--green); }
+    .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: var(--green); }
 
-    /* Второй экран: вход только через Google */
+    /* Второй экран: только Google */
     #auth {
       align-items: center;
       justify-content: center;
       padding: 24px 18px;
-      background: radial-gradient(circle at 50% 25%, rgba(255,255,255,0.92) 0%, rgba(242,249,244,0.86) 60%, rgba(227,240,232,0.92) 100%);
+      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #eff8f2 60%, #dfeee5 100%);
     }
     #auth.active { display: flex; flex-direction: column; }
 
-    .auth-box {
+    .auth-card {
       width: 100%;
-      max-width: 400px;
+      max-width: 390px;
       background: #ffffff;
-      border: 1.5px solid rgba(15, 107, 67, 0.22);
+      border: 1.5px solid var(--border-strong);
       border-radius: 28px;
-      padding: 32px 24px;
-      box-shadow: 0 18px 44px rgba(15, 95, 58, 0.11);
+      padding: 32px 22px;
+      box-shadow: 0 18px 42px rgba(15, 95, 58, 0.12);
       text-align: center;
     }
 
+    /* Кнопки */
     .btn {
       border: none;
-      border-radius: 16px;
-      padding: 13px 18px;
+      border-radius: 15px;
+      padding: 12px 16px;
       font-weight: 700;
-      font-size: 15px;
+      font-size: 14.5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 9px;
-      transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
+      gap: 8px;
+      user-select: none;
     }
     .btn:active { transform: scale(0.97); }
     .btn-primary {
       background: linear-gradient(135deg, var(--green-light), var(--green));
       color: #ffffff;
-      box-shadow: 0 10px 24px rgba(15, 107, 67, 0.24);
+      box-shadow: 0 8px 20px rgba(15, 107, 67, 0.22);
     }
     .btn-google {
       background: linear-gradient(135deg, #168253, #0d623d);
       color: #ffffff;
-      border: none;
-      box-shadow: 0 12px 26px rgba(15, 107, 67, 0.26);
       font-size: 16px;
       padding: 15px 20px;
       width: 100%;
+      box-shadow: 0 10px 24px rgba(15, 107, 67, 0.24);
     }
-    .g-badge {
+    .g-circle {
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -199,17 +176,16 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 16px;
-    }
-    .btn-ghost {
-      background: var(--surface-soft);
-      color: var(--text);
-      border: 1px solid var(--border);
     }
     .btn-mint {
       background: var(--green-soft);
       color: var(--green);
       border: 1px solid var(--border-strong);
+    }
+    .btn-ghost {
+      background: var(--soft-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
     .btn-danger {
       background: rgba(201, 55, 72, 0.12);
@@ -217,13 +193,12 @@
       border: 1px solid rgba(201, 55, 72, 0.28);
     }
 
-    /* Верхняя шапка */
+    /* Шапка */
     .topbar {
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
+      background: rgba(255, 255, 255, 0.92);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
       display: flex;
@@ -231,12 +206,8 @@
       justify-content: space-between;
       gap: 10px;
     }
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .mini-badge {
+    .brand-row { display: flex; align-items: center; gap: 10px; }
+    .mini-logo {
       width: 36px;
       height: 36px;
       border-radius: 12px;
@@ -249,20 +220,14 @@
       font-size: 19px;
       color: var(--green);
     }
-    .topbar-title {
-      font-weight: 900;
-      font-size: 19px;
-      letter-spacing: 1.2px;
-      color: var(--green);
-    }
+    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: var(--green); }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 26px; }
+    .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 28px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(10px);
+      background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 16px;
@@ -271,11 +236,11 @@
     }
     .meta { font-size: 13px; color: var(--muted); }
 
-    .input, select, textarea {
+    .input, textarea {
       width: 100%;
-      background: rgba(255, 255, 255, 0.92);
+      background: #ffffff;
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-strong);
       border-radius: 14px;
       padding: 12px 14px;
       font-size: 15px;
@@ -283,20 +248,12 @@
       margin-top: 6px;
       font-family: inherit;
     }
-    .input:focus, textarea:focus {
-      border-color: var(--green);
-      background: #ffffff;
-    }
 
-    /* Профиль: аватар и кольцо сторис */
-    .profile-hero {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .avatar-ring {
-      width: 84px;
-      height: 84px;
+    /* Профиль */
+    .profile-top { display: flex; align-items: center; gap: 15px; }
+    .ava-ring {
+      width: 82px;
+      height: 82px;
       border-radius: 50%;
       padding: 3px;
       background: var(--border-strong);
@@ -304,31 +261,26 @@
       position: relative;
       cursor: pointer;
     }
-    .avatar-ring.has-story {
-      background: linear-gradient(135deg, #19a366, #0b5d39, #c89632);
+    .ava-ring.has-story {
+      background: linear-gradient(135deg, #19a366, #0a5233, #c89632);
       padding: 3.5px;
     }
-    .avatar-img {
+    .ava-circle {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      object-fit: cover;
-      background: var(--surface-soft);
+      background: var(--soft-bg);
+      color: var(--green);
+      font-size: 28px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--green);
-      border: 2px solid #ffffff;
       overflow: hidden;
+      border: 2px solid #ffffff;
     }
-    .avatar-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .avatar-cam-badge {
+    .ava-circle img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .ava-cam {
       position: absolute;
       right: 0;
       bottom: 0;
@@ -343,86 +295,82 @@
       justify-content: center;
     }
 
-    .profile-quick-actions {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 14px;
-    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .subtabs-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .subtabs-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
 
-    .subtabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .subtab-btn {
+    .sub-btn {
       border: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--card-bg);
       color: var(--text);
-      border-radius: 14px;
-      padding: 11px 8px;
-      font-size: 13.5px;
+      border-radius: 13px;
+      padding: 10px 6px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       text-align: center;
     }
-    .subtab-btn.active {
+    .sub-btn.active {
       background: var(--green);
       color: #ffffff;
       border-color: var(--green);
-      box-shadow: 0 6px 16px rgba(15, 107, 67, 0.22);
     }
 
-    /* Сетка фотографий в профиле */
+    /* Сетка фотографий */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-top: 8px;
     }
-    .photo-grid-item {
+    .photo-cell {
       aspect-ratio: 1 / 1;
       border-radius: 14px;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: var(--surface-soft);
+      background: var(--soft-bg);
       cursor: pointer;
     }
-    .photo-grid-item img {
+    .photo-cell img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      pointer-events: none;
     }
 
-    /* Карточки публикаций */
+    /* Публикации */
     .post-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .post-author-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .post-mini-ava {
-      width: 40px;
-      height: 40px;
+    .post-user { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0; }
+    .mini-ava {
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       background: var(--green-soft);
       color: var(--green);
       font-weight: 800;
-      font-size: 15px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       flex-shrink: 0;
     }
-    .post-mini-ava img { width: 100%; height: 100%; object-fit: cover; }
-    .author { font-weight: 700; font-size: 15.5px; color: var(--text); }
-    .author-link:hover { text-decoration: underline; color: var(--green); }
-    .post-photo {
+    .mini-ava img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .user-name { font-weight: 700; font-size: 15.5px; color: var(--text); }
+    .post-img-wrap {
+      margin-top: 10px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .post-img-wrap img {
       width: 100%;
       max-height: 380px;
       object-fit: cover;
-      border-radius: 16px;
-      margin-top: 10px;
-      border: 1px solid var(--border);
+      display: block;
+      pointer-events: none;
     }
     .tag {
       font-size: 12px;
@@ -436,71 +384,37 @@
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
     /* Сетка 10 обоев */
-    .wallpapers-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .wp-card {
-      border: 1.5px solid var(--border);
+    .wp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+    .wp-item {
+      border: 2px solid var(--border);
       border-radius: 18px;
-      padding: 12px;
+      padding: 14px 12px;
       cursor: pointer;
+      min-height: 82px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 82px;
-      transition: transform 0.1s ease, border-color 0.15s ease;
     }
-    .wp-card:active { transform: scale(0.98); }
-    .wp-card.active {
+    .wp-item.active {
       border-color: var(--green);
-      box-shadow: 0 0 0 2px rgba(15, 107, 67, 0.24);
-    }
-    .wp-title { font-weight: 700; font-size: 14px; color: var(--text); }
-    .wp-badge { font-size: 11.5px; font-weight: 700; color: var(--green); margin-top: 6px; }
-
-    /* Выбор места отправки публикации */
-    .dest-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .dest-btn {
-      border: 1.5px solid var(--border);
-      background: var(--surface-soft);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 12px 10px;
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-    }
-    .dest-btn.active {
-      background: var(--green);
-      color: #ffffff;
-      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(15, 107, 67, 0.22);
     }
 
-    /* Нижняя панель: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце */
+    /* Нижняя навигация: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
       z-index: 30;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(18px);
+      background: rgba(255, 255, 255, 0.96);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
-      box-shadow: 0 -6px 22px rgba(15, 75, 48, 0.07);
+      box-shadow: 0 -6px 20px rgba(15, 75, 48, 0.07);
     }
-    .nav-item {
+    .nav-btn {
       border: none;
       background: transparent;
       color: var(--muted);
@@ -515,7 +429,7 @@
       border-radius: 14px;
       cursor: pointer;
     }
-    .nav-item svg {
+    .nav-btn svg {
       width: 22px;
       height: 22px;
       stroke: currentColor;
@@ -524,35 +438,36 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .nav-item.active {
-      color: var(--green);
-      background: var(--green-soft);
-    }
-    .nav-slot-empty {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-    .nav-slot-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(15, 107, 67, 0.16);
-    }
+    .nav-btn.active { color: var(--green); background: var(--green-soft); }
+    .nav-empty { display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(15, 107, 67, 0.16); }
 
-    /* Модальные окна */
-    .modal-backdrop {
+    /* Полноэкранная страница другого человека */
+    .peer-screen {
       position: fixed;
       inset: 0;
-      z-index: 50;
+      z-index: 55;
+      width: 100vw;
+      height: 100dvh;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      padding-bottom: 36px;
+    }
+    .peer-screen.open { display: flex; }
+
+    /* Модальные окна */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 65;
       background: rgba(12, 28, 20, 0.55);
       display: none;
       align-items: flex-end;
       justify-content: center;
     }
-    .modal-backdrop.open { display: flex; }
-    .modal-sheet {
+    .modal-bg.open { display: flex; }
+    .modal-box {
       width: 100%;
       max-width: 600px;
       max-height: 92vh;
@@ -561,92 +476,53 @@
       border-top: 1px solid var(--border);
       border-radius: 26px 26px 0 0;
       padding: 20px 18px 28px;
-      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
     }
+    #photoPickerModal { z-index: 80; }
 
-    /* Окно выбора фото (камера / галерея) поверх окна создания публикации */
-    #photoSourceModal {
-      z-index: 75;
-    }
-
-    /* Полноэкранный просмотр сторис и фото */
-    .story-viewer {
+    /* Полноэкранный просмотр фото и сторис */
+    .viewer-screen {
       position: fixed;
       inset: 0;
-      z-index: 80;
-      background: #0d1913;
+      z-index: 95;
+      background: #0c1712;
       color: #ffffff;
       display: none;
       flex-direction: column;
       justify-content: space-between;
       padding: 18px 16px 28px;
     }
-    .story-viewer.open { display: flex; }
-    .story-viewer img {
+    .viewer-screen.open { display: flex; }
+    .viewer-screen img {
       max-width: 100%;
-      max-height: 72vh;
+      max-height: 74vh;
       object-fit: contain;
-      border-radius: 18px;
+      border-radius: 16px;
       margin: auto;
+      pointer-events: none;
     }
 
-    /* Полноэкранная страница другого человека */
-    .peer-fullscreen {
+    /* Чат */
+    .chat-screen {
       position: fixed;
       inset: 0;
-      z-index: 65;
+      z-index: 75;
       width: 100vw;
       height: 100dvh;
-      overflow-y: auto;
-      background-color: inherit;
-      background-image: inherit;
-      background-size: inherit;
-      display: none;
-      flex-direction: column;
-      padding-bottom: 32px;
-    }
-    .peer-fullscreen.open { display: flex; }
-    .peer-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 14px;
-      text-align: center;
-    }
-    .peer-stat-box {
-      background: var(--surface-soft);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 6px;
-    }
-    .peer-stat-num { font-weight: 800; font-size: 16px; color: var(--green); }
-    .peer-stat-lbl { font-size: 12px; color: var(--muted); }
-
-    /* Полноэкранный чат */
-    .chat-fullscreen {
-      position: fixed;
-      inset: 0;
-      z-index: 72;
-      width: 100vw;
-      height: 100dvh;
-      background-color: inherit;
-      background-image: inherit;
-      background-size: inherit;
       display: none;
       flex-direction: column;
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
     }
-    .chat-fullscreen.open { display: flex; }
-    .chat-inner {
+    .chat-screen.open { display: flex; }
+    .chat-wrap {
       width: 100%;
-      max-width: 640px;
+      max-width: 620px;
       height: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
       min-height: 0;
     }
-    .chat-box {
+    .chat-list {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
@@ -656,13 +532,23 @@
       margin: 10px 0;
       padding: 12px;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid var(--border);
     }
     .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 84%; word-break: break-word; }
-    .msg.them { background: var(--surface-soft); align-self: flex-start; border: 1px solid var(--border); }
+    .msg.them { background: var(--soft-bg); align-self: flex-start; border: 1px solid var(--border); }
     .msg.me { background: var(--green); color: #ffffff; align-self: flex-end; }
-    .msg-author { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
+    .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .list-item:last-child { border-bottom: none; padding-bottom: 0; }
 
     .toast {
       position: fixed;
@@ -678,51 +564,47 @@
       opacity: 0;
       pointer-events: none;
       transition: all 0.25s ease;
-      z-index: 90;
+      z-index: 110;
       white-space: nowrap;
       max-width: 92vw;
       overflow: hidden;
       text-overflow: ellipsis;
-      box-shadow: 0 10px 24px rgba(10, 82, 51, 0.28);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    .list-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
+  </style>
+  <style id="dynamicWallpaperStyle">
+    body, .peer-screen, .chat-screen {
+      background-color: #f3f9f5 !important;
+      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1.2px, transparent 1.2px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%) !important;
+      background-size: 22px 22px, cover !important;
     }
-    .list-row:last-child { border-bottom: none; padding-bottom: 0; }
   </style>
 </head>
 <body>
   <!-- Индикатор обновления свайпом вниз -->
-  <div id="ptrIndicator" class="ptr-indicator">
-    <div class="ptr-spinner"></div>
+  <div id="ptrBar" class="ptr-bar">
+    <div class="ptr-spin"></div>
     <span id="ptrText">Обновление...</span>
   </div>
 
   <!-- 1. ЭКРАН ВХОДА SÄT -->
   <section id="splash" class="screen active">
-    <div class="logo-frame">
+    <div class="logo-box">
       <div class="logo-dots">
         <span class="logo-dot"></span>
         <span class="logo-dot"></span>
       </div>
       <div class="logo-letter">Ä</div>
     </div>
-    <h1 class="brand-title">SÄT</h1>
-    <button id="splashEnterBtn" class="btn btn-primary" style="min-width: 210px; padding: 15px 28px; font-size: 17px;" onclick="unlockSoundAndGo('auth')">Войти</button>
-    <div id="sessionCheckingHint" class="meta" style="margin-top: 14px; display: none;">Проверяем вход...</div>
+    <h1 class="brand-name">SÄT</h1>
+    <button type="button" class="btn btn-primary" style="min-width: 210px; padding: 15px 28px; font-size: 17px;" onclick="enterAppFlow()">Войти</button>
+    <div id="sessionHint" class="meta" style="margin-top: 14px; display: none;">Проверяем вход...</div>
   </section>
 
   <!-- 2. ЭКРАН АВТОРИЗАЦИИ ТОЛЬКО ЧЕРЕЗ GOOGLE -->
   <section id="auth" class="screen">
-    <div class="auth-box">
-      <div class="logo-frame" style="width: 88px; height: 88px; border-radius: 26px; margin-bottom: 14px;">
+    <div class="auth-card">
+      <div class="logo-box" style="width: 86px; height: 86px; border-radius: 26px; margin-bottom: 14px;">
         <div class="logo-dots" style="gap: 12px;">
           <span class="logo-dot" style="width: 8px; height: 8px;"></span>
           <span class="logo-dot" style="width: 8px; height: 8px;"></span>
@@ -730,10 +612,9 @@
         <div class="logo-letter" style="font-size: 40px;">Ä</div>
       </div>
       <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: var(--green); letter-spacing: 2px;">SÄT</h2>
-      <p class="meta" style="margin: 0 0 24px; font-size: 14.5px; line-height: 1.45;">Быстрый вход в одно касание без лишних анкет</p>
-
-      <button class="btn btn-google" onclick="authGoogle()">
-        <span class="g-badge">G</span>
+      <p class="meta" style="margin: 0 0 24px; font-size: 14.5px;">Быстрый вход в одно касание без анкет</p>
+      <button type="button" class="btn btn-google" onclick="loginWithGoogle()">
+        <span class="g-circle">G</span>
         <span>Продолжить через Google</span>
       </button>
     </div>
@@ -742,74 +623,73 @@
   <!-- 3. ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
   <section id="app" class="screen">
     <header class="topbar">
-      <div class="topbar-brand">
-        <div class="mini-badge">Ä</div>
-        <div class="topbar-title">SÄT</div>
+      <div class="brand-row">
+        <div class="mini-logo">Ä</div>
+        <div class="brand-text">SÄT</div>
       </div>
-      <button class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapersModal()">
+      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapers()">
         <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         <span>Обои</span>
       </button>
     </header>
 
     <main class="container">
-      <!-- РАЗДЕЛ: ПУЛЬС (единый поток публикаций) -->
+      <!-- ПУЛЬС -->
       <div id="tab-pulse" class="tab-panel">
-        <div id="feedList"></div>
+        <div id="feedContainer"></div>
       </div>
 
-      <!-- РАЗДЕЛ: ПРОФИЛЬ (открывается сразу при входе и повторном открытии) -->
+      <!-- ПРОФИЛЬ -->
       <div id="tab-profile" class="tab-panel active">
         <div class="card">
-          <div class="profile-hero">
-            <div id="profileAvatarRing" class="avatar-ring" onclick="handleAvatarClick()">
-              <div id="profileAvatarBox" class="avatar-img">Ä</div>
-              <div class="avatar-cam-badge" title="Сменить фото">
+          <div class="profile-top">
+            <div id="myAvatarRing" class="ava-ring" onclick="onMyAvatarTap()">
+              <div id="myAvatarBox" class="ava-circle">Ä</div>
+              <div class="ava-cam">
                 <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </div>
             </div>
             <div style="min-width: 0; flex: 1;">
-              <h2 id="profileName" style="margin: 0; font-size: 20px; color: var(--text);">Участник</h2>
-              <div id="profileSub" class="meta" style="margin-top: 4px;">Нажмите на фото, чтобы обновить снимок или посмотреть сторис</div>
+              <h2 id="myNameText" style="margin: 0; font-size: 20px;">Участник</h2>
+              <div id="myBioText" class="meta" style="margin-top: 4px;">Мой профиль SÄT</div>
             </div>
           </div>
 
-          <div class="profile-quick-actions">
-            <button class="btn btn-mint" style="font-size: 13.5px; padding: 11px 10px;" onclick="openPhotoPicker('avatar')">
+          <div class="grid-2">
+            <button type="button" class="btn btn-mint" style="font-size: 13.5px; padding: 11px 10px;" onclick="openPhotoPicker('avatar')">
               <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span>Фото профиля</span>
             </button>
-            <button class="btn btn-primary" style="font-size: 13.5px; padding: 11px 10px;" onclick="openPhotoPicker('story')">
+            <button type="button" class="btn btn-primary" style="font-size: 13.5px; padding: 11px 10px;" onclick="openPhotoPicker('story')">
               <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
               <span>+ Сторис</span>
             </button>
           </div>
 
           <div class="actions" style="margin-top: 10px;">
-            <button class="btn btn-primary" style="flex: 1; font-size: 13.5px;" onclick="openCreatePostModal()">Новая публикация</button>
-            <button class="btn btn-ghost" style="font-size: 13.5px;" onclick="openEditNameModal()">Имя</button>
-            <button class="btn btn-danger" style="font-size: 13.5px;" onclick="authLogout()">Выйти</button>
+            <button type="button" class="btn btn-primary" style="flex: 1; font-size: 13.5px;" onclick="openNewPostModal()">Новая публикация</button>
+            <button type="button" class="btn btn-ghost" style="font-size: 13.5px;" onclick="openEditProfileModal()">Изменить</button>
+            <button type="button" class="btn btn-danger" style="font-size: 13.5px;" onclick="logoutUser()">Выйти</button>
           </div>
         </div>
 
-        <!-- Вкладки внутри Профиля: Публикации, Друзья, Группы -->
-        <div class="subtabs">
-          <button id="subBtnPosts" class="subtab-btn active" onclick="setProfileSubtab('posts')">Публикации</button>
-          <button id="subBtnFriends" class="subtab-btn" onclick="setProfileSubtab('friends')">Друзья</button>
-          <button id="subBtnGroups" class="subtab-btn" onclick="setProfileSubtab('groups')">Группы</button>
+        <div class="subtabs-3">
+          <button type="button" id="subTabPosts" class="sub-btn active" onclick="switchMySubtab('posts')">Публикации</button>
+          <button type="button" id="subTabFriends" class="sub-btn" onclick="switchMySubtab('friends')">Друзья</button>
+          <button type="button" id="subTabGroups" class="sub-btn" onclick="switchMySubtab('groups')">Группы</button>
         </div>
 
-        <!-- Подвкладка 1: Сторис (3 часа), Сохранённые фото и Мои публикации -->
-        <div id="profileSubPosts">
-          <div id="myStoryCard" class="card" style="display: none;">
+        <!-- Подвкладка: Публикации, Сторис (3 ч) и Фотографии -->
+        <div id="mySubPosts">
+          <div id="myStoryBanner" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <div>
-                <div style="font-weight: 700; font-size: 15px; color: var(--green);">Ваша активная сторис (действует 3 ч)</div>
-                <div id="myStoryTime" class="meta">Опубликовано недавно</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--green);">Ваша сторис (действует 3 часа)</div>
+                <div id="myStoryTimerText" class="meta">Активна</div>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="viewMyStory()">Смотреть</button>
-                <button class="btn btn-danger" style="padding: 8px 10px; font-size: 13px;" onclick="deleteMyStory()">✕</button>
+                <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="viewOwnStory()">Смотреть</button>
+                <button type="button" class="btn btn-danger" style="padding: 8px 10px; font-size: 13px;" onclick="removeOwnStory()">✕</button>
               </div>
             </div>
           </div>
@@ -817,249 +697,241 @@
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
               <h3 style="margin: 0; font-size: 16px;">Мои фотографии</h3>
-              <button class="btn btn-mint" style="padding: 6px 11px; font-size: 12.5px;" onclick="openPhotoPicker('gallery_save')">+ Фото</button>
+              <button type="button" class="btn btn-mint" style="padding: 6px 11px; font-size: 12.5px;" onclick="openPhotoPicker('gallery_add')">+ Фото</button>
             </div>
-            <div id="myPhotosGrid" class="photo-grid"></div>
+            <div id="myPhotosBox" class="photo-grid"></div>
           </div>
 
           <div class="card">
             <h3 style="margin: 0 0 10px; font-size: 16px;">Мои публикации</h3>
-            <div id="myPostsList"></div>
+            <div id="myPostsBox"></div>
           </div>
         </div>
 
-        <!-- Подвкладка 2: Друзья -->
-        <div id="profileSubFriends" style="display: none;">
+        <!-- Подвкладка: Друзья -->
+        <div id="mySubFriends" style="display: none;">
           <div class="card">
             <h3 style="margin: 0 0 8px; font-size: 16px;">Мои друзья</h3>
-            <div id="myFriendsList"></div>
+            <div id="myFriendsBox"></div>
           </div>
 
           <div class="card">
-            <h3 style="margin: 0 0 8px; font-size: 16px;">Добавить друзей</h3>
-            <input id="friendSearchInput" class="input" style="margin-top: 0; margin-bottom: 10px;" placeholder="Найти человека по имени..." oninput="renderFriendsSection()" />
-            <div id="allUsersForFriendsList"></div>
+            <h3 style="margin: 0 0 8px; font-size: 16px;">Люди в SÄT (нажмите, чтобы открыть страницу)</h3>
+            <input id="searchPeopleInput" class="input" style="margin-top: 0; margin-bottom: 10px;" placeholder="Поиск по имени..." oninput="renderFriendsTab()" />
+            <div id="otherPeopleBox"></div>
           </div>
         </div>
 
-        <!-- Подвкладка 3: Группы -->
-        <div id="profileSubGroups" style="display: none;">
+        <!-- Подвкладка: Группы -->
+        <div id="mySubGroups" style="display: none;">
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
               <h3 style="margin: 0; font-size: 16px;">Группы</h3>
-              <button class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="openCircleModal()">+ Создать группу</button>
+              <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="openCreateGroupModal()">+ Создать группу</button>
             </div>
-            <div id="groupsList"></div>
+            <div id="groupsBox"></div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- НИЖНЯЯ НАВИГАЦИЯ: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце -->
+    <!-- Нижняя панель: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце -->
     <nav class="bottom-nav">
-      <button class="nav-item" data-tab="pulse" onclick="switchTab('pulse', this)">
+      <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
         <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
         <span>Пульс</span>
       </button>
 
-      <div class="nav-slot-empty" aria-hidden="true"><span class="nav-slot-dot"></span></div>
-      <div class="nav-slot-empty" aria-hidden="true"><span class="nav-slot-dot"></span></div>
-      <div class="nav-slot-empty" aria-hidden="true"><span class="nav-slot-dot"></span></div>
+      <div class="nav-empty" aria-hidden="true"><span class="nav-dot"></span></div>
+      <div class="nav-empty" aria-hidden="true"><span class="nav-dot"></span></div>
+      <div class="nav-empty" aria-hidden="true"><span class="nav-dot"></span></div>
 
-      <button class="nav-item active" data-tab="profile" onclick="switchTab('profile', this)">
+      <button type="button" class="nav-btn active" data-tab="profile" onclick="switchMainTab('profile', this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span>Профиль</span>
       </button>
     </nav>
   </section>
 
-  <!-- ПОЛНОЭКРАННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫТ ПОЛНЫЙ ДОСТУП КО ВСЕМУ) -->
-  <section id="peerPageModal" class="peer-fullscreen">
+  <!-- ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫВАЕТСЯ ВСЕГДА И ПОКАЗЫВАЕТ ВСЁ) -->
+  <section id="peerProfileScreen" class="peer-screen">
     <header class="topbar">
-      <button class="btn btn-ghost" style="padding: 8px 13px; font-size: 13.5px;" onclick="closePeerPage()">← Назад</button>
-      <div id="peerTopTitle" style="font-weight: 800; font-size: 16px; color: var(--green);">Страница</div>
-      <div style="width: 72px;"></div>
+      <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
+      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--green);">Страница</div>
+      <div style="width: 74px;"></div>
     </header>
 
     <div class="container">
       <div class="card">
-        <div class="profile-hero">
-          <div id="peerPageAvatarRing" class="avatar-ring" onclick="openPeerStory()">
-            <div id="peerPageAvatarBox" class="avatar-img">Ä</div>
+        <div class="profile-top">
+          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerStoryViewer()">
+            <div id="peerAvatarCircle" class="ava-circle">Ä</div>
           </div>
           <div style="min-width: 0; flex: 1;">
-            <h2 id="peerPageName" style="margin: 0; font-size: 20px;">Участник</h2>
-            <div id="peerPageInfo" class="meta" style="margin-top: 4px;">Страница участника SÄT</div>
-            <div id="peerPageStoryBadge" style="display: none; margin-top: 6px;">
-              <span class="tag" style="cursor: pointer;" onclick="openPeerStory()">Активная сторис (до 3 ч)</span>
+            <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
+            <div id="peerAboutLine" class="meta" style="margin-top: 4px;">Участник SÄT</div>
+            <div id="peerStoryTag" style="display: none; margin-top: 6px;">
+              <span class="tag" style="cursor: pointer;" onclick="openPeerStoryViewer()">Активная сторис (до 3 ч)</span>
             </div>
           </div>
         </div>
 
-        <div class="peer-stats">
-          <div class="peer-stat-box">
-            <div id="peerStatPosts" class="peer-stat-num">0</div>
-            <div class="peer-stat-lbl">Публикации</div>
-          </div>
-          <div class="peer-stat-box">
-            <div id="peerStatPhotos" class="peer-stat-num">0</div>
-            <div class="peer-stat-lbl">Фотографии</div>
-          </div>
-          <div class="peer-stat-box">
-            <div id="peerStatFriends" class="peer-stat-num">0</div>
-            <div class="peer-stat-lbl">Друзья</div>
-          </div>
-        </div>
-
-        <div id="peerPageActions" class="actions" style="margin-top: 14px;"></div>
+        <div id="peerActionButtons" class="actions" style="margin-top: 14px;"></div>
       </div>
 
-      <div class="card">
-        <h3 style="margin: 0 0 8px; font-size: 16px;">Друзья пользователя</h3>
-        <div id="peerPageFriends"></div>
+      <!-- Вкладки на странице другого человека: Публикации, Фото, Друзья, Информация -->
+      <div class="subtabs-4">
+        <button type="button" id="peerTabPosts" class="sub-btn active" onclick="switchPeerSubtab('posts')">Публикации</button>
+        <button type="button" id="peerTabPhotos" class="sub-btn" onclick="switchPeerSubtab('photos')">Фото</button>
+        <button type="button" id="peerTabFriends" class="sub-btn" onclick="switchPeerSubtab('friends')">Друзья</button>
+        <button type="button" id="peerTabInfo" class="sub-btn" onclick="switchPeerSubtab('info')">Инфо</button>
       </div>
 
-      <div class="card">
-        <h3 style="margin: 0 0 8px; font-size: 16px;">Фотографии на странице</h3>
-        <div id="peerPagePhotos" class="photo-grid"></div>
+      <div id="peerPanelPosts" class="card">
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Публикации</h3>
+        <div id="peerPostsList"></div>
       </div>
 
-      <div class="card">
-        <h3 style="margin: 0 0 10px; font-size: 16px;">Публикации пользователя</h3>
-        <div id="peerPagePosts"></div>
+      <div id="peerPanelPhotos" class="card" style="display: none;">
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Фотографии</h3>
+        <div id="peerPhotosGrid" class="photo-grid"></div>
+      </div>
+
+      <div id="peerPanelFriends" class="card" style="display: none;">
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Друзья</h3>
+        <div id="peerFriendsList"></div>
+      </div>
+
+      <div id="peerPanelInfo" class="card" style="display: none;">
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Информация о странице</h3>
+        <div id="peerInfoBox"></div>
       </div>
     </div>
   </section>
 
-  <!-- СКРЫТЫЕ INPUT ДЛЯ КАМЕРЫ И ГАЛЕРЕИ -->
-  <input type="file" id="cameraCaptureInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePickedImage(event)" />
-  <input type="file" id="galleryPickInput" accept="image/*" style="display: none;" onchange="handlePickedImage(event)" />
+  <!-- СКРЫТЫЕ ПОЛЯ ЗАГРУЗКИ ФОТО -->
+  <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;" onchange="onImageChosen(event)" />
+  <input type="file" id="galInput" accept="image/*" style="display: none;" onchange="onImageChosen(event)" />
 
-  <!-- МОДАЛКА ВЫБОРА: КАМЕРА ПО МЕСТУ ИЛИ ГАЛЕРЕЯ -->
-  <div id="photoSourceModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 id="photoSourceTitle" style="margin: 0 0 6px; font-size: 18px;">Загрузка фотографии</h3>
-      <p id="photoSourceHint" class="meta" style="margin: 0 0 16px;">Сделайте фото на месте или загрузите с галереи</p>
+  <!-- МОДАЛКА ВЫБОРА ФОТО: КАМЕРА ПО МЕСТУ ИЛИ ГАЛЕРЕЯ -->
+  <div id="photoPickerModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="pickerModalTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите фото</h3>
+      <p class="meta" style="margin: 0 0 16px;">Сделайте снимок по месту на камеру или загрузите с галереи</p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="triggerCamera()">
-          <svg class="ico" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>Сделать фото на месте (камера)</span>
-        </button>
-        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="triggerGallery()">
-          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span>Загрузить с галереи</span>
-        </button>
-        <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="closeModalById('photoSourceModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="startCamera()">Сделать фото на месте (камера)</button>
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="startGallery()">Загрузить с галереи</button>
+        <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="hideModal('photoPickerModal')">Отмена</button>
       </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА 10 ОБОЕВ ДЛЯ ИНТЕРФЕЙСА -->
-  <div id="wallpapersModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+  <!-- МОДАЛКА 10 ОБОЕВ -->
+  <div id="wallpapersModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Обои интерфейса</h3>
-          <div class="meta">Нажмите на любые обои — применятся мгновенно</div>
+          <h3 style="margin: 0; font-size: 18px;">Обои интерфейса (10 вариантов)</h3>
+          <div class="meta">Нажмите на любые обои — фон изменится сразу</div>
         </div>
-        <button class="btn btn-ghost" style="padding: 6px 12px;" onclick="closeModalById('wallpapersModal')">✕</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
-      <div id="wallpapersGrid" class="wallpapers-grid"></div>
+      <div id="wallpapersList" class="wp-grid"></div>
     </div>
   </div>
 
-  <!-- МОДАЛКА СОЗДАНИЯ ПУБЛИКАЦИИ (ИЗ ПРОФИЛЯ) -->
-  <div id="createPostModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+  <!-- МОДАЛКА НОВОЙ ПУБЛИКАЦИИ -->
+  <div id="newPostModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
-
-      <label class="meta">Напишите сообщение</label>
-      <textarea id="newPostBody" rows="3" placeholder="Напишите ваше сообщение..."></textarea>
+      <label class="meta">Текст сообщения</label>
+      <textarea id="postTextInput" rows="3" placeholder="Напишите ваше сообщение..."></textarea>
 
       <div style="margin-top: 12px;">
         <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('post')">
-          <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span id="postPhotoBtnText">Фото на месте или загрузить с галереи</span>
+          <span id="postPhotoLabel">Сделать фото на месте или загрузить с галереи</span>
         </button>
-        <div id="postPhotoStatus" class="meta" style="display: none; margin-top: 6px; color: var(--green); font-weight: 700;">Фото загружено и готово к отправке</div>
-        <div id="postPhotoPreviewBox" style="display: none; margin-top: 8px; position: relative;">
-          <img id="postPhotoPreviewImg" src="" alt="Предпросмотр" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px;" />
-          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearPostPhoto()">Убрать</button>
+        <div id="postPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
+          <img id="postPreviewImg" src="" alt="" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px; pointer-events: none;" />
+          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearPostAttachment()">Убрать</button>
         </div>
       </div>
 
       <div style="margin-top: 14px;">
-        <label class="meta">Куда отправить публикацию?</label>
-        <div class="dest-options">
-          <button type="button" id="destPulseBtn" class="dest-btn active" onclick="setPostDestination('pulse')">Отправить в Пульс</button>
-          <button type="button" id="destSelfBtn" class="dest-btn" onclick="setPostDestination('self')">У себя на странице</button>
+        <label class="meta">Куда отправить?</label>
+        <div class="grid-2" style="margin-top: 6px;">
+          <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">Отправить в Пульс</button>
+          <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">У себя на странице</button>
         </div>
-        <div id="destHint" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, и публикация сохранится у вас на странице.</div>
+        <div id="destHelpText" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, и запись сохранится у вас на странице.</div>
       </div>
 
       <div class="actions" style="margin-top: 16px;">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModalById('createPostModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="publishPost()">Отправить</button>
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('newPostModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="submitNewPost()">Отправить</button>
       </div>
     </div>
   </div>
 
-  <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ИМЕНИ -->
-  <div id="editNameModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 10px;">Ваше имя в SÄT</h3>
-      <input id="editDisplayNameInput" class="input" placeholder="Введите имя" />
+  <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+  <div id="editProfileModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 10px;">Данные профиля</h3>
+      <label class="meta">Имя</label>
+      <input id="editNameField" class="input" placeholder="Введите ваше имя" />
+      <label class="meta" style="display: block; margin-top: 10px;">О себе / статус</label>
+      <input id="editBioField" class="input" placeholder="Коротко о себе..." />
       <div class="actions" style="margin-top: 14px;">
-        <button class="btn btn-ghost" style="flex: 1;" onclick="closeModalById('editNameModal')">Отмена</button>
-        <button class="btn btn-primary" style="flex: 1;" onclick="saveNewName()">Сохранить</button>
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('editProfileModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()">Сохранить</button>
       </div>
     </div>
   </div>
 
   <!-- МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
-  <div id="circleModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
+  <div id="createGroupModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Создать группу</h3>
       <label class="meta">Название группы</label>
-      <input id="circleNameInput" class="input" placeholder="Например: Соседи / Автопомощь / Спорт" />
+      <input id="groupTitleInput" class="input" placeholder="Например: Соседи / Спорт / Помощь" />
       <label class="meta" style="display: block; margin-top: 10px;">Описание</label>
-      <input id="circleDescInput" class="input" placeholder="О чём эта группа" />
+      <input id="groupDescInput" class="input" placeholder="О чём эта группа" />
       <div class="actions" style="margin-top: 16px;">
-        <button class="btn btn-ghost" style="flex: 1;" onclick="closeModalById('circleModal')">Отмена</button>
-        <button class="btn btn-primary" style="flex: 1;" onclick="createCircle()">Создать</button>
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('createGroupModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="createNewGroup()">Создать</button>
       </div>
     </div>
   </div>
 
-  <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТР СТОРИС И ФОТО -->
-  <div id="storyViewer" class="story-viewer" onclick="closeStoryViewer()">
+  <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТРЩИК ФОТО И СТОРИС -->
+  <div id="fullViewer" class="viewer-screen" onclick="closeFullViewer()">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div>
-        <div id="storyViewerAuthor" style="font-weight: 800; font-size: 16px;">Сторис</div>
-        <div id="storyViewerTime" style="font-size: 12px; opacity: 0.75;">Сейчас</div>
+        <div id="viewerTitle" style="font-weight: 800; font-size: 16px;">Фото</div>
+        <div id="viewerSub" style="font-size: 12px; opacity: 0.78;"></div>
       </div>
-      <button class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeStoryViewer()">✕</button>
+      <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
     </div>
-    <img id="storyViewerImg" src="" alt="Сторис" />
+    <img id="viewerImage" src="" alt="" />
     <div style="text-align: center; font-size: 13px; opacity: 0.75;">Нажмите в любое место, чтобы закрыть</div>
   </div>
 
-  <!-- ПОЛНОЭКРАННЫЙ ЧАТ -->
-  <div id="chatModal" class="chat-fullscreen">
-    <div class="chat-inner">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border);">
+  <!-- ЧАТ -->
+  <div id="chatScreen" class="chat-screen">
+    <div class="chat-wrap">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.92); padding: 10px 12px; border-radius: 16px;">
         <div style="min-width: 0;">
-          <h3 id="chatTitle" style="margin: 0; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
-          <div id="chatSubtitle" class="meta">SÄT</div>
+          <h3 id="chatHeaderTitle" style="margin: 0; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
+          <div id="chatHeaderSub" class="meta">SÄT</div>
         </div>
-        <button class="btn btn-ghost" style="padding: 8px 12px;" onclick="closeChatModal()">✕</button>
+        <button type="button" class="btn btn-ghost" style="padding: 8px 12px;" onclick="closeChat()">✕</button>
       </div>
 
-      <div id="chatMessages" class="chat-box"></div>
+      <div id="chatMessagesBox" class="chat-list"></div>
 
       <div style="display: flex; gap: 8px; align-items: center;">
-        <input id="chatInput" class="input" style="margin-top: 0; flex: 1;" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter') sendChatMsg()" />
-        <button class="btn btn-primary" style="padding: 12px 16px;" onclick="sendChatMsg()">Отправить</button>
+        <input id="chatMsgInput" class="input" style="margin-top: 0; flex: 1;" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button type="button" class="btn btn-primary" style="padding: 12px 16px;" onclick="sendMessage()">Отправить</button>
       </div>
     </div>
   </div>
@@ -1104,209 +976,196 @@
       appId: "1:622960056003:web:8182bc730dff46ed02f476"
     };
 
-    const fbApp = initializeApp(firebaseConfig);
-    const auth = getAuth(fbApp);
-    const db = getFirestore(fbApp);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();
-
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
-    const STORY_TTL_MS = 3 * 60 * 60 * 1000; // Ровно 3 часа (вместо 24 часов)
+    const STORY_TTL = 3 * 60 * 60 * 1000; // 3 часа
 
-    // 10 стильных светло-зелёных обоев интерфейса
     const WALLPAPERS = [
-      { id: 'wp1', name: 'Утренний лист', top: '#f7fbf8', base: '#f3f9f5', bot: '#e5f2ea', dot: 'rgba(15,107,67,0.06)', size: '22px 22px' },
-      { id: 'wp2', name: 'Мягкая мята', top: '#e8f8f0', base: '#d6f2e4', bot: '#bce7d1', dot: 'rgba(15,120,76,0.09)', size: '24px 24px' },
-      { id: 'wp3', name: 'Тёплый алебастр', top: '#fdfaf0', base: '#f5efe0', bot: '#e8dec6', dot: 'rgba(25,110,70,0.07)', size: '22px 22px' },
-      { id: 'wp4', name: 'Светлый шалфей', top: '#eef6f0', base: '#dcebe1', bot: '#c5dcd0', dot: 'rgba(15,107,67,0.09)', size: '20px 20px' },
-      { id: 'wp5', name: 'Фисташковый свет', top: '#f2fceb', base: '#e2f4d4', bot: '#cce8b8', dot: 'rgba(35,125,65,0.08)', size: '26px 26px' },
-      { id: 'wp6', name: 'Изумрудный туман', top: '#e7f8f3', base: '#d1efe6', bot: '#b5e3d5', dot: 'rgba(12,112,72,0.09)', size: '22px 22px' },
-      { id: 'wp7', name: 'Жемчужный рассвет', top: '#ffffff', base: '#eef4f0', bot: '#dce7e0', dot: 'rgba(15,107,67,0.06)', size: '28px 28px' },
-      { id: 'wp8', name: 'Песочный бриз', top: '#fcf7ec', base: '#f3ead8', bot: '#e6d8be', dot: 'rgba(15,107,67,0.07)', size: '24px 24px' },
-      { id: 'wp9', name: 'Светлый нефрит', top: '#e3f7ee', base: '#c9ece0', bot: '#a9decb', dot: 'rgba(10,104,66,0.1)', size: '18px 18px' },
-      { id: 'wp10', name: 'Льняной покой', top: '#f7faf7', base: '#e8efe9', bot: '#d6e2d8', dot: 'rgba(15,107,67,0.07)', size: '24px 24px' }
+      { id: 'w1', name: 'Утренний сад', c1: '#f7fbf8', c2: '#eff8f2', c3: '#dfeee5', dot: 'rgba(15,107,67,0.06)' },
+      { id: 'w2', name: 'Свежая мята', c1: '#e6f9f0', c2: '#d0f2e2', c3: '#b4e6cf', dot: 'rgba(15,120,76,0.09)' },
+      { id: 'w3', name: 'Тёплый шёлк', c1: '#fdfaf0', c2: '#f5efe0', c3: '#e8dec5', dot: 'rgba(25,110,70,0.07)' },
+      { id: 'w4', name: 'Шалфей и роса', c1: '#ebf6ef', c2: '#d6eadf', c3: '#bddcc9', dot: 'rgba(15,107,67,0.09)' },
+      { id: 'w5', name: 'Фисташковый свет', c1: '#f0fce8', c2: '#dff4cf', c3: '#c8e8b0', dot: 'rgba(35,125,65,0.08)' },
+      { id: 'w6', name: 'Изумрудный туман', c1: '#e4f8f2', c2: '#cceee4', c3: '#aee0d1', dot: 'rgba(12,112,72,0.09)' },
+      { id: 'w7', name: 'Белый жемчуг', c1: '#ffffff', c2: '#eef4f0', c3: '#dbe6df', dot: 'rgba(15,107,67,0.06)' },
+      { id: 'w8', name: 'Песочный рассвет', c1: '#fcf6ea', c2: '#f2e8d4', c3: '#e4d4b7', dot: 'rgba(15,107,67,0.07)' },
+      { id: 'w9', name: 'Нефритовый лист', c1: '#dff7ec', c2: '#c3ebda', c3: '#a2dec5', dot: 'rgba(10,104,66,0.1)' },
+      { id: 'w10', name: 'Льняное утро', c1: '#f5faf6', c2: '#e4ede6', c3: '#d0dfd4', dot: 'rgba(15,107,67,0.07)' }
     ];
 
-    const STORAGE_KEY = 'sat_profile_state_v6';
+    const STORE_KEY = 'sat_clean_state_v1';
     let state = {
-      wallpaperId: 'wp1',
-      displayName: '',
-      photoData: '',
-      savedPhotos: [],
-      storyData: '',
-      storyCreatedAt: 0,
-      storyExpiresAt: 0,
-      storyTimeLabel: '',
-      activeTab: 'profile',
-      profileSubtab: 'posts',
-      activeChatId: null
+      wpId: 'w1',
+      name: '',
+      bio: '',
+      avatar: '',
+      photos: [],
+      story: '',
+      storyStart: 0,
+      storyEnd: 0,
+      storyLabel: ''
     };
 
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      state = { ...state, ...saved };
-      if (!Array.isArray(state.savedPhotos)) state.savedPhotos = [];
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+      state = { ...state, ...parsed };
+      if (!Array.isArray(state.photos)) state.photos = [];
     } catch (e) {}
 
-    function saveState() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    function persist() {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
     }
 
     let currentUser = null;
-    let cloudPosts = [];
-    let cloudUsers = [];
-    let friendRequests = [];
-    let cloudChats = [];
-    let activeMsgUnsub = null;
-    let currentMessages = [];
-    let currentPickTarget = 'avatar';
-    let pendingPostPhotoData = '';
-    let postDestination = 'pulse';
-    let activePeerUid = null;
-    let activePeerStory = null;
+    let posts = [];
+    let users = [];
+    let friendsDocs = [];
+    let chats = [];
+    let pickTarget = 'avatar';
+    let draftPostPhoto = '';
+    let draftPostDest = 'pulse';
+    let openPeerUid = null;
+    let openPeerName = '';
+    let openPeerStoryData = null;
+    let activeChatId = null;
+    let chatUnsub = null;
+    let chatMsgs = [];
 
-    document.getElementById('sessionCheckingHint').style.display = 'block';
+    document.getElementById('sessionHint').style.display = 'block';
 
-    /* МГНОВЕННОЕ ПРИМЕНЕНИЕ ОБОЕВ БЕЗ ОШИБОК */
-    function applyWallpaper(wpId) {
-      const wp = WALLPAPERS.find(w => w.id === wpId) || WALLPAPERS[0];
-      state.wallpaperId = wp.id;
-      saveState();
+    /* МГНОВЕННАЯ СМЕНА ОБОЕВ ЧЕРЕЗ <style id="dynamicWallpaperStyle"> */
+    function applyWallpaper(id) {
+      const wp = WALLPAPERS.find(x => x.id === id) || WALLPAPERS[0];
+      state.wpId = wp.id;
+      persist();
 
-      const bgStyle = `radial-gradient(${wp.dot} 1.2px, transparent 1.2px), linear-gradient(165deg, ${wp.top} 0%, ${wp.base} 52%, ${wp.bot} 100%)`;
-      const sizeStyle = `${wp.size}, cover`;
-
-      document.body.style.backgroundColor = wp.base;
-      document.body.style.backgroundImage = bgStyle;
-      document.body.style.backgroundSize = sizeStyle;
-
-      const peerEl = document.getElementById('peerPageModal');
-      if (peerEl) {
-        peerEl.style.backgroundColor = wp.base;
-        peerEl.style.backgroundImage = bgStyle;
-        peerEl.style.backgroundSize = sizeStyle;
+      const styleEl = document.getElementById('dynamicWallpaperStyle');
+      if (styleEl) {
+        styleEl.textContent = `
+          body, .peer-screen, .chat-screen {
+            background-color: ${wp.c2} !important;
+            background-image: radial-gradient(${wp.dot} 1.3px, transparent 1.3px), linear-gradient(165deg, ${wp.c1} 0%, ${wp.c2} 52%, ${wp.c3} 100%) !important;
+            background-size: 22px 22px, cover !important;
+          }
+        `;
       }
 
-      const chatEl = document.getElementById('chatModal');
-      if (chatEl) {
-        chatEl.style.backgroundColor = wp.base;
-        chatEl.style.backgroundImage = bgStyle;
-        chatEl.style.backgroundSize = sizeStyle;
-      }
-
-      const grid = document.getElementById('wallpapersGrid');
-      if (grid) {
-        grid.querySelectorAll('.wp-card').forEach(card => {
-          const isMatch = card.getAttribute('data-wp-id') === wp.id;
-          card.classList.toggle('active', isMatch);
-          const badge = card.querySelector('.wp-badge');
-          if (badge) badge.textContent = isMatch ? 'Выбрано' : 'Применить';
+      const list = document.getElementById('wallpapersList');
+      if (list) {
+        list.querySelectorAll('.wp-item').forEach(el => {
+          const isCur = el.dataset.id === wp.id;
+          el.classList.toggle('active', isCur);
+          const lbl = el.querySelector('.wp-status');
+          if (lbl) lbl.textContent = isCur ? 'Выбрано' : 'Нажмите, чтобы применить';
         });
       }
     }
 
-    function openWallpapersModal() {
-      const grid = document.getElementById('wallpapersGrid');
-      if (grid) {
-        grid.innerHTML = WALLPAPERS.map(wp => {
-          const active = state.wallpaperId === wp.id;
-          return `
-            <div class="wp-card ${active ? 'active' : ''}" data-wp-id="${wp.id}" style="background: linear-gradient(150deg, ${wp.top}, ${wp.bot});" onclick="selectWallpaper('${wp.id}')">
-              <div class="wp-title">${escapeHtml(wp.name)}</div>
-              <div class="wp-badge">${active ? 'Выбрано' : 'Применить'}</div>
-            </div>
-          `;
-        }).join('');
-      }
+    function openWallpapers() {
+      const list = document.getElementById('wallpapersList');
+      list.innerHTML = WALLPAPERS.map(wp => {
+        const isCur = wp.id === state.wpId;
+        return `
+          <div class="wp-item ${isCur ? 'active' : ''}" data-id="${wp.id}" style="background: linear-gradient(145deg, ${wp.c1}, ${wp.c3});" onclick="pickWallpaper('${wp.id}')">
+            <div style="font-weight: 800; font-size: 14.5px; color: #11241a;">${esc(wp.name)}</div>
+            <div class="wp-status" style="font-size: 12px; font-weight: 700; color: #0f6b43; margin-top: 8px;">${isCur ? 'Выбрано' : 'Нажмите, чтобы применить'}</div>
+          </div>
+        `;
+      }).join('');
       document.getElementById('wallpapersModal').classList.add('open');
     }
 
-    function selectWallpaper(wpId) {
-      applyWallpaper(wpId);
-      const wp = WALLPAPERS.find(w => w.id === wpId);
-      showToast(`Обои применены: ${wp ? wp.name : ''}`);
+    function pickWallpaper(id) {
+      applyWallpaper(id);
+      const wp = WALLPAPERS.find(x => x.id === id);
+      toast(`Обои применены: ${wp ? wp.name : ''}`);
     }
 
-    function formatRealTime(tsMs) {
-      const d = tsMs ? new Date(tsMs) : new Date();
-      const timePart = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const datePart = d.toLocaleDateString([], { day: '2-digit', month: 'short' });
-      return `${timePart} • ${datePart}`;
-    }
-
-    function isStoryValid(storyData, expiresAt) {
-      if (!storyData || !expiresAt) return false;
-      return Date.now() < Number(expiresAt);
-    }
-
-    function pruneExpiredOwnStory() {
-      if (state.storyData && !isStoryValid(state.storyData, state.storyExpiresAt)) {
-        state.storyData = '';
-        state.storyCreatedAt = 0;
-        state.storyExpiresAt = 0;
-        state.storyTimeLabel = '';
-        saveState();
-      }
-    }
-
-    function showToast(msg) {
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => el.classList.remove('show'), 2600);
-    }
-
-    function escapeHtml(str) {
-      return String(str || '')
+    function esc(s) {
+      return String(s || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function getUserName() {
-      return (state.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник').trim();
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2500);
     }
 
-    function getUserPhoto() {
-      return state.photoData || currentUser?.photoURL || '';
+    function formatTime(ms) {
+      const d = ms ? new Date(ms) : new Date();
+      const t = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dt = d.toLocaleDateString([], { day: '2-digit', month: 'short' });
+      return `${t} • ${dt}`;
     }
 
-    function goScreen(id) {
+    function storyAlive(data, endMs) {
+      return Boolean(data && endMs && Date.now() < Number(endMs));
+    }
+
+    function checkOwnStoryExpiry() {
+      if (state.story && !storyAlive(state.story, state.storyEnd)) {
+        state.story = '';
+        state.storyStart = 0;
+        state.storyEnd = 0;
+        state.storyLabel = '';
+        persist();
+      }
+    }
+
+    function myDisplayName() {
+      return (state.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник').trim();
+    }
+
+    function myAvatarUrl() {
+      return state.avatar || currentUser?.photoURL || '';
+    }
+
+    function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
 
-    function unlockSoundAndGo(screenId) {
+    function enterAppFlow() {
       if (currentUser) {
-        openAppInProfile();
-        return;
+        goToProfileStart();
+      } else {
+        showScreen('auth');
       }
-      goScreen(screenId);
     }
 
-    function openAppInProfile() {
-      pruneExpiredOwnStory();
-      goScreen('app');
-      const profileNav = document.querySelector('.nav-item[data-tab="profile"]');
-      switchTab('profile', profileNav);
-      renderAll();
+    function goToProfileStart() {
+      checkOwnStoryExpiry();
+      showScreen('app');
+      const profNav = document.querySelector('.nav-btn[data-tab="profile"]');
+      switchMainTab('profile', profNav);
+      renderEverything();
     }
 
-    async function syncUserToCloud(user) {
+    async function syncProfileCloud(user) {
       if (!user) return;
-      pruneExpiredOwnStory();
+      checkOwnStoryExpiry();
       try {
         await setDoc(doc(db, 'users', user.uid), {
           uid: user.uid,
-          fullName: getUserName(),
-          photoData: getUserPhoto(),
-          savedPhotos: state.savedPhotos || [],
-          storyData: state.storyData || '',
-          storyCreatedAt: state.storyCreatedAt || 0,
-          storyExpiresAt: state.storyExpiresAt || 0,
-          storyTimeLabel: state.storyTimeLabel || '',
+          fullName: myDisplayName(),
+          bio: state.bio || 'Мой профиль SÄT',
+          photoData: myAvatarUrl(),
+          savedPhotos: state.photos || [],
+          storyData: state.story || '',
+          storyCreatedAt: state.storyStart || 0,
+          storyExpiresAt: state.storyEnd || 0,
+          storyTimeLabel: state.storyLabel || '',
           email: user.email || '',
           updatedAt: serverTimestamp()
         }, { merge: true });
@@ -1317,25 +1176,24 @@
 
     onAuthStateChanged(auth, async (user) => {
       currentUser = user;
-      document.getElementById('sessionCheckingHint').style.display = 'none';
-
+      document.getElementById('sessionHint').style.display = 'none';
       if (user) {
-        if (!state.displayName && user.displayName) {
-          state.displayName = user.displayName;
-          saveState();
+        if (!state.name && user.displayName) {
+          state.name = user.displayName;
+          persist();
         }
-        await syncUserToCloud(user);
-        openAppInProfile();
+        await syncProfileCloud(user);
+        goToProfileStart();
       } else {
-        goScreen('splash');
+        showScreen('splash');
       }
     });
 
-    async function authGoogle() {
+    async function loginWithGoogle() {
       try {
         await signInWithPopup(auth, googleProvider);
-        openAppInProfile();
-        showToast('Добро пожаловать в SÄT');
+        goToProfileStart();
+        toast('Вход выполнен');
       } catch (e) {
         if (
           e.code === 'auth/popup-blocked' ||
@@ -1346,442 +1204,412 @@
           try {
             await signInWithRedirect(auth, googleProvider);
           } catch (err) {
-            showToast('Не удалось войти через Google');
+            toast('Не удалось войти через Google');
           }
         } else {
-          showToast('Ошибка входа: ' + (e.code || e.message));
+          toast('Ошибка входа: ' + (e.code || e.message));
         }
       }
     }
 
-    async function authLogout() {
+    async function logoutUser() {
       await signOut(auth);
-      state.activeTab = 'profile';
-      saveState();
-      goScreen('splash');
-      showToast('Вы вышли из аккаунта');
+      showScreen('splash');
+      toast('Вы вышли');
     }
 
-    /* ПЛАВНОЕ ОБНОВЛЕНИЕ СВАЙПОМ ВНИЗ (без перезагрузки страницы) */
-    (function setupPullToRefresh() {
-      let startY = 0;
-      let pulling = false;
-      let currentPull = 0;
-      const indicator = document.getElementById('ptrIndicator');
-      const ptrText = document.getElementById('ptrText');
+    /* ПЛАВНОЕ ОБНОВЛЕНИЕ СВАЙПОМ ВНИЗ БЕЗ ПЕРЕЗАГРУЗКИ */
+    (function initPullRefresh() {
+      let y0 = 0, active = false, dist = 0;
+      const bar = document.getElementById('ptrBar');
+      const txt = document.getElementById('ptrText');
 
       window.addEventListener('touchstart', (e) => {
         if (!document.getElementById('app').classList.contains('active')) return;
-        if (document.querySelector('.modal-backdrop.open') || document.getElementById('chatModal').classList.contains('open') || document.getElementById('peerPageModal').classList.contains('open')) return;
+        if (document.querySelector('.modal-bg.open') || document.getElementById('peerProfileScreen').classList.contains('open') || document.getElementById('chatScreen').classList.contains('open')) return;
         if (window.scrollY <= 2) {
-          startY = e.touches[0].clientY;
-          pulling = true;
-          currentPull = 0;
+          y0 = e.touches[0].clientY;
+          active = true;
+          dist = 0;
         }
       }, { passive: true });
 
       window.addEventListener('touchmove', (e) => {
-        if (!pulling) return;
-        const diff = e.touches[0].clientY - startY;
-        if (diff > 10 && window.scrollY <= 2) {
-          currentPull = Math.min(diff * 0.45, 76);
-          indicator.style.transform = `translate(-50%, ${currentPull - 48}px)`;
-          ptrText.textContent = currentPull > 52 ? 'Отпустите для обновления' : 'Потяните вниз...';
+        if (!active) return;
+        const dy = e.touches[0].clientY - y0;
+        if (dy > 10 && window.scrollY <= 2) {
+          dist = Math.min(dy * 0.45, 76);
+          bar.style.transform = `translate(-50%, ${dist - 48}px)`;
+          txt.textContent = dist > 52 ? 'Отпустите для обновления' : 'Потяните вниз...';
         }
       }, { passive: true });
 
       window.addEventListener('touchend', () => {
-        if (!pulling) return;
-        pulling = false;
-        if (currentPull > 52) {
-          indicator.classList.add('spinning');
-          indicator.style.transform = 'translate(-50%, 16px)';
-          ptrText.textContent = 'Обновляем...';
-          pruneExpiredOwnStory();
-          renderAll();
-          if (activePeerUid) openUserProfile(activePeerUid);
+        if (!active) return;
+        active = false;
+        if (dist > 52) {
+          bar.classList.add('spinning');
+          bar.style.transform = 'translate(-50%, 16px)';
+          txt.textContent = 'Обновляем...';
+          checkOwnStoryExpiry();
+          renderEverything();
+          if (openPeerUid) openPersonPage(openPeerUid, openPeerName);
           setTimeout(() => {
-            indicator.classList.remove('spinning');
-            indicator.style.transform = 'translate(-50%, -64px)';
-            showToast('Обновлено');
-          }, 600);
+            bar.classList.remove('spinning');
+            bar.style.transform = 'translate(-50%, -64px)';
+            toast('Обновлено');
+          }, 550);
         } else {
-          indicator.style.transform = 'translate(-50%, -64px)';
+          bar.style.transform = 'translate(-50%, -64px)';
         }
       }, { passive: true });
     })();
 
-    /* ПОДПИСКИ FIRESTORE */
+    /* ОБЛАЧНЫЕ ПОДПИСКИ */
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
-      cloudPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderFeed();
+      posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPulse();
       renderMyPosts();
-      if (activePeerUid) openUserProfile(activePeerUid);
+      if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
     onSnapshot(collection(db, 'users'), (snap) => {
-      cloudUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (currentUser) {
-        const me = cloudUsers.find(u => u.uid === currentUser.uid);
+        const me = users.find(u => u.uid === currentUser.uid);
         if (me) {
-          if (me.photoData && !state.photoData) state.photoData = me.photoData;
-          if (Array.isArray(me.savedPhotos) && me.savedPhotos.length > (state.savedPhotos || []).length) {
-            state.savedPhotos = me.savedPhotos;
+          if (me.photoData && !state.avatar) state.avatar = me.photoData;
+          if (me.bio && !state.bio) state.bio = me.bio;
+          if (Array.isArray(me.savedPhotos) && me.savedPhotos.length > state.photos.length) {
+            state.photos = me.savedPhotos;
           }
-          if (me.storyData && isStoryValid(me.storyData, me.storyExpiresAt)) {
-            state.storyData = me.storyData;
-            state.storyCreatedAt = me.storyCreatedAt;
-            state.storyExpiresAt = me.storyExpiresAt;
-            state.storyTimeLabel = me.storyTimeLabel || '';
+          if (me.storyData && storyAlive(me.storyData, me.storyExpiresAt)) {
+            state.story = me.storyData;
+            state.storyStart = me.storyCreatedAt;
+            state.storyEnd = me.storyExpiresAt;
+            state.storyLabel = me.storyTimeLabel || '';
           }
         }
       }
-      pruneExpiredOwnStory();
-      renderProfileHeader();
-      renderMyPhotos();
-      renderFriendsSection();
-      if (activePeerUid) openUserProfile(activePeerUid);
+      renderMyProfile();
+      renderFriendsTab();
+      if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
     onSnapshot(collection(db, 'friendRequests'), (snap) => {
-      friendRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderFriendsSection();
-      if (activePeerUid) openUserProfile(activePeerUid);
+      friendsDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderFriendsTab();
+      if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
     onSnapshot(collection(db, 'chats'), (snap) => {
-      cloudChats = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
+      chats = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => {
         const ta = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0;
         const tb = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
         return tb - ta;
       });
-      renderGroupsSection();
+      renderGroupsTab();
     }, () => {});
 
     /* НАВИГАЦИЯ */
-    function switchTab(tab, btn) {
-      state.activeTab = tab;
-      saveState();
+    function switchMainTab(tab, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
-      pruneExpiredOwnStory();
-      renderAll();
+      renderEverything();
     }
 
-    function setProfileSubtab(sub) {
-      state.profileSubtab = sub;
-      saveState();
-      document.getElementById('subBtnPosts').classList.toggle('active', sub === 'posts');
-      document.getElementById('subBtnFriends').classList.toggle('active', sub === 'friends');
-      document.getElementById('subBtnGroups').classList.toggle('active', sub === 'groups');
+    function switchMySubtab(sub) {
+      document.getElementById('subTabPosts').classList.toggle('active', sub === 'posts');
+      document.getElementById('subTabFriends').classList.toggle('active', sub === 'friends');
+      document.getElementById('subTabGroups').classList.toggle('active', sub === 'groups');
 
-      document.getElementById('profileSubPosts').style.display = sub === 'posts' ? 'block' : 'none';
-      document.getElementById('profileSubFriends').style.display = sub === 'friends' ? 'block' : 'none';
-      document.getElementById('profileSubGroups').style.display = sub === 'groups' ? 'block' : 'none';
+      document.getElementById('mySubPosts').style.display = sub === 'posts' ? 'block' : 'none';
+      document.getElementById('mySubFriends').style.display = sub === 'friends' ? 'block' : 'none';
+      document.getElementById('mySubGroups').style.display = sub === 'groups' ? 'block' : 'none';
     }
 
-    function renderAll() {
-      renderProfileHeader();
-      renderMyPhotos();
-      renderFeed();
+    function renderEverything() {
+      renderMyProfile();
+      renderPulse();
       renderMyPosts();
-      renderFriendsSection();
-      renderGroupsSection();
+      renderFriendsTab();
+      renderGroupsTab();
     }
 
-    function renderProfileHeader() {
-      pruneExpiredOwnStory();
-      const name = getUserName();
-      const photo = getUserPhoto();
-      document.getElementById('profileName').textContent = name;
+    /* МОЙ ПРОФИЛЬ */
+    function renderMyProfile() {
+      checkOwnStoryExpiry();
+      const name = myDisplayName();
+      const ava = myAvatarUrl();
+      document.getElementById('myNameText').textContent = name;
+      document.getElementById('myBioText').textContent = state.bio || 'Мой профиль SÄT';
 
-      const avaBox = document.getElementById('profileAvatarBox');
-      if (photo) {
-        avaBox.innerHTML = `<img src="${photo}" alt="${escapeHtml(name)}" />`;
-      } else {
-        avaBox.textContent = (name[0] || 'Ä').toUpperCase();
-      }
+      const box = document.getElementById('myAvatarBox');
+      box.innerHTML = ava ? `<img src="${ava}" alt="" />` : esc((name[0] || 'Ä').toUpperCase());
 
-      const ring = document.getElementById('profileAvatarRing');
-      const storyCard = document.getElementById('myStoryCard');
-      if (state.storyData && isStoryValid(state.storyData, state.storyExpiresAt)) {
+      const ring = document.getElementById('myAvatarRing');
+      const banner = document.getElementById('myStoryBanner');
+      if (state.story && storyAlive(state.story, state.storyEnd)) {
         ring.classList.add('has-story');
-        storyCard.style.display = 'block';
-        const leftHours = Math.max(0.1, ((Number(state.storyExpiresAt) - Date.now()) / 3600000)).toFixed(1);
-        document.getElementById('myStoryTime').textContent = `${state.storyTimeLabel || ''} • осталось ~${leftHours} ч из 3 ч`;
+        banner.style.display = 'block';
+        const hrs = Math.max(0.1, ((Number(state.storyEnd) - Date.now()) / 3600000)).toFixed(1);
+        document.getElementById('myStoryTimerText').textContent = `${state.storyLabel || ''} • осталось ~${hrs} ч из 3 ч`;
       } else {
         ring.classList.remove('has-story');
-        storyCard.style.display = 'none';
+        banner.style.display = 'none';
+      }
+
+      const pGrid = document.getElementById('myPhotosBox');
+      if (!state.photos.length) {
+        pGrid.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет. Нажмите «+ Фото».</div>';
+      } else {
+        pGrid.innerHTML = state.photos.map((src, i) => `
+          <div class="photo-cell" onclick="openImageViewer('${src}', '${esc(name)}', 'Фото #${i + 1}')">
+            <img src="${src}" alt="" />
+          </div>
+        `).join('');
       }
     }
 
-    function renderMyPhotos() {
-      const box = document.getElementById('myPhotosGrid');
-      if (!box) return;
-      const photos = state.savedPhotos || [];
-      if (!photos.length) {
-        box.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Сохранённых фото пока нет. Нажмите «+ Фото», чтобы добавить.</div>';
-        return;
-      }
-      box.innerHTML = photos.map((src, idx) => `
-        <div class="photo-grid-item" onclick="openPhotoPreview('${src}', 'Фото профиля', '${formatRealTime(Date.now())}')">
-          <img src="${src}" alt="Фото ${idx + 1}" />
-        </div>
-      `).join('');
-    }
-
-    function openPhotoPreview(src, author, timeStr) {
-      if (!src) return;
-      document.getElementById('storyViewerAuthor').textContent = author || getUserName();
-      document.getElementById('storyViewerTime').textContent = timeStr || '';
-      document.getElementById('storyViewerImg').src = src;
-      document.getElementById('storyViewer').classList.add('open');
-    }
-
-    /* КАМЕРА НА МЕСТЕ И ЗАГРУЗКА С ГАЛЕРЕИ */
+    /* КАМЕРА / ГАЛЕРЕЯ */
     function openPhotoPicker(target) {
-      currentPickTarget = target;
+      pickTarget = target;
       const titles = {
         avatar: 'Фото профиля',
-        story: 'Новая сторис (на 3 часа)',
-        post: 'Фото к публикации',
-        gallery_save: 'Добавить фото на страницу'
+        story: 'Сторис (на 3 часа)',
+        post: 'Фото для публикации',
+        gallery_add: 'Добавить фото на страницу'
       };
-      document.getElementById('photoSourceTitle').textContent = titles[target] || 'Загрузка фото';
-      document.getElementById('photoSourceHint').textContent = 'Сделайте фото на месте или загрузите с галереи';
-      document.getElementById('photoSourceModal').classList.add('open');
+      document.getElementById('pickerModalTitle').textContent = titles[target] || 'Выберите фото';
+      document.getElementById('photoPickerModal').classList.add('open');
     }
 
-    function triggerCamera() {
-      closeModalById('photoSourceModal');
-      const inp = document.getElementById('cameraCaptureInput');
-      inp.value = '';
-      inp.click();
+    function startCamera() {
+      hideModal('photoPickerModal');
+      const el = document.getElementById('camInput');
+      el.value = '';
+      el.click();
     }
 
-    function triggerGallery() {
-      closeModalById('photoSourceModal');
-      const inp = document.getElementById('galleryPickInput');
-      inp.value = '';
-      inp.click();
+    function startGallery() {
+      hideModal('photoPickerModal');
+      const el = document.getElementById('galInput');
+      el.value = '';
+      el.click();
     }
 
-    function compressImageFile(file, maxSide, quality, onDone) {
+    function onImageChosen(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const scale = Math.min(1, maxSide / Math.max(img.width || 1, img.height || 1));
-          canvas.width = Math.max(1, Math.round((img.width || 600) * scale));
-          canvas.height = Math.max(1, Math.round((img.height || 600) * scale));
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          onDone(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = () => {
-          if (typeof ev.target.result === 'string') onDone(ev.target.result);
+          const maxD = pickTarget === 'avatar' ? 420 : 860;
+          const sc = Math.min(1, maxD / Math.max(img.width || 1, img.height || 1));
+          canvas.width = Math.max(1, Math.round((img.width || 600) * sc));
+          canvas.height = Math.max(1, Math.round((img.height || 600) * sc));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+
+          if (pickTarget === 'avatar') {
+            state.avatar = dataUrl;
+            persist();
+            renderMyProfile();
+            await syncProfileCloud(currentUser);
+            toast('Фото профиля обновлено');
+          } else if (pickTarget === 'story') {
+            const now = Date.now();
+            state.story = dataUrl;
+            state.storyStart = now;
+            state.storyEnd = now + STORY_TTL;
+            state.storyLabel = formatTime(now);
+            persist();
+            renderMyProfile();
+            await syncProfileCloud(currentUser);
+            toast('Сторис опубликована на 3 часа');
+          } else if (pickTarget === 'gallery_add') {
+            state.photos = [dataUrl, ...state.photos].slice(0, 30);
+            persist();
+            renderMyProfile();
+            await syncProfileCloud(currentUser);
+            toast('Фото добавлено на страницу');
+          } else if (pickTarget === 'post') {
+            draftPostPhoto = dataUrl;
+            document.getElementById('postPreviewImg').src = dataUrl;
+            document.getElementById('postPreviewWrap').style.display = 'block';
+            document.getElementById('postPhotoLabel').textContent = 'Фото загружено — заменить';
+            toast('Фото загружено');
+          }
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
-    }
-
-    function handlePickedImage(e) {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const maxSide = currentPickTarget === 'avatar' ? 420 : 860;
-      compressImageFile(file, maxSide, 0.72, async (compressed) => {
-        if (currentPickTarget === 'avatar') {
-          state.photoData = compressed;
-          saveState();
-          renderProfileHeader();
-          await syncUserToCloud(currentUser);
-          showToast('Фото профиля загружено');
-        } else if (currentPickTarget === 'story') {
-          const now = Date.now();
-          state.storyData = compressed;
-          state.storyCreatedAt = now;
-          state.storyExpiresAt = now + STORY_TTL_MS;
-          state.storyTimeLabel = formatRealTime(now);
-          saveState();
-          renderProfileHeader();
-          await syncUserToCloud(currentUser);
-          showToast('Сторис опубликована на 3 часа');
-        } else if (currentPickTarget === 'gallery_save') {
-          state.savedPhotos = [compressed, ...(state.savedPhotos || [])].slice(0, 30);
-          saveState();
-          renderMyPhotos();
-          await syncUserToCloud(currentUser);
-          showToast('Фото сохранено на странице');
-        } else if (currentPickTarget === 'post') {
-          pendingPostPhotoData = compressed;
-          document.getElementById('postPhotoPreviewImg').src = compressed;
-          document.getElementById('postPhotoPreviewBox').style.display = 'block';
-          document.getElementById('postPhotoStatus').style.display = 'block';
-          document.getElementById('postPhotoBtnText').textContent = 'Фото загружено — заменить';
-          showToast('Фото загружено');
-        }
-      });
       e.target.value = '';
     }
 
-    function handleAvatarClick() {
-      pruneExpiredOwnStory();
-      if (state.storyData && isStoryValid(state.storyData, state.storyExpiresAt)) {
-        viewMyStory();
+    function onMyAvatarTap() {
+      checkOwnStoryExpiry();
+      if (state.story && storyAlive(state.story, state.storyEnd)) {
+        viewOwnStory();
       } else {
         openPhotoPicker('avatar');
       }
     }
 
-    function viewMyStory() {
-      pruneExpiredOwnStory();
-      if (!state.storyData) return;
-      openPhotoPreview(state.storyData, getUserName(), `Сторис • ${state.storyTimeLabel || formatRealTime(state.storyCreatedAt)}`);
+    function viewOwnStory() {
+      checkOwnStoryExpiry();
+      if (!state.story) return;
+      openImageViewer(state.story, myDisplayName(), `Сторис • ${state.storyLabel}`);
     }
 
-    function closeStoryViewer() {
-      document.getElementById('storyViewer').classList.remove('open');
+    async function removeOwnStory() {
+      state.story = '';
+      state.storyStart = 0;
+      state.storyEnd = 0;
+      state.storyLabel = '';
+      persist();
+      renderMyProfile();
+      await syncProfileCloud(currentUser);
+      toast('Сторис удалена');
     }
 
-    async function deleteMyStory() {
-      state.storyData = '';
-      state.storyCreatedAt = 0;
-      state.storyExpiresAt = 0;
-      state.storyTimeLabel = '';
-      saveState();
-      renderProfileHeader();
-      await syncUserToCloud(currentUser);
-      showToast('Сторис удалена');
+    function openImageViewer(src, title, sub) {
+      if (!src) return;
+      document.getElementById('viewerTitle').textContent = title || 'Фото';
+      document.getElementById('viewerSub').textContent = sub || '';
+      document.getElementById('viewerImage').src = src;
+      document.getElementById('fullViewer').classList.add('open');
     }
 
-    /* СОЗДАНИЕ ПУБЛИКАЦИИ В ПРОФИЛЕ (В ПУЛЬС ИЛИ У СЕБЯ НА СТРАНИЦЕ) */
-    function openCreatePostModal() {
-      setPostDestination('pulse');
-      document.getElementById('createPostModal').classList.add('open');
+    function closeFullViewer() {
+      document.getElementById('fullViewer').classList.remove('open');
     }
 
-    function setPostDestination(dest) {
-      postDestination = dest;
-      document.getElementById('destPulseBtn').classList.toggle('active', dest === 'pulse');
-      document.getElementById('destSelfBtn').classList.toggle('active', dest === 'self');
-      document.getElementById('destHint').textContent = dest === 'pulse'
-        ? 'Увидят все в Пульсе, и публикация сохранится у вас на странице.'
-        : 'Сохранится у вас на странице — увидят друзья и посетители вашего профиля.';
+    /* ПУБЛИКАЦИИ */
+    function openNewPostModal() {
+      choosePostDest('pulse');
+      document.getElementById('newPostModal').classList.add('open');
     }
 
-    function clearPostPhoto() {
-      pendingPostPhotoData = '';
-      document.getElementById('postPhotoPreviewBox').style.display = 'none';
-      document.getElementById('postPhotoStatus').style.display = 'none';
-      document.getElementById('postPhotoPreviewImg').src = '';
-      document.getElementById('postPhotoBtnText').textContent = 'Фото на месте или загрузить с галереи';
+    function choosePostDest(d) {
+      draftPostDest = d;
+      document.getElementById('destBtnPulse').classList.toggle('active', d === 'pulse');
+      document.getElementById('destBtnSelf').classList.toggle('active', d === 'self');
+      document.getElementById('destHelpText').textContent = d === 'pulse'
+        ? 'Увидят все в Пульсе, и запись сохранится у вас на странице.'
+        : 'Сохранится у вас на странице — увидят гости вашей страницы.';
     }
 
-    async function publishPost() {
-      const body = document.getElementById('newPostBody').value.trim();
-      if (!body && !pendingPostPhotoData) {
-        showToast('Напишите сообщение или загрузите фото');
+    function clearPostAttachment() {
+      draftPostPhoto = '';
+      document.getElementById('postPreviewWrap').style.display = 'none';
+      document.getElementById('postPreviewImg').src = '';
+      document.getElementById('postPhotoLabel').textContent = 'Сделать фото на месте или загрузить с галереи';
+    }
+
+    async function submitNewPost() {
+      const text = document.getElementById('postTextInput').value.trim();
+      if (!text && !draftPostPhoto) {
+        toast('Напишите сообщение или загрузите фото');
         return;
       }
+      const now = Date.now();
+      const timeStr = formatTime(now);
+      const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
 
-      const nowMs = Date.now();
-      const sentTimeStr = formatRealTime(nowMs);
-      const visibility = postDestination === 'pulse' ? 'pulse' : 'profile_only';
-
-      if (pendingPostPhotoData) {
-        state.savedPhotos = [pendingPostPhotoData, ...(state.savedPhotos || [])].slice(0, 30);
-        saveState();
-        renderMyPhotos();
-        await syncUserToCloud(currentUser);
+      if (draftPostPhoto) {
+        state.photos = [draftPostPhoto, ...state.photos].slice(0, 30);
+        persist();
+        renderMyProfile();
+        await syncProfileCloud(currentUser);
       }
 
-      const localPost = {
-        id: 'local_' + nowMs,
-        author: getUserName(),
-        authorUid: currentUser ? currentUser.uid : 'local_user',
-        authorPhoto: getUserPhoto(),
-        body,
-        photoData: pendingPostPhotoData || '',
-        visibility,
-        sentAtMs: nowMs,
-        time: sentTimeStr,
+      const item = {
+        id: 'tmp_' + now,
+        author: myDisplayName(),
+        authorUid: currentUser ? currentUser.uid : 'me',
+        authorPhoto: myAvatarUrl(),
+        body: text,
+        photoData: draftPostPhoto || '',
+        visibility: vis,
+        sentAtMs: now,
+        time: timeStr,
         confirms: 0
       };
 
-      cloudPosts = [localPost, ...cloudPosts];
-      renderFeed();
+      posts = [item, ...posts];
+      renderPulse();
       renderMyPosts();
 
       try {
         await addDoc(collection(db, 'posts'), {
-          author: localPost.author,
+          author: item.author,
           authorUid: currentUser ? currentUser.uid : null,
-          authorPhoto: localPost.authorPhoto,
-          body,
-          photoData: pendingPostPhotoData || '',
-          visibility,
-          sentAtMs: nowMs,
-          time: sentTimeStr,
+          authorPhoto: item.authorPhoto,
+          body: text,
+          photoData: draftPostPhoto || '',
+          visibility: vis,
+          sentAtMs: now,
+          time: timeStr,
           confirms: 0,
           createdAt: serverTimestamp()
         });
       } catch (e) {}
 
-      document.getElementById('newPostBody').value = '';
-      clearPostPhoto();
-      closeModalById('createPostModal');
-      showToast(visibility === 'pulse' ? 'Отправлено в Пульс и на вашу страницу' : 'Сохранено у вас на странице');
+      document.getElementById('postTextInput').value = '';
+      clearPostAttachment();
+      hideModal('newPostModal');
+      toast(vis === 'pulse' ? 'Отправлено в Пульс' : 'Сохранено на вашей странице');
     }
 
-    function getPostTimeLabel(p) {
-      if (p.sentAtMs) return formatRealTime(Number(p.sentAtMs));
-      if (p.createdAt?.toMillis) return formatRealTime(p.createdAt.toMillis());
-      return p.time || formatRealTime(Date.now());
+    function getPostTime(p) {
+      if (p.sentAtMs) return formatTime(Number(p.sentAtMs));
+      if (p.createdAt?.toMillis) return formatTime(p.createdAt.toMillis());
+      return p.time || formatTime(Date.now());
     }
 
-    function renderFeed() {
-      const box = document.getElementById('feedList');
-      if (!box) return;
-      const pulsePosts = cloudPosts.filter(p => (p.visibility || 'pulse') === 'pulse');
-      if (!pulsePosts.length) {
-        box.innerHTML = `
-          <div class="card">
-            <div style="font-weight: 800; font-size: 16px; margin-bottom: 6px;">В Пульсе пока нет публикаций</div>
-            <div class="meta" style="line-height: 1.45;">Откройте Профиль и нажмите «Новая публикация», чтобы отправить запись в Пульс или сохранить у себя.</div>
-          </div>
-        `;
+    function renderPulse() {
+      const box = document.getElementById('feedContainer');
+      const list = posts.filter(p => (p.visibility || 'pulse') === 'pulse');
+      if (!list.length) {
+        box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">В Пульсе пока тихо</div><div class="meta">Зайдите в Профиль и нажмите «Новая публикация», чтобы поделиться записью.</div></div>';
         return;
       }
 
-      box.innerHTML = pulsePosts.map(p => {
-        const isMine = currentUser && p.authorUid === currentUser.uid;
-        const avaHtml = p.authorPhoto
-          ? `<img src="${p.authorPhoto}" alt="" />`
-          : escapeHtml((p.author || 'S')[0].toUpperCase());
-        const timeStr = getPostTimeLabel(p);
+      box.innerHTML = list.map(p => {
+        const isMe = currentUser && p.authorUid === currentUser.uid;
+        const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" />` : esc((p.author || 'S')[0].toUpperCase());
+        const t = getPostTime(p);
+        const uid = p.authorUid || 'unknown';
+        const author = p.author || 'Участник';
 
         return `
           <article class="card">
             <div class="post-head">
-              <div class="post-author-row" onclick="openUserProfile('${escapeHtml(p.authorUid || '')}', '${escapeHtml(p.author || 'Участник')}')">
-                <div class="post-mini-ava">${avaHtml}</div>
+              <div class="post-user" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">
+                <div class="mini-ava">${ava}</div>
                 <div>
-                  <div class="author author-link">${escapeHtml(p.author || 'Участник')}</div>
-                  <div class="meta">Отправлено: ${escapeHtml(timeStr)}</div>
+                  <div class="user-name">${esc(author)}</div>
+                  <div class="meta">Отправлено: ${esc(t)}</div>
                 </div>
               </div>
               <span class="tag">Пульс</span>
             </div>
-            ${p.body ? `<div style="font-size: 15px; line-height: 1.48; color: var(--text);">${escapeHtml(p.body)}</div>` : ''}
-            ${p.photoData ? `<img class="post-photo" src="${p.photoData}" alt="Фото" onclick="openPhotoPreview('${p.photoData}', '${escapeHtml(p.author || 'Участник')}', '${escapeHtml(timeStr)}')" />` : ''}
+            ${p.body ? `<div style="font-size: 15px; line-height: 1.48;">${esc(p.body)}</div>` : ''}
+            ${p.photoData ? `
+              <div class="post-img-wrap" onclick="openImageViewer('${p.photoData}', '${esc(author)}', '${esc(t)}')">
+                <img src="${p.photoData}" alt="" />
+              </div>
+            ` : ''}
             <div class="actions">
-              <button class="btn btn-ghost" style="padding: 8px 13px; font-size: 13px;" onclick="confirmPost('${p.id}')">Поддержать (${Number(p.confirms || 0)})</button>
-              ${!isMine && p.authorUid ? `<button class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="startDirectChat('${p.authorUid}', '${escapeHtml(p.author)}')">Написать</button>` : ''}
-              ${isMine ? `<button class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="deletePost('${p.id}')">Удалить</button>` : ''}
+              <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="likePost('${p.id}')">Поддержать (${Number(p.confirms || 0)})</button>
+              <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">Страница</button>
+              ${!isMe && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(author)}')">Написать</button>` : ''}
+              ${isMe ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${p.id}')">Удалить</button>` : ''}
             </div>
           </article>
         `;
@@ -1789,422 +1617,443 @@
     }
 
     function renderMyPosts() {
-      const box = document.getElementById('myPostsList');
-      if (!box) return;
-      const uid = currentUser ? currentUser.uid : 'local_user';
-      const mine = cloudPosts.filter(p => p.authorUid === uid || (currentUser && p.authorUid === currentUser.uid));
+      const box = document.getElementById('myPostsBox');
+      const myUid = currentUser ? currentUser.uid : 'me';
+      const mine = posts.filter(p => p.authorUid === myUid || (currentUser && p.authorUid === currentUser.uid));
       if (!mine.length) {
-        box.innerHTML = '<div class="meta">Публикаций пока нет. Нажмите «Новая публикация» выше.</div>';
+        box.innerHTML = '<div class="meta">У вас пока нет публикаций.</div>';
         return;
       }
       box.innerHTML = mine.map(p => {
-        const timeStr = getPostTimeLabel(p);
-        const placeLabel = (p.visibility || 'pulse') === 'pulse' ? 'Пульс и страница' : 'Только на странице';
+        const t = getPostTime(p);
+        const where = (p.visibility || 'pulse') === 'pulse' ? 'Пульс и страница' : 'У себя на странице';
         return `
           <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
               <div>
-                <div class="meta">Отправлено в ${escapeHtml(timeStr)} • ${escapeHtml(placeLabel)}</div>
-                ${p.body ? `<div style="font-size: 14.5px; margin-top: 5px; line-height: 1.45;">${escapeHtml(p.body)}</div>` : ''}
+                <div class="meta">Отправлено: ${esc(t)} • ${esc(where)}</div>
+                ${p.body ? `<div style="font-size: 14.5px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
               </div>
-              <button class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="deletePost('${p.id}')">Удалить</button>
+              <button type="button" class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="removePost('${p.id}')">Удалить</button>
             </div>
-            ${p.photoData ? `<img class="post-photo" style="max-height: 240px;" src="${p.photoData}" alt="Фото" />` : ''}
+            ${p.photoData ? `
+              <div class="post-img-wrap" style="max-height: 240px;" onclick="openImageViewer('${p.photoData}', '${esc(myDisplayName())}', '${esc(t)}')">
+                <img src="${p.photoData}" alt="" />
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('');
     }
 
-    async function confirmPost(id) {
-      cloudPosts = cloudPosts.map(p => p.id === id ? { ...p, confirms: Number(p.confirms || 0) + 1 } : p);
-      renderFeed();
-      if (!String(id).startsWith('local_')) {
+    async function likePost(id) {
+      posts = posts.map(p => p.id === id ? { ...p, confirms: Number(p.confirms || 0) + 1 } : p);
+      renderPulse();
+      if (!String(id).startsWith('tmp_')) {
         try { await updateDoc(doc(db, 'posts', id), { confirms: increment(1) }); } catch (e) {}
       }
-      showToast('Отмечено');
+      toast('Отмечено');
     }
 
-    async function deletePost(id) {
+    async function removePost(id) {
       if (!confirm('Удалить публикацию?')) return;
-      cloudPosts = cloudPosts.filter(p => p.id !== id);
-      renderFeed();
+      posts = posts.filter(p => p.id !== id);
+      renderPulse();
       renderMyPosts();
-      if (!String(id).startsWith('local_')) {
+      if (!String(id).startsWith('tmp_')) {
         try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
       }
-      showToast('Удалено');
+      toast('Удалено');
     }
 
-    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫТ ДОСТУП КО ВСЕМУ) */
-    function openUserProfile(uid, fallbackName) {
+    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫВАЕТСЯ ВСЕГДА, ПОКАЗЫВАЕТ ВСЁ) */
+    function openPersonPage(uid, fallbackName) {
+      openPeerUid = uid || 'unknown';
+      openPeerName = fallbackName || 'Участник';
+      switchPeerSubtab('posts');
+      renderPeerPageContent();
+      const scr = document.getElementById('peerProfileScreen');
+      scr.classList.add('open');
+      scr.scrollTop = 0;
+    }
+
+    function closePeerScreen() {
+      openPeerUid = null;
+      openPeerName = '';
+      document.getElementById('peerProfileScreen').classList.remove('open');
+    }
+
+    function switchPeerSubtab(sub) {
+      document.getElementById('peerTabPosts').classList.toggle('active', sub === 'posts');
+      document.getElementById('peerTabPhotos').classList.toggle('active', sub === 'photos');
+      document.getElementById('peerTabFriends').classList.toggle('active', sub === 'friends');
+      document.getElementById('peerTabInfo').classList.toggle('active', sub === 'info');
+
+      document.getElementById('peerPanelPosts').style.display = sub === 'posts' ? 'block' : 'none';
+      document.getElementById('peerPanelPhotos').style.display = sub === 'photos' ? 'block' : 'none';
+      document.getElementById('peerPanelFriends').style.display = sub === 'friends' ? 'block' : 'none';
+      document.getElementById('peerPanelInfo').style.display = sub === 'info' ? 'block' : 'none';
+    }
+
+    function renderPeerPageContent() {
+      const uid = openPeerUid;
       if (!uid) return;
-      activePeerUid = uid;
-      const u = cloudUsers.find(x => x.uid === uid) || {};
-      const name = u.fullName || fallbackName || 'Участник';
 
-      document.getElementById('peerTopTitle').textContent = name;
-      document.getElementById('peerPageName').textContent = name;
-      document.getElementById('peerPageInfo').textContent = u.email ? `Участник SÄT • ${u.email}` : 'Участник SÄT';
+      const u = users.find(x => x.uid === uid) || {};
+      const name = u.fullName || openPeerName || 'Участник';
+      const bio = u.bio || 'Участник SÄT';
 
-      const avaBox = document.getElementById('peerPageAvatarBox');
-      if (u.photoData) {
-        avaBox.innerHTML = `<img src="${u.photoData}" alt="${escapeHtml(name)}" />`;
-      } else {
-        avaBox.textContent = (name[0] || 'S').toUpperCase();
-      }
+      document.getElementById('peerHeaderTitle').textContent = name;
+      document.getElementById('peerFullName').textContent = name;
+      document.getElementById('peerAboutLine').textContent = bio;
 
-      const ring = document.getElementById('peerPageAvatarRing');
-      const storyBadge = document.getElementById('peerPageStoryBadge');
-      if (u.storyData && isStoryValid(u.storyData, u.storyExpiresAt)) {
-        activePeerStory = {
+      const avaBox = document.getElementById('peerAvatarCircle');
+      avaBox.innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((name[0] || 'S').toUpperCase());
+
+      const ring = document.getElementById('peerAvatarRing');
+      const storyTag = document.getElementById('peerStoryTag');
+      if (u.storyData && storyAlive(u.storyData, u.storyExpiresAt)) {
+        openPeerStoryData = {
           author: name,
-          photo: u.storyData,
-          time: u.storyTimeLabel || formatRealTime(u.storyCreatedAt)
+          src: u.storyData,
+          time: u.storyTimeLabel || formatTime(u.storyCreatedAt)
         };
         ring.classList.add('has-story');
-        storyBadge.style.display = 'block';
+        storyTag.style.display = 'block';
       } else {
-        activePeerStory = null;
+        openPeerStoryData = null;
         ring.classList.remove('has-story');
-        storyBadge.style.display = 'none';
+        storyTag.style.display = 'none';
       }
 
-      const peerPosts = cloudPosts.filter(p => p.authorUid === uid);
-      const photosFromPosts = peerPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: getPostTimeLabel(p) }));
-      const extraSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
-      const allPeerPhotos = [...photosFromPosts, ...extraSaved];
+      // Кнопки действий
+      const actBox = document.getElementById('peerActionButtons');
+      if (currentUser && uid !== currentUser.uid && uid !== 'unknown') {
+        const fs = getFriendRel(uid);
+        let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">Добавить в друзья</button>`;
+        if (fs.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
+        else if (fs.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
+        else if (fs.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${fs.id}')">Принять заявку</button>`;
 
-      const peerFriendUids = new Set();
-      friendRequests.forEach(r => {
-        if (r.status === 'accepted') {
-          if (r.fromUid === uid) peerFriendUids.add(r.toUid);
-          if (r.toUid === uid) peerFriendUids.add(r.fromUid);
-        }
-      });
-
-      document.getElementById('peerStatPosts').textContent = String(peerPosts.length);
-      document.getElementById('peerStatPhotos').textContent = String(allPeerPhotos.length);
-      document.getElementById('peerStatFriends').textContent = String(peerFriendUids.size);
-
-      const actBox = document.getElementById('peerPageActions');
-      if (currentUser && uid !== currentUser.uid) {
-        const fs = getFriendStatus(uid);
-        let friendBtn = `<button class="btn btn-mint" style="flex: 1;" onclick="sendFriendRequest('${uid}', '${escapeHtml(name)}')">Добавить в друзья</button>`;
-        if (fs.status === 'accepted') {
-          friendBtn = `<span class="tag" style="padding: 10px 14px;">В друзьях</span>`;
-        } else if (fs.status === 'outgoing') {
-          friendBtn = `<span class="meta" style="padding: 10px;">Заявка отправлена</span>`;
-        } else if (fs.status === 'incoming') {
-          friendBtn = `<button class="btn btn-mint" style="flex: 1;" onclick="acceptFriend('${fs.id}')">Принять заявку</button>`;
-        }
         actBox.innerHTML = `
-          <button class="btn btn-primary" style="flex: 1;" onclick="startDirectChat('${uid}', '${escapeHtml(name)}')">Написать</button>
-          ${friendBtn}
+          <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать сообщение</button>
+          ${fBtn}
         `;
       } else {
-        actBox.innerHTML = '';
+        actBox.innerHTML = '<div class="meta">Открытая страница участника</div>';
       }
 
-      /* Друзья пользователя */
-      const friendsBox = document.getElementById('peerPageFriends');
-      const peerFriendsList = Array.from(peerFriendUids).map(fUid => {
-        const fu = cloudUsers.find(x => x.uid === fUid);
-        return { uid: fUid, name: fu?.fullName || 'Участник' };
-      });
-      if (!peerFriendsList.length) {
-        friendsBox.innerHTML = '<div class="meta">Друзей пока нет.</div>';
+      // 1. Публикации человека
+      const userPosts = posts.filter(p => p.authorUid === uid);
+      const postsBox = document.getElementById('peerPostsList');
+      if (!userPosts.length) {
+        postsBox.innerHTML = '<div class="meta" style="padding: 12px 0;">У этого пользователя пока нет публикаций.</div>';
       } else {
-        friendsBox.innerHTML = peerFriendsList.map(fr => `
-          <div class="list-row">
-            <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${fr.uid}', '${escapeHtml(fr.name)}')">${escapeHtml(fr.name)}</div>
-            <button class="btn btn-ghost" style="padding: 6px 11px; font-size: 12.5px;" onclick="openUserProfile('${fr.uid}', '${escapeHtml(fr.name)}')">Открыть</button>
-          </div>
-        `).join('');
-      }
-
-      /* Фотографии пользователя */
-      const photosBox = document.getElementById('peerPagePhotos');
-      if (!allPeerPhotos.length) {
-        photosBox.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет.</div>';
-      } else {
-        photosBox.innerHTML = allPeerPhotos.map(ph => `
-          <div class="photo-grid-item" onclick="openPhotoPreview('${ph.src}', '${escapeHtml(name)}', '${escapeHtml(ph.time)}')">
-            <img src="${ph.src}" alt="Фото" />
-          </div>
-        `).join('');
-      }
-
-      /* Публикации пользователя */
-      const postsBox = document.getElementById('peerPagePosts');
-      if (!peerPosts.length) {
-        postsBox.innerHTML = '<div class="meta">Публикаций пока нет.</div>';
-      } else {
-        postsBox.innerHTML = peerPosts.map(p => {
-          const timeStr = getPostTimeLabel(p);
+        postsBox.innerHTML = userPosts.map(p => {
+          const t = getPostTime(p);
           return `
             <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
-              <div class="meta">Отправлено в ${escapeHtml(timeStr)}</div>
-              ${p.body ? `<div style="font-size: 15px; margin-top: 5px; line-height: 1.45;">${escapeHtml(p.body)}</div>` : ''}
-              ${p.photoData ? `<img class="post-photo" style="max-height: 260px;" src="${p.photoData}" alt="Фото" onclick="openPhotoPreview('${p.photoData}', '${escapeHtml(name)}', '${escapeHtml(timeStr)}')" />` : ''}
+              <div class="meta">Отправлено: ${esc(t)}</div>
+              ${p.body ? `<div style="font-size: 15px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
+              ${p.photoData ? `
+                <div class="post-img-wrap" style="max-height: 260px;" onclick="openImageViewer('${p.photoData}', '${esc(name)}', '${esc(t)}')">
+                  <img src="${p.photoData}" alt="" />
+                </div>
+              ` : ''}
             </div>
           `;
         }).join('');
       }
 
-      document.getElementById('peerPageModal').classList.add('open');
-      document.getElementById('peerPageModal').scrollTop = 0;
+      // 2. Фотографии человека
+      const fromPosts = userPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: getPostTime(p) }));
+      const fromSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
+      const allPhotos = [...fromPosts, ...fromSaved];
+      const photosBox = document.getElementById('peerPhotosGrid');
+      if (!allPhotos.length) {
+        photosBox.innerHTML = '<div class="meta" style="grid-column: 1 / -1; padding: 12px 0;">Фотографий пока нет.</div>';
+      } else {
+        photosBox.innerHTML = allPhotos.map(ph => `
+          <div class="photo-cell" onclick="openImageViewer('${ph.src}', '${esc(name)}', '${esc(ph.time)}')">
+            <img src="${ph.src}" alt="" />
+          </div>
+        `).join('');
+      }
+
+      // 3. Друзья человека
+      const fUids = new Set();
+      friendsDocs.forEach(r => {
+        if (r.status === 'accepted') {
+          if (r.fromUid === uid) fUids.add(r.toUid);
+          if (r.toUid === uid) fUids.add(r.fromUid);
+        }
+      });
+      const peerFriends = Array.from(fUids).map(fid => {
+        const fu = users.find(x => x.uid === fid);
+        return { uid: fid, name: fu?.fullName || 'Участник', photo: fu?.photoData || '' };
+      });
+      const friendsBox = document.getElementById('peerFriendsList');
+      if (!peerFriends.length) {
+        friendsBox.innerHTML = '<div class="meta" style="padding: 12px 0;">Список друзей пуст.</div>';
+      } else {
+        friendsBox.innerHTML = peerFriends.map(fr => {
+          const fAva = fr.photo ? `<img src="${fr.photo}" alt="" />` : esc((fr.name[0] || 'S').toUpperCase());
+          return `
+            <div class="list-item">
+              <div class="post-user" onclick="openPersonPage('${esc(fr.uid)}', '${esc(fr.name)}')">
+                <div class="mini-ava">${fAva}</div>
+                <div class="user-name">${esc(fr.name)}</div>
+              </div>
+              <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="openPersonPage('${esc(fr.uid)}', '${esc(fr.name)}')">Открыть</button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 4. Информация о странице
+      document.getElementById('peerInfoBox').innerHTML = `
+        <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
+        <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
+        <div class="list-item"><span class="meta">Публикаций</span><span style="font-weight:700;">${userPosts.length}</span></div>
+        <div class="list-item"><span class="meta">Фотографий</span><span style="font-weight:700;">${allPhotos.length}</span></div>
+        <div class="list-item"><span class="meta">Друзей</span><span style="font-weight:700;">${peerFriends.length}</span></div>
+      `;
     }
 
-    function closePeerPage() {
-      activePeerUid = null;
-      document.getElementById('peerPageModal').classList.remove('open');
-    }
-
-    function openPeerStory() {
-      if (!activePeerStory) return;
-      openPhotoPreview(activePeerStory.photo, activePeerStory.author, `Сторис • ${activePeerStory.time}`);
+    function openPeerStoryViewer() {
+      if (openPeerStoryData) {
+        openImageViewer(openPeerStoryData.src, openPeerStoryData.author, `Сторис • ${openPeerStoryData.time}`);
+      } else {
+        const u = users.find(x => x.uid === openPeerUid);
+        if (u?.photoData) openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
+      }
     }
 
     /* ДРУЗЬЯ */
-    function getFriendStatus(otherUid) {
+    function getFriendRel(otherUid) {
       if (!currentUser) return { status: 'none' };
-      const req = friendRequests.find(r =>
-        (r.fromUid === currentUser.uid && r.toUid === otherUid) ||
-        (r.toUid === currentUser.uid && r.fromUid === otherUid)
+      const r = friendsDocs.find(x =>
+        (x.fromUid === currentUser.uid && x.toUid === otherUid) ||
+        (x.toUid === currentUser.uid && x.fromUid === otherUid)
       );
-      if (!req) return { status: 'none' };
-      if (req.status === 'accepted') return { status: 'accepted', id: req.id };
-      if (req.fromUid === currentUser.uid) return { status: 'outgoing', id: req.id };
-      return { status: 'incoming', id: req.id };
+      if (!r) return { status: 'none' };
+      if (r.status === 'accepted') return { status: 'accepted', id: r.id };
+      if (r.fromUid === currentUser.uid) return { status: 'outgoing', id: r.id };
+      return { status: 'incoming', id: r.id };
     }
 
-    function renderFriendsSection() {
-      const myBox = document.getElementById('myFriendsList');
-      const allBox = document.getElementById('allUsersForFriendsList');
-      if (!myBox || !allBox || !currentUser) return;
+    function renderFriendsTab() {
+      const myBox = document.getElementById('myFriendsBox');
+      const otherBox = document.getElementById('otherPeopleBox');
+      if (!myBox || !otherBox || !currentUser) return;
 
-      const others = cloudUsers.filter(u => u.uid !== currentUser.uid);
-      const friends = others.filter(u => getFriendStatus(u.uid).status === 'accepted');
+      const others = users.filter(u => u.uid !== currentUser.uid);
+      const myFriends = others.filter(u => getFriendRel(u.uid).status === 'accepted');
 
-      if (!friends.length) {
-        myBox.innerHTML = '<div class="meta">Список друзей пока пуст. Добавьте людей ниже.</div>';
+      if (!myFriends.length) {
+        myBox.innerHTML = '<div class="meta">Друзей пока нет. Добавьте людей ниже.</div>';
       } else {
-        myBox.innerHTML = friends.map(u => {
-          const name = u.fullName || 'Участник';
+        myBox.innerHTML = myFriends.map(u => {
+          const nm = u.fullName || 'Участник';
+          const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
           return `
-            <div class="list-row">
-              <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
-              <div style="display: flex; gap: 6px;">
-                <button class="btn btn-primary" style="padding: 7px 12px; font-size: 12.5px;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">Страница</button>
-                <button class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="startDirectChat('${u.uid}', '${escapeHtml(name)}')">Чат</button>
+            <div class="list-item">
+              <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">
+                <div class="mini-ava">${ava}</div>
+                <div class="user-name">${esc(nm)}</div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">Страница</button>
+                <button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openDirectChat('${esc(u.uid)}', '${esc(nm)}')">Чат</button>
               </div>
             </div>
           `;
         }).join('');
       }
 
-      const q = (document.getElementById('friendSearchInput')?.value || '').trim().toLowerCase();
-      const candidates = others.filter(u => {
-        const fs = getFriendStatus(u.uid);
-        if (fs.status === 'accepted') return false;
-        const name = (u.fullName || '').toLowerCase();
-        return !q || name.includes(q);
+      const q = (document.getElementById('searchPeopleInput')?.value || '').trim().toLowerCase();
+      const list = others.filter(u => {
+        if (getFriendRel(u.uid).status === 'accepted') return false;
+        return !q || (u.fullName || '').toLowerCase().includes(q);
       });
 
-      if (!candidates.length) {
-        allBox.innerHTML = '<div class="meta">Новых пользователей для добавления пока нет.</div>';
+      if (!list.length) {
+        otherBox.innerHTML = '<div class="meta">Новых пользователей пока нет.</div>';
       } else {
-        allBox.innerHTML = candidates.map(u => {
-          const name = u.fullName || 'Участник';
-          const fs = getFriendStatus(u.uid);
-          let actionHtml = `<button class="btn btn-primary" style="padding: 7px 12px; font-size: 13px;" onclick="sendFriendRequest('${u.uid}', '${escapeHtml(name)}')">Добавить</button>`;
-          if (fs.status === 'outgoing') {
-            actionHtml = `<span class="meta">Заявка отправлена</span>`;
-          } else if (fs.status === 'incoming') {
-            actionHtml = `
-              <button class="btn btn-mint" style="padding: 7px 11px; font-size: 13px;" onclick="acceptFriend('${fs.id}')">Принять</button>
-              <button class="btn btn-danger" style="padding: 7px 10px; font-size: 13px;" onclick="declineFriend('${fs.id}')">✕</button>
-            `;
-          }
+        otherBox.innerHTML = list.map(u => {
+          const nm = u.fullName || 'Участник';
+          const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
+          const rel = getFriendRel(u.uid);
+          let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(nm)}')">Добавить</button>`;
+          if (rel.status === 'outgoing') btn = `<span class="meta">Заявка отправлена</span>`;
+          else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${rel.id}')">Принять</button>`;
+
           return `
-            <div class="list-row">
-              <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
-              <div style="display: flex; gap: 6px; align-items: center;">${actionHtml}</div>
+            <div class="list-item">
+              <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">
+                <div class="mini-ava">${ava}</div>
+                <div class="user-name">${esc(nm)}</div>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">${btn}</div>
             </div>
           `;
         }).join('');
       }
     }
 
-    async function sendFriendRequest(toUid, toName) {
+    async function addFriend(toUid, toName) {
       if (!currentUser) return;
-      const reqId = [currentUser.uid, toUid].sort().join('_');
+      const id = [currentUser.uid, toUid].sort().join('_');
       try {
-        await setDoc(doc(db, 'friendRequests', reqId), {
+        await setDoc(doc(db, 'friendRequests', id), {
           fromUid: currentUser.uid,
-          fromName: getUserName(),
+          fromName: myDisplayName(),
           toUid,
           toName,
           status: 'pending',
           createdAt: serverTimestamp()
         });
-        showToast('Заявка в друзья отправлена');
+        toast('Заявка отправлена');
       } catch (e) {}
     }
 
-    async function acceptFriend(reqId) {
+    async function acceptFriendReq(id) {
       try {
-        await updateDoc(doc(db, 'friendRequests', reqId), { status: 'accepted' });
-        showToast('Добавлено в друзья');
-      } catch (e) {}
-    }
-
-    async function declineFriend(reqId) {
-      try {
-        await deleteDoc(doc(db, 'friendRequests', reqId));
+        await updateDoc(doc(db, 'friendRequests', id), { status: 'accepted' });
+        toast('Добавлено в друзья');
       } catch (e) {}
     }
 
     /* ГРУППЫ */
-    function renderGroupsSection() {
-      const box = document.getElementById('groupsList');
+    function renderGroupsTab() {
+      const box = document.getElementById('groupsBox');
       if (!box || !currentUser) return;
-      const groups = cloudChats.filter(c => c.type === 'group');
+      const groups = chats.filter(c => c.type === 'group');
       if (!groups.length) {
-        box.innerHTML = '<div class="meta">Групп пока нет. Нажмите «+ Создать группу», чтобы открыть первую.</div>';
+        box.innerHTML = '<div class="meta">Групп пока нет. Нажмите «+ Создать группу».</div>';
         return;
       }
       box.innerHTML = groups.map(g => {
-        const joined = Array.isArray(g.members) && g.members.includes(currentUser.uid);
+        const inGroup = Array.isArray(g.members) && g.members.includes(currentUser.uid);
         return `
-          <div class="list-row">
-            <div style="min-width: 0; flex: 1;">
-              <div style="font-weight: 700; font-size: 15px;">${escapeHtml(g.title || 'Группа')}</div>
-              <div class="meta">${escapeHtml(g.description || 'Открытая группа')}</div>
+          <div class="list-item">
+            <div style="min-width:0; flex:1;">
+              <div style="font-weight:700; font-size:15px;">${esc(g.title || 'Группа')}</div>
+              <div class="meta">${esc(g.description || 'Открытая группа')}</div>
             </div>
-            ${joined
-              ? `<button class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openChat('${g.id}', '${escapeHtml(g.title)}')">Открыть</button>`
-              : `<button class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="joinGroup('${g.id}', '${escapeHtml(g.title)}')">Войти</button>`}
+            ${inGroup
+              ? `<button type="button" class="btn btn-mint" style="padding:8px 13px; font-size:13px;" onclick="openChatRoom('${g.id}', '${esc(g.title)}')">Открыть</button>`
+              : `<button type="button" class="btn btn-primary" style="padding:8px 13px; font-size:13px;" onclick="joinChatGroup('${g.id}', '${esc(g.title)}')">Войти</button>`}
           </div>
         `;
       }).join('');
     }
 
-    function openCircleModal() {
-      document.getElementById('circleModal').classList.add('open');
+    function openCreateGroupModal() {
+      document.getElementById('createGroupModal').classList.add('open');
     }
 
-    async function createCircle() {
-      const title = document.getElementById('circleNameInput').value.trim();
-      const description = document.getElementById('circleDescInput').value.trim();
+    async function createNewGroup() {
+      const title = document.getElementById('groupTitleInput').value.trim();
+      const desc = document.getElementById('groupDescInput').value.trim();
       if (!title || !currentUser) {
-        showToast('Введите название группы');
+        toast('Введите название группы');
         return;
       }
       try {
         const ref = await addDoc(collection(db, 'chats'), {
           type: 'group',
           title,
-          description: description || 'Открытая группа SÄT',
+          description: desc || 'Открытая группа SÄT',
           creatorUid: currentUser.uid,
           members: [currentUser.uid],
           lastMessage: 'Группа создана',
           lastSenderUid: currentUser.uid,
           updatedAt: serverTimestamp()
         });
-        document.getElementById('circleNameInput').value = '';
-        document.getElementById('circleDescInput').value = '';
-        closeModalById('circleModal');
-        openChat(ref.id, title);
-      } catch (e) {
-        showToast('Не удалось создать группу');
-      }
-    }
-
-    async function joinGroup(chatId, title) {
-      if (!currentUser) return;
-      try {
-        await updateDoc(doc(db, 'chats', chatId), {
-          members: arrayUnion(currentUser.uid)
-        });
-        showToast('Вы вошли в группу');
-        openChat(chatId, title);
+        document.getElementById('groupTitleInput').value = '';
+        document.getElementById('groupDescInput').value = '';
+        hideModal('createGroupModal');
+        openChatRoom(ref.id, title);
       } catch (e) {}
     }
 
-    /* ЛИЧНЫЕ ДИАЛОГИ И ЧАТ ГРУПП */
-    async function startDirectChat(otherUid, otherName) {
-      if (!currentUser || !otherUid || otherUid === currentUser.uid) return;
-      const chatId = 'dm_' + [currentUser.uid, otherUid].sort().join('_');
+    async function joinChatGroup(id, title) {
+      if (!currentUser) return;
       try {
-        await setDoc(doc(db, 'chats', chatId), {
+        await updateDoc(doc(db, 'chats', id), { members: arrayUnion(currentUser.uid) });
+        openChatRoom(id, title);
+      } catch (e) {}
+    }
+
+    /* ЧАТ */
+    async function openDirectChat(otherUid, otherName) {
+      if (!currentUser || !otherUid || otherUid === currentUser.uid) return;
+      const id = 'dm_' + [currentUser.uid, otherUid].sort().join('_');
+      try {
+        await setDoc(doc(db, 'chats', id), {
           type: 'direct',
           members: [currentUser.uid, otherUid],
-          memberNames: {
-            [currentUser.uid]: getUserName(),
-            [otherUid]: otherName || 'Участник'
-          },
+          memberNames: { [currentUser.uid]: myDisplayName(), [otherUid]: otherName || 'Участник' },
           updatedAt: serverTimestamp()
         }, { merge: true });
-        openChat(chatId, otherName);
-      } catch (e) {
-        showToast('Не удалось открыть чат');
-      }
+        openChatRoom(id, otherName);
+      } catch (e) {}
     }
 
-    function openChat(chatId, fallbackTitle) {
-      state.activeChatId = chatId;
-      const chat = cloudChats.find(c => c.id === chatId);
-      document.getElementById('chatTitle').textContent = chat?.title || fallbackTitle || 'Чат';
-      document.getElementById('chatSubtitle').textContent = chat?.type === 'group' ? (chat.description || 'Группа') : 'Личный чат';
+    function openChatRoom(id, title) {
+      activeChatId = id;
+      const c = chats.find(x => x.id === id);
+      document.getElementById('chatHeaderTitle').textContent = c?.title || title || 'Чат';
+      document.getElementById('chatHeaderSub').textContent = c?.type === 'group' ? (c.description || 'Группа') : 'Личный чат';
 
-      if (activeMsgUnsub) activeMsgUnsub();
-      const msgQuery = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'asc'));
-      activeMsgUnsub = onSnapshot(msgQuery, (snap) => {
-        currentMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderChatMessages();
+      if (chatUnsub) chatUnsub();
+      const q = query(collection(db, 'chats', id, 'messages'), orderBy('createdAt', 'asc'));
+      chatUnsub = onSnapshot(q, (snap) => {
+        chatMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderChatBox();
       }, () => {});
-      document.getElementById('chatModal').classList.add('open');
+      document.getElementById('chatScreen').classList.add('open');
     }
 
-    function closeChatModal() {
-      if (activeMsgUnsub) { activeMsgUnsub(); activeMsgUnsub = null; }
-      state.activeChatId = null;
-      document.getElementById('chatModal').classList.remove('open');
+    function closeChat() {
+      if (chatUnsub) { chatUnsub(); chatUnsub = null; }
+      activeChatId = null;
+      document.getElementById('chatScreen').classList.remove('open');
     }
 
-    function renderChatMessages() {
-      const box = document.getElementById('chatMessages');
-      if (!currentMessages.length) {
-        box.innerHTML = '<div class="meta" style="text-align: center; padding: 14px;">Сообщений пока нет. Напишите первым.</div>';
+    function renderChatBox() {
+      const box = document.getElementById('chatMessagesBox');
+      if (!chatMsgs.length) {
+        box.innerHTML = '<div class="meta" style="text-align:center; padding:14px;">Сообщений пока нет. Напишите первым.</div>';
         return;
       }
-      box.innerHTML = currentMessages.map(m => {
-        const isMe = currentUser && m.senderUid === currentUser.uid;
+      box.innerHTML = chatMsgs.map(m => {
+        const mine = currentUser && m.senderUid === currentUser.uid;
         return `
-          <div class="msg ${isMe ? 'me' : 'them'}">
-            ${!isMe && m.senderName ? `<div class="msg-author">${escapeHtml(m.senderName)}</div>` : ''}
-            ${escapeHtml(m.text || '')}
+          <div class="msg ${mine ? 'me' : 'them'}">
+            ${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}
+            ${esc(m.text || '')}
           </div>
         `;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
 
-    async function sendChatMsg() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text || !state.activeChatId || !currentUser) return;
-      input.value = '';
+    async function sendMessage() {
+      const inp = document.getElementById('chatMsgInput');
+      const text = inp.value.trim();
+      if (!text || !activeChatId || !currentUser) return;
+      inp.value = '';
       try {
-        await addDoc(collection(db, 'chats', state.activeChatId, 'messages'), {
+        await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
           senderUid: currentUser.uid,
-          senderName: getUserName(),
+          senderName: myDisplayName(),
           kind: 'text',
           text,
           createdAt: serverTimestamp()
         });
-        await updateDoc(doc(db, 'chats', state.activeChatId), {
+        await updateDoc(doc(db, 'chats', activeChatId), {
           lastMessage: text,
           lastSenderUid: currentUser.uid,
           updatedAt: serverTimestamp()
@@ -2212,60 +2061,60 @@
       } catch (e) {}
     }
 
-    /* РЕДАКТИРОВАНИЕ ИМЕНИ */
-    function openEditNameModal() {
-      document.getElementById('editDisplayNameInput').value = getUserName();
-      document.getElementById('editNameModal').classList.add('open');
+    /* РЕДАКТИРОВАНИЕ ПРОФИЛЯ */
+    function openEditProfileModal() {
+      document.getElementById('editNameField').value = myDisplayName();
+      document.getElementById('editBioField').value = state.bio || '';
+      document.getElementById('editProfileModal').classList.add('open');
     }
 
-    async function saveNewName() {
-      const val = document.getElementById('editDisplayNameInput').value.trim();
-      if (!val) return;
-      state.displayName = val;
-      saveState();
-      await syncUserToCloud(currentUser);
-      renderProfileHeader();
-      closeModalById('editNameModal');
-      showToast('Имя обновлено');
+    async function saveProfileData() {
+      const n = document.getElementById('editNameField').value.trim();
+      const b = document.getElementById('editBioField').value.trim();
+      if (n) state.name = n;
+      state.bio = b;
+      persist();
+      await syncProfileCloud(currentUser);
+      renderMyProfile();
+      hideModal('editProfileModal');
+      toast('Сохранено');
     }
 
-    function closeModalById(id) {
+    function hideModal(id) {
       document.getElementById(id).classList.remove('open');
     }
 
-    function closeModals(e) {
-      if (e.target.classList.contains('modal-backdrop')) {
+    function closeBackdrop(e) {
+      if (e.target.classList.contains('modal-bg')) {
         e.target.classList.remove('open');
       }
     }
 
     Object.assign(window, {
-      unlockSoundAndGo, authGoogle, authLogout,
-      switchTab, setProfileSubtab,
-      openWallpapersModal, selectWallpaper,
-      openPhotoPicker, triggerCamera, triggerGallery, handlePickedImage,
-      openPhotoPreview, handleAvatarClick, viewMyStory, closeStoryViewer, deleteMyStory,
-      openCreatePostModal, setPostDestination, clearPostPhoto, publishPost, confirmPost, deletePost,
-      openUserProfile, closePeerPage, openPeerStory,
-      sendFriendRequest, acceptFriend, declineFriend,
-      openCircleModal, createCircle, joinGroup,
-      startDirectChat, openChat, closeChatModal, sendChatMsg,
-      openEditNameModal, saveNewName,
-      closeModalById, closeModals
+      enterAppFlow, loginWithGoogle, logoutUser,
+      switchMainTab, switchMySubtab,
+      openWallpapers, pickWallpaper,
+      openPhotoPicker, startCamera, startGallery, onImageChosen,
+      onMyAvatarTap, viewOwnStory, removeOwnStory,
+      openImageViewer, closeFullViewer,
+      openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
+      likePost, removePost,
+      openPersonPage, closePeerScreen, switchPeerSubtab, openPeerStoryViewer,
+      addFriend, acceptFriendReq,
+      openCreateGroupModal, createNewGroup, joinChatGroup,
+      openDirectChat, openChatRoom, closeChat, sendMessage,
+      openEditProfileModal, saveProfileData,
+      hideModal, closeBackdrop
     });
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((regs) => {
-        regs.forEach((r) => r.unregister());
-      }).catch(() => {});
+      navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister())).catch(() => {});
     }
     if ('caches' in window) {
-      caches.keys().then((keys) => {
-        keys.forEach((k) => caches.delete(k));
-      }).catch(() => {});
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k))).catch(() => {});
     }
 
-    applyWallpaper(state.wallpaperId);
+    applyWallpaper(state.wpId);
   </script>
 </body>
 </html>

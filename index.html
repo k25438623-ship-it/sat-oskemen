@@ -594,6 +594,7 @@
     }
     #photoPickerModal { z-index: 80; }
     #captionBox { z-index: 85; }
+    #avatarChoiceModal { z-index: 90; }
 
     .viewer-screen {
       position: fixed;
@@ -604,16 +605,32 @@
       display: none;
       flex-direction: column;
       justify-content: space-between;
-      padding: 18px 16px 28px;
+      padding: 18px 16px 24px;
     }
     .viewer-screen.open { display: flex; }
+    .viewer-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 10px 0;
+    }
     .viewer-screen img {
       max-width: 100%;
-      max-height: 74vh;
+      max-height: 68vh;
       object-fit: contain;
       border-radius: 16px;
-      margin: auto;
-      pointer-events: none;
+      transition: transform 0.18s ease;
+      transform-origin: center center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .viewer-zoom-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
     }
 
     .chat-screen {
@@ -1179,7 +1196,7 @@
     <div class="container">
       <div class="card">
         <div class="profile-top">
-          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerAvatarViewer(event)">
+          <div id="peerAvatarRing" class="ava-ring" onclick="onPeerAvatarTap(event)">
             <div id="peerAvatarCircle" class="ava-circle">Ä</div>
           </div>
           <div style="min-width: 0; flex: 1;">
@@ -1222,6 +1239,16 @@
       </div>
     </div>
   </section>
+
+  <!-- Выбор: посмотреть фото профиля или сторис -->
+  <div id="avatarChoiceModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="avatarChoiceTitle" style="margin: 0 0 6px; font-size: 18px;">Что открыть?</h3>
+      <p id="avatarChoiceSub" class="meta" style="margin: 0 0 14px;">Выберите, что посмотреть</p>
+      <div id="avatarChoiceButtons" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      <button type="button" class="btn btn-ghost" style="width: 100%; margin-top: 10px;" onclick="hideModal('avatarChoiceModal')">Отмена</button>
+    </div>
+  </div>
 
   <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;" onchange="onImageChosen(event)" />
   <input type="file" id="galInput" accept="image/*" style="display: none;" onchange="onImageChosen(event)" />
@@ -1366,7 +1393,7 @@
     </div>
   </div>
 
-  <div id="fullViewer" class="viewer-screen" onclick="closeFullViewer()">
+  <div id="fullViewer" class="viewer-screen">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div>
         <div id="viewerTitle" style="font-weight: 800; font-size: 16px;">Фото</div>
@@ -1374,8 +1401,15 @@
       </div>
       <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
     </div>
-    <img id="viewerImage" src="" alt="" />
-    <div style="text-align: center; font-size: 13px; opacity: 0.75;">Нажмите в любое место, чтобы закрыть</div>
+    <div class="viewer-stage" onclick="onViewerStageTap(event)">
+      <img id="viewerImage" src="" alt="" draggable="false" />
+    </div>
+    <div class="viewer-zoom-bar">
+      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="zoomViewer(0.35)">Увеличить (+)</button>
+      <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 13.5px;" onclick="resetViewerZoom()">100%</button>
+      <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="zoomViewer(-0.35)">Уменьшить (−)</button>
+    </div>
+    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Масштаб: 100% • Нажмите дважды для увеличения</div>
   </div>
 
   <div id="chatScreen" class="chat-screen">
@@ -1553,7 +1587,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v12';
+    const STORE_KEY = 'sat_clean_state_v13';
 
     let state = {
       name: '',
@@ -1575,7 +1609,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v11') || localStorage.getItem('sat_clean_state_v10') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v12') || localStorage.getItem('sat_clean_state_v11') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
@@ -1637,6 +1671,20 @@
       persist();
     }
 
+    async function saveChatPhotoToGallery(msgId, ev) {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+      const m = chatMsgs.find(x => x.id === msgId);
+      if (!m?.photoData) return;
+      const senderLabel = m.senderName ? `Из чата: ${m.senderName}` : 'Из чата';
+      addSavedPhoto(m.photoData, senderLabel);
+      renderMyProfile();
+      await syncProfileCloud(currentUser);
+      toast('Фото сохранено в галерею');
+    }
+
     async function deleteGalleryPhoto(idx, ev) {
       if (ev) {
         ev.preventDefault();
@@ -1695,6 +1743,9 @@
     let editingMsgId = null;
     let studioTab = 'inbox';
     let studioCollapsed = false;
+
+    let viewerZoom = 1;
+    let lastViewerTap = 0;
 
     const openCommentsPostIds = new Set();
     const commentsByPostId = new Map();
@@ -2569,13 +2620,47 @@
       }
     }
 
-    function onMyAvatarTap() {
-      const ava = myAvatarUrl();
-      if (ava) {
-        openImageViewer(ava, myDisplayName(), 'Фото профиля');
-      } else {
-        openPhotoPicker('avatar');
+    function showAvatarChoiceModal({ title, sub, avatarSrc, avatarTitle, avatarSub, storySrc, storyTitle, storySub }) {
+      const btns = [];
+      if (avatarSrc) {
+        btns.push(`<button type="button" class="btn btn-primary" style="width:100%; padding:13px;" onclick="pickChoiceAndOpen('${esc(avatarSrc)}', '${esc(avatarTitle)}', '${esc(avatarSub)}')">Посмотреть фотографию профиля</button>`);
       }
+      if (storySrc) {
+        btns.push(`<button type="button" class="btn btn-mint" style="width:100%; padding:13px;" onclick="pickChoiceAndOpen('${esc(storySrc)}', '${esc(storyTitle)}', '${esc(storySub)}')">Посмотреть сторис</button>`);
+      }
+      if (!btns.length) {
+        toast('Фото профиля и сторис пока не добавлены');
+        return;
+      }
+      document.getElementById('avatarChoiceTitle').textContent = title || 'Что открыть?';
+      document.getElementById('avatarChoiceSub').textContent = sub || 'Выберите, что посмотреть';
+      document.getElementById('avatarChoiceButtons').innerHTML = btns.join('');
+      document.getElementById('avatarChoiceModal').classList.add('open');
+    }
+
+    function pickChoiceAndOpen(src, title, sub) {
+      hideModal('avatarChoiceModal');
+      openImageViewer(src, title, sub);
+    }
+
+    function onMyAvatarTap() {
+      checkOwnStoryExpiry();
+      const hasStory = Boolean(state.story && storyAlive(state.story, state.storyEnd));
+      const ava = myAvatarUrl();
+      if (!ava && !hasStory) {
+        openPhotoPicker('avatar');
+        return;
+      }
+      showAvatarChoiceModal({
+        title: myDisplayName(),
+        sub: hasStory && ava ? 'У вас есть фото профиля и активная сторис' : (hasStory ? 'Активна сторис (до 3 ч)' : 'Фото профиля'),
+        avatarSrc: ava,
+        avatarTitle: myDisplayName(),
+        avatarSub: 'Фото профиля',
+        storySrc: hasStory ? state.story : '',
+        storyTitle: myDisplayName(),
+        storySub: `Сторис • ${state.storyLabel}`
+      });
     }
 
     function viewOwnStory() {
@@ -2595,15 +2680,46 @@
       toast('Сторис удалена');
     }
 
+    function applyViewerZoom(val) {
+      viewerZoom = Math.min(3.5, Math.max(1, Number(val.toFixed(2))));
+      const img = document.getElementById('viewerImage');
+      const lbl = document.getElementById('viewerScaleLabel');
+      if (img) img.style.transform = `scale(${viewerZoom})`;
+      if (lbl) lbl.textContent = `Масштаб: ${Math.round(viewerZoom * 100)}% • Нажмите дважды для увеличения`;
+    }
+
+    function zoomViewer(delta) {
+      applyViewerZoom(viewerZoom + delta);
+    }
+
+    function resetViewerZoom() {
+      applyViewerZoom(1);
+    }
+
+    function onViewerStageTap(ev) {
+      if (ev.target.tagName !== 'IMG') {
+        closeFullViewer();
+        return;
+      }
+      ev.stopPropagation();
+      const now = Date.now();
+      if (now - lastViewerTap < 320) {
+        applyViewerZoom(viewerZoom > 1.05 ? 1 : 2);
+      }
+      lastViewerTap = now;
+    }
+
     function openImageViewer(src, title, sub) {
       if (!src) return;
       document.getElementById('viewerTitle').textContent = title || 'Фото';
       document.getElementById('viewerSub').textContent = sub || '';
       document.getElementById('viewerImage').src = src;
+      applyViewerZoom(1);
       document.getElementById('fullViewer').classList.add('open');
     }
 
     function closeFullViewer() {
+      applyViewerZoom(1);
       document.getElementById('fullViewer').classList.remove('open');
     }
 
@@ -3090,17 +3206,25 @@
       `;
     }
 
-    function openPeerAvatarViewer(ev) {
+    function onPeerAvatarTap(ev) {
       if (ev) {
         ev.preventDefault();
         ev.stopPropagation();
       }
-      const u = users.find(x => x.uid === openPeerUid);
-      if (u?.photoData) {
-        openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
-      } else {
-        toast('Фото профиля не установлено');
-      }
+      const u = users.find(x => x.uid === openPeerUid) || {};
+      const name = u.fullName || openPeerName || 'Участник';
+      const avaSrc = u.photoData || '';
+      const hasStory = Boolean(openPeerStoryData && openPeerStoryData.src);
+      showAvatarChoiceModal({
+        title: name,
+        sub: hasStory && avaSrc ? 'Выберите, что посмотреть' : (hasStory ? 'Активна сторис (до 3 ч)' : 'Фото профиля'),
+        avatarSrc: avaSrc,
+        avatarTitle: name,
+        avatarSub: 'Фото профиля',
+        storySrc: hasStory ? openPeerStoryData.src : '',
+        storyTitle: name,
+        storySub: `Сторис • ${openPeerStoryData?.time || ''}`
+      });
     }
 
     function openPeerStoryViewer(ev) {
@@ -3481,6 +3605,9 @@
         return;
       }
       const myUid = getMyUid();
+      const curChat = chats.find(x => x.id === activeChatId);
+      const isDirectChat = curChat?.type === 'direct' || (curChat?.id && String(curChat.id).startsWith('dm_'));
+
       box.innerHTML = chatMsgs.map(m => {
         const mine = Boolean(myUid && m.senderUid === myUid) || String(m.id).startsWith('tmp_');
         const whoHtml = (!mine && m.senderName) ? `<div class="msg-who">${esc(m.senderName)}</div>` : '';
@@ -3497,10 +3624,14 @@
           : '';
 
         if (m.kind === 'photo' && m.photoData) {
+          const saveBtnHtml = (!mine && isDirectChat)
+            ? `<div class="msg-tools"><button type="button" class="msg-tool-btn" onclick="saveChatPhotoToGallery('${esc(m.id)}', event)">В галерею</button></div>`
+            : '';
           return `
             <div class="msg ${mine ? 'me' : 'them'}">
               ${whoHtml}
               <img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(msgMs))}')" />
+              ${saveBtnHtml}
               ${metaRow}
               ${toolsHtml}
             </div>
@@ -4126,12 +4257,12 @@
       toggleStudioSection, switchStudioTab, clearRecordedErrors,
       openSupportModal, submitSupportTicket, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
-      deleteGalleryPhoto, askPhotoCaption, applyCaptionNow,
-      onMyAvatarTap, viewOwnStory, removeOwnStory,
-      openImageViewer, closeFullViewer,
+      deleteGalleryPhoto, saveChatPhotoToGallery, askPhotoCaption, applyCaptionNow,
+      onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
+      openImageViewer, closeFullViewer, zoomViewer, resetViewerZoom, onViewerStageTap,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       giveKarma, toggleCommentsPanel, addPostComment, removePost,
-      openPersonPage, closePeerScreen, switchPeerSubtab, openPeerAvatarViewer, openPeerStoryViewer,
+      openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,

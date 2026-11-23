@@ -1007,7 +1007,7 @@
           <div class="profile-top">
             <div id="myAvatarRing" class="ava-ring" onclick="onMyAvatarTap()">
               <div id="myAvatarBox" class="ava-circle">Ä</div>
-              <div class="ava-cam">
+              <div class="ava-cam" onclick="event.stopPropagation(); openPhotoPicker('avatar')">
                 <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               </div>
             </div>
@@ -1179,14 +1179,14 @@
     <div class="container">
       <div class="card">
         <div class="profile-top">
-          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerStoryViewer(event)">
+          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerAvatarViewer(event)">
             <div id="peerAvatarCircle" class="ava-circle">Ä</div>
           </div>
           <div style="min-width: 0; flex: 1;">
             <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
             <div id="peerAboutLine" class="meta" style="margin-top: 4px;">Участник SÄT</div>
-            <div id="peerStoryTag" style="display: none; margin-top: 6px;">
-              <span class="tag" style="cursor: pointer;" onclick="openPeerStoryViewer(event)">Активная сторис (до 3 ч)</span>
+            <div id="peerStoryTag" style="display: none; margin-top: 8px;">
+              <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
             </div>
           </div>
         </div>
@@ -1553,7 +1553,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v11';
+    const STORE_KEY = 'sat_clean_state_v12';
 
     let state = {
       name: '',
@@ -1575,7 +1575,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v10') || localStorage.getItem('sat_clean_state_v9') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v11') || localStorage.getItem('sat_clean_state_v10') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
@@ -2272,7 +2272,7 @@
 
     function openSupportModal() {
       const creator = isCreatorAccount();
-      document.getElementById('supportModalTitle').textContent = creator ? 'Предложения и поддержка' : 'Предложения и поддержка';
+      document.getElementById('supportModalTitle').textContent = 'Предложения и поддержка';
       document.getElementById('supportModalSub').textContent = creator
         ? 'Напишите сообщение или посмотрите обращения пользователей'
         : 'Напишите, что добавить, что изменить или задайте вопрос';
@@ -2570,9 +2570,9 @@
     }
 
     function onMyAvatarTap() {
-      checkOwnStoryExpiry();
-      if (state.story && storyAlive(state.story, state.storyEnd)) {
-        viewOwnStory();
+      const ava = myAvatarUrl();
+      if (ava) {
+        openImageViewer(ava, myDisplayName(), 'Фото профиля');
       } else {
         openPhotoPicker('avatar');
       }
@@ -3090,6 +3090,19 @@
       `;
     }
 
+    function openPeerAvatarViewer(ev) {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
+      const u = users.find(x => x.uid === openPeerUid);
+      if (u?.photoData) {
+        openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
+      } else {
+        toast('Фото профиля не установлено');
+      }
+    }
+
     function openPeerStoryViewer(ev) {
       if (ev) {
         ev.preventDefault();
@@ -3098,12 +3111,7 @@
       if (openPeerStoryData) {
         openImageViewer(openPeerStoryData.src, openPeerStoryData.author, `Сторис • ${openPeerStoryData.time}`);
       } else {
-        const u = users.find(x => x.uid === openPeerUid);
-        if (u?.photoData) {
-          openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
-        } else {
-          toast('Сторис пока нет');
-        }
+        toast('Сторис пока нет');
       }
     }
 
@@ -4123,7 +4131,7 @@
       openImageViewer, closeFullViewer,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       giveKarma, toggleCommentsPanel, addPostComment, removePost,
-      openPersonPage, closePeerScreen, switchPeerSubtab, openPeerStoryViewer,
+      openPersonPage, closePeerScreen, switchPeerSubtab, openPeerAvatarViewer, openPeerStoryViewer,
       refreshFriendsView, addFriend, acceptFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,

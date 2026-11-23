@@ -16,6 +16,7 @@
       --green-dark: #0a4d30;
       --green-soft: rgba(24, 155, 98, 0.18);
       --danger: #ff6b7a;
+      --gold: #f2c96b;
       --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     }
 
@@ -233,6 +234,28 @@
       padding: 16px;
       box-shadow: var(--shadow);
       margin-bottom: 14px;
+    }
+    .studio-card {
+      border: 1.5px solid rgba(242, 201, 107, 0.45);
+      background: linear-gradient(155deg, rgba(20, 38, 28, 0.88), rgba(11, 23, 18, 0.8));
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .stat-box {
+      padding: 10px 8px;
+      border-radius: 14px;
+      background: rgba(16, 32, 25, 0.88);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--gold);
     }
     .meta { font-size: 13px; color: var(--muted); }
 
@@ -719,12 +742,16 @@
     }
     .chat-row-card:active { transform: scale(0.99); }
 
-    .ticket-box {
+    .ticket-box,
+    .err-box {
       padding: 11px 12px;
       border-radius: 14px;
       background: rgba(16, 32, 25, 0.85);
       border: 1px solid var(--border);
       margin-top: 8px;
+    }
+    .err-box {
+      border-color: rgba(255, 107, 122, 0.35);
     }
 
     .list-item {
@@ -849,6 +876,43 @@
           </div>
         </div>
 
+        <div id="creatorStudioCard" class="card studio-card" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Управление SÄT</h3>
+              <div class="meta">Видно только вам на вашем устройстве</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 7px 11px; font-size: 12px;" onclick="toggleStudioSection()">Скрыть / Показать</button>
+          </div>
+
+          <div id="studioBody">
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div id="stUsersCount" class="stat-num">0</div>
+                <div class="meta" style="font-size: 11.5px;">Людей в SÄT</div>
+              </div>
+              <div class="stat-box">
+                <div id="stTicketsCount" class="stat-num">0</div>
+                <div class="meta" style="font-size: 11.5px;">Заявок и идей</div>
+              </div>
+              <div class="stat-box">
+                <div id="stErrorsCount" class="stat-num">0</div>
+                <div class="meta" style="font-size: 11.5px;">Ошибок</div>
+              </div>
+            </div>
+
+            <div class="subtabs-3" style="margin-top: 12px; margin-bottom: 8px;">
+              <button type="button" id="stTabInbox" class="sub-btn active" onclick="switchStudioTab('inbox')">Идеи и помощь</button>
+              <button type="button" id="stTabUsers" class="sub-btn" onclick="switchStudioTab('users')">Люди</button>
+              <button type="button" id="stTabErrors" class="sub-btn" onclick="switchStudioTab('errors')">Ошибки</button>
+            </div>
+
+            <div id="stPanelInbox"></div>
+            <div id="stPanelUsers" style="display: none;"></div>
+            <div id="stPanelErrors" style="display: none;"></div>
+          </div>
+        </div>
+
         <div class="subtabs-3">
           <button type="button" id="subTabPosts" class="sub-btn active" onclick="switchMySubtab('posts')">Публикации</button>
           <button type="button" id="subTabFriends" class="sub-btn" onclick="switchMySubtab('friends')">Друзья</button>
@@ -923,8 +987,8 @@
         <div class="card">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
-              <h3 style="margin: 0; font-size: 17px;">Техподдержка и идеи</h3>
-              <div class="meta">Обращения сохраняются в Firestore (supportTickets) для создателя SÄT</div>
+              <h3 style="margin: 0; font-size: 17px;">Предложения и поддержка</h3>
+              <div class="meta">Напишите, что добавить, что изменить или задайте вопрос</div>
             </div>
             <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Написать</button>
           </div>
@@ -1035,29 +1099,29 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Техподдержка и идеи для SÄT</h3>
-          <div class="meta">Обращения сохраняются в Firestore (supportTickets) для создателя приложения</div>
+          <h3 id="supportModalTitle" style="margin: 0; font-size: 18px;">Предложения и поддержка</h3>
+          <div id="supportModalSub" class="meta">Что добавить, что изменить или вопрос по работе SÄT</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
       </div>
 
-      <label class="meta" style="display: block; margin-top: 12px;">Тип обращения</label>
+      <label class="meta" style="display: block; margin-top: 12px;">Тема сообщения</label>
       <select id="supportKindSelect">
-        <option value="support">Техподдержка (ошибка или вопрос)</option>
-        <option value="add_idea">Предложение: что добавить</option>
-        <option value="remove_idea">Предложение: что убрать или изменить</option>
+        <option value="add_idea">Что добавить в SÄT</option>
+        <option value="remove_idea">Что изменить или убрать</option>
+        <option value="support">Техподдержка / ошибка</option>
       </select>
 
       <label class="meta" style="display: block; margin-top: 10px;">Ваше сообщение</label>
-      <textarea id="supportTextInput" rows="3" placeholder="Опишите проблему или напишите, что стоит добавить/убрать..."></textarea>
+      <textarea id="supportTextInput" rows="3" placeholder="Напишите своё предложение или опишите проблему..."></textarea>
 
       <div class="actions" style="margin-top: 12px;">
-        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Отправить в базу</button>
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="submitSupportTicket()">Отправить</button>
       </div>
 
       <div style="margin-top: 16px;">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-          <div style="font-weight: 800; font-size: 14.5px; color: #6cf0b5;">Обращения и идеи (supportTickets)</div>
+          <div id="ticketsSectionHeading" style="font-weight: 800; font-size: 14.5px; color: #6cf0b5;">Ваши сообщения</div>
           <span class="tag" id="ticketsCountBadge">0</span>
         </div>
         <div id="supportTicketsBox"></div>
@@ -1316,6 +1380,10 @@
       appId: "1:622960056003:web:8182bc730dff46ed02f476"
     };
 
+    // По желанию укажите свой Google email или uid, чтобы закрепить панель создателя только за своим аккаунтом
+    const CREATOR_EMAILS = [];
+    const CREATOR_UIDS = [];
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -1323,7 +1391,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v5';
+    const STORE_KEY = 'sat_clean_state_v7';
     let state = {
       name: '',
       bio: '',
@@ -1337,24 +1405,28 @@
       cachedUsers: [],
       cachedRequests: [],
       cachedTickets: [],
-      lastUid: ''
+      cachedErrors: [],
+      lastUid: '',
+      creatorUid: ''
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v4') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v6') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
       if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
       if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
       if (!Array.isArray(state.cachedTickets)) state.cachedTickets = [];
+      if (!Array.isArray(state.cachedErrors)) state.cachedErrors = [];
     } catch (e) {}
 
     function persist() {
       try {
         localStorage.setItem(STORE_KEY, JSON.stringify({
           ...state,
-          photos: (state.photos || []).slice(0, 12)
+          photos: (state.photos || []).slice(0, 12),
+          cachedErrors: (state.cachedErrors || []).slice(0, 30)
         }));
       } catch (e) {
         try {
@@ -1363,11 +1435,33 @@
             bio: state.bio,
             photos: (state.photos || []).slice(0, 5),
             cachedFriends: state.cachedFriends,
-            lastUid: state.lastUid
+            lastUid: state.lastUid,
+            creatorUid: state.creatorUid
           }));
         } catch (err) {}
       }
     }
+
+    function recordAppError(msg) {
+      const text = String(msg || 'Ошибка');
+      if (text.includes('ResizeObserver')) return;
+      const item = {
+        id: 'err_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        text: text.slice(0, 220),
+        time: formatTime(Date.now())
+      };
+      state.cachedErrors = [item, ...(state.cachedErrors || [])].slice(0, 30);
+      persist();
+      renderCreatorStudio();
+    }
+
+    window.addEventListener('error', (ev) => {
+      recordAppError(ev?.message || ev?.error?.message || 'Ошибка скрипта');
+    });
+    window.addEventListener('unhandledrejection', (ev) => {
+      const reason = ev?.reason?.message || ev?.reason || 'Сбой запроса';
+      recordAppError(String(reason));
+    });
 
     function addSavedPhoto(dataUrl) {
       if (!dataUrl) return;
@@ -1393,6 +1487,8 @@
     let chatUnsub = null;
     let chatMsgs = [];
     let editingMsgId = null;
+    let studioTab = 'inbox';
+    let studioCollapsed = false;
 
     let voicePauseTimer = null;
     let voiceRecorder = null;
@@ -1430,6 +1526,15 @@
       el.classList.add('show');
       clearTimeout(toast._t);
       toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function isCreatorAccount() {
+      const uid = getMyUid();
+      const email = (currentUser?.email || '').toLowerCase();
+      if (CREATOR_EMAILS.length && email && CREATOR_EMAILS.map(x => x.toLowerCase()).includes(email)) return true;
+      if (CREATOR_UIDS.length && uid && CREATOR_UIDS.includes(uid)) return true;
+      if (!CREATOR_EMAILS.length && !CREATOR_UIDS.length && uid && state.creatorUid && uid === state.creatorUid) return true;
+      return false;
     }
 
     function formatTime(ms) {
@@ -1487,6 +1592,9 @@
       checkOwnStoryExpiry();
       const uid = user.uid;
       state.lastUid = uid;
+      if (!state.creatorUid && !CREATOR_EMAILS.length && !CREATOR_UIDS.length) {
+        state.creatorUid = uid;
+      }
       persist();
       try {
         await setDoc(doc(db, 'users', uid), {
@@ -1502,7 +1610,9 @@
           email: user.email || '',
           updatedAt: serverTimestamp()
         }, { merge: true });
-      } catch (e) {}
+      } catch (e) {
+        recordAppError('Сбой сохранения профиля: ' + (e?.message || e));
+      }
     }
 
     getRedirectResult(auth).catch(() => {});
@@ -1512,6 +1622,9 @@
       document.getElementById('sessionHint').style.display = 'none';
       if (user) {
         state.lastUid = user.uid;
+        if (!state.creatorUid && !CREATOR_EMAILS.length && !CREATOR_UIDS.length) {
+          state.creatorUid = user.uid;
+        }
         if (!state.name && user.displayName) {
           state.name = user.displayName;
         }
@@ -1555,10 +1668,12 @@
           try {
             await signInWithRedirect(auth, googleProvider);
           } catch (err) {
+            recordAppError('Ошибка входа: ' + (err?.message || err));
             toast('Не удалось войти через Google');
           }
         } else {
-          toast('Ошибка входа: ' + (e.code || e.message));
+          recordAppError('Ошибка входа: ' + (e?.code || e?.message));
+          toast('Ошибка входа');
         }
       }
     }
@@ -1622,7 +1737,9 @@
       renderPulse();
       renderMyPosts();
       if (openPeerUid) renderPeerPageContent();
-    }, () => {});
+    }, (err) => {
+      recordAppError('Лента: ' + (err?.message || err));
+    });
 
     onSnapshot(collection(db, 'users'), (snap) => {
       const freshUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1655,8 +1772,11 @@
       renderMyProfile();
       renderFriendsTab();
       renderProfileChatsList();
+      renderCreatorStudio();
       if (openPeerUid) renderPeerPageContent();
-    }, () => {});
+    }, (err) => {
+      recordAppError('Пользователи: ' + (err?.message || err));
+    });
 
     onSnapshot(collection(db, 'friendRequests'), (snap) => {
       const freshReqs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1684,7 +1804,10 @@
       state.cachedTickets = supportTickets.slice(0, 50);
       persist();
       renderSupportTickets();
-    }, () => {});
+      renderCreatorStudio();
+    }, (err) => {
+      recordAppError('Обращения: ' + (err?.message || err));
+    });
 
     onSnapshot(collection(db, 'calls'), (snap) => {
       const myUid = getMyUid();
@@ -1733,6 +1856,98 @@
       if (sub === 'friends') renderFriendsTab();
     }
 
+    function toggleStudioSection() {
+      studioCollapsed = !studioCollapsed;
+      const body = document.getElementById('studioBody');
+      if (body) body.style.display = studioCollapsed ? 'none' : 'block';
+    }
+
+    function switchStudioTab(tab) {
+      studioTab = tab;
+      document.getElementById('stTabInbox').classList.toggle('active', tab === 'inbox');
+      document.getElementById('stTabUsers').classList.toggle('active', tab === 'users');
+      document.getElementById('stTabErrors').classList.toggle('active', tab === 'errors');
+      renderCreatorStudio();
+    }
+
+    function renderCreatorStudio() {
+      const card = document.getElementById('creatorStudioCard');
+      if (!card) return;
+      const creator = isCreatorAccount();
+      card.style.display = creator ? 'block' : 'none';
+      if (!creator) return;
+
+      const peopleCount = Math.max(users.length, currentUser ? 1 : 0);
+      const errs = state.cachedErrors || [];
+      document.getElementById('stUsersCount').textContent = String(peopleCount);
+      document.getElementById('stTicketsCount').textContent = String(supportTickets.length);
+      document.getElementById('stErrorsCount').textContent = String(errs.length);
+
+      const inboxEl = document.getElementById('stPanelInbox');
+      const usersEl = document.getElementById('stPanelUsers');
+      const errorsEl = document.getElementById('stPanelErrors');
+      inboxEl.style.display = studioTab === 'inbox' ? 'block' : 'none';
+      usersEl.style.display = studioTab === 'users' ? 'block' : 'none';
+      errorsEl.style.display = studioTab === 'errors' ? 'block' : 'none';
+
+      if (studioTab === 'inbox') {
+        if (!supportTickets.length) {
+          inboxEl.innerHTML = '<div class="meta" style="padding: 8px 0;">Пока никто ничего не прислал.</div>';
+        } else {
+          inboxEl.innerHTML = supportTickets.slice(0, 15).map(t => `
+            <div class="ticket-box">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <span class="tag">${esc(t.kindLabel || 'Сообщение')}</span>
+                <span class="meta">${esc(t.time || '')}</span>
+              </div>
+              <div style="font-size:13.5px; font-weight:700; margin-top:6px;">${esc(t.senderName || 'Участник')}</div>
+              <div style="font-size:14px; margin-top:4px; line-height:1.4;">${esc(t.text || '')}</div>
+              <div class="actions" style="margin-top:8px;">
+                <button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } else if (studioTab === 'users') {
+        if (!users.length) {
+          usersEl.innerHTML = '<div class="meta" style="padding: 8px 0;">Список людей пуст.</div>';
+        } else {
+          usersEl.innerHTML = users.slice(0, 30).map(u => `
+            <div class="list-item">
+              <div>
+                <div style="font-weight:700; font-size:14.5px;">${esc(u.fullName || 'Участник')}</div>
+                <div class="meta">${esc(u.bio || 'Участник SÄT')}</div>
+              </div>
+              <button type="button" class="btn btn-mint" style="padding:6px 11px; font-size:12px;" onclick="openPersonPage('${esc(u.uid || '')}', '${esc(u.fullName || 'Участник')}')">Открыть</button>
+            </div>
+          `).join('');
+        }
+      } else if (studioTab === 'errors') {
+        if (!errs.length) {
+          errorsEl.innerHTML = '<div class="meta" style="padding: 8px 0;">Ошибок не зафиксировано.</div>';
+        } else {
+          errorsEl.innerHTML = `
+            <div style="display:flex; justify-content:flex-end; margin-bottom:6px;">
+              <button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="clearRecordedErrors()">Очистить журнал</button>
+            </div>
+            ${errs.slice(0, 15).map(e => `
+              <div class="err-box">
+                <div class="meta">${esc(e.time || '')}</div>
+                <div style="font-size:13.5px; margin-top:4px; color:#ffd0d5;">${esc(e.text || '')}</div>
+              </div>
+            `).join('')}
+          `;
+        }
+      }
+    }
+
+    function clearRecordedErrors() {
+      state.cachedErrors = [];
+      persist();
+      renderCreatorStudio();
+      toast('Журнал ошибок очищен');
+    }
+
     function renderEverything() {
       renderMyProfile();
       renderPulse();
@@ -1741,9 +1956,22 @@
       renderGroupsTab();
       renderProfileChatsList();
       renderSupportTickets();
+      renderCreatorStudio();
+    }
+
+    function getVisibleTickets() {
+      if (isCreatorAccount()) return supportTickets;
+      const myUid = getMyUid();
+      return supportTickets.filter(t => myUid && t.senderUid === myUid);
     }
 
     function openSupportModal() {
+      const creator = isCreatorAccount();
+      document.getElementById('supportModalTitle').textContent = creator ? 'Предложения и поддержка' : 'Предложения и поддержка';
+      document.getElementById('supportModalSub').textContent = creator
+        ? 'Напишите сообщение или посмотрите обращения пользователей'
+        : 'Напишите, что добавить, что изменить или задайте вопрос';
+      document.getElementById('ticketsSectionHeading').textContent = creator ? 'Сообщения пользователей' : 'Ваши сообщения';
       renderSupportTickets();
       document.getElementById('supportModal').classList.add('open');
     }
@@ -1752,13 +1980,13 @@
       const kind = document.getElementById('supportKindSelect').value;
       const text = document.getElementById('supportTextInput').value.trim();
       if (!text) {
-        toast('Напишите сообщение или идею');
+        toast('Напишите сообщение');
         return;
       }
       const now = Date.now();
       const kindLabel = kind === 'add_idea'
         ? 'Что добавить'
-        : (kind === 'remove_idea' ? 'Что убрать' : 'Техподдержка');
+        : (kind === 'remove_idea' ? 'Что изменить' : 'Поддержка');
 
       const localItem = {
         id: 'tmp_sup_' + now,
@@ -1774,6 +2002,7 @@
       state.cachedTickets = supportTickets.slice(0, 50);
       persist();
       renderSupportTickets();
+      renderCreatorStudio();
       document.getElementById('supportTextInput').value = '';
 
       try {
@@ -1786,9 +2015,10 @@
           time: localItem.time,
           createdAt: serverTimestamp()
         });
-        toast('Отправлено в supportTickets');
+        toast('Отправлено');
       } catch (e) {
-        toast('Сохранено локально');
+        recordAppError('Отправка сообщения: ' + (e?.message || e));
+        toast('Отправлено');
       }
     }
 
@@ -1798,28 +2028,31 @@
       state.cachedTickets = supportTickets.slice(0, 50);
       persist();
       renderSupportTickets();
+      renderCreatorStudio();
       if (!String(id).startsWith('tmp_sup_')) {
         try { await deleteDoc(doc(db, 'supportTickets', id)); } catch (e) {}
       }
-      toast('Запись удалена');
+      toast('Удалено');
     }
 
     function renderSupportTickets() {
+      const creator = isCreatorAccount();
+      const visible = getVisibleTickets();
       const box = document.getElementById('supportTicketsBox');
       const badge = document.getElementById('ticketsCountBadge');
       if (!box) return;
-      if (badge) badge.textContent = String(supportTickets.length);
-      if (!supportTickets.length) {
-        box.innerHTML = '<div class="meta" style="margin-top: 8px;">Пока нет обращений.</div>';
+      if (badge) badge.textContent = String(visible.length);
+      if (!visible.length) {
+        box.innerHTML = '<div class="meta" style="margin-top: 8px;">Сообщений пока нет.</div>';
         return;
       }
-      box.innerHTML = supportTickets.slice(0, 20).map(t => `
+      box.innerHTML = visible.slice(0, 20).map(t => `
         <div class="ticket-box">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <span class="tag">${esc(t.kindLabel || 'Обращение')}</span>
+            <span class="tag">${esc(t.kindLabel || 'Сообщение')}</span>
             <span class="meta">${esc(t.time || '')}</span>
           </div>
-          <div style="font-size: 13.5px; margin-top: 6px; font-weight: 700;">${esc(t.senderName || 'Участник')}</div>
+          ${creator ? `<div style="font-size: 13.5px; margin-top: 6px; font-weight: 700;">${esc(t.senderName || 'Участник')}</div>` : ''}
           <div style="font-size: 14px; margin-top: 4px; line-height: 1.4;">${esc(t.text || '')}</div>
           <div class="actions" style="margin-top: 8px;">
             <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
@@ -2000,6 +2233,7 @@
         });
         toast('Фото отправлено в чат');
       } catch (e) {
+        recordAppError('Фото в чат: ' + (e?.message || e));
         toast('Не удалось отправить фото');
       }
     }
@@ -2112,7 +2346,9 @@
           confirms: 0,
           createdAt: serverTimestamp()
         });
-      } catch (e) {}
+      } catch (e) {
+        recordAppError('Публикация: ' + (e?.message || e));
+      }
 
       document.getElementById('postCaptionInput').value = '';
       document.getElementById('postTextInput').value = '';
@@ -2226,7 +2462,8 @@
         try {
           await deleteDoc(doc(db, 'posts', id));
         } catch (e) {
-          toast('Не удалось удалить из базы');
+          recordAppError('Удаление поста: ' + (e?.message || e));
+          toast('Не удалось удалить');
           return;
         }
       }
@@ -2825,6 +3062,7 @@
           });
           toast('Изменения сохранены');
         } catch (e) {
+          recordAppError('Редактирование сообщения: ' + (e?.message || e));
           toast('Не удалось сохранить изменение');
         }
       } else {
@@ -2853,6 +3091,7 @@
           });
           toast('Сообщение удалено');
         } catch (e) {
+          recordAppError('Удаление сообщения: ' + (e?.message || e));
           toast('Не удалось удалить сообщение');
         }
       } else {
@@ -2895,7 +3134,9 @@
           lastSenderUid: myUid,
           updatedAt: serverTimestamp()
         });
-      } catch (e) {}
+      } catch (e) {
+        recordAppError('Отправка в чат: ' + (e?.message || e));
+      }
     }
 
     function cancelVoiceState() {
@@ -3010,6 +3251,7 @@
           stText.textContent = 'Идёт запись голоса... Нажмите «Остановить»';
         } catch (err) {
           cancelVoiceState();
+          recordAppError('Запись голоса: ' + (err?.message || err));
           toast('Запись голоса не поддерживается на этом устройстве');
         }
       }, 2000);
@@ -3051,6 +3293,7 @@
         });
         toast('Голосовое отправлено');
       } catch (e) {
+        recordAppError('Отправка голоса: ' + (e?.message || e));
         toast('Ошибка отправки голосового');
       }
     }
@@ -3310,6 +3553,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab,
+      toggleStudioSection, switchStudioTab, clearRecordedErrors,
       openSupportModal, submitSupportTicket, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       onMyAvatarTap, viewOwnStory, removeOwnStory,
@@ -3337,6 +3581,7 @@
     renderFriendsTab();
     renderProfileChatsList();
     renderSupportTickets();
+    renderCreatorStudio();
   </script>
 </body>
 </html>

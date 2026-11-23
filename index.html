@@ -10,11 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <style>
     :root {
-      --bg-base: #f4f9f5;
-      --bg-grad-top: #f7fbf8;
-      --bg-grad-bot: #e6f2eb;
-      --bg-pattern: radial-gradient(rgba(15, 107, 67, 0.05) 1px, transparent 1px);
-      --bg-pattern-size: 22px 22px;
       --surface: #ffffff;
       --surface-soft: #eef6f1;
       --border: rgba(15, 107, 67, 0.16);
@@ -40,13 +35,12 @@
       min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
-      background-color: var(--bg-base);
-      background-image: var(--bg-pattern), linear-gradient(165deg, var(--bg-grad-top) 0%, var(--bg-base) 52%, var(--bg-grad-bot) 100%);
-      background-size: var(--bg-pattern-size), cover;
+      background-color: #f3f9f5;
+      background-image: radial-gradient(rgba(15, 107, 67, 0.05) 1px, transparent 1px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%);
+      background-size: 22px 22px, cover;
       padding-bottom: 92px;
       position: relative;
       overflow-x: hidden;
-      transition: background-color 0.25s ease, background-image 0.25s ease;
     }
 
     .ico {
@@ -61,7 +55,7 @@
     }
     .ico-sm { width: 16px; height: 16px; }
 
-    /* Плавный индикатор обновления свайпом вниз (Pull-to-Refresh) */
+    /* Индикатор обновления свайпом вниз (Pull-to-Refresh) */
     .ptr-indicator {
       position: fixed;
       top: 0;
@@ -230,7 +224,7 @@
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
@@ -458,12 +452,12 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 82px;
-      transition: transform 0.12s ease, border-color 0.2s ease;
+      transition: transform 0.1s ease, border-color 0.15s ease;
     }
     .wp-card:active { transform: scale(0.98); }
     .wp-card.active {
       border-color: var(--green);
-      box-shadow: 0 0 0 2px rgba(15, 107, 67, 0.2);
+      box-shadow: 0 0 0 2px rgba(15, 107, 67, 0.24);
     }
     .wp-title { font-weight: 700; font-size: 14px; color: var(--text); }
     .wp-badge { font-size: 11.5px; font-weight: 700; color: var(--green); margin-top: 6px; }
@@ -571,11 +565,16 @@
       box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
     }
 
+    /* Окно выбора фото (камера / галерея) поверх окна создания публикации */
+    #photoSourceModal {
+      z-index: 75;
+    }
+
     /* Полноэкранный просмотр сторис и фото */
     .story-viewer {
       position: fixed;
       inset: 0;
-      z-index: 70;
+      z-index: 80;
       background: #0d1913;
       color: #ffffff;
       display: none;
@@ -592,14 +591,48 @@
       margin: auto;
     }
 
+    /* Полноэкранная страница другого человека */
+    .peer-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 65;
+      width: 100vw;
+      height: 100dvh;
+      overflow-y: auto;
+      background-color: inherit;
+      background-image: inherit;
+      background-size: inherit;
+      display: none;
+      flex-direction: column;
+      padding-bottom: 32px;
+    }
+    .peer-fullscreen.open { display: flex; }
+    .peer-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+      text-align: center;
+    }
+    .peer-stat-box {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 6px;
+    }
+    .peer-stat-num { font-weight: 800; font-size: 16px; color: var(--green); }
+    .peer-stat-lbl { font-size: 12px; color: var(--muted); }
+
     /* Полноэкранный чат */
     .chat-fullscreen {
       position: fixed;
       inset: 0;
-      z-index: 60;
+      z-index: 72;
       width: 100vw;
       height: 100dvh;
-      background: var(--bg-base);
+      background-color: inherit;
+      background-image: inherit;
+      background-size: inherit;
       display: none;
       flex-direction: column;
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
@@ -841,25 +874,78 @@
     </nav>
   </section>
 
+  <!-- ПОЛНОЭКРАННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА -->
+  <section id="peerPageModal" class="peer-fullscreen">
+    <header class="topbar">
+      <button class="btn btn-ghost" style="padding: 8px 13px; font-size: 13.5px;" onclick="closePeerPage()">← Назад</button>
+      <div id="peerTopTitle" style="font-weight: 800; font-size: 16px; color: var(--green);">Страница</div>
+      <div style="width: 72px;"></div>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <div class="profile-hero">
+          <div id="peerPageAvatarRing" class="avatar-ring" onclick="openPeerStory()">
+            <div id="peerPageAvatarBox" class="avatar-img">Ä</div>
+          </div>
+          <div style="min-width: 0; flex: 1;">
+            <h2 id="peerPageName" style="margin: 0; font-size: 20px;">Участник</h2>
+            <div id="peerPageInfo" class="meta" style="margin-top: 4px;">Участник SÄT</div>
+            <div id="peerPageStoryBadge" style="display: none; margin-top: 6px;">
+              <span class="tag" style="cursor: pointer;" onclick="openPeerStory()">Активная сторис (до 3 ч)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="peer-stats">
+          <div class="peer-stat-box">
+            <div id="peerStatPosts" class="peer-stat-num">0</div>
+            <div class="peer-stat-lbl">Публикации</div>
+          </div>
+          <div class="peer-stat-box">
+            <div id="peerStatPhotos" class="peer-stat-num">0</div>
+            <div class="peer-stat-lbl">Фотографии</div>
+          </div>
+          <div class="peer-stat-box">
+            <div id="peerStatFriends" class="peer-stat-num">0</div>
+            <div class="peer-stat-lbl">Друзья</div>
+          </div>
+        </div>
+
+        <div id="peerPageActions" class="actions" style="margin-top: 14px;"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin: 0 0 8px; font-size: 16px;">Фотографии на странице</h3>
+        <div id="peerPagePhotos" class="photo-grid"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin: 0 0 10px; font-size: 16px;">Публикации</h3>
+        <div id="peerPagePosts"></div>
+      </div>
+    </div>
+  </section>
+
   <!-- СКРЫТЫЕ INPUT ДЛЯ КАМЕРЫ И ГАЛЕРЕИ -->
   <input type="file" id="cameraCaptureInput" accept="image/*" capture="environment" style="display: none;" onchange="handlePickedImage(event)" />
   <input type="file" id="galleryPickInput" accept="image/*" style="display: none;" onchange="handlePickedImage(event)" />
 
-  <!-- МОДАЛКА ВЫБОРА: КАМЕРА ИЛИ ГАЛЕРЕЯ -->
+  <!-- МОДАЛКА ВЫБОРА: КАМЕРА ПО МЕСТУ ИЛИ ГАЛЕРЕЯ -->
   <div id="photoSourceModal" class="modal-backdrop" onclick="closeModals(event)">
     <div class="modal-sheet" onclick="event.stopPropagation()">
-      <h3 id="photoSourceTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите способ</h3>
-      <p id="photoSourceHint" class="meta" style="margin: 0 0 16px;">Сделайте фото на камеру по месту или загрузите из галереи</p>
+      <h3 id="photoSourceTitle" style="margin: 0 0 6px; font-size: 18px;">Загрузка фотографии</h3>
+      <p id="photoSourceHint" class="meta" style="margin: 0 0 16px;">Сделайте фото на месте или загрузите с галереи</p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="triggerCamera()">
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="triggerCamera()">
           <svg class="ico" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>Сделать фото на камеру</span>
+          <span>Сделать фото на месте (камера)</span>
         </button>
-        <button class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="triggerGallery()">
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="triggerGallery()">
           <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span>Загрузить из галереи</span>
+          <span>Загрузить с галереи</span>
         </button>
-        <button class="btn btn-ghost" style="width: 100%;" onclick="closeModalById('photoSourceModal')">Отмена</button>
+        <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="closeModalById('photoSourceModal')">Отмена</button>
       </div>
     </div>
   </div>
@@ -870,7 +956,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h3 style="margin: 0; font-size: 18px;">Обои интерфейса</h3>
-          <div class="meta">10 спокойных светло-зелёных вариантов на выбор</div>
+          <div class="meta">Нажмите на любые обои — применятся мгновенно</div>
         </div>
         <button class="btn btn-ghost" style="padding: 6px 12px;" onclick="closeModalById('wallpapersModal')">✕</button>
       </div>
@@ -883,16 +969,17 @@
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
 
-      <label class="meta">Напишите сообщение или заметку</label>
+      <label class="meta">Напишите сообщение</label>
       <textarea id="newPostBody" rows="3" placeholder="Напишите ваше сообщение..."></textarea>
 
       <div style="margin-top: 12px;">
         <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('post')">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <span id="postPhotoBtnText">Сделать фото на месте или выбрать из галереи</span>
+          <span id="postPhotoBtnText">Фото на месте или загрузить с галереи</span>
         </button>
-        <div id="postPhotoPreviewBox" style="display: none; margin-top: 10px; position: relative;">
-          <img id="postPhotoPreviewImg" src="" alt="Предпросмотр" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 14px;" />
+        <div id="postPhotoStatus" class="meta" style="display: none; margin-top: 6px; color: var(--green); font-weight: 700;">Фото загружено и готово к отправке</div>
+        <div id="postPhotoPreviewBox" style="display: none; margin-top: 8px; position: relative;">
+          <img id="postPhotoPreviewImg" src="" alt="Предпросмотр" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px;" />
           <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearPostPhoto()">Убрать</button>
         </div>
       </div>
@@ -907,37 +994,9 @@
       </div>
 
       <div class="actions" style="margin-top: 16px;">
-        <button class="btn btn-ghost" style="flex: 1;" onclick="closeModalById('createPostModal')">Отмена</button>
-        <button class="btn btn-primary" style="flex: 1;" onclick="publishPost()">Отправить</button>
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="closeModalById('createPostModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="publishPost()">Отправить</button>
       </div>
-    </div>
-  </div>
-
-  <!-- МОДАЛКА ПРОСМОТРА СТРАНИЦЫ ДРУГОГО ЧЕЛОВЕКА -->
-  <div id="userProfileModal" class="modal-backdrop" onclick="closeModals(event)">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div id="peerAvatarBox" class="post-mini-ava" style="width: 54px; height: 54px; font-size: 20px;">Ä</div>
-          <div>
-            <h3 id="modalUserName" style="margin: 0; font-size: 18px;">Участник</h3>
-            <div id="modalUserMeta" class="meta" style="margin-top: 3px;">Страница участника</div>
-          </div>
-        </div>
-        <button class="btn btn-ghost" style="padding: 6px 12px;" onclick="closeModalById('userProfileModal')">✕</button>
-      </div>
-
-      <div id="modalUserActions" class="actions" style="margin-top: 12px;"></div>
-
-      <div id="modalUserStoryBox" style="display: none; margin-top: 12px;">
-        <button class="btn btn-mint" style="width: 100%;" onclick="openPeerStory()">Смотреть активную сторис (до 3 ч)</button>
-      </div>
-
-      <h4 style="margin: 16px 0 8px;">Фотографии на странице</h4>
-      <div id="modalUserPhotos" class="photo-grid"></div>
-
-      <h4 style="margin: 16px 0 8px;">Публикации</h4>
-      <div id="modalUserPosts"></div>
     </div>
   </div>
 
@@ -1064,7 +1123,7 @@
       { id: 'wp10', name: 'Льняной покой', top: '#fafcf9', base: '#f1f5f2', bot: '#e3ebe5', dot: 'rgba(15,107,67,0.04)', size: '26px 26px' }
     ];
 
-    const STORAGE_KEY = 'sat_profile_state_v2';
+    const STORAGE_KEY = 'sat_profile_state_v3';
     let state = {
       wallpaperId: 'wp1',
       displayName: '',
@@ -1099,46 +1158,52 @@
     let currentPickTarget = 'avatar';
     let pendingPostPhotoData = '';
     let postDestination = 'pulse';
+    let activePeerUid = null;
     let activePeerStory = null;
 
     document.getElementById('sessionCheckingHint').style.display = 'block';
 
+    /* МГНОВЕННОЕ ПРИМЕНЕНИЕ ОБОЕВ БЕЗ ОШИБОК */
     function applyWallpaper(wpId) {
       const wp = WALLPAPERS.find(w => w.id === wpId) || WALLPAPERS[0];
       state.wallpaperId = wp.id;
       saveState();
-      const root = document.documentElement;
-      root.style.setProperty('--bg-grad-top', wp.top);
-      root.style.setProperty('--bg-base', wp.base);
-      root.style.setProperty('--bg-grad-bot', wp.bot);
-      root.style.setProperty('--bg-pattern', `radial-gradient(${wp.dot} 1px, transparent 1px)`);
-      root.style.setProperty('--bg-pattern-size', wp.size);
-      renderWallpapersGrid();
+
+      document.body.style.backgroundColor = wp.base;
+      document.body.style.backgroundImage = `radial-gradient(${wp.dot} 1px, transparent 1px), linear-gradient(165deg, ${wp.top} 0%, ${wp.base} 52%, ${wp.bot} 100%)`;
+      document.body.style.backgroundSize = `${wp.size}, cover`;
+
+      const grid = document.getElementById('wallpapersGrid');
+      if (grid) {
+        grid.querySelectorAll('.wp-card').forEach(card => {
+          const isMatch = card.getAttribute('data-wp-id') === wp.id;
+          card.classList.toggle('active', isMatch);
+          const badge = card.querySelector('.wp-badge');
+          if (badge) badge.textContent = isMatch ? 'Выбрано' : 'Применить';
+        });
+      }
     }
 
     function openWallpapersModal() {
-      renderWallpapersGrid();
-      document.getElementById('wallpapersModal').classList.add('open');
-    }
-
-    function renderWallpapersGrid() {
       const grid = document.getElementById('wallpapersGrid');
-      if (!grid) return;
-      grid.innerHTML = WALLPAPERS.map(wp => {
-        const active = state.wallpaperId === wp.id;
-        return `
-          <div class="wp-card ${active ? 'active' : ''}" style="background: linear-gradient(150deg, ${wp.top}, ${wp.bot});" onclick="selectWallpaper('${wp.id}')">
-            <div class="wp-title">${escapeHtml(wp.name)}</div>
-            <div class="wp-badge">${active ? 'Выбрано' : 'Применить'}</div>
-          </div>
-        `;
-      }).join('');
+      if (grid) {
+        grid.innerHTML = WALLPAPERS.map(wp => {
+          const active = state.wallpaperId === wp.id;
+          return `
+            <div class="wp-card ${active ? 'active' : ''}" data-wp-id="${wp.id}" style="background: linear-gradient(150deg, ${wp.top}, ${wp.bot});" onclick="selectWallpaper('${wp.id}')">
+              <div class="wp-title">${escapeHtml(wp.name)}</div>
+              <div class="wp-badge">${active ? 'Выбрано' : 'Применить'}</div>
+            </div>
+          `;
+        }).join('');
+      }
+      document.getElementById('wallpapersModal').classList.add('open');
     }
 
     function selectWallpaper(wpId) {
       applyWallpaper(wpId);
       const wp = WALLPAPERS.find(w => w.id === wpId);
-      showToast(`Обои: ${wp ? wp.name : ''}`);
+      showToast(`Обои применены: ${wp ? wp.name : ''}`);
     }
 
     function formatRealTime(tsMs) {
@@ -1286,7 +1351,7 @@
 
       window.addEventListener('touchstart', (e) => {
         if (!document.getElementById('app').classList.contains('active')) return;
-        if (document.querySelector('.modal-backdrop.open') || document.getElementById('chatModal').classList.contains('open')) return;
+        if (document.querySelector('.modal-backdrop.open') || document.getElementById('chatModal').classList.contains('open') || document.getElementById('peerPageModal').classList.contains('open')) return;
         if (window.scrollY <= 2) {
           startY = e.touches[0].clientY;
           pulling = true;
@@ -1313,6 +1378,7 @@
           ptrText.textContent = 'Обновляем...';
           pruneExpiredOwnStory();
           renderAll();
+          if (activePeerUid) openUserProfile(activePeerUid);
           setTimeout(() => {
             indicator.classList.remove('spinning');
             indicator.style.transform = 'translate(-50%, -64px)';
@@ -1329,6 +1395,7 @@
       cloudPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderFeed();
       renderMyPosts();
+      if (activePeerUid) openUserProfile(activePeerUid);
     });
 
     onSnapshot(collection(db, 'users'), (snap) => {
@@ -1352,11 +1419,13 @@
       renderProfileHeader();
       renderMyPhotos();
       renderFriendsSection();
+      if (activePeerUid) openUserProfile(activePeerUid);
     });
 
     onSnapshot(collection(db, 'friendRequests'), (snap) => {
       friendRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderFriendsSection();
+      if (activePeerUid) openUserProfile(activePeerUid);
     });
 
     onSnapshot(collection(db, 'chats'), (snap) => {
@@ -1450,7 +1519,7 @@
       document.getElementById('storyViewer').classList.add('open');
     }
 
-    /* КАМЕРА И ГАЛЕРЕЯ (С АВТОМАТИЧЕСКИМ СЖАТИЕМ) */
+    /* КАМЕРА НА МЕСТЕ И ЗАГРУЗКА С ГАЛЕРЕИ */
     function openPhotoPicker(target) {
       currentPickTarget = target;
       const titles = {
@@ -1459,68 +1528,82 @@
         post: 'Фото к публикации',
         gallery_save: 'Добавить фото на страницу'
       };
-      document.getElementById('photoSourceTitle').textContent = titles[target] || 'Выбор фото';
+      document.getElementById('photoSourceTitle').textContent = titles[target] || 'Загрузка фото';
+      document.getElementById('photoSourceHint').textContent = 'Сделайте фото на месте или загрузите с галереи';
       document.getElementById('photoSourceModal').classList.add('open');
     }
 
     function triggerCamera() {
       closeModalById('photoSourceModal');
-      document.getElementById('cameraCaptureInput').click();
+      const inp = document.getElementById('cameraCaptureInput');
+      inp.value = '';
+      inp.click();
     }
 
     function triggerGallery() {
       closeModalById('photoSourceModal');
-      document.getElementById('galleryPickInput').click();
+      const inp = document.getElementById('galleryPickInput');
+      inp.value = '';
+      inp.click();
+    }
+
+    function compressImageFile(file, maxSide, quality, onDone) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const scale = Math.min(1, maxSide / Math.max(img.width || 1, img.height || 1));
+          canvas.width = Math.max(1, Math.round((img.width || 600) * scale));
+          canvas.height = Math.max(1, Math.round((img.height || 600) * scale));
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          onDone(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => {
+          if (typeof ev.target.result === 'string') onDone(ev.target.result);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     }
 
     function handlePickedImage(e) {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = async () => {
-          const canvas = document.createElement('canvas');
-          const maxSide = currentPickTarget === 'avatar' ? 420 : 860;
-          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
-          canvas.width = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const compressed = canvas.toDataURL('image/jpeg', 0.72);
-
-          if (currentPickTarget === 'avatar') {
-            state.photoData = compressed;
-            saveState();
-            renderProfileHeader();
-            await syncUserToCloud(currentUser);
-            showToast('Фото профиля обновлено');
-          } else if (currentPickTarget === 'story') {
-            const now = Date.now();
-            state.storyData = compressed;
-            state.storyCreatedAt = now;
-            state.storyExpiresAt = now + STORY_TTL_MS;
-            state.storyTimeLabel = formatRealTime(now);
-            saveState();
-            renderProfileHeader();
-            await syncUserToCloud(currentUser);
-            showToast('Сторис опубликована на 3 часа');
-          } else if (currentPickTarget === 'gallery_save') {
-            state.savedPhotos = [compressed, ...(state.savedPhotos || [])].slice(0, 30);
-            saveState();
-            renderMyPhotos();
-            await syncUserToCloud(currentUser);
-            showToast('Фото сохранено на странице');
-          } else if (currentPickTarget === 'post') {
-            pendingPostPhotoData = compressed;
-            document.getElementById('postPhotoPreviewImg').src = compressed;
-            document.getElementById('postPhotoPreviewBox').style.display = 'block';
-            document.getElementById('postPhotoBtnText').textContent = 'Заменить фото';
-          }
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
+      const maxSide = currentPickTarget === 'avatar' ? 420 : 860;
+      compressImageFile(file, maxSide, 0.72, async (compressed) => {
+        if (currentPickTarget === 'avatar') {
+          state.photoData = compressed;
+          saveState();
+          renderProfileHeader();
+          await syncUserToCloud(currentUser);
+          showToast('Фото профиля загружено');
+        } else if (currentPickTarget === 'story') {
+          const now = Date.now();
+          state.storyData = compressed;
+          state.storyCreatedAt = now;
+          state.storyExpiresAt = now + STORY_TTL_MS;
+          state.storyTimeLabel = formatRealTime(now);
+          saveState();
+          renderProfileHeader();
+          await syncUserToCloud(currentUser);
+          showToast('Сторис опубликована на 3 часа');
+        } else if (currentPickTarget === 'gallery_save') {
+          state.savedPhotos = [compressed, ...(state.savedPhotos || [])].slice(0, 30);
+          saveState();
+          renderMyPhotos();
+          await syncUserToCloud(currentUser);
+          showToast('Фото сохранено на странице');
+        } else if (currentPickTarget === 'post') {
+          pendingPostPhotoData = compressed;
+          document.getElementById('postPhotoPreviewImg').src = compressed;
+          document.getElementById('postPhotoPreviewBox').style.display = 'block';
+          document.getElementById('postPhotoStatus').style.display = 'block';
+          document.getElementById('postPhotoBtnText').textContent = 'Фото загружено — заменить';
+          showToast('Фото загружено');
+        }
+      });
       e.target.value = '';
     }
 
@@ -1572,14 +1655,15 @@
     function clearPostPhoto() {
       pendingPostPhotoData = '';
       document.getElementById('postPhotoPreviewBox').style.display = 'none';
+      document.getElementById('postPhotoStatus').style.display = 'none';
       document.getElementById('postPhotoPreviewImg').src = '';
-      document.getElementById('postPhotoBtnText').textContent = 'Сделать фото на месте или выбрать из галереи';
+      document.getElementById('postPhotoBtnText').textContent = 'Фото на месте или загрузить с галереи';
     }
 
     async function publishPost() {
       const body = document.getElementById('newPostBody').value.trim();
       if (!body && !pendingPostPhotoData) {
-        showToast('Напишите сообщение или добавьте фото');
+        showToast('Напишите сообщение или загрузите фото');
         return;
       }
 
@@ -1708,43 +1792,38 @@
       } catch (e) {}
     }
 
-    /* ПРОСМОТР СТРАНИЦЫ ДРУГОГО ЧЕЛОВЕКА */
+    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА */
     function openUserProfile(uid, fallbackName) {
       if (!uid) return;
+      activePeerUid = uid;
       const u = cloudUsers.find(x => x.uid === uid) || {};
       const name = u.fullName || fallbackName || 'Участник';
-      document.getElementById('modalUserName').textContent = name;
-      document.getElementById('modalUserMeta').textContent = 'Страница участника SÄT';
 
-      const avaBox = document.getElementById('peerAvatarBox');
+      document.getElementById('peerTopTitle').textContent = name;
+      document.getElementById('peerPageName').textContent = name;
+      document.getElementById('peerPageInfo').textContent = u.email ? `Участник SÄT • ${u.email}` : 'Участник SÄT';
+
+      const avaBox = document.getElementById('peerPageAvatarBox');
       if (u.photoData) {
-        avaBox.innerHTML = `<img src="${u.photoData}" alt="" />`;
+        avaBox.innerHTML = `<img src="${u.photoData}" alt="${escapeHtml(name)}" />`;
       } else {
         avaBox.textContent = (name[0] || 'S').toUpperCase();
       }
 
-      const actBox = document.getElementById('modalUserActions');
-      if (currentUser && uid !== currentUser.uid) {
-        const fs = getFriendStatus(uid);
-        actBox.innerHTML = `
-          <button class="btn btn-primary" onclick="closeModalById('userProfileModal'); startDirectChat('${uid}', '${escapeHtml(name)}')">Написать</button>
-          ${fs.status === 'none' ? `<button class="btn btn-mint" onclick="sendFriendRequest('${uid}', '${escapeHtml(name)}')">В друзья</button>` : ''}
-        `;
-      } else {
-        actBox.innerHTML = '';
-      }
-
-      const storyBox = document.getElementById('modalUserStoryBox');
+      const ring = document.getElementById('peerPageAvatarRing');
+      const storyBadge = document.getElementById('peerPageStoryBadge');
       if (u.storyData && isStoryValid(u.storyData, u.storyExpiresAt)) {
         activePeerStory = {
           author: name,
           photo: u.storyData,
           time: u.storyTimeLabel || formatRealTime(u.storyCreatedAt)
         };
-        storyBox.style.display = 'block';
+        ring.classList.add('has-story');
+        storyBadge.style.display = 'block';
       } else {
         activePeerStory = null;
-        storyBox.style.display = 'none';
+        ring.classList.remove('has-story');
+        storyBadge.style.display = 'none';
       }
 
       const peerPosts = cloudPosts.filter(p => p.authorUid === uid);
@@ -1752,7 +1831,34 @@
       const extraSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
       const allPeerPhotos = [...photosFromPosts, ...extraSaved];
 
-      const photosBox = document.getElementById('modalUserPhotos');
+      const peerFriendsCount = friendRequests.filter(r =>
+        r.status === 'accepted' && (r.fromUid === uid || r.toUid === uid)
+      ).length;
+
+      document.getElementById('peerStatPosts').textContent = String(peerPosts.length);
+      document.getElementById('peerStatPhotos').textContent = String(allPeerPhotos.length);
+      document.getElementById('peerStatFriends').textContent = String(peerFriendsCount);
+
+      const actBox = document.getElementById('peerPageActions');
+      if (currentUser && uid !== currentUser.uid) {
+        const fs = getFriendStatus(uid);
+        let friendBtn = `<button class="btn btn-mint" style="flex: 1;" onclick="sendFriendRequest('${uid}', '${escapeHtml(name)}')">Добавить в друзья</button>`;
+        if (fs.status === 'accepted') {
+          friendBtn = `<span class="tag" style="padding: 10px 14px;">В друзьях</span>`;
+        } else if (fs.status === 'outgoing') {
+          friendBtn = `<span class="meta" style="padding: 10px;">Заявка отправлена</span>`;
+        } else if (fs.status === 'incoming') {
+          friendBtn = `<button class="btn btn-mint" style="flex: 1;" onclick="acceptFriend('${fs.id}')">Принять заявку</button>`;
+        }
+        actBox.innerHTML = `
+          <button class="btn btn-primary" style="flex: 1;" onclick="startDirectChat('${uid}', '${escapeHtml(name)}')">Написать</button>
+          ${friendBtn}
+        `;
+      } else {
+        actBox.innerHTML = '';
+      }
+
+      const photosBox = document.getElementById('peerPagePhotos');
       if (!allPeerPhotos.length) {
         photosBox.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет.</div>';
       } else {
@@ -1763,23 +1869,29 @@
         `).join('');
       }
 
-      const postsBox = document.getElementById('modalUserPosts');
+      const postsBox = document.getElementById('peerPagePosts');
       if (!peerPosts.length) {
         postsBox.innerHTML = '<div class="meta">Публикаций пока нет.</div>';
       } else {
         postsBox.innerHTML = peerPosts.map(p => {
           const timeStr = getPostTimeLabel(p);
           return `
-            <div class="card" style="padding: 12px;">
+            <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
               <div class="meta">Отправлено в ${escapeHtml(timeStr)}</div>
-              ${p.body ? `<div style="font-size: 14.5px; margin-top: 5px; line-height: 1.45;">${escapeHtml(p.body)}</div>` : ''}
-              ${p.photoData ? `<img class="post-photo" style="max-height: 220px;" src="${p.photoData}" alt="Фото" />` : ''}
+              ${p.body ? `<div style="font-size: 15px; margin-top: 5px; line-height: 1.45;">${escapeHtml(p.body)}</div>` : ''}
+              ${p.photoData ? `<img class="post-photo" style="max-height: 260px;" src="${p.photoData}" alt="Фото" onclick="openPhotoPreview('${p.photoData}', '${escapeHtml(name)}', '${escapeHtml(timeStr)}')" />` : ''}
             </div>
           `;
         }).join('');
       }
 
-      document.getElementById('userProfileModal').classList.add('open');
+      document.getElementById('peerPageModal').classList.add('open');
+      document.getElementById('peerPageModal').scrollTop = 0;
+    }
+
+    function closePeerPage() {
+      activePeerUid = null;
+      document.getElementById('peerPageModal').classList.remove('open');
     }
 
     function openPeerStory() {
@@ -1815,10 +1927,10 @@
           const name = u.fullName || 'Участник';
           return `
             <div class="list-row">
-              <div class="author author-link" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
+              <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
               <div style="display: flex; gap: 6px;">
-                <button class="btn btn-ghost" style="padding: 7px 11px; font-size: 12.5px;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">Страница</button>
-                <button class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="startDirectChat('${u.uid}', '${escapeHtml(name)}')">Написать</button>
+                <button class="btn btn-primary" style="padding: 7px 12px; font-size: 12.5px;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">Страница</button>
+                <button class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="startDirectChat('${u.uid}', '${escapeHtml(name)}')">Чат</button>
               </div>
             </div>
           `;
@@ -1850,7 +1962,7 @@
           }
           return `
             <div class="list-row">
-              <div class="author author-link" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
+              <div class="author author-link" style="flex: 1;" onclick="openUserProfile('${u.uid}', '${escapeHtml(name)}')">${escapeHtml(name)}</div>
               <div style="display: flex; gap: 6px; align-items: center;">${actionHtml}</div>
             </div>
           `;
@@ -2068,7 +2180,7 @@
       openPhotoPicker, triggerCamera, triggerGallery, handlePickedImage,
       openPhotoPreview, handleAvatarClick, viewMyStory, closeStoryViewer, deleteMyStory,
       openCreatePostModal, setPostDestination, clearPostPhoto, publishPost, confirmPost, deletePost,
-      openUserProfile, openPeerStory,
+      openUserProfile, closePeerPage, openPeerStory,
       sendFriendRequest, acceptFriend, declineFriend,
       openCircleModal, createCircle, joinGroup,
       startDirectChat, openChat, closeChatModal, sendChatMsg,

@@ -159,6 +159,7 @@
       justify-content: center;
       gap: 8px;
       user-select: none;
+      touch-action: manipulation;
     }
     .btn:active { transform: scale(0.97); }
     .btn-primary {
@@ -268,6 +269,10 @@
       flex-shrink: 0;
       position: relative;
       cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
     }
     .ava-ring.has-story {
       background: linear-gradient(135deg, #2ce69b, #0f6b43, #e6b84c);
@@ -286,8 +291,33 @@
       justify-content: center;
       overflow: hidden;
       border: 2px solid rgba(255, 255, 255, 0.25);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
     }
-    .ava-circle img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .ava-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    #peerAvatarRing,
+    #peerAvatarCircle,
+    #peerAvatarCircle img {
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation !important;
+    }
+    #peerAvatarCircle img {
+      pointer-events: none !important;
+    }
+
     .ava-cam {
       position: absolute;
       right: 0;
@@ -389,16 +419,18 @@
     }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
-    .wp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+    /* Список из 5 крупных живых обоев */
+    .wp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
     .wp-item {
       border: 1.5px solid var(--border);
       border-radius: 18px;
-      padding: 13px 12px;
+      padding: 14px 16px;
       cursor: pointer;
-      min-height: 86px;
       display: flex;
-      flex-direction: column;
       justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      touch-action: manipulation;
     }
     .wp-item.active {
       border-color: #6cf0b5;
@@ -742,14 +774,14 @@
     <div class="container">
       <div class="card">
         <div class="profile-top">
-          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerStoryViewer()">
+          <div id="peerAvatarRing" class="ava-ring" onclick="openPeerStoryViewer(event)">
             <div id="peerAvatarCircle" class="ava-circle">Ä</div>
           </div>
           <div style="min-width: 0; flex: 1;">
             <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
             <div id="peerAboutLine" class="meta" style="margin-top: 4px;">Участник SÄT</div>
             <div id="peerStoryTag" style="display: none; margin-top: 6px;">
-              <span class="tag" style="cursor: pointer;" onclick="openPeerStoryViewer()">Активная сторис (до 3 ч)</span>
+              <span class="tag" style="cursor: pointer;" onclick="openPeerStoryViewer(event)">Активная сторис (до 3 ч)</span>
             </div>
           </div>
         </div>
@@ -805,12 +837,12 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Живые обои городов</h3>
-          <div class="meta">Нажмите — живая сцена за карточками обновится сразу</div>
+          <h3 style="margin: 0; font-size: 18px;">5 живых обоев</h3>
+          <div class="meta">Нажмите — фон за карточками оживёт сразу</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
-      <div id="wallpapersList" class="wp-grid"></div>
+      <div id="wallpapersList" class="wp-list"></div>
     </div>
   </div>
 
@@ -910,16 +942,11 @@
   <script>
     (function () {
       const CITIES = [
-        { id: 'oskemen', name: 'Өскемен', desc: 'Ночной Иртыш, сопки и огни', sky1: '#04120c', sky2: '#0b291d', glow: 'rgba(54, 226, 150, 0.34)', water: true, style: 'oskemen' },
-        { id: 'katon', name: 'Катон-Карагай', desc: 'Горные пики, туман и звёзды', sky1: '#04100b', sky2: '#0b2419', glow: 'rgba(72, 232, 166, 0.32)', water: false, style: 'mountains' },
-        { id: 'almaty', name: 'Алматы', desc: 'Огни предгорий и ночной хребет', sky1: '#060e19', sky2: '#11253d', glow: 'rgba(245, 182, 76, 0.3)', water: false, style: 'almaty' },
-        { id: 'astana', name: 'Астана', desc: 'Байтерек и огни мегаполиса', sky1: '#060c1b', sky2: '#102242', glow: 'rgba(78, 192, 250, 0.32)', water: true, style: 'astana' },
-        { id: 'turkestan', name: 'Туркестан', desc: 'Ночной купол и золотой месяц', sky1: '#120d06', sky2: '#291e0e', glow: 'rgba(242, 190, 78, 0.34)', water: false, style: 'mosque' },
-        { id: 'istanbul', name: 'Стамбул', desc: 'Босфор, минареты и огни на воде', sky1: '#06111b', sky2: '#11283b', glow: 'rgba(240, 172, 74, 0.3)', water: true, style: 'istanbul' },
-        { id: 'mecca', name: 'Мекка', desc: 'Звёздная ночь и тёплое сияние', sky1: '#0b0c08', sky2: '#1c1f13', glow: 'rgba(238, 198, 92, 0.36)', water: false, style: 'mecca' },
-        { id: 'tokyo', name: 'Токио', desc: 'Ночные небоскрёбы и неоновые огни', sky1: '#060919', sky2: '#131b3d', glow: 'rgba(52, 232, 190, 0.34)', water: false, style: 'skyline' },
-        { id: 'paris', name: 'Париж', desc: 'Вечерняя башня и огни Сены', sky1: '#0c0b19', sky2: '#201c38', glow: 'rgba(245, 192, 96, 0.32)', water: true, style: 'paris' },
-        { id: 'aurora', name: 'Северное сияние', desc: 'Живые изумрудные волны в небе', sky1: '#030d0a', sky2: '#08251c', glow: 'rgba(48, 245, 158, 0.4)', water: true, style: 'aurora' }
+        { id: 'oskemen', name: 'Өскемен', desc: 'Ночной Иртыш, сопки и огни', sky1: '#04120c', sky2: '#0b291d', glow: 'rgba(54, 226, 150, 0.36)', water: true, style: 'oskemen' },
+        { id: 'katon', name: 'Катон-Карагай', desc: 'Горные пики, туман и звёзды', sky1: '#04100b', sky2: '#0b2419', glow: 'rgba(72, 232, 166, 0.34)', water: false, style: 'mountains' },
+        { id: 'almaty', name: 'Алматы', desc: 'Огни предгорий и ночной хребет', sky1: '#060e19', sky2: '#11253d', glow: 'rgba(245, 182, 76, 0.32)', water: false, style: 'almaty' },
+        { id: 'astana', name: 'Астана', desc: 'Вечерние огни и блики на воде', sky1: '#060c1b', sky2: '#102242', glow: 'rgba(78, 192, 250, 0.34)', water: true, style: 'astana' },
+        { id: 'aurora', name: 'Северное сияние', desc: 'Живые изумрудные волны в небе', sky1: '#030d0a', sky2: '#08251c', glow: 'rgba(48, 245, 158, 0.42)', water: true, style: 'aurora' }
       ];
 
       let activeCity = CITIES[0];
@@ -927,31 +954,31 @@
       const ctx = canvas ? canvas.getContext('2d') : null;
       let W = 360, H = 740;
 
-      const stars = Array.from({ length: 65 }, function () {
+      const stars = Array.from({ length: 70 }, function () {
         return {
           x: Math.random(),
           y: Math.random() * 0.56,
-          r: 0.8 + Math.random() * 1.7,
-          sp: 1.0 + Math.random() * 2.5,
+          r: 0.9 + Math.random() * 1.8,
+          sp: 1.1 + Math.random() * 2.5,
           ph: Math.random() * Math.PI * 2
         };
       });
 
-      const floatingSparks = Array.from({ length: 24 }, function () {
+      const floatingSparks = Array.from({ length: 28 }, function () {
         return {
           x: Math.random(),
-          y: 0.25 + Math.random() * 0.65,
-          r: 1.2 + Math.random() * 2.2,
-          vy: 0.015 + Math.random() * 0.03,
+          y: 0.22 + Math.random() * 0.68,
+          r: 1.4 + Math.random() * 2.3,
+          vy: 0.018 + Math.random() * 0.032,
           ph: Math.random() * Math.PI * 2
         };
       });
 
-      const cityLights = Array.from({ length: 48 }, function () {
+      const cityLights = Array.from({ length: 52 }, function () {
         return {
           x: Math.random(),
           y: 0.62 + Math.random() * 0.15,
-          w: 1.8 + Math.random() * 2.6,
+          w: 2 + Math.random() * 2.8,
           ph: Math.random() * Math.PI * 2,
           gold: Math.random() > 0.35
         };
@@ -985,60 +1012,25 @@
           ctx.fill();
         }
 
-        if (activeCity.style === 'oskemen' || activeCity.style === 'mosque' || activeCity.style === 'istanbul' || activeCity.style === 'mecca') {
-          const cx = W * 0.5;
-          ctx.beginPath();
-          ctx.arc(cx, horizon - 26, 38, Math.PI, 0);
-          ctx.lineTo(cx + 44, horizon);
-          ctx.lineTo(cx - 44, horizon);
-          ctx.closePath();
-          ctx.fill();
-
-          ctx.fillRect(cx - 66, horizon - 92, 7, 92);
-          ctx.fillRect(cx + 59, horizon - 92, 7, 92);
-
-          ctx.fillStyle = 'rgba(248, 212, 110, 0.9)';
-          ctx.beginPath();
-          ctx.arc(W * 0.78, H * 0.16, 15, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = activeCity.sky1;
-          ctx.beginPath();
-          ctx.arc(W * 0.78 + 6, H * 0.16 - 3, 12.5, 0, Math.PI * 2);
-          ctx.fill();
-        } else if (activeCity.style === 'astana') {
+        if (activeCity.style === 'astana') {
           const cx = W * 0.5;
           ctx.fillRect(cx - 7, horizon - 118, 14, 118);
           ctx.fillStyle = 'rgba(248, 208, 88, 0.9)';
           ctx.beginPath();
           ctx.arc(cx, horizon - 125, 16, 0, Math.PI * 2);
           ctx.fill();
-        } else if (activeCity.style === 'paris') {
-          const cx = W * 0.5;
-          ctx.beginPath();
-          ctx.moveTo(cx - 34, horizon);
-          ctx.lineTo(cx - 4, horizon - 148);
-          ctx.lineTo(cx + 4, horizon - 148);
-          ctx.lineTo(cx + 34, horizon);
-          ctx.closePath();
-          ctx.fill();
-        } else if (activeCity.style === 'skyline') {
-          const bars = [0.1, 0.24, 0.4, 0.56, 0.72, 0.86];
-          const heights = [78, 124, 98, 144, 108, 84];
-          bars.forEach(function (bx, idx) {
-            ctx.fillRect(W * bx - 16, horizon - heights[idx], 32, heights[idx]);
-          });
         }
 
         cityLights.forEach(function (l) {
-          const alpha = 0.28 + 0.68 * (0.5 + 0.5 * Math.sin(t * 2.2 + l.ph));
+          const alpha = 0.32 + 0.68 * (0.5 + 0.5 * Math.sin(t * 2.3 + l.ph));
           ctx.fillStyle = l.gold ? 'rgba(255, 214, 104,' + alpha + ')' : 'rgba(116, 248, 190,' + alpha + ')';
-          ctx.fillRect(l.x * W, l.y * H, l.w, 2.2);
+          ctx.fillRect(l.x * W, l.y * H, l.w, 2.3);
         });
 
         const fogX = Math.sin(t * 0.45) * 45;
         const fogGrad = ctx.createLinearGradient(0, horizon - 40, 0, horizon + 12);
         fogGrad.addColorStop(0, 'rgba(145, 240, 200, 0)');
-        fogGrad.addColorStop(0.5, 'rgba(145, 240, 200, 0.11)');
+        fogGrad.addColorStop(0.5, 'rgba(145, 240, 200, 0.12)');
         fogGrad.addColorStop(1, 'rgba(145, 240, 200, 0)');
         ctx.fillStyle = fogGrad;
         ctx.fillRect(fogX - 50, horizon - 40, W + 100, 52);
@@ -1054,8 +1046,8 @@
             const wy = horizon + 10 + i * ((H - horizon) / 20);
             const wx = ((i * 57 + Math.sin(t * 1.6 + i) * 34) % W + W) % W;
             const len = 20 + (i % 4) * 14;
-            ctx.fillStyle = 'rgba(116, 248, 190, 0.2)';
-            ctx.fillRect(wx, wy, len, 1.8);
+            ctx.fillStyle = 'rgba(116, 248, 190, 0.22)';
+            ctx.fillRect(wx, wy, len, 1.9);
           }
         } else {
           ctx.fillStyle = 'rgba(4, 11, 8, 0.96)';
@@ -1090,13 +1082,13 @@
             const y = H * (0.18 + w * 0.07) + Math.sin(x * 0.013 + t * (1.15 + w * 0.28)) * amp;
             ctx.lineTo(x, y);
           }
-          ctx.strokeStyle = activeCity.style === 'aurora' ? 'rgba(68, 248, 168, 0.25)' : 'rgba(120, 235, 185, 0.09)';
+          ctx.strokeStyle = activeCity.style === 'aurora' ? 'rgba(68, 248, 168, 0.28)' : 'rgba(120, 235, 185, 0.1)';
           ctx.lineWidth = activeCity.style === 'aurora' ? 14 : 8;
           ctx.stroke();
         }
 
         stars.forEach(function (s) {
-          const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
+          const a = 0.28 + 0.72 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
           ctx.fillStyle = 'rgba(238, 254, 246,' + a + ')';
           ctx.beginPath();
           ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
@@ -1106,7 +1098,7 @@
         floatingSparks.forEach(function (sp) {
           const py = ((sp.y - t * sp.vy) % 0.85 + 0.85) % 0.85 + 0.1;
           const px = sp.x * W + Math.sin(t * 1.3 + sp.ph) * 14;
-          const alpha = 0.2 + 0.5 * Math.sin(t * 2 + sp.ph);
+          const alpha = 0.22 + 0.52 * Math.sin(t * 2 + sp.ph);
           ctx.fillStyle = 'rgba(140, 248, 198,' + alpha + ')';
           ctx.beginPath();
           ctx.arc(px, py * H, sp.r, 0, Math.PI * 2);
@@ -1120,6 +1112,7 @@
       function setCityWallpaper(id) {
         activeCity = CITIES.find(function (c) { return c.id === id; }) || CITIES[0];
         try { localStorage.setItem('sat_live_city_wp', activeCity.id); } catch (e) {}
+        document.body.style.backgroundColor = activeCity.sky2;
 
         const badge = document.getElementById('wpActiveName');
         if (badge) badge.textContent = activeCity.name;
@@ -1129,9 +1122,11 @@
           list.innerHTML = CITIES.map(function (c) {
             const cur = c.id === activeCity.id;
             return '<div class="wp-item ' + (cur ? 'active' : '') + '" data-city-wp="' + c.id + '" style="background: linear-gradient(155deg, ' + c.sky1 + ', ' + c.sky2 + ');">' +
-              '<div style="font-weight:800;font-size:14.5px;color:#eef8f3;pointer-events:none;">' + c.name + '</div>' +
-              '<div style="font-size:11.5px;color:#9ec2b1;margin-top:3px;pointer-events:none;">' + c.desc + '</div>' +
-              '<div style="font-size:12px;font-weight:700;color:#6cf0b5;margin-top:8px;pointer-events:none;">' + (cur ? 'Активно' : 'Включить') + '</div>' +
+              '<div style="pointer-events:none;">' +
+                '<div style="font-weight:800;font-size:15.5px;color:#eef8f3;">' + c.name + '</div>' +
+                '<div style="font-size:12.5px;color:#9ec2b1;margin-top:3px;">' + c.desc + '</div>' +
+              '</div>' +
+              '<div style="font-size:12.5px;font-weight:700;color:#6cf0b5;white-space:nowrap;pointer-events:none;">' + (cur ? 'Активно' : 'Включить') + '</div>' +
             '</div>';
           }).join('');
         }
@@ -1526,7 +1521,7 @@
       document.getElementById('myBioText').textContent = state.bio || 'Мой профиль SÄT';
 
       const box = document.getElementById('myAvatarBox');
-      box.innerHTML = ava ? `<img src="${ava}" alt="" />` : esc((name[0] || 'Ä').toUpperCase());
+      box.innerHTML = ava ? `<img src="${ava}" alt="" draggable="false" />` : esc((name[0] || 'Ä').toUpperCase());
 
       const ring = document.getElementById('myAvatarRing');
       const banner = document.getElementById('myStoryBanner');
@@ -1546,7 +1541,7 @@
       } else {
         pGrid.innerHTML = state.photos.map((src, i) => `
           <div class="photo-cell" onclick="openImageViewer('${src}', '${esc(name)}', 'Фото #${i + 1}')">
-            <img src="${src}" alt="" />
+            <img src="${src}" alt="" draggable="false" />
           </div>
         `).join('');
       }
@@ -1759,7 +1754,7 @@
 
       box.innerHTML = list.map(p => {
         const isMe = currentUser && p.authorUid === currentUser.uid;
-        const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" />` : esc((p.author || 'S')[0].toUpperCase());
+        const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const uid = p.authorUid || 'unknown';
         const author = p.author || 'Участник';
@@ -1779,7 +1774,7 @@
             ${p.body ? `<div style="font-size: 15px; line-height: 1.48;">${esc(p.body)}</div>` : ''}
             ${p.photoData ? `
               <div class="post-img-wrap" onclick="openImageViewer('${p.photoData}', '${esc(author)}', '${esc(t)}')">
-                <img src="${p.photoData}" alt="" />
+                <img src="${p.photoData}" alt="" draggable="false" />
               </div>
             ` : ''}
             <div class="actions">
@@ -1815,7 +1810,7 @@
             </div>
             ${p.photoData ? `
               <div class="post-img-wrap" style="max-height: 240px;" onclick="openImageViewer('${p.photoData}', '${esc(myDisplayName())}', '${esc(t)}')">
-                <img src="${p.photoData}" alt="" />
+                <img src="${p.photoData}" alt="" draggable="false" />
               </div>
             ` : ''}
           </div>
@@ -1884,7 +1879,7 @@
       document.getElementById('peerAboutLine').textContent = bio;
 
       const avaBox = document.getElementById('peerAvatarCircle');
-      avaBox.innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((name[0] || 'S').toUpperCase());
+      avaBox.innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((name[0] || 'S').toUpperCase());
 
       const ring = document.getElementById('peerAvatarRing');
       const storyTag = document.getElementById('peerStoryTag');
@@ -1931,7 +1926,7 @@
               ${p.body ? `<div style="font-size: 15px; margin-top: 5px;">${esc(p.body)}</div>` : ''}
               ${p.photoData ? `
                 <div class="post-img-wrap" style="max-height: 260px;" onclick="openImageViewer('${p.photoData}', '${esc(name)}', '${esc(t)}')">
-                  <img src="${p.photoData}" alt="" />
+                  <img src="${p.photoData}" alt="" draggable="false" />
                 </div>
               ` : ''}
             </div>
@@ -1948,7 +1943,7 @@
       } else {
         photosBox.innerHTML = allPhotos.map(ph => `
           <div class="photo-cell" onclick="openImageViewer('${ph.src}', '${esc(name)}', '${esc(ph.time)}')">
-            <img src="${ph.src}" alt="" />
+            <img src="${ph.src}" alt="" draggable="false" />
           </div>
         `).join('');
       }
@@ -1969,7 +1964,7 @@
         friendsBox.innerHTML = '<div class="meta" style="padding: 12px 0;">Список друзей пуст.</div>';
       } else {
         friendsBox.innerHTML = peerFriends.map(fr => {
-          const fAva = fr.photo ? `<img src="${fr.photo}" alt="" />` : esc((fr.name[0] || 'S').toUpperCase());
+          const fAva = fr.photo ? `<img src="${fr.photo}" alt="" draggable="false" />` : esc((fr.name[0] || 'S').toUpperCase());
           return `
             <div class="list-item">
               <div class="post-user" onclick="openPersonPage('${esc(fr.uid)}', '${esc(fr.name)}')">
@@ -1991,12 +1986,20 @@
       `;
     }
 
-    function openPeerStoryViewer() {
+    function openPeerStoryViewer(ev) {
+      if (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+      }
       if (openPeerStoryData) {
         openImageViewer(openPeerStoryData.src, openPeerStoryData.author, `Сторис • ${openPeerStoryData.time}`);
       } else {
         const u = users.find(x => x.uid === openPeerUid);
-        if (u?.photoData) openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
+        if (u?.photoData) {
+          openImageViewer(u.photoData, u.fullName || openPeerName, 'Фото профиля');
+        } else {
+          toast('Сторис пока нет');
+        }
       }
     }
 
@@ -2071,7 +2074,7 @@
       } else {
         myBox.innerHTML = listToShow.map(u => {
           const nm = u.fullName || 'Участник';
-          const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
+          const ava = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((nm[0] || 'S').toUpperCase());
           return `
             <div class="list-item">
               <div class="post-user" style="cursor:pointer;" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">
@@ -2099,7 +2102,7 @@
       } else {
         otherBox.innerHTML = candidates.map(u => {
           const nm = u.fullName || 'Участник';
-          const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
+          const ava = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((nm[0] || 'S').toUpperCase());
           const rel = getFriendRel(u.uid);
           let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(nm)}')">Добавить</button>`;
           if (rel.status === 'outgoing') btn = `<span class="meta">Заявка отправлена</span>`;

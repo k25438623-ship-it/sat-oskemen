@@ -996,9 +996,11 @@
       <div id="tab-pulse" class="tab-panel">
         <div class="filter-row">
           <button type="button" id="pFilterAll" class="chip-btn active" onclick="setPulseFilter('all')">Все</button>
+          <button type="button" id="pFilterPosts" class="chip-btn" onclick="setPulseFilter('posts')">Публикации</button>
           <button type="button" id="pFilterNews" class="chip-btn" onclick="setPulseFilter('news')">Новости</button>
+          <button type="button" id="pFilterHelp" class="chip-btn" onclick="setPulseFilter('help')">Помощь</button>
+          <button type="button" id="pFilterWalks" class="chip-btn" onclick="setPulseFilter('walks')">Прогулки</button>
           <button type="button" id="pFilterCafe" class="chip-btn" onclick="setPulseFilter('cafe')">Кафе</button>
-          <button type="button" id="pFilterPeople" class="chip-btn" onclick="setPulseFilter('people')">Люди</button>
         </div>
 
         <div id="feedContainer"></div>
@@ -1313,13 +1315,15 @@
 
       <label class="meta">Раздел в «Пульсе»</label>
       <select id="postCategorySelect">
-        <option value="people">От людей (мысли, фото, события)</option>
-        <option value="news">Новости Оскемена</option>
-        <option value="cafe">Предложение / реклама кафе</option>
+        <option value="posts">Публикации</option>
+        <option value="news">Новости</option>
+        <option value="help">Помощь</option>
+        <option value="walks">Прогулки</option>
+        <option value="cafe">Кафе</option>
       </select>
 
       <label class="meta" style="display: block; margin-top: 10px;">Подпись или заголовок</label>
-      <input id="postCaptionInput" class="input" placeholder="Например: Кофейня у парка / Новости города / День в SÄT..." />
+      <input id="postCaptionInput" class="input" placeholder="Например: Кофейня у парка / Новости города / Нужна помощь..." />
 
       <label class="meta" style="display: block; margin-top: 10px;">Текст сообщения</label>
       <textarea id="postTextInput" rows="3" placeholder="Напишите ваше сообщение..."></textarea>
@@ -1567,7 +1571,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v14';
+    const STORE_KEY = 'sat_clean_state_v15';
 
     let state = {
       name: '',
@@ -1589,7 +1593,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v13') || localStorage.getItem('sat_clean_state_v12') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v14') || localStorage.getItem('sat_clean_state_v13') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
@@ -2183,10 +2187,18 @@
 
     function setPulseFilter(f) {
       pulseFilter = f;
-      document.getElementById('pFilterAll').classList.toggle('active', f === 'all');
-      document.getElementById('pFilterNews').classList.toggle('active', f === 'news');
-      document.getElementById('pFilterCafe').classList.toggle('active', f === 'cafe');
-      document.getElementById('pFilterPeople').classList.toggle('active', f === 'people');
+      const map = {
+        all: 'pFilterAll',
+        posts: 'pFilterPosts',
+        news: 'pFilterNews',
+        help: 'pFilterHelp',
+        walks: 'pFilterWalks',
+        cafe: 'pFilterCafe'
+      };
+      Object.entries(map).forEach(([key, elId]) => {
+        const el = document.getElementById(elId);
+        if (el) el.classList.toggle('active', key === f);
+      });
       renderPulse();
     }
 
@@ -2812,6 +2824,8 @@
     })();
 
     function openNewPostModal() {
+      const sel = document.getElementById('postCategorySelect');
+      if (sel) sel.value = (pulseFilter !== 'all') ? pulseFilter : 'posts';
       choosePostDest('pulse');
       document.getElementById('newPostModal').classList.add('open');
     }
@@ -2834,7 +2848,13 @@
 
     async function submitNewPost() {
       const cat = document.getElementById('postCategorySelect').value;
-      const catLabels = { news: 'Новости', cafe: 'Кафе', people: 'Люди' };
+      const catLabels = {
+        posts: 'Публикации',
+        news: 'Новости',
+        help: 'Помощь',
+        walks: 'Прогулки',
+        cafe: 'Кафе'
+      };
       const caption = document.getElementById('postCaptionInput').value.trim();
       const text = document.getElementById('postTextInput').value.trim();
       if (!caption && !text && !draftPostPhoto) {
@@ -2851,7 +2871,7 @@
         authorUid: currentUser ? currentUser.uid : (state.lastUid || 'me'),
         authorPhoto: myAvatarUrl(),
         category: cat,
-        categoryLabel: catLabels[cat] || 'Пульс',
+        categoryLabel: catLabels[cat] || 'Публикации',
         caption,
         body: text,
         photoData: draftPostPhoto || '',
@@ -2969,16 +2989,33 @@
       }
     }
 
+    function normalizePostCategory(cat) {
+      if (cat === 'people') return 'posts';
+      return cat || 'posts';
+    }
+
+    function getCategoryDisplayLabel(p) {
+      const norm = normalizePostCategory(p.category);
+      const labels = {
+        posts: 'Публикации',
+        news: 'Новости',
+        help: 'Помощь',
+        walks: 'Прогулки',
+        cafe: 'Кафе'
+      };
+      return labels[norm] || p.categoryLabel || 'Публикации';
+    }
+
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       const myUid = getMyUid();
       const list = posts.filter(p => {
         if ((p.visibility || 'pulse') !== 'pulse') return false;
         if (pulseFilter === 'all') return true;
-        return (p.category || 'people') === pulseFilter;
+        return normalizePostCategory(p.category) === pulseFilter;
       });
       if (!list.length) {
-        box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">В Пульсе пока тихо</div><div class="meta">Зайдите в Профиль и нажмите «Новая публикация», чтобы поделиться записью.</div></div>';
+        box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">В этом разделе пока пусто</div><div class="meta">Зайдите в Профиль и нажмите «Новая публикация», чтобы добавить запись.</div></div>';
         return;
       }
 
@@ -2990,7 +3027,7 @@
         const t = getPostTime(p);
         const uid = p.authorUid || 'unknown';
         const author = p.author || 'Участник';
-        const badge = p.categoryLabel || 'Пульс';
+        const badge = getCategoryDisplayLabel(p);
         const karmaVal = Number(p.karma ?? p.confirms ?? 0);
         const usedKarma = Number(state.karmaClicksByPost?.[p.id] || 0);
         const karmaReachedLimit = usedKarma >= MAX_KARMA_PER_POST;
@@ -3067,7 +3104,8 @@
       box.innerHTML = mine.map(p => {
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? p.confirms ?? 0);
-        const where = (p.visibility || 'pulse') === 'pulse' ? `В Пульсе • Карма: ${karmaVal}` : 'Только на вашей странице';
+        const catName = getCategoryDisplayLabel(p);
+        const where = (p.visibility || 'pulse') === 'pulse' ? `${catName} • Карма: ${karmaVal}` : 'Только на вашей странице';
         return `
           <div style="padding: 12px 0; border-bottom: 1px solid var(--border);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">

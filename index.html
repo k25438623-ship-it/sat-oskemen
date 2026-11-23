@@ -54,7 +54,6 @@
     }
     .ico-sm { width: 16px; height: 16px; }
 
-    /* Индикатор обновления свайпом вниз */
     .ptr-bar {
       position: fixed;
       top: 0;
@@ -90,7 +89,6 @@
     .screen { display: none; min-height: 100vh; }
     .screen.active { display: block; }
 
-    /* Экран входа SÄT */
     #splash {
       align-items: center;
       justify-content: center;
@@ -118,7 +116,6 @@
     .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: var(--green); }
     .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: var(--green); }
 
-    /* Второй экран: только Google */
     #auth {
       align-items: center;
       justify-content: center;
@@ -138,7 +135,6 @@
       text-align: center;
     }
 
-    /* Кнопки */
     .btn {
       border: none;
       border-radius: 15px;
@@ -193,7 +189,6 @@
       border: 1px solid rgba(201, 55, 72, 0.28);
     }
 
-    /* Шапка */
     .topbar {
       position: sticky;
       top: 0;
@@ -249,7 +244,6 @@
       font-family: inherit;
     }
 
-    /* Профиль */
     .profile-top { display: flex; align-items: center; gap: 15px; }
     .ava-ring {
       width: 82px;
@@ -316,7 +310,6 @@
       border-color: var(--green);
     }
 
-    /* Сетка фотографий */
     .photo-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -339,7 +332,6 @@
       pointer-events: none;
     }
 
-    /* Публикации */
     .post-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
     .post-user { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0; }
     .mini-ava {
@@ -383,7 +375,6 @@
     }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
-    /* Сетка 10 обоев */
     .wp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
     .wp-item {
       border: 2px solid var(--border);
@@ -400,7 +391,6 @@
       box-shadow: 0 0 0 3px rgba(15, 107, 67, 0.22);
     }
 
-    /* Нижняя навигация: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -442,7 +432,6 @@
     .nav-empty { display: flex; align-items: center; justify-content: center; pointer-events: none; }
     .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(15, 107, 67, 0.16); }
 
-    /* Полноэкранная страница другого человека */
     .peer-screen {
       position: fixed;
       inset: 0;
@@ -456,7 +445,6 @@
     }
     .peer-screen.open { display: flex; }
 
-    /* Модальные окна */
     .modal-bg {
       position: fixed;
       inset: 0;
@@ -479,7 +467,6 @@
     }
     #photoPickerModal { z-index: 80; }
 
-    /* Полноэкранный просмотр фото и сторис */
     .viewer-screen {
       position: fixed;
       inset: 0;
@@ -501,7 +488,6 @@
       pointer-events: none;
     }
 
-    /* Чат */
     .chat-screen {
       position: fixed;
       inset: 0;
@@ -573,21 +559,19 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
   <style id="dynamicWallpaperStyle">
-    body, .peer-screen, .chat-screen {
+    body, #app, #peerProfileScreen, #chatScreen {
       background-color: #f3f9f5 !important;
-      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1.2px, transparent 1.2px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%) !important;
+      background-image: radial-gradient(rgba(15, 107, 67, 0.06) 1.3px, transparent 1.3px), linear-gradient(165deg, #f7fbf8 0%, #f3f9f5 52%, #e5f2ea 100%) !important;
       background-size: 22px 22px, cover !important;
     }
   </style>
 </head>
 <body>
-  <!-- Индикатор обновления свайпом вниз -->
   <div id="ptrBar" class="ptr-bar">
     <div class="ptr-spin"></div>
     <span id="ptrText">Обновление...</span>
   </div>
 
-  <!-- 1. ЭКРАН ВХОДА SÄT -->
   <section id="splash" class="screen active">
     <div class="logo-box">
       <div class="logo-dots">
@@ -601,7 +585,6 @@
     <div id="sessionHint" class="meta" style="margin-top: 14px; display: none;">Проверяем вход...</div>
   </section>
 
-  <!-- 2. ЭКРАН АВТОРИЗАЦИИ ТОЛЬКО ЧЕРЕЗ GOOGLE -->
   <section id="auth" class="screen">
     <div class="auth-card">
       <div class="logo-box" style="width: 86px; height: 86px; border-radius: 26px; margin-bottom: 14px;">
@@ -620,7 +603,6 @@
     </div>
   </section>
 
-  <!-- 3. ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
   <section id="app" class="screen">
     <header class="topbar">
       <div class="brand-row">
@@ -628,18 +610,16 @@
         <div class="brand-text">SÄT</div>
       </div>
       <button type="button" class="btn btn-mint" style="padding: 8px 14px; font-size: 13.5px;" onclick="openWallpapers()">
-        <svg class="ico ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <span id="wpSwatch" style="width:12px; height:12px; border-radius:50%; background:#d0f2e2; border:1px solid #0f6b43; display:inline-block;"></span>
         <span>Обои</span>
       </button>
     </header>
 
     <main class="container">
-      <!-- ПУЛЬС -->
       <div id="tab-pulse" class="tab-panel">
         <div id="feedContainer"></div>
       </div>
 
-      <!-- ПРОФИЛЬ -->
       <div id="tab-profile" class="tab-panel active">
         <div class="card">
           <div class="profile-top">
@@ -679,7 +659,6 @@
           <button type="button" id="subTabGroups" class="sub-btn" onclick="switchMySubtab('groups')">Группы</button>
         </div>
 
-        <!-- Подвкладка: Публикации, Сторис (3 ч) и Фотографии -->
         <div id="mySubPosts">
           <div id="myStoryBanner" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
@@ -708,7 +687,6 @@
           </div>
         </div>
 
-        <!-- Подвкладка: Друзья -->
         <div id="mySubFriends" style="display: none;">
           <div class="card">
             <h3 style="margin: 0 0 8px; font-size: 16px;">Мои друзья</h3>
@@ -722,7 +700,6 @@
           </div>
         </div>
 
-        <!-- Подвкладка: Группы -->
         <div id="mySubGroups" style="display: none;">
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -735,7 +712,6 @@
       </div>
     </main>
 
-    <!-- Нижняя панель: Пульс слева в конце, 3 пустых слота по центру, Профиль справа в конце -->
     <nav class="bottom-nav">
       <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
         <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
@@ -753,7 +729,6 @@
     </nav>
   </section>
 
-  <!-- ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫВАЕТСЯ ВСЕГДА И ПОКАЗЫВАЕТ ВСЁ) -->
   <section id="peerProfileScreen" class="peer-screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
@@ -779,7 +754,6 @@
         <div id="peerActionButtons" class="actions" style="margin-top: 14px;"></div>
       </div>
 
-      <!-- Вкладки на странице другого человека: Публикации, Фото, Друзья, Информация -->
       <div class="subtabs-4">
         <button type="button" id="peerTabPosts" class="sub-btn active" onclick="switchPeerSubtab('posts')">Публикации</button>
         <button type="button" id="peerTabPhotos" class="sub-btn" onclick="switchPeerSubtab('photos')">Фото</button>
@@ -809,11 +783,9 @@
     </div>
   </section>
 
-  <!-- СКРЫТЫЕ ПОЛЯ ЗАГРУЗКИ ФОТО -->
   <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;" onchange="onImageChosen(event)" />
   <input type="file" id="galInput" accept="image/*" style="display: none;" onchange="onImageChosen(event)" />
 
-  <!-- МОДАЛКА ВЫБОРА ФОТО: КАМЕРА ПО МЕСТУ ИЛИ ГАЛЕРЕЯ -->
   <div id="photoPickerModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 id="pickerModalTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите фото</h3>
@@ -826,7 +798,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА 10 ОБОЕВ -->
   <div id="wallpapersModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -840,7 +811,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА НОВОЙ ПУБЛИКАЦИИ -->
   <div id="newPostModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
@@ -873,7 +843,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
   <div id="editProfileModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Данные профиля</h3>
@@ -888,7 +857,6 @@
     </div>
   </div>
 
-  <!-- МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
   <div id="createGroupModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Создать группу</h3>
@@ -903,7 +871,6 @@
     </div>
   </div>
 
-  <!-- ПОЛНОЭКРАННЫЙ ПРОСМОТРЩИК ФОТО И СТОРИС -->
   <div id="fullViewer" class="viewer-screen" onclick="closeFullViewer()">
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <div>
@@ -916,7 +883,6 @@
     <div style="text-align: center; font-size: 13px; opacity: 0.75;">Нажмите в любое место, чтобы закрыть</div>
   </div>
 
-  <!-- ЧАТ -->
   <div id="chatScreen" class="chat-screen">
     <div class="chat-wrap">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.92); padding: 10px 12px; border-radius: 16px;">
@@ -982,22 +948,22 @@
     const googleProvider = new GoogleAuthProvider();
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
-    const STORY_TTL = 3 * 60 * 60 * 1000; // 3 часа
+    const STORY_TTL = 3 * 60 * 60 * 1000;
 
     const WALLPAPERS = [
       { id: 'w1', name: 'Утренний сад', c1: '#f7fbf8', c2: '#eff8f2', c3: '#dfeee5', dot: 'rgba(15,107,67,0.06)' },
-      { id: 'w2', name: 'Свежая мята', c1: '#e6f9f0', c2: '#d0f2e2', c3: '#b4e6cf', dot: 'rgba(15,120,76,0.09)' },
-      { id: 'w3', name: 'Тёплый шёлк', c1: '#fdfaf0', c2: '#f5efe0', c3: '#e8dec5', dot: 'rgba(25,110,70,0.07)' },
-      { id: 'w4', name: 'Шалфей и роса', c1: '#ebf6ef', c2: '#d6eadf', c3: '#bddcc9', dot: 'rgba(15,107,67,0.09)' },
-      { id: 'w5', name: 'Фисташковый свет', c1: '#f0fce8', c2: '#dff4cf', c3: '#c8e8b0', dot: 'rgba(35,125,65,0.08)' },
-      { id: 'w6', name: 'Изумрудный туман', c1: '#e4f8f2', c2: '#cceee4', c3: '#aee0d1', dot: 'rgba(12,112,72,0.09)' },
-      { id: 'w7', name: 'Белый жемчуг', c1: '#ffffff', c2: '#eef4f0', c3: '#dbe6df', dot: 'rgba(15,107,67,0.06)' },
-      { id: 'w8', name: 'Песочный рассвет', c1: '#fcf6ea', c2: '#f2e8d4', c3: '#e4d4b7', dot: 'rgba(15,107,67,0.07)' },
-      { id: 'w9', name: 'Нефритовый лист', c1: '#dff7ec', c2: '#c3ebda', c3: '#a2dec5', dot: 'rgba(10,104,66,0.1)' },
-      { id: 'w10', name: 'Льняное утро', c1: '#f5faf6', c2: '#e4ede6', c3: '#d0dfd4', dot: 'rgba(15,107,67,0.07)' }
+      { id: 'w2', name: 'Свежая мята', c1: '#d8f8e8', c2: '#b8eed4', c3: '#91dfc0', dot: 'rgba(15,120,76,0.12)' },
+      { id: 'w3', name: 'Тёплый шёлк', c1: '#fdf8e6', c2: '#f6ebd0', c3: '#ead9b3', dot: 'rgba(140,100,30,0.09)' },
+      { id: 'w4', name: 'Шалфей и роса', c1: '#e3f5ea', c2: '#c7e5d4', c3: '#a4d0b8', dot: 'rgba(15,107,67,0.11)' },
+      { id: 'w5', name: 'Фисташковый свет', c1: '#ebfce0', c2: '#d4f2be', c3: '#b7e39b', dot: 'rgba(35,125,65,0.1)' },
+      { id: 'w6', name: 'Изумрудный туман', c1: '#d8f7ee', c2: '#b6ebdc', c3: '#8fdcc6', dot: 'rgba(12,112,72,0.11)' },
+      { id: 'w7', name: 'Белый жемчуг', c1: '#ffffff', c2: '#e9f0ec', c3: '#d1dfd7', dot: 'rgba(15,107,67,0.07)' },
+      { id: 'w8', name: 'Песочный рассвет', c1: '#fcf3df', c2: '#f2e2c2', c3: '#e3cca2', dot: 'rgba(130,85,25,0.09)' },
+      { id: 'w9', name: 'Нефритовый лист', c1: '#d1f6e5', c2: '#a9e6cb', c3: '#7fd4b0', dot: 'rgba(10,104,66,0.12)' },
+      { id: 'w10', name: 'Льняное утро', c1: '#f2f8f4', c2: '#dce8e0', c3: '#c3d6ca', dot: 'rgba(15,107,67,0.09)' }
     ];
 
-    const STORE_KEY = 'sat_clean_state_v1';
+    const STORE_KEY = 'sat_clean_state_v2';
     let state = {
       wpId: 'w1',
       name: '',
@@ -1037,21 +1003,24 @@
 
     document.getElementById('sessionHint').style.display = 'block';
 
-    /* МГНОВЕННАЯ СМЕНА ОБОЕВ ЧЕРЕЗ <style id="dynamicWallpaperStyle"> */
     function applyWallpaper(id) {
       const wp = WALLPAPERS.find(x => x.id === id) || WALLPAPERS[0];
       state.wpId = wp.id;
       persist();
 
-      const styleEl = document.getElementById('dynamicWallpaperStyle');
-      if (styleEl) {
-        styleEl.textContent = `
-          body, .peer-screen, .chat-screen {
-            background-color: ${wp.c2} !important;
-            background-image: radial-gradient(${wp.dot} 1.3px, transparent 1.3px), linear-gradient(165deg, ${wp.c1} 0%, ${wp.c2} 52%, ${wp.c3} 100%) !important;
-            background-size: 22px 22px, cover !important;
-          }
-        `;
+      const bgValue = `radial-gradient(${wp.dot} 1.4px, transparent 1.4px), linear-gradient(165deg, ${wp.c1} 0%, ${wp.c2} 52%, ${wp.c3} 100%)`;
+      const sizeValue = '22px 22px, cover';
+
+      [document.body, document.getElementById('app'), document.getElementById('peerProfileScreen'), document.getElementById('chatScreen')].forEach(el => {
+        if (!el) return;
+        el.style.setProperty('background-color', wp.c2, 'important');
+        el.style.setProperty('background-image', bgValue, 'important');
+        el.style.setProperty('background-size', sizeValue, 'important');
+      });
+
+      const swatch = document.getElementById('wpSwatch');
+      if (swatch) {
+        swatch.style.background = `linear-gradient(135deg, ${wp.c1}, ${wp.c3})`;
       }
 
       const list = document.getElementById('wallpapersList');
@@ -1150,6 +1119,7 @@
       const profNav = document.querySelector('.nav-btn[data-tab="profile"]');
       switchMainTab('profile', profNav);
       renderEverything();
+      applyWallpaper(state.wpId);
     }
 
     async function syncProfileCloud(user) {
@@ -1218,7 +1188,6 @@
       toast('Вы вышли');
     }
 
-    /* ПЛАВНОЕ ОБНОВЛЕНИЕ СВАЙПОМ ВНИЗ БЕЗ ПЕРЕЗАГРУЗКИ */
     (function initPullRefresh() {
       let y0 = 0, active = false, dist = 0;
       const bar = document.getElementById('ptrBar');
@@ -1253,7 +1222,7 @@
           txt.textContent = 'Обновляем...';
           checkOwnStoryExpiry();
           renderEverything();
-          if (openPeerUid) openPersonPage(openPeerUid, openPeerName);
+          if (openPeerUid) renderPeerPageContent();
           setTimeout(() => {
             bar.classList.remove('spinning');
             bar.style.transform = 'translate(-50%, -64px)';
@@ -1265,7 +1234,6 @@
       }, { passive: true });
     })();
 
-    /* ОБЛАЧНЫЕ ПОДПИСКИ */
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
       posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderPulse();
@@ -1311,7 +1279,6 @@
       renderGroupsTab();
     }, () => {});
 
-    /* НАВИГАЦИЯ */
     function switchMainTab(tab, btn) {
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       document.getElementById('tab-' + tab).classList.add('active');
@@ -1338,7 +1305,6 @@
       renderGroupsTab();
     }
 
-    /* МОЙ ПРОФИЛЬ */
     function renderMyProfile() {
       checkOwnStoryExpiry();
       const name = myDisplayName();
@@ -1373,7 +1339,6 @@
       }
     }
 
-    /* КАМЕРА / ГАЛЕРЕЯ */
     function openPhotoPicker(target) {
       pickTarget = target;
       const titles = {
@@ -1489,7 +1454,6 @@
       document.getElementById('fullViewer').classList.remove('open');
     }
 
-    /* ПУБЛИКАЦИИ */
     function openNewPostModal() {
       choosePostDest('pulse');
       document.getElementById('newPostModal').classList.add('open');
@@ -1666,7 +1630,6 @@
       toast('Удалено');
     }
 
-    /* ПОЛНОЦЕННАЯ СТРАНИЦА ДРУГОГО ЧЕЛОВЕКА (ОТКРЫВАЕТСЯ ВСЕГДА, ПОКАЗЫВАЕТ ВСЁ) */
     function openPersonPage(uid, fallbackName) {
       openPeerUid = uid || 'unknown';
       openPeerName = fallbackName || 'Участник';
@@ -1726,7 +1689,6 @@
         storyTag.style.display = 'none';
       }
 
-      // Кнопки действий
       const actBox = document.getElementById('peerActionButtons');
       if (currentUser && uid !== currentUser.uid && uid !== 'unknown') {
         const fs = getFriendRel(uid);
@@ -1743,7 +1705,6 @@
         actBox.innerHTML = '<div class="meta">Открытая страница участника</div>';
       }
 
-      // 1. Публикации человека
       const userPosts = posts.filter(p => p.authorUid === uid);
       const postsBox = document.getElementById('peerPostsList');
       if (!userPosts.length) {
@@ -1765,7 +1726,6 @@
         }).join('');
       }
 
-      // 2. Фотографии человека
       const fromPosts = userPosts.filter(p => p.photoData).map(p => ({ src: p.photoData, time: getPostTime(p) }));
       const fromSaved = Array.isArray(u.savedPhotos) ? u.savedPhotos.map(src => ({ src, time: '' })) : [];
       const allPhotos = [...fromPosts, ...fromSaved];
@@ -1780,7 +1740,6 @@
         `).join('');
       }
 
-      // 3. Друзья человека
       const fUids = new Set();
       friendsDocs.forEach(r => {
         if (r.status === 'accepted') {
@@ -1810,7 +1769,6 @@
         }).join('');
       }
 
-      // 4. Информация о странице
       document.getElementById('peerInfoBox').innerHTML = `
         <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
         <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
@@ -1829,7 +1787,6 @@
       }
     }
 
-    /* ДРУЗЬЯ */
     function getFriendRel(otherUid) {
       if (!currentUser) return { status: 'none' };
       const r = friendsDocs.find(x =>
@@ -1924,7 +1881,6 @@
       } catch (e) {}
     }
 
-    /* ГРУППЫ */
     function renderGroupsTab() {
       const box = document.getElementById('groupsBox');
       if (!box || !currentUser) return;
@@ -1986,7 +1942,6 @@
       } catch (e) {}
     }
 
-    /* ЧАТ */
     async function openDirectChat(otherUid, otherName) {
       if (!currentUser || !otherUid || otherUid === currentUser.uid) return;
       const id = 'dm_' + [currentUser.uid, otherUid].sort().join('_');
@@ -2061,7 +2016,6 @@
       } catch (e) {}
     }
 
-    /* РЕДАКТИРОВАНИЕ ПРОФИЛЯ */
     function openEditProfileModal() {
       document.getElementById('editNameField').value = myDisplayName();
       document.getElementById('editBioField').value = state.bio || '';

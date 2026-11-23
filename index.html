@@ -446,25 +446,11 @@
     .nav-empty { display: flex; align-items: center; justify-content: center; pointer-events: none; }
     .nav-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(108, 240, 181, 0.25); }
 
-    .peer-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 55;
-      width: 100vw;
-      height: 100dvh;
-      overflow-y: auto;
-      display: none;
-      flex-direction: column;
-      padding-bottom: 36px;
-      background: transparent;
-    }
-    .peer-screen.open { display: flex; }
-
     .modal-bg {
       position: fixed;
       inset: 0;
       z-index: 65;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.24);
       display: none;
       align-items: flex-end;
       justify-content: center;
@@ -475,7 +461,8 @@
       max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      background: #0e1d17;
+      background: rgba(14, 29, 23, 0.72);
+      backdrop-filter: blur(8px);
       color: var(--text);
       border-top: 1px solid var(--border-strong);
       border-radius: 26px 26px 0 0;
@@ -744,8 +731,8 @@
     </nav>
   </section>
 
-  <!-- ОТДЕЛЬНАЯ ВКЛАДКА / ЭКРАН СТРАНИЦЫ ВЫБРАННОГО ЧЕЛОВЕКА -->
-  <section id="peerProfileScreen" class="peer-screen">
+  <!-- ОТДЕЛЬНЫЙ ЭКРАН-ВКЛАДКА СТРАНИЦЫ ВЫБРАННОГО ЧЕЛОВЕКА -->
+  <section id="peerProfileScreen" class="screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
       <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: #6cf0b5;">Страница</div>
@@ -1410,7 +1397,7 @@
 
       window.addEventListener('touchstart', (e) => {
         if (!document.getElementById('app').classList.contains('active')) return;
-        if (document.querySelector('.modal-bg.open') || document.getElementById('peerProfileScreen').classList.contains('open') || document.getElementById('chatScreen').classList.contains('open')) return;
+        if (document.querySelector('.modal-bg.open') || document.getElementById('chatScreen').classList.contains('open')) return;
         if (window.scrollY <= 2) {
           y0 = e.touches[0].clientY;
           active = true;
@@ -1861,15 +1848,15 @@
       openPeerName = fallbackName || 'Участник';
       switchPeerSubtab('posts');
       renderPeerPageContent();
-      const scr = document.getElementById('peerProfileScreen');
-      scr.classList.add('open');
-      scr.scrollTop = 0;
+      showScreen('peerProfileScreen');
+      window.scrollTo(0, 0);
     }
 
     function closePeerScreen() {
       openPeerUid = null;
       openPeerName = '';
-      document.getElementById('peerProfileScreen').classList.remove('open');
+      showScreen('app');
+      window.scrollTo(0, 0);
     }
 
     function switchPeerSubtab(sub) {

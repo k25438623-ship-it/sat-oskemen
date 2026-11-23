@@ -155,6 +155,7 @@
       touch-action: manipulation;
     }
     .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.65; cursor: default; }
     .btn-primary {
       background: linear-gradient(135deg, #1ea86b, #0f6b43);
       color: #ffffff;
@@ -1136,7 +1137,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
               <h3 style="margin: 0; font-size: 17px;">Чаты</h3>
-              <div class="meta">Нажмите на чат с другом или группу — откроется на весь экран</div>
+              <div id="chatsUnreadSummary" class="meta">Нажмите на чат с другом или группу — откроется на весь экран</div>
             </div>
             <span class="tag" id="chatsCountBadge">0</span>
           </div>
@@ -1327,7 +1328,7 @@
           <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">В Пульс</button>
           <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
         </div>
-        <div id="destHelpText" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, можно ставить карму и писать комментарии.</div>
+        <div id="destHelpText" class="meta" style="margin-top: 6px;">Увидят все в Пульсе, можно ставить карму (до 3 раз) и писать комментарии.</div>
       </div>
 
       <div class="actions" style="margin-top: 16px;">
@@ -1543,6 +1544,7 @@
 
     const CREATOR_EMAILS = [];
     const CREATOR_UIDS = [];
+    const MAX_KARMA_PER_POST = 3;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1551,7 +1553,7 @@
     setPersistence(auth, browserLocalPersistence).catch(() => {});
 
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v10';
+    const STORE_KEY = 'sat_clean_state_v11';
 
     let state = {
       name: '',
@@ -1562,6 +1564,7 @@
       storyStart: 0,
       storyEnd: 0,
       storyLabel: '',
+      karmaClicksByPost: {},
       cachedFriends: [],
       cachedUsers: [],
       cachedRequests: [],
@@ -1572,9 +1575,10 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v9') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v10') || localStorage.getItem('sat_clean_state_v9') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
+      if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
       if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
       if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
@@ -2374,11 +2378,25 @@
     function renderProfileChatsList() {
       const box = document.getElementById('profileChatsList');
       const badge = document.getElementById('chatsCountBadge');
+      const summaryEl = document.getElementById('chatsUnreadSummary');
       if (!box) return;
 
       const myUid = getMyUid();
       const myChats = chats.filter(c => Array.isArray(c.members) ? (!myUid || c.members.includes(myUid)) : true);
       if (badge) badge.textContent = String(myChats.length);
+
+      let unreadTotal = 0;
+      myChats.forEach(c => {
+        if (myUid && c.lastSenderUid && c.lastSenderUid !== myUid && !(Array.isArray(c.readByUsers) && c.readByUsers.includes(myUid))) {
+          unreadTotal++;
+        }
+      });
+
+      if (summaryEl) {
+        summaryEl.textContent = unreadTotal > 0
+          ? `Непрочитанных диалогов: ${unreadTotal} • Нажмите, чтобы открыть`
+          : 'Нажмите на чат с другом или группу — откроется на весь экран';
+      }
 
       if (!myChats.length) {
         box.innerHTML = '<div class="meta" style="margin-top: 10px;">Чатов пока нет. Откройте вкладку «Друзья» или «Группы», чтобы начать переписку.</div>';
@@ -2388,12 +2406,15 @@
       box.innerHTML = myChats.map(c => {
         const title = getChatDisplayTitle(c);
         const hasUnread = Boolean(myUid && c.lastSenderUid && c.lastSenderUid !== myUid && !(Array.isArray(c.readByUsers) && c.readByUsers.includes(myUid)));
+        const updMs = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+        const timeStr = updMs ? formatTime(updMs) : '';
         const sub = c.lastMessage || (c.type === 'group' ? (c.description || 'Группа') : 'Нажмите, чтобы открыть чат');
         return `
           <div class="chat-row-card ${hasUnread ? 'has-unread' : ''}" onclick="openChatRoom('${esc(c.id)}', '${esc(title)}')">
             <div style="min-width: 0; flex: 1;">
               <div style="font-weight: 800; font-size: 15px; color: #eef8f3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(title)}</div>
               <div class="meta" style="margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(sub)}</div>
+              ${timeStr ? `<div class="meta" style="font-size: 11px; margin-top: 2px;">${esc(timeStr)}</div>` : ''}
             </div>
             ${hasUnread ? '<span class="tag-alert">Новое</span>' : '<span class="tag">Открыть</span>'}
           </div>
@@ -2596,7 +2617,7 @@
       document.getElementById('destBtnPulse').classList.toggle('active', d === 'pulse');
       document.getElementById('destBtnSelf').classList.toggle('active', d === 'self');
       document.getElementById('destHelpText').textContent = d === 'pulse'
-        ? 'Увидят все в Пульсе, можно ставить карму и писать комментарии.'
+        ? 'Увидят все в Пульсе, можно ставить карму (до 3 раз) и писать комментарии.'
         : 'Сохранится только на вашей странице — гости смогут зайти и прочитать.';
     }
 
@@ -2678,6 +2699,19 @@
       return Boolean(myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_');
     }
 
+    function ensureCommentsListener(postId) {
+      if (!postId || String(postId).startsWith('tmp_') || commentUnsubs.has(postId)) return;
+      const q = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
+      const unsub = onSnapshot(q, (snap) => {
+        const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        commentsByPostId.set(postId, list);
+        renderPulse();
+      }, (err) => {
+        recordAppError('Комментарии: ' + (err?.message || err));
+      });
+      commentUnsubs.set(postId, unsub);
+    }
+
     function toggleCommentsPanel(postId) {
       if (!postId) return;
       if (openCommentsPostIds.has(postId)) {
@@ -2686,17 +2720,7 @@
         return;
       }
       openCommentsPostIds.add(postId);
-      if (!String(postId).startsWith('tmp_') && !commentUnsubs.has(postId)) {
-        const q = query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc'));
-        const unsub = onSnapshot(q, (snap) => {
-          const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-          commentsByPostId.set(postId, list);
-          renderPulse();
-        }, (err) => {
-          recordAppError('Комментарии: ' + (err?.message || err));
-        });
-        commentUnsubs.set(postId, unsub);
-      }
+      ensureCommentsListener(postId);
       renderPulse();
     }
 
@@ -2720,6 +2744,7 @@
 
       const prev = commentsByPostId.get(postId) || [];
       commentsByPostId.set(postId, [...prev, cmtObj]);
+      openCommentsPostIds.add(postId);
       renderPulse();
 
       if (!String(postId).startsWith('tmp_')) {
@@ -2742,6 +2767,7 @@
 
     function renderPulse() {
       const box = document.getElementById('feedContainer');
+      const myUid = getMyUid();
       const list = posts.filter(p => {
         if ((p.visibility || 'pulse') !== 'pulse') return false;
         if (pulseFilter === 'all') return true;
@@ -2753,13 +2779,17 @@
       }
 
       box.innerHTML = list.map(p => {
+        ensureCommentsListener(p.id);
         const isMine = canManagePost(p);
+        const isSelfAuthor = Boolean(myUid && p.authorUid === myUid);
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const uid = p.authorUid || 'unknown';
         const author = p.author || 'Участник';
         const badge = p.categoryLabel || 'Пульс';
         const karmaVal = Number(p.karma ?? p.confirms ?? 0);
+        const usedKarma = Number(state.karmaClicksByPost?.[p.id] || 0);
+        const karmaReachedLimit = usedKarma >= MAX_KARMA_PER_POST;
         const cmtList = commentsByPostId.get(p.id) || [];
         const isCmtOpen = openCommentsPostIds.has(p.id);
         const safeId = esc(p.id);
@@ -2771,7 +2801,7 @@
                 <div class="comment-item">
                   <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                     <span style="font-weight:800; font-size:13px; color:#6cf0b5;">${esc(c.authorName || 'Участник')}</span>
-                    <span class="meta" style="font-size:11px;">${esc(c.time || '')}</span>
+                    <span class="meta" style="font-size:11px;">${esc(c.time || formatTime(Date.now()))}</span>
                   </div>
                   <div style="font-size:14px; margin-top:4px; line-height:1.38;">${esc(c.text || '')}</div>
                 </div>
@@ -2784,10 +2814,14 @@
           </div>
         ` : '';
 
+        const authorClickAttr = (!isSelfAuthor && p.authorUid)
+          ? `onclick="openPersonPage('${esc(uid)}', '${esc(author)}')"`
+          : '';
+
         return `
           <article class="card">
             <div class="post-head">
-              <div class="post-user" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">
+              <div class="post-user" ${authorClickAttr}>
                 <div class="mini-ava">${ava}</div>
                 <div>
                   <div class="user-name">${esc(author)}</div>
@@ -2804,10 +2838,12 @@
               </div>
             ` : ''}
             <div class="actions">
-              <button type="button" class="btn btn-gold" style="padding: 8px 12px; font-size: 13px;" onclick="giveKarma('${safeId}')">+1 Карма (${karmaVal})</button>
+              <button type="button" class="btn btn-gold" style="padding: 8px 12px; font-size: 13px;" ${karmaReachedLimit ? 'disabled' : ''} onclick="giveKarma('${safeId}')">
+                ${karmaReachedLimit ? `Карма: ${karmaVal} (3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
+              </button>
               <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13px;" onclick="toggleCommentsPanel('${safeId}')">Комментарии (${cmtList.length})</button>
-              <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">Страница</button>
-              ${!isMine && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(author)}')">Написать</button>` : ''}
+              ${!isSelfAuthor && p.authorUid ? `<button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openPersonPage('${esc(uid)}', '${esc(author)}')">Страница</button>` : ''}
+              ${!isSelfAuthor && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openDirectChat('${esc(uid)}', '${esc(author)}')">Написать</button>` : ''}
               ${isMine ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="removePost('${safeId}')">Удалить</button>` : ''}
             </div>
             ${commentsHtml}
@@ -2849,6 +2885,15 @@
     }
 
     async function giveKarma(id) {
+      if (!id) return;
+      const used = Number(state.karmaClicksByPost?.[id] || 0);
+      if (used >= MAX_KARMA_PER_POST) {
+        toast('Можно поставить карму не больше 3 раз');
+        return;
+      }
+      state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: used + 1 };
+      persist();
+
       posts = posts.map(p => {
         if (p.id !== id) return p;
         const nextK = Number(p.karma ?? p.confirms ?? 0) + 1;
@@ -2861,7 +2906,7 @@
           await updateDoc(doc(db, 'posts', id), { karma: increment(1), confirms: increment(1) });
         } catch (e) {}
       }
-      toast('+1 к карме');
+      toast(`+1 к карме (${used + 1}/${MAX_KARMA_PER_POST})`);
     }
 
     async function removePost(id) {
@@ -2882,7 +2927,16 @@
     }
 
     function openPersonPage(uid, fallbackName) {
-      openPeerUid = uid || 'unknown';
+      const myUid = getMyUid();
+      if (!uid || uid === 'unknown') {
+        toast('Страница участника недоступна');
+        return;
+      }
+      if (myUid && uid === myUid) {
+        goToProfileStart();
+        return;
+      }
+      openPeerUid = uid;
       openPeerName = fallbackName || 'Участник';
       switchPeerSubtab('posts');
       renderPeerPageContent();
@@ -2911,7 +2965,12 @@
 
     function renderPeerPageContent() {
       const uid = openPeerUid;
+      const myUid = getMyUid();
       if (!uid) return;
+      if (myUid && uid === myUid) {
+        closePeerScreen();
+        return;
+      }
 
       const u = users.find(x => x.uid === uid) || {};
       const name = u.fullName || openPeerName || 'Участник';
@@ -2941,20 +3000,16 @@
       }
 
       const actBox = document.getElementById('peerActionButtons');
-      if (currentUser && uid !== currentUser.uid && uid !== 'unknown') {
-        const fs = getFriendRel(uid);
-        let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">Добавить в друзья</button>`;
-        if (fs.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
-        else if (fs.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
-        else if (fs.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${fs.id}')">Принять заявку</button>`;
+      const fs = getFriendRel(uid);
+      let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">Добавить в друзья</button>`;
+      if (fs.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
+      else if (fs.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
+      else if (fs.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${fs.id}')">Принять заявку</button>`;
 
-        actBox.innerHTML = `
-          <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать сообщение</button>
-          ${fBtn}
-        `;
-      } else {
-        actBox.innerHTML = '<div class="meta">Открытая страница участника</div>';
-      }
+      actBox.innerHTML = `
+        <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать сообщение</button>
+        ${fBtn}
+      `;
 
       const userPosts = posts.filter(p => p.authorUid === uid);
       const postsBox = document.getElementById('peerPostsList');
@@ -2998,6 +3053,8 @@
           if (r.toUid === uid) fUids.add(r.fromUid);
         }
       });
+      fUids.delete(myUid);
+
       const peerFriends = Array.from(fUids).map(fid => {
         const fu = users.find(x => x.uid === fid);
         return { uid: fid, name: fu?.fullName || 'Участник', photo: fu?.photoData || '' };
@@ -3020,9 +3077,13 @@
         }).join('');
       }
 
+      const updMs = u.updatedAt?.toMillis ? u.updatedAt.toMillis() : 0;
+      const lastSeenText = updMs ? formatTime(updMs) : formatTime(Date.now());
+
       document.getElementById('peerInfoBox').innerHTML = `
         <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
         <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
+        <div class="list-item"><span class="meta">Активность</span><span>${esc(lastSeenText)}</span></div>
         <div class="list-item"><span class="meta">Публикаций</span><span style="font-weight:700;">${userPosts.length}</span></div>
         <div class="list-item"><span class="meta">Фотографий</span><span style="font-weight:700;">${allPhotos.length}</span></div>
         <div class="list-item"><span class="meta">Друзей</span><span style="font-weight:700;">${peerFriends.length}</span></div>
@@ -3052,7 +3113,7 @@
 
     function getFriendRel(otherUid) {
       const myUid = getMyUid();
-      if (!myUid) return { status: 'none' };
+      if (!myUid || !otherUid || otherUid === myUid) return { status: 'none' };
       const r = friendsDocs.find(x =>
         (x.fromUid === myUid && x.toUid === otherUid) ||
         (x.toUid === myUid && x.fromUid === otherUid)
@@ -3110,7 +3171,7 @@
         persist();
       }
 
-      const listToShow = myFriends.length ? myFriends : state.cachedFriends;
+      const listToShow = (myFriends.length ? myFriends : state.cachedFriends).filter(f => f.uid && f.uid !== myUid);
 
       if (!listToShow.length) {
         myBox.innerHTML = '<div class="meta">Друзей пока нет. Добавьте людей ниже.</div>';
@@ -3166,7 +3227,7 @@
 
     async function addFriend(toUid, toName) {
       const myUid = getMyUid();
-      if (!myUid) return;
+      if (!myUid || !toUid || toUid === myUid) return;
       const id = [myUid, toUid].sort().join('_');
       try {
         await setDoc(doc(db, 'friendRequests', id), {
@@ -3415,11 +3476,11 @@
       box.innerHTML = chatMsgs.map(m => {
         const mine = Boolean(myUid && m.senderUid === myUid) || String(m.id).startsWith('tmp_');
         const whoHtml = (!mine && m.senderName) ? `<div class="msg-who">${esc(m.senderName)}</div>` : '';
+        const msgMs = m.createdAt?.toMillis ? m.createdAt.toMillis() : (m.sentAtMs || Date.now());
+        const timeMini = new Date(msgMs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const editedHtml = m.edited ? `<span class="msg-edited">изменено</span>` : '';
         const chkHtml = mine ? renderReadCheckmark(m, myUid) : '';
-        const metaRow = (editedHtml || chkHtml)
-          ? `<div class="msg-meta-row">${editedHtml}${chkHtml}</div>`
-          : '';
+        const metaRow = `<div class="msg-meta-row"><span style="opacity:0.75;">${esc(timeMini)}</span>${editedHtml}${chkHtml}</div>`;
         const editBtnHtml = (mine && m.kind !== 'photo' && m.kind !== 'voice')
           ? `<button type="button" class="msg-tool-btn" onclick="beginEditMessage('${esc(m.id)}')">Ред.</button>`
           : '';
@@ -3431,7 +3492,7 @@
           return `
             <div class="msg ${mine ? 'me' : 'them'}">
               ${whoHtml}
-              <img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(m.createdAt?.toMillis ? m.createdAt.toMillis() : Date.now()))}')" />
+              <img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(msgMs))}')" />
               ${metaRow}
               ${toolsHtml}
             </div>
@@ -3564,13 +3625,15 @@
       inp.value = '';
       playSendSound();
 
-      const tmpId = 'tmp_msg_' + Date.now();
+      const now = Date.now();
+      const tmpId = 'tmp_msg_' + now;
       chatMsgs = [...chatMsgs, {
         id: tmpId,
         senderUid: myUid,
         senderName: myDisplayName(),
         kind: 'text',
         text,
+        sentAtMs: now,
         readBy: [myUid]
       }];
       renderChatBox();
@@ -3581,6 +3644,7 @@
           senderName: myDisplayName(),
           kind: 'text',
           text,
+          sentAtMs: now,
           readBy: [myUid],
           createdAt: serverTimestamp()
         });

@@ -186,12 +186,12 @@
       font-weight: 900;
     }
     .btn-mint {
-      background: rgba(30, 168, 107, 0.18);
+      background: rgba(30, 168, 107, 0.2);
       color: #6cf0b5;
       border: 1px solid var(--border-strong);
     }
     .btn-ghost {
-      background: rgba(20, 40, 31, 0.78);
+      background: rgba(18, 36, 28, 0.72);
       color: var(--text);
       border: 1px solid var(--border);
     }
@@ -205,8 +205,8 @@
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(10, 22, 17, 0.78);
-      backdrop-filter: blur(12px);
+      background: rgba(10, 22, 17, 0.74);
+      backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
       display: flex;
@@ -235,8 +235,8 @@
     .tab-panel.active { display: block; }
 
     .card {
-      background: rgba(12, 24, 19, 0.68);
-      backdrop-filter: blur(10px);
+      background: rgba(11, 23, 18, 0.56);
+      backdrop-filter: blur(7px);
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 16px;
@@ -309,7 +309,7 @@
 
     .sub-btn {
       border: 1px solid var(--border);
-      background: rgba(14, 28, 22, 0.74);
+      background: rgba(14, 28, 22, 0.68);
       color: var(--text);
       border-radius: 13px;
       padding: 10px 6px;
@@ -411,8 +411,8 @@
       left: 0;
       right: 0;
       z-index: 30;
-      background: rgba(10, 22, 17, 0.86);
-      backdrop-filter: blur(14px);
+      background: rgba(10, 22, 17, 0.84);
+      backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -744,6 +744,7 @@
     </nav>
   </section>
 
+  <!-- ОТДЕЛЬНАЯ ВКЛАДКА / ЭКРАН СТРАНИЦЫ ВЫБРАННОГО ЧЕЛОВЕКА -->
   <section id="peerProfileScreen" class="peer-screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
@@ -818,7 +819,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <h3 style="margin: 0; font-size: 18px;">Живые обои городов</h3>
-          <div class="meta">Нажмите — фон за карточками оживёт сразу</div>
+          <div class="meta">Нажмите — живая сцена за карточками обновится сразу</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
@@ -922,16 +923,16 @@
   <script>
     (function () {
       const CITIES = [
-        { id: 'oskemen', name: 'Өскемен', desc: 'Ночной Иртыш, сопки и огни', sky1: '#05120d', sky2: '#0c261c', glow: 'rgba(46, 214, 142, 0.28)', water: true, style: 'oskemen' },
-        { id: 'katon', name: 'Катон-Карагай', desc: 'Горные пики, туман и звёзды', sky1: '#040f0b', sky2: '#0a2118', glow: 'rgba(66, 224, 158, 0.26)', water: false, style: 'mountains' },
-        { id: 'almaty', name: 'Алматы', desc: 'Огни предгорий и ночной хребет', sky1: '#070e18', sky2: '#102238', glow: 'rgba(245, 178, 72, 0.24)', water: false, style: 'almaty' },
-        { id: 'astana', name: 'Астана', desc: 'Байтерек и огни мегаполиса', sky1: '#060c1a', sky2: '#0f1f3d', glow: 'rgba(72, 184, 245, 0.26)', water: true, style: 'astana' },
-        { id: 'turkestan', name: 'Туркестан', desc: 'Ночной купол и золотой месяц', sky1: '#120e07', sky2: '#261d0e', glow: 'rgba(235, 185, 76, 0.28)', water: false, style: 'mosque' },
-        { id: 'istanbul', name: 'Стамбул', desc: 'Босфор, минареты и огни на воде', sky1: '#07111a', sky2: '#102536', glow: 'rgba(235, 168, 72, 0.25)', water: true, style: 'istanbul' },
-        { id: 'mecca', name: 'Мекка', desc: 'Звёздная ночь и тёплое сияние', sky1: '#0b0c09', sky2: '#1a1c12', glow: 'rgba(232, 192, 88, 0.3)', water: false, style: 'mecca' },
-        { id: 'tokyo', name: 'Токио', desc: 'Ночные небоскрёбы и неоновые огни', sky1: '#070a18', sky2: '#121836', glow: 'rgba(46, 224, 184, 0.28)', water: false, style: 'skyline' },
-        { id: 'paris', name: 'Париж', desc: 'Вечерняя башня и огни Сены', sky1: '#0d0c18', sky2: '#1d1a33', glow: 'rgba(242, 188, 92, 0.26)', water: true, style: 'paris' },
-        { id: 'aurora', name: 'Северное сияние', desc: 'Живые изумрудные волны в небе', sky1: '#030d0a', sky2: '#08221a', glow: 'rgba(42, 238, 152, 0.34)', water: true, style: 'aurora' }
+        { id: 'oskemen', name: 'Өскемен', desc: 'Ночной Иртыш, сопки и огни', sky1: '#04120c', sky2: '#0b291d', glow: 'rgba(54, 226, 150, 0.34)', water: true, style: 'oskemen' },
+        { id: 'katon', name: 'Катон-Карагай', desc: 'Горные пики, туман и звёзды', sky1: '#04100b', sky2: '#0b2419', glow: 'rgba(72, 232, 166, 0.32)', water: false, style: 'mountains' },
+        { id: 'almaty', name: 'Алматы', desc: 'Огни предгорий и ночной хребет', sky1: '#060e19', sky2: '#11253d', glow: 'rgba(245, 182, 76, 0.3)', water: false, style: 'almaty' },
+        { id: 'astana', name: 'Астана', desc: 'Байтерек и огни мегаполиса', sky1: '#060c1b', sky2: '#102242', glow: 'rgba(78, 192, 250, 0.32)', water: true, style: 'astana' },
+        { id: 'turkestan', name: 'Туркестан', desc: 'Ночной купол и золотой месяц', sky1: '#120d06', sky2: '#291e0e', glow: 'rgba(242, 190, 78, 0.34)', water: false, style: 'mosque' },
+        { id: 'istanbul', name: 'Стамбул', desc: 'Босфор, минареты и огни на воде', sky1: '#06111b', sky2: '#11283b', glow: 'rgba(240, 172, 74, 0.3)', water: true, style: 'istanbul' },
+        { id: 'mecca', name: 'Мекка', desc: 'Звёздная ночь и тёплое сияние', sky1: '#0b0c08', sky2: '#1c1f13', glow: 'rgba(238, 198, 92, 0.36)', water: false, style: 'mecca' },
+        { id: 'tokyo', name: 'Токио', desc: 'Ночные небоскрёбы и неоновые огни', sky1: '#060919', sky2: '#131b3d', glow: 'rgba(52, 232, 190, 0.34)', water: false, style: 'skyline' },
+        { id: 'paris', name: 'Париж', desc: 'Вечерняя башня и огни Сены', sky1: '#0c0b19', sky2: '#201c38', glow: 'rgba(245, 192, 96, 0.32)', water: true, style: 'paris' },
+        { id: 'aurora', name: 'Северное сияние', desc: 'Живые изумрудные волны в небе', sky1: '#030d0a', sky2: '#08251c', glow: 'rgba(48, 245, 158, 0.4)', water: true, style: 'aurora' }
       ];
 
       let activeCity = CITIES[0];
@@ -939,21 +940,31 @@
       const ctx = canvas ? canvas.getContext('2d') : null;
       let W = 360, H = 740;
 
-      const stars = Array.from({ length: 55 }, function () {
+      const stars = Array.from({ length: 65 }, function () {
         return {
           x: Math.random(),
-          y: Math.random() * 0.58,
-          r: 0.7 + Math.random() * 1.5,
-          sp: 0.8 + Math.random() * 2.2,
+          y: Math.random() * 0.56,
+          r: 0.8 + Math.random() * 1.7,
+          sp: 1.0 + Math.random() * 2.5,
           ph: Math.random() * Math.PI * 2
         };
       });
 
-      const cityLights = Array.from({ length: 42 }, function () {
+      const floatingSparks = Array.from({ length: 24 }, function () {
         return {
           x: Math.random(),
-          y: 0.64 + Math.random() * 0.14,
-          w: 1.5 + Math.random() * 2.5,
+          y: 0.25 + Math.random() * 0.65,
+          r: 1.2 + Math.random() * 2.2,
+          vy: 0.015 + Math.random() * 0.03,
+          ph: Math.random() * Math.PI * 2
+        };
+      });
+
+      const cityLights = Array.from({ length: 48 }, function () {
+        return {
+          x: Math.random(),
+          y: 0.62 + Math.random() * 0.15,
+          w: 1.8 + Math.random() * 2.6,
           ph: Math.random() * Math.PI * 2,
           gold: Math.random() > 0.35
         };
@@ -970,18 +981,18 @@
       resizeCanvas();
 
       function drawSilhouette(t) {
-        const horizon = H * 0.76;
-        ctx.fillStyle = 'rgba(4, 11, 8, 0.88)';
+        const horizon = H * 0.75;
+        ctx.fillStyle = 'rgba(4, 11, 8, 0.9)';
 
         if (activeCity.style === 'oskemen' || activeCity.style === 'mountains' || activeCity.style === 'almaty') {
           ctx.beginPath();
           ctx.moveTo(0, horizon);
           ctx.lineTo(0, horizon - H * 0.14);
-          ctx.lineTo(W * 0.18, horizon - H * 0.24);
+          ctx.lineTo(W * 0.18, horizon - H * 0.25);
           ctx.lineTo(W * 0.36, horizon - H * 0.12);
-          ctx.lineTo(W * 0.58, horizon - H * 0.28);
+          ctx.lineTo(W * 0.58, horizon - H * 0.29);
           ctx.lineTo(W * 0.82, horizon - H * 0.15);
-          ctx.lineTo(W, horizon - H * 0.21);
+          ctx.lineTo(W, horizon - H * 0.22);
           ctx.lineTo(W, horizon);
           ctx.closePath();
           ctx.fill();
@@ -990,74 +1001,74 @@
         if (activeCity.style === 'oskemen' || activeCity.style === 'mosque' || activeCity.style === 'istanbul' || activeCity.style === 'mecca') {
           const cx = W * 0.5;
           ctx.beginPath();
-          ctx.arc(cx, horizon - 26, 36, Math.PI, 0);
-          ctx.lineTo(cx + 42, horizon);
-          ctx.lineTo(cx - 42, horizon);
+          ctx.arc(cx, horizon - 26, 38, Math.PI, 0);
+          ctx.lineTo(cx + 44, horizon);
+          ctx.lineTo(cx - 44, horizon);
           ctx.closePath();
           ctx.fill();
 
-          ctx.fillRect(cx - 64, horizon - 88, 7, 88);
-          ctx.fillRect(cx + 57, horizon - 88, 7, 88);
+          ctx.fillRect(cx - 66, horizon - 92, 7, 92);
+          ctx.fillRect(cx + 59, horizon - 92, 7, 92);
 
-          ctx.fillStyle = 'rgba(245, 208, 108, 0.85)';
+          ctx.fillStyle = 'rgba(248, 212, 110, 0.9)';
           ctx.beginPath();
-          ctx.arc(W * 0.78, H * 0.16, 14, 0, Math.PI * 2);
+          ctx.arc(W * 0.78, H * 0.16, 15, 0, Math.PI * 2);
           ctx.fill();
           ctx.fillStyle = activeCity.sky1;
           ctx.beginPath();
-          ctx.arc(W * 0.78 + 6, H * 0.16 - 3, 12, 0, Math.PI * 2);
+          ctx.arc(W * 0.78 + 6, H * 0.16 - 3, 12.5, 0, Math.PI * 2);
           ctx.fill();
         } else if (activeCity.style === 'astana') {
           const cx = W * 0.5;
-          ctx.fillRect(cx - 7, horizon - 115, 14, 115);
-          ctx.fillStyle = 'rgba(245, 204, 86, 0.85)';
+          ctx.fillRect(cx - 7, horizon - 118, 14, 118);
+          ctx.fillStyle = 'rgba(248, 208, 88, 0.9)';
           ctx.beginPath();
-          ctx.arc(cx, horizon - 122, 16, 0, Math.PI * 2);
+          ctx.arc(cx, horizon - 125, 16, 0, Math.PI * 2);
           ctx.fill();
         } else if (activeCity.style === 'paris') {
           const cx = W * 0.5;
           ctx.beginPath();
-          ctx.moveTo(cx - 32, horizon);
-          ctx.lineTo(cx - 4, horizon - 145);
-          ctx.lineTo(cx + 4, horizon - 145);
-          ctx.lineTo(cx + 32, horizon);
+          ctx.moveTo(cx - 34, horizon);
+          ctx.lineTo(cx - 4, horizon - 148);
+          ctx.lineTo(cx + 4, horizon - 148);
+          ctx.lineTo(cx + 34, horizon);
           ctx.closePath();
           ctx.fill();
         } else if (activeCity.style === 'skyline') {
           const bars = [0.1, 0.24, 0.4, 0.56, 0.72, 0.86];
-          const heights = [75, 120, 95, 140, 105, 80];
+          const heights = [78, 124, 98, 144, 108, 84];
           bars.forEach(function (bx, idx) {
             ctx.fillRect(W * bx - 16, horizon - heights[idx], 32, heights[idx]);
           });
         }
 
         cityLights.forEach(function (l) {
-          const alpha = 0.25 + 0.65 * (0.5 + 0.5 * Math.sin(t * 2 + l.ph));
-          ctx.fillStyle = l.gold ? 'rgba(255, 212, 102,' + alpha + ')' : 'rgba(110, 245, 185,' + alpha + ')';
-          ctx.fillRect(l.x * W, l.y * H, l.w, 2);
+          const alpha = 0.28 + 0.68 * (0.5 + 0.5 * Math.sin(t * 2.2 + l.ph));
+          ctx.fillStyle = l.gold ? 'rgba(255, 214, 104,' + alpha + ')' : 'rgba(116, 248, 190,' + alpha + ')';
+          ctx.fillRect(l.x * W, l.y * H, l.w, 2.2);
         });
 
-        const fogX = Math.sin(t * 0.35) * 35;
-        const fogGrad = ctx.createLinearGradient(0, horizon - 35, 0, horizon + 10);
-        fogGrad.addColorStop(0, 'rgba(140, 235, 195, 0)');
-        fogGrad.addColorStop(0.5, 'rgba(140, 235, 195, 0.08)');
-        fogGrad.addColorStop(1, 'rgba(140, 235, 195, 0)');
+        const fogX = Math.sin(t * 0.45) * 45;
+        const fogGrad = ctx.createLinearGradient(0, horizon - 40, 0, horizon + 12);
+        fogGrad.addColorStop(0, 'rgba(145, 240, 200, 0)');
+        fogGrad.addColorStop(0.5, 'rgba(145, 240, 200, 0.11)');
+        fogGrad.addColorStop(1, 'rgba(145, 240, 200, 0)');
         ctx.fillStyle = fogGrad;
-        ctx.fillRect(fogX - 40, horizon - 35, W + 80, 45);
+        ctx.fillRect(fogX - 50, horizon - 40, W + 100, 52);
 
         if (activeCity.water) {
           const waterGrad = ctx.createLinearGradient(0, horizon, 0, H);
-          waterGrad.addColorStop(0, 'rgba(6, 18, 14, 0.92)');
+          waterGrad.addColorStop(0, 'rgba(6, 20, 15, 0.92)');
           waterGrad.addColorStop(1, 'rgba(3, 9, 7, 0.98)');
           ctx.fillStyle = waterGrad;
           ctx.fillRect(0, horizon, W, H - horizon);
 
-          for (let i = 0; i < 18; i++) {
-            const wy = horizon + 10 + i * ((H - horizon) / 18);
-            const wx = ((i * 53 + Math.sin(t * 1.4 + i) * 28) % W + W) % W;
-            const len = 18 + (i % 4) * 12;
-            ctx.fillStyle = 'rgba(110, 240, 185, 0.16)';
-            ctx.fillRect(wx, wy, len, 1.5);
+          for (let i = 0; i < 20; i++) {
+            const wy = horizon + 10 + i * ((H - horizon) / 20);
+            const wx = ((i * 57 + Math.sin(t * 1.6 + i) * 34) % W + W) % W;
+            const len = 20 + (i % 4) * 14;
+            ctx.fillStyle = 'rgba(116, 248, 190, 0.2)';
+            ctx.fillRect(wx, wy, len, 1.8);
           }
         } else {
           ctx.fillStyle = 'rgba(4, 11, 8, 0.96)';
@@ -1076,33 +1087,42 @@
         ctx.fillStyle = sky;
         ctx.fillRect(0, 0, W, H);
 
-        const gx = W * 0.5 + Math.sin(t * 0.5) * 45;
-        const gy = H * 0.32 + Math.cos(t * 0.4) * 25;
-        const radial = ctx.createRadialGradient(gx, gy, 10, gx, gy, W * 0.65);
+        const gx = W * 0.5 + Math.sin(t * 0.55) * 55;
+        const gy = H * 0.3 + Math.cos(t * 0.45) * 30;
+        const radial = ctx.createRadialGradient(gx, gy, 12, gx, gy, W * 0.72);
         radial.addColorStop(0, activeCity.glow);
         radial.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = radial;
         ctx.fillRect(0, 0, W, H);
 
-        if (activeCity.style === 'aurora') {
-          for (let w = 0; w < 3; w++) {
-            ctx.beginPath();
-            ctx.moveTo(0, H * 0.25);
-            for (let x = 0; x <= W; x += 24) {
-              const y = H * (0.2 + w * 0.06) + Math.sin(x * 0.012 + t * (1.1 + w * 0.3)) * 24;
-              ctx.lineTo(x, y);
-            }
-            ctx.strokeStyle = 'rgba(65, 245, 165, 0.22)';
-            ctx.lineWidth = 14;
-            ctx.stroke();
+        for (let w = 0; w < 3; w++) {
+          ctx.beginPath();
+          ctx.moveTo(0, H * 0.24);
+          for (let x = 0; x <= W; x += 22) {
+            const amp = activeCity.style === 'aurora' ? 28 : 11;
+            const y = H * (0.18 + w * 0.07) + Math.sin(x * 0.013 + t * (1.15 + w * 0.28)) * amp;
+            ctx.lineTo(x, y);
           }
+          ctx.strokeStyle = activeCity.style === 'aurora' ? 'rgba(68, 248, 168, 0.25)' : 'rgba(120, 235, 185, 0.09)';
+          ctx.lineWidth = activeCity.style === 'aurora' ? 14 : 8;
+          ctx.stroke();
         }
 
         stars.forEach(function (s) {
           const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
-          ctx.fillStyle = 'rgba(235, 252, 244,' + a + ')';
+          ctx.fillStyle = 'rgba(238, 254, 246,' + a + ')';
           ctx.beginPath();
           ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        floatingSparks.forEach(function (sp) {
+          const py = ((sp.y - t * sp.vy) % 0.85 + 0.85) % 0.85 + 0.1;
+          const px = sp.x * W + Math.sin(t * 1.3 + sp.ph) * 14;
+          const alpha = 0.2 + 0.5 * Math.sin(t * 2 + sp.ph);
+          ctx.fillStyle = 'rgba(140, 248, 198,' + alpha + ')';
+          ctx.beginPath();
+          ctx.arc(px, py * H, sp.r, 0, Math.PI * 2);
           ctx.fill();
         });
 
@@ -2067,7 +2087,7 @@
           const ava = u.photoData ? `<img src="${u.photoData}" alt="" />` : esc((nm[0] || 'S').toUpperCase());
           return `
             <div class="list-item">
-              <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">
+              <div class="post-user" style="cursor:pointer;" onclick="openPersonPage('${esc(u.uid)}', '${esc(nm)}')">
                 <div class="mini-ava">${ava}</div>
                 <div class="user-name">${esc(nm)}</div>
               </div>

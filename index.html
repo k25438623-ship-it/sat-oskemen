@@ -1017,7 +1017,6 @@
     </div>
   </section>
 
-  <!-- Время намаза по Оскемену (ручное обновление + подсветка текущего намаза) -->
   <div id="namazQiblaModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
@@ -1193,12 +1192,15 @@
   </div>
 
   <div id="fullViewer" class="viewer-screen">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
       <div>
         <div id="viewerTitle" style="font-weight: 800; font-size: 16px;">Фото</div>
         <div id="viewerSub" style="font-size: 12px; opacity: 0.78;"></div>
       </div>
-      <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="downloadCurrentViewerPhoto()">Скачать</button>
+        <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
+      </div>
     </div>
     <div id="viewerStage" class="viewer-stage">
       <img id="viewerImage" src="" alt="" draggable="false" />
@@ -1365,7 +1367,8 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v23';
+    const STORE_KEY = 'sat_clean_state_v24';
+    const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1394,21 +1397,65 @@
       cachedFriends: [],
       cachedUsers: [],
       cachedRequests: [],
-      lastUid: ''
+      lastUid: '',
+      lastSilentError: null
     };
 
-    try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v22') || '{}');
-      state = { ...state, ...parsed };
-      if (!Array.isArray(state.photos)) state.photos = [];
-      if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
-      if (!state.manualPrayerTimes || typeof state.manualPrayerTimes !== 'object') {
-        state.manualPrayerTimes = { Fajr: '05:45', Dhuhr: '12:15', Asr: '14:40', Maghrib: '16:40', Isha: '18:20', updatedDateLabel: '' };
+    function normalizePhotos(list) {
+      if (!Array.isArray(list)) return [];
+      return list.map((x) => {
+        if (!x) return null;
+        if (typeof x === 'string') return { src: x, caption: '' };
+        if (typeof x === 'object' && x.src) return { src: x.src, caption: String(x.caption || '') };
+        return null;
+      }).filter(Boolean);
+    }
+
+    function recoverFromAnyBackup() {
+      const keys = [
+        STORE_KEY,
+        VAULT_BACKUP_KEY,
+        'sat_clean_state_v23',
+        'sat_clean_state_v22',
+        'sat_clean_state_v21',
+        'sat_clean_state_v20',
+        'sat_clean_state_v19',
+        'sat_clean_state_v18'
+      ];
+      let best = null;
+      for (const k of keys) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (!raw) continue;
+          const p = JSON.parse(raw);
+          if (!p || typeof p !== 'object') continue;
+          if (!best) best = { ...p };
+          else {
+            if (!best.avatar && p.avatar) best.avatar = p.avatar;
+            if ((!best.photos || !best.photos.length) && Array.isArray(p.photos) && p.photos.length) best.photos = p.photos;
+            if (!best.name && p.name) best.name = p.name;
+            if (!best.bio && p.bio) best.bio = p.bio;
+          }
+        } catch (e) {}
       }
-      if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
-      if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
-      if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
-    } catch (e) {}
+      return best;
+    }
+
+    const recovered = recoverFromAnyBackup();
+    if (recovered) {
+      state = {
+        ...state,
+        ...recovered,
+        photos: normalizePhotos(recovered.photos),
+        karmaClicksByPost: recovered.karmaClicksByPost && typeof recovered.karmaClicksByPost === 'object' ? recovered.karmaClicksByPost : {},
+        manualPrayerTimes: recovered.manualPrayerTimes && typeof recovered.manualPrayerTimes === 'object'
+          ? recovered.manualPrayerTimes
+          : state.manualPrayerTimes,
+        cachedFriends: Array.isArray(recovered.cachedFriends) ? recovered.cachedFriends : [],
+        cachedUsers: Array.isArray(recovered.cachedUsers) ? recovered.cachedUsers : [],
+        cachedRequests: Array.isArray(recovered.cachedRequests) ? recovered.cachedRequests : []
+      };
+    }
 
     let currentUser = null;
     let posts = [];
@@ -1429,6 +1476,8 @@
     let prayerEditOpen = false;
     let initialChatsLoaded = false;
     const notifiedChatLastMsg = new Map();
+    const retryQueue = [];
+    const postPhotoRegistry = new Map();
 
     let vScale = 1, vPanX = 0, vPanY = 0, vStartScale = 1, vStartDist = 0, vStartX = 0, vStartY = 0, vPanOriginX = 0, vPanOriginY = 0, vMode = 'none', vLastTap = 0;
 
@@ -1516,24 +1565,49 @@
       return '<span class="offline-txt">не в сети</span>';
     }
 
-    function normalizePhotos(list) {
-      if (!Array.isArray(list)) return [];
-      return list.map((x) => {
-        if (!x) return null;
-        if (typeof x === 'string') return { src: x, caption: '' };
-        if (typeof x === 'object' && x.src) return { src: x.src, caption: String(x.caption || '') };
-        return null;
-      }).filter(Boolean);
+    function persist() {
+      const payload = JSON.stringify({
+        ...state,
+        photos: normalizePhotos(state.photos).slice(0, 30)
+      });
+      try { localStorage.setItem(STORE_KEY, payload); } catch (e) {}
+      try { localStorage.setItem(VAULT_BACKUP_KEY, payload); } catch (e) {}
     }
 
-    function persist() {
-      try {
-        localStorage.setItem(STORE_KEY, JSON.stringify({
-          ...state,
-          photos: normalizePhotos(state.photos).slice(0, 12)
-        }));
-      } catch (e) {}
+    function queueCloudRetry(fn) {
+      retryQueue.push({ fn, tries: 0 });
     }
+
+    setInterval(async () => {
+      if (!retryQueue.length) return;
+      const item = retryQueue[0];
+      item.tries += 1;
+      try {
+        await item.fn();
+        retryQueue.shift();
+      } catch (e) {
+        if (item.tries >= 8) retryQueue.shift();
+      }
+    }, 4500);
+
+    window.addEventListener('error', (ev) => {
+      state.lastSilentError = {
+        time: Date.now(),
+        msg: ev?.message || 'error',
+        line: ev?.lineno || 0
+      };
+      persist();
+      return true;
+    });
+
+    window.addEventListener('unhandledrejection', (ev) => {
+      state.lastSilentError = {
+        time: Date.now(),
+        msg: String(ev?.reason?.message || ev?.reason || 'promise_error')
+      };
+      persist();
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+    });
 
     function getMyUid() {
       return currentUser?.uid || state.lastUid || '';
@@ -1582,6 +1656,10 @@
       if (!user) return;
       checkOwnStoryExpiry();
       state.lastUid = user.uid;
+      if (!state.avatar && recovered?.avatar) state.avatar = recovered.avatar;
+      if ((!state.photos || !state.photos.length) && recovered?.photos?.length) {
+        state.photos = normalizePhotos(recovered.photos);
+      }
       const nowMs = Date.now();
       persist();
       try {
@@ -1590,7 +1668,7 @@
           fullName: myDisplayName(),
           bio: state.bio || 'Мой профиль SÄT',
           photoData: myAvatarUrl(),
-          savedPhotos: normalizePhotos(state.photos).slice(0, 12),
+          savedPhotos: normalizePhotos(state.photos).slice(0, 30),
           storyData: state.story || '',
           storyCreatedAt: state.storyStart || 0,
           storyExpiresAt: state.storyEnd || 0,
@@ -1598,7 +1676,21 @@
           lastSeenMs: nowMs,
           updatedAt: serverTimestamp()
         }, { merge: true });
-      } catch (e) {}
+      } catch (e) {
+        queueCloudRetry(() => setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          fullName: myDisplayName(),
+          bio: state.bio || 'Мой профиль SÄT',
+          photoData: myAvatarUrl(),
+          savedPhotos: normalizePhotos(state.photos).slice(0, 30),
+          storyData: state.story || '',
+          storyCreatedAt: state.storyStart || 0,
+          storyExpiresAt: state.storyEnd || 0,
+          storyTimeLabel: state.storyLabel || '',
+          lastSeenMs: Date.now(),
+          updatedAt: serverTimestamp()
+        }, { merge: true }));
+      }
     }
 
     async function pingOnlinePresence() {
@@ -1663,7 +1755,9 @@
     }
 
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
-      posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const cloudPosts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const pendingLocal = posts.filter((p) => String(p.id).startsWith('tmp_'));
+      posts = [...pendingLocal, ...cloudPosts];
       renderPulse();
       renderMyPosts();
       if (openPeerUid) renderPeerPageContent();
@@ -1674,6 +1768,15 @@
       if (fresh.length) {
         users = fresh;
         state.cachedUsers = fresh.slice(0, 100);
+        const myUid = getMyUid();
+        const meCloud = myUid ? fresh.find((u) => u.uid === myUid) : null;
+        if (meCloud) {
+          if (!state.avatar && meCloud.photoData) state.avatar = meCloud.photoData;
+          if ((!state.photos || !state.photos.length) && Array.isArray(meCloud.savedPhotos) && meCloud.savedPhotos.length) {
+            state.photos = normalizePhotos(meCloud.savedPhotos);
+          }
+          if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
+        }
         persist();
       }
       renderMyProfile();
@@ -1835,7 +1938,7 @@
       if (!dataUrl) return;
       const cap = String(caption || '').trim().slice(0, 120);
       const list = normalizePhotos(state.photos).filter((p) => p.src !== dataUrl);
-      state.photos = [{ src: dataUrl, caption: cap }, ...list].slice(0, 20);
+      state.photos = [{ src: dataUrl, caption: cap }, ...list].slice(0, 30);
       persist();
     }
 
@@ -2025,6 +2128,23 @@
       document.getElementById('fullViewer')?.classList.remove('open');
     }
 
+    function downloadCurrentViewerPhoto() {
+      const img = document.getElementById('viewerImage');
+      const src = img ? img.getAttribute('src') : '';
+      if (!src) { toast('Нет фото для скачивания'); return; }
+      try {
+        const a = document.createElement('a');
+        a.href = src;
+        a.download = `sat-photo-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast('Фото сохранено на устройство');
+      } catch (e) {
+        toast('Удерживайте фото для сохранения');
+      }
+    }
+
     function getTouchDist(t1, t2) { return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY); }
 
     (function bindViewerTouchGestures() {
@@ -2109,6 +2229,18 @@
       return map[normalizePostCategory(p.category)] || p.categoryLabel || 'Публикации';
     }
 
+    function resolvePostAuthorUid(p) {
+      if (p && p.authorUid && p.authorUid !== 'null' && p.authorUid !== 'undefined') {
+        return String(p.authorUid);
+      }
+      if (p && p.author) {
+        const found = users.find((u) => (u.fullName || '').trim().toLowerCase() === String(p.author).trim().toLowerCase());
+        if (found?.uid) return String(found.uid);
+        return 'by_name:' + encodeURIComponent(String(p.author).trim());
+      }
+      return '';
+    }
+
     async function submitNewPost() {
       const cat = document.getElementById('postCategorySelect').value;
       const caption = document.getElementById('postCaptionInput').value.trim();
@@ -2117,29 +2249,29 @@
       const now = Date.now();
       const timeStr = formatTime(now);
       const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
+      const uidForPost = getMyUid() || 'guest';
 
-      const item = {
-        id: 'tmp_' + now,
+      const payload = {
         author: myDisplayName(),
-        authorUid: getMyUid() || 'me',
+        authorUid: uidForPost,
         authorPhoto: myAvatarUrl(),
         category: cat,
         categoryLabel: getCategoryDisplayLabel({ category: cat }),
-        caption, body: text,
+        caption,
+        body: text,
         photoData: draftPostPhoto || '',
         visibility: vis,
-        sentAtMs: now, time: timeStr, karma: 0
+        sentAtMs: now,
+        time: timeStr,
+        karma: 0
       };
+
+      const item = { id: 'tmp_' + now, ...payload };
       posts = [item, ...posts];
       renderPulse(); renderMyPosts();
 
-      try {
-        await addDoc(collection(db, 'posts'), {
-          author: item.author, authorUid: currentUser ? currentUser.uid : null, authorPhoto: item.authorPhoto,
-          category: item.category, categoryLabel: item.categoryLabel, caption, body: text,
-          photoData: draftPostPhoto || '', visibility: vis, sentAtMs: now, time: timeStr, karma: 0, createdAt: serverTimestamp()
-        });
-      } catch (e) {}
+      const writePost = () => addDoc(collection(db, 'posts'), { ...payload, createdAt: serverTimestamp() });
+      writePost().catch(() => queueCloudRetry(writePost));
 
       document.getElementById('postCaptionInput').value = '';
       document.getElementById('postTextInput').value = '';
@@ -2188,10 +2320,21 @@
       }
     }
 
+    document.getElementById('feedContainer')?.addEventListener('click', (ev) => {
+      const wrap = ev.target.closest('[data-post-photo]');
+      if (!wrap) return;
+      const pid = wrap.getAttribute('data-post-photo');
+      const item = postPhotoRegistry.get(pid);
+      if (item && item.src) {
+        openImageViewer(item.src, item.author, item.time);
+      }
+    });
+
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       if (!box) return;
       const myUid = getMyUid();
+      postPhotoRegistry.clear();
       const list = posts.filter((p) => {
         if ((p.visibility || 'pulse') !== 'pulse') return false;
         return pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter;
@@ -2202,8 +2345,9 @@
       }
       box.innerHTML = list.map((p) => {
         ensureCommentsListener(p.id);
-        const isMine = Boolean(myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_');
-        const isSelf = Boolean(myUid && p.authorUid === myUid);
+        const resolvedUid = resolvePostAuthorUid(p);
+        const isSelf = Boolean(myUid && (p.authorUid === myUid || resolvedUid === myUid));
+        const isMine = isSelf || String(p.id).startsWith('tmp_');
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? 0);
@@ -2212,6 +2356,16 @@
         const cmtList = commentsByPostId.get(p.id) || [];
         const isCmtOpen = openCommentsPostIds.has(p.id);
         const safeId = esc(p.id);
+        const safeAuthorUid = esc(resolvedUid);
+        const safeAuthorName = esc(p.author || 'Участник');
+
+        if (p.photoData) {
+          postPhotoRegistry.set(String(p.id), {
+            src: p.photoData,
+            author: p.author || 'Фото',
+            time: t
+          });
+        }
 
         const commentsHtml = isCmtOpen ? `
           <div class="comments-box">
@@ -2231,13 +2385,24 @@
           </div>
         ` : '';
 
+        const karmaBtnHtml = !isSelf
+          ? `<button type="button" class="btn btn-gold" style="padding:8px 12px; font-size:13px;" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">
+              ${reached ? `Карма: ${karmaVal} (3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
+            </button>`
+          : `<span class="tag" style="padding:8px 12px;">Карма: ${karmaVal}</span>`;
+
+        const peerButtonsHtml = (!isSelf && resolvedUid)
+          ? `<button type="button" class="btn btn-mint" style="padding:8px 12px; font-size:13px;" onclick="openPersonPage('${safeAuthorUid}', '${safeAuthorName}')">Страница</button>
+             ${!resolvedUid.startsWith('by_name:') ? `<button type="button" class="btn btn-primary" style="padding:8px 12px; font-size:13px;" onclick="openDirectChat('${safeAuthorUid}', '${safeAuthorName}')">Написать</button>` : ''}`
+          : '';
+
         return `
           <article class="card">
             <div class="post-head">
-              <div class="post-user" ${(!isSelf && p.authorUid) ? `onclick="openPersonPage('${esc(p.authorUid)}', '${esc(p.author || 'Участник')}')"` : ''}>
+              <div class="post-user" ${(!isSelf && resolvedUid) ? `onclick="openPersonPage('${safeAuthorUid}', '${safeAuthorName}')"` : ''}>
                 <div class="mini-ava">${ava}</div>
                 <div>
-                  <div class="user-name">${esc(p.author || 'Участник')}</div>
+                  <div class="user-name">${safeAuthorName}</div>
                   <div class="meta">${esc(t)}</div>
                 </div>
               </div>
@@ -2245,14 +2410,11 @@
             </div>
             ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
             ${p.body ? `<div style="font-size:15px; line-height:1.48; margin-top:6px;">${esc(p.body)}</div>` : ''}
-            ${p.photoData ? `<div class="post-img-wrap" onclick="openImageViewer('${p.photoData}', '${esc(p.author || 'Фото')}', '${esc(t)}')"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
+            ${p.photoData ? `<div class="post-img-wrap" data-post-photo="${safeId}"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
             <div class="actions">
-              <button type="button" class="btn btn-gold" style="padding:8px 12px; font-size:13px;" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">
-                ${reached ? `Карма: ${karmaVal} (3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
-              </button>
+              ${karmaBtnHtml}
               <button type="button" class="btn btn-ghost" style="padding:8px 12px; font-size:13px;" onclick="toggleCommentsPanel('${safeId}')">Комментарии (${cmtList.length})</button>
-              ${!isSelf && p.authorUid ? `<button type="button" class="btn btn-mint" style="padding:8px 12px; font-size:13px;" onclick="openPersonPage('${esc(p.authorUid)}', '${esc(p.author || 'Участник')}')">Страница</button>` : ''}
-              ${!isSelf && p.authorUid ? `<button type="button" class="btn btn-primary" style="padding:8px 12px; font-size:13px;" onclick="openDirectChat('${esc(p.authorUid)}', '${esc(p.author || 'Участник')}')">Написать</button>` : ''}
+              ${peerButtonsHtml}
               ${isMine ? `<button type="button" class="btn btn-danger" style="padding:8px 12px; font-size:13px;" onclick="removePost('${safeId}')">Удалить</button>` : ''}
             </div>
             ${commentsHtml}
@@ -2265,7 +2427,13 @@
       const box = document.getElementById('myPostsBox');
       if (!box) return;
       const myUid = getMyUid();
-      const mine = posts.filter((p) => (myUid && p.authorUid === myUid) || String(p.id).startsWith('tmp_'));
+      const myName = myDisplayName().toLowerCase();
+      const mine = posts.filter((p) => {
+        if (myUid && p.authorUid === myUid) return true;
+        if (String(p.id).startsWith('tmp_')) return true;
+        if ((!p.authorUid || p.authorUid === 'guest') && (p.author || '').toLowerCase() === myName) return true;
+        return false;
+      });
       if (!mine.length) { box.innerHTML = '<div class="meta">Публикаций пока нет.</div>'; return; }
       box.innerHTML = mine.map((p) => `
         <div style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:8px;">
@@ -2280,6 +2448,12 @@
     }
 
     async function giveKarma(id) {
+      const targetPost = posts.find((p) => p.id === id);
+      const myUid = getMyUid();
+      if (targetPost && myUid && targetPost.authorUid === myUid) {
+        toast('Карму нельзя ставить себе');
+        return;
+      }
       const used = Number(state.karmaClicksByPost?.[id] || 0);
       if (used >= MAX_KARMA_PER_POST) { toast('Лимит кармы: 3 раза на запись'); return; }
       state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: used + 1 };
@@ -2305,6 +2479,16 @@
       const myUid = getMyUid();
       if (!uid || uid === 'unknown') return;
       if (myUid && uid === myUid) { goToProfileStart(); return; }
+      if (String(uid).startsWith('by_name:')) {
+        const rawName = decodeURIComponent(String(uid).slice('by_name:'.length));
+        openPeerUid = uid;
+        openPeerName = rawName || fallbackName || 'Участник';
+        switchPeerSubtab('posts');
+        renderPeerPageContent();
+        showScreen('peerProfileScreen');
+        window.scrollTo(0, 0);
+        return;
+      }
       openPeerUid = uid; openPeerName = fallbackName || 'Участник';
       switchPeerSubtab('posts');
       renderPeerPageContent();
@@ -2326,13 +2510,14 @@
       if (!uid) return;
       if (myUid && uid === myUid) { closePeerScreen(); return; }
 
+      const isByName = String(uid).startsWith('by_name:');
       const u = users.find((x) => x.uid === uid) || {};
       const name = u.fullName || openPeerName || 'Участник';
       const bio = u.bio || 'Участник SÄT';
       document.getElementById('peerHeaderTitle').textContent = name;
       document.getElementById('peerFullName').textContent = name;
       const pOnline = document.getElementById('peerOnlineStatus');
-      if (pOnline) pOnline.innerHTML = formatPresenceHtml(u.lastSeenMs);
+      if (pOnline) pOnline.innerHTML = isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs);
       document.getElementById('peerAboutLine').textContent = bio;
       document.getElementById('peerAvatarCircle').innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((name[0] || 'S').toUpperCase());
 
@@ -2341,18 +2526,21 @@
       document.getElementById('peerAvatarRing')?.classList.toggle('has-story', hasStory);
       document.getElementById('peerStoryTag').style.display = hasStory ? 'block' : 'none';
 
-      const rel = getFriendRel(uid);
-      let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">В друзья</button>`;
-      if (rel.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
-      else if (rel.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
-      else if (rel.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${rel.id}')">Принять</button>`;
+      let actionHtml = '';
+      if (!isByName) {
+        const rel = getFriendRel(uid);
+        let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">В друзья</button>`;
+        if (rel.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
+        else if (rel.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
+        else if (rel.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${rel.id}')">Принять</button>`;
+        actionHtml = `
+          <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать</button>
+          ${fBtn}
+        `;
+      }
+      document.getElementById('peerActionButtons').innerHTML = actionHtml;
 
-      document.getElementById('peerActionButtons').innerHTML = `
-        <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать</button>
-        ${fBtn}
-      `;
-
-      const uPosts = posts.filter((p) => p.authorUid === uid);
+      const uPosts = posts.filter((p) => p.authorUid === uid || (isByName && (p.author || '').trim().toLowerCase() === name.trim().toLowerCase()));
       document.getElementById('peerPostsList').innerHTML = uPosts.length
         ? uPosts.map((p) => `<div style="padding:10px 0; border-bottom:1px solid var(--border);"><div class="meta">${esc(getPostTime(p))}</div><div style="margin-top:4px;">${esc(p.body || p.caption || '')}</div></div>`).join('')
         : '<div class="meta">Публикаций нет.</div>';
@@ -2377,7 +2565,7 @@
 
       document.getElementById('peerInfoBox').innerHTML = `
         <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
-        <div class="list-item"><span class="meta">Статус</span><span>${formatPresenceHtml(u.lastSeenMs)}</span></div>
+        <div class="list-item"><span class="meta">Статус</span><span>${isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs)}</span></div>
         <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
         <div class="list-item"><span class="meta">Публикаций</span><span>${uPosts.length}</span></div>
       `;
@@ -2984,18 +3172,19 @@
       renderOskemenPrayerUI();
       togglePrayerEditor(false);
 
-      try {
-        await setDoc(doc(db, 'settings', 'oskemen_prayer'), {
-          Fajr: f,
-          Dhuhr: d,
-          Asr: a,
-          Maghrib: m,
-          Isha: i,
-          updatedDateLabel: label,
-          updatedBy: myDisplayName(),
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-      } catch (e) {}
+      const prayerPayload = {
+        Fajr: f,
+        Dhuhr: d,
+        Asr: a,
+        Maghrib: m,
+        Isha: i,
+        updatedDateLabel: label,
+        updatedBy: myDisplayName(),
+        updatedAt: serverTimestamp()
+      };
+      setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true }).catch(() => {
+        queueCloudRetry(() => setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true }));
+      });
 
       toast('Время намаза по Оскемену сохранено');
     }
@@ -3040,7 +3229,7 @@
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
-      openImageViewer, closeFullViewer,
+      openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       giveKarma, toggleCommentsPanel, addPostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,

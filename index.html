@@ -560,6 +560,8 @@
     #avatarChoiceModal { z-index: 90; }
     #namazQiblaModal { z-index: 92; }
     #supportModal { z-index: 94; }
+    #accountRoleModal { z-index: 96; }
+    #deleteAccountModal { z-index: 97; }
 
     .viewer-screen {
       position: fixed;
@@ -912,7 +914,10 @@
               </div>
             </div>
             <div style="min-width: 0; flex: 1;">
-              <h2 id="myNameText" style="margin: 0; font-size: 20px;">Участник</h2>
+              <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                <h2 id="myNameText" style="margin: 0; font-size: 20px;">Участник</h2>
+                <span id="myAccountRoleBadge"></span>
+              </div>
               <div id="myBioText" class="meta" style="margin-top: 4px;">Мой профиль SÄT</div>
               <div id="myOnlineBadge" style="margin-top: 5px;"><span class="online-dot"></span><span class="online-txt">в сети</span></div>
             </div>
@@ -930,7 +935,21 @@
           <div class="actions" style="margin-top: 10px;">
             <button type="button" class="btn btn-primary" style="flex: 1; font-size: 13.5px;" onclick="openNewPostModal()">Новая публикация</button>
             <button type="button" class="btn btn-ghost" style="font-size: 13.5px;" onclick="openEditProfileModal()">Изменить</button>
-            <button type="button" class="btn btn-danger" style="font-size: 13.5px;" onclick="logoutUser()">Выйти</button>
+            <button type="button" class="btn btn-danger" style="font-size: 13.5px;" onclick="openDeleteAccountModal()">Удалить страницу</button>
+            <button type="button" class="btn btn-ghost" style="font-size: 13.5px;" onclick="logoutUser()">Выйти</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 16px;">Анкета</h3>
+              <div id="myQuestionnaireMeta" class="meta">Видна другим пользователям на вашей странице</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="openEditProfileModal()">Заполнить</button>
+          </div>
+          <div id="myQuestionnaireText" style="margin-top: 8px; font-size: 14px; line-height: 1.48; color: #d8ece2;">
+            Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.
           </div>
         </div>
 
@@ -969,6 +988,14 @@
         </div>
 
         <div id="mySubFriends" style="display: none;">
+          <div id="incomingFriendRequestsCard" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">Заявки в друзья</h3>
+              <span class="tag-alert" id="incomingFriendCountBadge">0</span>
+            </div>
+            <div id="incomingFriendRequestsList"></div>
+          </div>
+
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <h3 style="margin: 0; font-size: 16px;">Мои друзья</h3>
@@ -1057,9 +1084,12 @@
             <div id="peerAvatarCircle" class="ava-circle">Ä</div>
           </div>
           <div style="min-width: 0; flex: 1;">
-            <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+              <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
+              <span id="peerAccountRoleBadge"></span>
+            </div>
             <div id="peerOnlineStatus" style="margin-top: 3px;"></div>
-            <div id="peerAboutLine" class="meta" style="margin-top: 4px;">Участник SÄT</div>
+            <div id="peerAboutLine" class="meta" style="margin-top: 6px; line-height: 1.45;">Участник SÄT</div>
             <div id="peerStoryTag" style="display: none; margin-top: 8px;">
               <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
             </div>
@@ -1072,7 +1102,7 @@
         <button type="button" id="peerTabPosts" class="sub-btn active" onclick="switchPeerSubtab('posts')">Публикации</button>
         <button type="button" id="peerTabPhotos" class="sub-btn" onclick="switchPeerSubtab('photos')">Фото</button>
         <button type="button" id="peerTabFriends" class="sub-btn" onclick="switchPeerSubtab('friends')">Друзья</button>
-        <button type="button" id="peerTabInfo" class="sub-btn" onclick="switchPeerSubtab('info')">Инфо</button>
+        <button type="button" id="peerTabInfo" class="sub-btn" onclick="switchPeerSubtab('info')">Анкета</button>
       </div>
 
       <div id="peerPanelPosts" class="card"><div id="peerPostsList"></div></div>
@@ -1081,6 +1111,36 @@
       <div id="peerPanelInfo" class="card" style="display: none;"><div id="peerInfoBox"></div></div>
     </div>
   </section>
+
+  <div id="accountRoleModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 6px; font-size: 18px;">Выберите тип аккаунта</h3>
+      <p class="meta" style="margin: 0 0 14px; line-height: 1.45;">
+        Это можно изменить в любое время в разделе «Изменить» профиля. Видны только имя, анкета и статус в SÄT.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('user')">
+          Пользователь
+        </button>
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('business')">
+          Бизнес-аккаунт
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteAccountModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 8px; font-size: 18px; color: var(--danger);">Удалить страницу SÄT?</h3>
+      <p class="meta" style="margin: 0 0 14px; line-height: 1.5;">
+        Ваша страница, анкета, фото и публикации в SÄT будут удалены, а вы выйдете из аккаунта приложения. Это действие нельзя отменить.
+      </p>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('deleteAccountModal')">Отмена</button>
+        <button type="button" id="confirmDeleteAccountBtn" class="btn btn-danger" style="flex: 1;" onclick="deleteMyPageCompletely()">Да, удалить</button>
+      </div>
+    </div>
+  </div>
 
   <div id="readingViewerModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1307,11 +1367,35 @@
 
   <div id="editProfileModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 10px;">Данные профиля</h3>
+      <h3 style="margin: 0 0 10px;">Данные профиля и анкета</h3>
       <label class="meta">Имя</label>
-      <input id="editNameField" class="input" placeholder="Введите имя" />
-      <label class="meta" style="display: block; margin-top: 10px;">О себе</label>
-      <input id="editBioField" class="input" placeholder="Коротко о себе..." />
+      <input id="editNameField" class="input" placeholder="Введите имя" oninput="updateNameStylePreview()" />
+
+      <label class="meta" style="display: block; margin-top: 10px;">Стиль шрифта имени</label>
+      <select id="editNameStyleSelect" onchange="updateNameStylePreview()">
+        <option value="normal">Обычный</option>
+        <option value="bold">Жирный (𝐀𝐛𝐜)</option>
+        <option value="italic">Курсив (𝐴𝑏𝑐)</option>
+        <option value="fraktur">Акцентный (𝔄𝔟𝔠)</option>
+        <option value="mono">Печатный (𝙰𝚋𝚌)</option>
+      </select>
+      <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: #6cf0b5; font-weight: 700;"></div>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Тип аккаунта</label>
+      <select id="editAccountTypeSelect">
+        <option value="user">Пользователь</option>
+        <option value="business">Бизнес-аккаунт</option>
+      </select>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Анкета / О себе (видно другим пользователям)</label>
+      <textarea id="editBioField" rows="3" placeholder="Коротко о себе или о вашем деле..."></textarea>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Статус активности</label>
+      <select id="editHideLastSeenSelect">
+        <option value="0">Показывать «в сети» и время визита</option>
+        <option value="1">Скрывать время последнего визита</option>
+      </select>
+
       <div class="actions" style="margin-top: 14px;">
         <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('editProfileModal')">Отмена</button>
         <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()">Сохранить</button>
@@ -1539,8 +1623,30 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v32';
+    const STORE_KEY = 'sat_clean_state_v33';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
+
+    const NAME_STYLE_MAPS = {
+      bold: {
+        A:'𝐀',B:'𝐁',C:'𝐂',D:'𝐃',E:'𝐄',F:'𝐅',G:'𝐆',H:'𝐇',I:'𝐈',J:'𝐉',K:'𝐊',L:'𝐋',M:'𝐌',N:'𝐍',O:'𝐎',P:'𝐏',Q:'𝐐',R:'𝐑',S:'𝐒',T:'𝐓',U:'𝐔',V:'𝐕',W:'𝐖',X:'𝐗',Y:'𝐘',Z:'𝐙',
+        a:'𝐚',b:'𝐛',c:'𝐜',d:'𝐝',e:'𝐞',f:'𝐟',g:'𝐠',h:'𝐡',i:'𝐢',j:'𝐣',k:'𝐤',l:'𝐥',m:'𝐦',n:'𝐧',o:'𝐨',p:'𝐩',q:'𝐪',r:'𝐫',s:'𝐬',t:'𝐭',u:'𝐮',v:'𝐯',w:'𝐰',x:'𝐱',y:'𝐲',z:'𝐳',
+        А:'𝐀',Б:'𝐁',В:'В',Г:'Г',Д:'Д',Е:'𝐄',Ё:'Ё',Ж:'Ж',З:'З',И:'И',Й:'Й',К:'𝐊',Л:'Л',М:'𝐌',Н:'𝐇',О:'𝐎',П:'П',Р:'𝐏',С:'𝐂',Т:'𝐓',У:'У',Ф:'Ф',Х:'𝐗',Ц:'Ц',Ч:'Ч',Ш:'Ш',Щ:'Щ',Ъ:'Ъ',Ы:'Ы',Ь:'Ь',Э:'Э',Ю:'Ю',Я:'Я',
+        а:'𝐚',б:'б',в:'в',г:'г',д:'д',е:'𝐞',ё:'ё',ж:'ж',з:'з',и:'и',й:'й',к:'𝐤',л:'л',м:'𝐦',н:'н',о:'𝐨',п:'п',р:'𝐩',с:'𝐜',т:'т',у:'𝐲',ф:'ф',х:'𝐱',ц:'ц',ч:'ч',ш:'ш',щ:'щ',ъ:'ъ',ы:'ы',ь:'ь',э:'э',ю:'ю',я:'я'
+      },
+      italic: {
+        A:'𝐴',B:'𝐵',C:'𝐶',D:'𝐷',E:'𝐸',F:'𝐹',G:'𝐺',H:'𝐻',I:'𝐼',J:'𝐽',K:'𝐾',L:'𝐿',M:'𝑀',N:'𝑁',O:'𝑂',P:'𝑃',Q:'𝑄',R:'𝑅',S:'𝑆',T:'𝑇',U:'𝑈',V:'𝑉',W:'𝑊',X:'𝑋',Y:'𝑌',Z:'𝑍',
+        a:'𝑎',b:'𝑏',c:'𝑐',d:'𝑑',e:'𝑒',f:'𝑓',g:'𝑔',h:'ℎ',i:'𝑖',j:'𝑗',k:'𝑘',l:'𝑙',m:'𝑚',n:'𝑛',o:'𝑜',p:'𝑝',q:'𝑞',r:'𝑟',s:'𝑠',t:'𝑡',u:'𝑢',v:'𝑣',w:'𝑤',x:'𝑥',y:'𝑦',z:'𝑧',
+        А:'𝐴',Е:'𝐸',К:'𝐾',М:'𝑀',Н:'𝐻',О:'𝑂',Р:'𝑃',С:'𝐶',Т:'𝑇',Х:'𝑋',а:'𝑎',е:'𝑒',к:'𝑘',м:'𝑚',о:'𝑜',р:'𝑝',с:'𝑐',т:'𝑡',х:'𝑥'
+      },
+      fraktur: {
+        A:'𝔄',B:'𝔅',C:'ℭ',D:'𝔇',E:'𝔈',F:'𝔉',G:'𝔊',H:'ℌ',I:'ℑ',J:'𝔍',K:'𝔎',L:'𝔏',M:'𝔐',N:'𝔑',O:'𝔒',P:'𝔓',Q:'𝔔',R:'ℜ',S:'𝔖',T:'𝔗',U:'𝔘',V:'𝔙',W:'𝔚',X:'𝔛',Y:'𝔜',Z:'ℨ',
+        a:'𝔞',b:'𝔟',c:'𝔠',d:'𝔡',e:'𝔢',f:'𝔣',g:'𝔤',h:'𝔥',i:'𝔦',j:'𝔧',k:'𝔨',l:'𝔩',m:'𝔪',n:'𝔫',o:'𝔬',p:'𝔭',q:'𝔮',r:'𝔯',s:'𝔰',t:'𝔱',u:'𝔲',v:'𝔳',w:'𝔴',x:'𝔵',y:'𝔶',z:'𝔷'
+      },
+      mono: {
+        A:'𝙰',B:'𝙱',C:'𝙲',D:'𝙳',E:'𝙴',F:'𝙵',G:'𝙶',H:'𝙷',I:'𝙸',J:'𝙹',K:'𝙺',L:'𝙻',M:'𝙼',N:'𝙽',O:'𝙾',P:'𝙿',Q:'𝚀',R:'𝚁',S:'𝚂',T:'𝚃',U:'𝚄',V:'𝚅',W:'𝚆',X:'𝚇',Y:'𝚈',Z:'𝚉',
+        a:'𝚊',b:'𝚋',c:'𝚌',d:'𝚍',e:'𝚎',f:'𝚏',g:'𝚐',h:'𝚑',i:'𝚒',j:'𝚓',k:'𝚔',l:'𝚕',m:'𝚖',n:'𝚗',o:'𝚘',p:'𝚙',q:'𝚚',r:'𝚛',s:'𝚜',t:'𝚝',u:'𝚞',v:'𝚟',w:'𝚠',x:'𝚡',y:'𝚢',z:'𝚣'
+      }
+    };
 
     const INITIAL_READING_ITEMS = [
       {
@@ -1625,6 +1731,11 @@
 
     let state = {
       name: '',
+      namePlain: '',
+      nameStyle: 'normal',
+      accountType: 'user',
+      hasChosenAccountType: false,
+      hideLastSeen: false,
       bio: '',
       avatar: '',
       photos: [],
@@ -1662,6 +1773,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v32',
         'sat_clean_state_v31',
         'sat_clean_state_v30',
         'sat_clean_state_v29',
@@ -1701,6 +1813,11 @@
       state = {
         ...state,
         ...recovered,
+        namePlain: String(recovered.namePlain || recovered.name || '').trim(),
+        nameStyle: ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(recovered.nameStyle) ? recovered.nameStyle : 'normal',
+        accountType: recovered.accountType === 'business' ? 'business' : 'user',
+        hasChosenAccountType: Boolean(recovered.hasChosenAccountType || recovered.accountType),
+        hideLastSeen: Boolean(recovered.hideLastSeen),
         photos: normalizePhotos(recovered.photos),
         karmaClicksByPost: recovered.karmaClicksByPost && typeof recovered.karmaClicksByPost === 'object' ? recovered.karmaClicksByPost : {},
         manualPrayerTimes: recovered.manualPrayerTimes && typeof recovered.manualPrayerTimes === 'object'
@@ -1710,6 +1827,36 @@
         cachedUsers: Array.isArray(recovered.cachedUsers) ? recovered.cachedUsers : [],
         cachedRequests: Array.isArray(recovered.cachedRequests) ? recovered.cachedRequests : []
       };
+    }
+
+    function normalizeAccountType(val) {
+      return val === 'business' ? 'business' : 'user';
+    }
+
+    function renderAccountBadgeHtml(accountType) {
+      if (normalizeAccountType(accountType) === 'business') {
+        return '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Бизнес</span>';
+      }
+      return '';
+    }
+
+    function formatStyledName(rawName, styleKey) {
+      const base = String(rawName || '').trim();
+      if (!base) return 'Участник';
+      const map = NAME_STYLE_MAPS[styleKey];
+      if (!map) return base;
+      return Array.from(base).map((ch) => map[ch] || ch).join('');
+    }
+
+    function updateNameStylePreview() {
+      try {
+        const raw = document.getElementById('editNameField')?.value || '';
+        const styleKey = document.getElementById('editNameStyleSelect')?.value || 'normal';
+        const prev = document.getElementById('editNamePreview');
+        if (prev) {
+          prev.textContent = raw.trim() ? `Вид в профиле: ${formatStyledName(raw, styleKey)}` : '';
+        }
+      } catch (e) {}
     }
 
     function normalizeReadingDoc(raw, id) {
@@ -1887,10 +2034,13 @@
       return `${t} • ${dt}`;
     }
 
-    function formatPresenceHtml(lastSeenMs) {
+    function formatPresenceHtml(lastSeenMs, hideLastSeen = false) {
       const ts = Number(lastSeenMs || 0);
       if (ts && (Date.now() - ts) <= ONLINE_WINDOW_MS) {
         return '<span class="online-dot"></span><span class="online-txt">в сети</span>';
+      }
+      if (hideLastSeen) {
+        return '<span class="offline-txt">активность скрыта</span>';
       }
       if (ts > 0) {
         return `<span class="offline-txt">был(а) в сети ${esc(formatTime(ts))}</span>`;
@@ -1927,8 +2077,18 @@
       return currentUser?.uid || state.lastUid || '';
     }
 
+    function getMyPlainName() {
+      const raw = (state.namePlain || state.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник').trim();
+      return raw || 'Участник';
+    }
+
     function myDisplayName() {
-      return (state.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник').trim();
+      const base = getMyPlainName();
+      const styleKey = state.nameStyle || 'normal';
+      if (styleKey !== 'normal') {
+        return formatStyledName(base, styleKey);
+      }
+      return (state.name || base).trim() || 'Участник';
     }
 
     function myAvatarUrl() {
@@ -2077,6 +2237,25 @@
       showScreen('app');
       switchMainTab('profile', document.querySelector('.nav-btn[data-tab="profile"]'));
       renderEverything();
+      if (currentUser && !state.hasChosenAccountType) {
+        document.getElementById('accountRoleModal')?.classList.add('open');
+      }
+    }
+
+    async function selectInitialAccountType(typeVal) {
+      try {
+        const chosen = normalizeAccountType(typeVal);
+        state.accountType = chosen;
+        state.hasChosenAccountType = true;
+        persist();
+        hideModal('accountRoleModal');
+        renderMyProfile();
+        renderFriendsTab();
+        await syncProfileCloud(currentUser);
+        toast(chosen === 'business' ? 'Выбран бизнес-аккаунт' : 'Выбран аккаунт пользователя');
+      } catch (e) {
+        hideModal('accountRoleModal');
+      }
     }
 
     function subscribeIncomingCallsForUser(uid) {
@@ -2113,32 +2292,29 @@
         state.photos = normalizePhotos(recovered.photos);
       }
       const nowMs = Date.now();
+      const payload = {
+        uid: user.uid,
+        fullName: myDisplayName(),
+        namePlain: getMyPlainName(),
+        nameStyle: state.nameStyle || 'normal',
+        accountType: normalizeAccountType(state.accountType),
+        hideLastSeen: Boolean(state.hideLastSeen),
+        bio: state.bio || 'Мой профиль SÄT',
+        photoData: myAvatarUrl(),
+        savedPhotos: normalizePhotos(state.photos).slice(0, 30),
+        storyData: state.story || '',
+        storyCreatedAt: state.storyStart || 0,
+        storyExpiresAt: state.storyEnd || 0,
+        storyTimeLabel: state.storyLabel || '',
+        lastSeenMs: nowMs,
+        updatedAt: serverTimestamp()
+      };
       persist();
       try {
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          fullName: myDisplayName(),
-          bio: state.bio || 'Мой профиль SÄT',
-          photoData: myAvatarUrl(),
-          savedPhotos: normalizePhotos(state.photos).slice(0, 30),
-          storyData: state.story || '',
-          storyCreatedAt: state.storyStart || 0,
-          storyExpiresAt: state.storyEnd || 0,
-          storyTimeLabel: state.storyLabel || '',
-          lastSeenMs: nowMs,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
+        await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
       } catch (e) {
         queueCloudRetry(() => setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          fullName: myDisplayName(),
-          bio: state.bio || 'Мой профиль SÄT',
-          photoData: myAvatarUrl(),
-          savedPhotos: normalizePhotos(state.photos).slice(0, 30),
-          storyData: state.story || '',
-          storyCreatedAt: state.storyStart || 0,
-          storyExpiresAt: state.storyEnd || 0,
-          storyTimeLabel: state.storyLabel || '',
+          ...payload,
           lastSeenMs: Date.now(),
           updatedAt: serverTimestamp()
         }, { merge: true }));
@@ -2176,6 +2352,7 @@
       if (hint) hint.style.display = 'none';
       if (user) {
         state.lastUid = user.uid;
+        if (!state.namePlain && user.displayName) state.namePlain = user.displayName;
         if (!state.name && user.displayName) state.name = user.displayName;
         persist();
         subscribeIncomingCallsForUser(user.uid);
@@ -2257,6 +2434,13 @@
             state.photos = normalizePhotos(meCloud.savedPhotos);
           }
           if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
+          if (meCloud.accountType) {
+            state.accountType = normalizeAccountType(meCloud.accountType);
+            state.hasChosenAccountType = true;
+          }
+          if (typeof meCloud.hideLastSeen === 'boolean') {
+            state.hideLastSeen = meCloud.hideLastSeen;
+          }
         }
         persist();
       }
@@ -2643,8 +2827,8 @@
           ? sortedUsers.map((u) => `
               <div class="list-item">
                 <div>
-                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}</div>
-                  <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}${renderAccountBadgeHtml(u.accountType)}</div>
+                  <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
                 </div>
                 ${u.uid ? `<button type="button" class="btn btn-mint" style="padding:6px 10px; font-size:12px;" onclick="hideModal('supportModal'); openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Страница</button>` : ''}
               </div>
@@ -2779,8 +2963,33 @@
       checkOwnStoryExpiry();
       const name = myDisplayName();
       const ava = myAvatarUrl();
+      const isBiz = normalizeAccountType(state.accountType) === 'business';
       document.getElementById('myNameText').textContent = name;
-      document.getElementById('myBioText').textContent = state.bio || 'Мой профиль SÄT';
+      const roleBadge = document.getElementById('myAccountRoleBadge');
+      if (roleBadge) roleBadge.innerHTML = renderAccountBadgeHtml(state.accountType);
+
+      const bioText = state.bio || (isBiz ? 'Бизнес-аккаунт SÄT' : 'Мой профиль SÄT');
+      document.getElementById('myBioText').textContent = bioText;
+
+      const qMeta = document.getElementById('myQuestionnaireMeta');
+      if (qMeta) {
+        qMeta.textContent = isBiz
+          ? 'Анкета бизнес-аккаунта • Видна другим пользователям'
+          : 'Анкета пользователя • Видна другим пользователям';
+      }
+      const qBody = document.getElementById('myQuestionnaireText');
+      if (qBody) {
+        qBody.textContent = state.bio
+          ? state.bio
+          : 'Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.';
+      }
+
+      const myOnlineBadge = document.getElementById('myOnlineBadge');
+      if (myOnlineBadge) {
+        myOnlineBadge.innerHTML = state.hideLastSeen
+          ? '<span class="online-dot"></span><span class="online-txt">в сети</span> <span class="offline-txt">• время визита скрыто</span>'
+          : '<span class="online-dot"></span><span class="online-txt">в сети</span>';
+      }
 
       const box = document.getElementById('myAvatarBox');
       if (box) box.innerHTML = ava ? `<img src="${ava}" alt="" draggable="false" />` : esc((name[0] || 'Ä').toUpperCase());
@@ -3290,6 +3499,7 @@
       box.innerHTML = list.map((p) => {
         ensureCommentsListener(p.id);
         const resolvedUid = resolvePostAuthorUid(p);
+        const authorObj = users.find((u) => u && u.uid === resolvedUid) || {};
         const isSelf = Boolean(myUid && (p.authorUid === myUid || resolvedUid === myUid));
         const isMine = isSelf || String(p.id).startsWith('post_');
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
@@ -3347,7 +3557,7 @@
               <div class="post-user" ${(!isSelf && resolvedUid) ? `onclick="openPersonPage('${safeAuthorUid}', '${safeAuthorName}')"` : ''}>
                 <div class="mini-ava">${ava}</div>
                 <div>
-                  <div class="user-name">${safeAuthorName}</div>
+                  <div class="user-name">${safeAuthorName}${renderAccountBadgeHtml(authorObj.accountType)}</div>
                   <div class="meta">${esc(t)}</div>
                 </div>
               </div>
@@ -3483,11 +3693,16 @@
       const isByName = String(uid).startsWith('by_name:');
       const u = users.find((x) => x.uid === uid) || {};
       const name = u.fullName || openPeerName || 'Участник';
-      const bio = u.bio || 'Участник SÄT';
+      const isBiz = normalizeAccountType(u.accountType) === 'business';
+      const bio = u.bio || (isBiz ? 'Бизнес-аккаунт в SÄT' : 'Участник SÄT');
+
       document.getElementById('peerHeaderTitle').textContent = name;
       document.getElementById('peerFullName').textContent = name;
+      const pBadge = document.getElementById('peerAccountRoleBadge');
+      if (pBadge) pBadge.innerHTML = renderAccountBadgeHtml(u.accountType);
+
       const pOnline = document.getElementById('peerOnlineStatus');
-      if (pOnline) pOnline.innerHTML = isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs);
+      if (pOnline) pOnline.innerHTML = isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs, u.hideLastSeen);
       document.getElementById('peerAboutLine').textContent = bio;
       document.getElementById('peerAvatarCircle').innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((name[0] || 'S').toUpperCase());
 
@@ -3502,7 +3717,7 @@
         let fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="addFriend('${esc(uid)}', '${esc(name)}')">В друзья</button>`;
         if (rel.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
         else if (rel.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
-        else if (rel.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${rel.id}')">Принять</button>`;
+        else if (rel.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${rel.id}', '${esc(uid)}', '${esc(name)}')">Принять</button>`;
         actionHtml = `
           <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать</button>
           ${fBtn}
@@ -3534,13 +3749,14 @@
       fSet.delete(myUid);
       const pFriends = Array.from(fSet).map((fid) => users.find((x) => x.uid === fid) || { uid: fid, fullName: 'Участник' });
       document.getElementById('peerFriendsList').innerHTML = pFriends.length
-        ? pFriends.map((fr) => `<div class="list-item"><span style="font-weight:700;">${esc(fr.fullName)}</span><button type="button" class="btn btn-mint" style="padding:6px 11px; font-size:12px;" onclick="openPersonPage('${esc(fr.uid)}', '${esc(fr.fullName)}')">Открыть</button></div>`).join('')
+        ? pFriends.map((fr) => `<div class="list-item"><span style="font-weight:700;">${esc(fr.fullName)}${renderAccountBadgeHtml(fr.accountType)}</span><button type="button" class="btn btn-mint" style="padding:6px 11px; font-size:12px;" onclick="openPersonPage('${esc(fr.uid)}', '${esc(fr.fullName)}')">Открыть</button></div>`).join('')
         : '<div class="meta">Друзей пока нет.</div>';
 
       document.getElementById('peerInfoBox').innerHTML = `
         <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
-        <div class="list-item"><span class="meta">Статус</span><span>${isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs)}</span></div>
-        <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
+        <div class="list-item"><span class="meta">Тип</span><span style="font-weight:700;">${isBiz ? 'Бизнес-аккаунт' : 'Пользователь'}</span></div>
+        <div class="list-item"><span class="meta">Статус</span><span>${isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</span></div>
+        <div style="padding:12px 0; border-bottom:1px solid var(--border);"><div class="meta">О себе / Анкета</div><div style="margin-top:5px; line-height:1.48;">${esc(bio)}</div></div>
         <div class="list-item"><span class="meta">Публикаций</span><span>${uPosts.length}</span></div>
       `;
     }
@@ -3574,10 +3790,46 @@
     function refreshFriendsView() { pingOnlinePresence(); renderFriendsTab(); toast('Обновлено'); }
 
     function renderFriendsTab() {
+      const incCard = document.getElementById('incomingFriendRequestsCard');
+      const incList = document.getElementById('incomingFriendRequestsList');
+      const incBadge = document.getElementById('incomingFriendCountBadge');
       const myBox = document.getElementById('myFriendsBox');
       const otherBox = document.getElementById('otherPeopleBox');
       if (!myBox || !otherBox) return;
-      const myUid = getMyUid();
+      const myUid = String(getMyUid() || '');
+
+      const incomingReqs = myUid
+        ? friendsDocs.filter((r) => r && r.toUid === myUid && r.status === 'pending' && r.fromUid && r.fromUid !== myUid)
+        : [];
+
+      if (incCard && incList && incBadge) {
+        incCard.style.display = incomingReqs.length ? 'block' : 'none';
+        incBadge.textContent = String(incomingReqs.length);
+        incList.innerHTML = incomingReqs.map((req) => {
+          const senderUid = String(req.fromUid || '');
+          const prof = users.find((u) => u && u.uid === senderUid) || {};
+          const senderName = String(prof.fullName || req.fromName || 'Участник');
+          const avaHtml = prof.photoData
+            ? `<img src="${esc(prof.photoData)}" alt="" draggable="false" />`
+            : esc((senderName[0] || 'S').toUpperCase());
+
+          return `
+            <div class="list-item">
+              <div class="post-user" onclick="openPersonPage('${esc(senderUid)}', '${esc(senderName)}')">
+                <div class="mini-ava">${avaHtml}</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div class="user-name">${esc(senderName)}${renderAccountBadgeHtml(prof.accountType)}</div>
+                  <div class="meta">Заявка в друзья</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" onclick="acceptFriendReq('${esc(req.id)}', '${esc(senderUid)}', '${esc(senderName)}')">Принять</button>
+                <button type="button" class="btn btn-danger" style="padding: 7px 11px; font-size: 12px;" onclick="declineFriendReq('${esc(req.id)}', '${esc(senderUid)}')">Отклонить</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
 
       const acceptedMap = new Map();
       friendsDocs.forEach((r) => {
@@ -3588,6 +3840,8 @@
           acceptedMap.set(otherUid, {
             uid: otherUid,
             fullName: prof.fullName || r.toName || r.fromName || 'Участник',
+            accountType: prof.accountType || 'user',
+            hideLastSeen: Boolean(prof.hideLastSeen),
             photoData: prof.photoData || '',
             lastSeenMs: prof.lastSeenMs || 0
           });
@@ -3601,8 +3855,8 @@
               <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName)}')">
                 <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div>
                 <div style="min-width:0; flex:1;">
-                  <div class="user-name">${esc(u.fullName)}</div>
-                  <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                  <div class="user-name">${esc(u.fullName)}${renderAccountBadgeHtml(u.accountType)}</div>
+                  <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
                 </div>
               </div>
               <button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openDirectChat('${esc(u.uid)}', '${esc(u.fullName)}')">Чат</button>
@@ -3611,20 +3865,28 @@
         : '<div class="meta">Друзей пока нет.</div>';
 
       const q = (document.getElementById('searchPeopleInput')?.value || '').trim().toLowerCase();
-      const candidates = users.filter((u) => u.uid && u.uid !== myUid && !acceptedMap.has(u.uid) && (!q || (u.fullName || '').toLowerCase().includes(q)));
+      const candidates = users.filter((u) => {
+        if (!u || !u.uid || u.uid === myUid || acceptedMap.has(u.uid)) return false;
+        if (!q) return true;
+        const nDisp = String(u.fullName || '').toLowerCase();
+        const nPlain = String(u.namePlain || '').toLowerCase();
+        const bio = String(u.bio || '').toLowerCase();
+        return nDisp.includes(q) || nPlain.includes(q) || bio.includes(q);
+      });
       otherBox.innerHTML = candidates.length
         ? candidates.map((u) => {
             const rel = getFriendRel(u.uid);
-            let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Добавить</button>`;
+            const uName = u.fullName || 'Участник';
+            let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(uName)}')">Добавить</button>`;
             if (rel.status === 'outgoing') btn = '<span class="meta">Отправлена</span>';
-            else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${rel.id}')">Принять</button>`;
+            else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${esc(rel.id)}', '${esc(u.uid)}', '${esc(uName)}')">Принять</button>`;
             return `
               <div class="list-item">
-                <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">
-                  <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc(((u.fullName || 'S')[0]).toUpperCase())}</div>
+                <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(uName)}')">
+                  <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((uName[0] || 'S').toUpperCase())}</div>
                   <div style="min-width:0; flex:1;">
-                    <div class="user-name">${esc(u.fullName || 'Участник')}</div>
-                    <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                    <div class="user-name">${esc(uName)}${renderAccountBadgeHtml(u.accountType)}</div>
+                    <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
                   </div>
                 </div>
                 ${btn}
@@ -3635,17 +3897,80 @@
     }
 
     async function addFriend(toUid, toName) {
-      const myUid = getMyUid();
-      if (!myUid || !toUid || toUid === myUid) return;
-      await setDoc(doc(db, 'friendRequests', [myUid, toUid].sort().join('_')), {
-        fromUid: myUid, fromName: myDisplayName(), toUid, toName, status: 'pending', createdAt: serverTimestamp()
-      }).catch(() => {});
-      toast('Заявка отправлена');
+      try {
+        const myUid = String(getMyUid() || '');
+        const safeToUid = String(toUid || '');
+        if (!myUid || !safeToUid || safeToUid === myUid) return;
+        const docId = 'req_' + [myUid, safeToUid].sort().join('_');
+        const payload = {
+          fromUid: myUid,
+          fromName: myDisplayName(),
+          toUid: safeToUid,
+          toName: toName || 'Участник',
+          status: 'pending',
+          createdAt: serverTimestamp()
+        };
+        const existingIdx = friendsDocs.findIndex((x) => x && x.id === docId);
+        if (existingIdx >= 0) friendsDocs[existingIdx] = { ...friendsDocs[existingIdx], ...payload, id: docId };
+        else friendsDocs = [{ id: docId, ...payload }, ...friendsDocs];
+        renderFriendsTab();
+        if (openPeerUid) renderPeerPageContent();
+        const op = () => setDoc(doc(db, 'friendRequests', docId), payload, { merge: true });
+        op().catch(() => queueCloudRetry(op));
+        toast('Заявка отправлена');
+      } catch (e) {
+        toast('Не удалось отправить заявку');
+      }
     }
 
-    async function acceptFriendReq(id) {
-      await updateDoc(doc(db, 'friendRequests', id), { status: 'accepted' }).catch(() => {});
-      toast('Добавлено в друзья');
+    async function acceptFriendReq(reqId, fromUid, fromName) {
+      try {
+        const myUid = String(getMyUid() || '');
+        if (!myUid) {
+          toast('Сначала войдите в аккаунт');
+          return;
+        }
+        const safeId = String(reqId || '').trim() || ('req_' + [myUid, String(fromUid || '')].sort().join('_'));
+        if (!safeId || safeId === 'req_') return;
+
+        friendsDocs = friendsDocs.map((r) => (
+          r && (r.id === safeId || (r.fromUid === fromUid && r.toUid === myUid))
+            ? { ...r, id: safeId, status: 'accepted' }
+            : r
+        ));
+        renderFriendsTab();
+        if (openPeerUid) renderPeerPageContent();
+
+        const op = () => updateDoc(doc(db, 'friendRequests', safeId), {
+          status: 'accepted',
+          acceptedAt: serverTimestamp()
+        });
+        op().catch(() => queueCloudRetry(op));
+        toast(`Вы добавили ${String(fromName || 'участника')} в друзья`);
+      } catch (e) {
+        toast('Не удалось принять заявку');
+      }
+    }
+
+    async function declineFriendReq(reqId, fromUid) {
+      try {
+        const myUid = String(getMyUid() || '');
+        if (!myUid) return;
+        const safeId = String(reqId || '').trim() || ('req_' + [myUid, String(fromUid || '')].sort().join('_'));
+        if (!safeId || safeId === 'req_') return;
+
+        friendsDocs = friendsDocs.filter((r) => (
+          r && r.id !== safeId && !(r.fromUid === fromUid && r.toUid === myUid && r.status === 'pending')
+        ));
+        renderFriendsTab();
+        if (openPeerUid) renderPeerPageContent();
+
+        const op = () => deleteDoc(doc(db, 'friendRequests', safeId));
+        op().catch(() => queueCloudRetry(op));
+        toast('Заявка отклонена');
+      } catch (e) {
+        toast('Не удалось отклонить заявку');
+      }
     }
 
     function renderGroupsTab() {
@@ -3728,7 +4053,7 @@
       if (subEl && c?.type !== 'group' && Array.isArray(c?.members)) {
         const peerId = c.members.find((u) => u && u !== myUid);
         const peerObj = users.find((u) => u.uid === peerId);
-        subEl.innerHTML = peerObj ? formatPresenceHtml(peerObj.lastSeenMs) : 'Сообщения • Голос • Фото';
+        subEl.innerHTML = peerObj ? formatPresenceHtml(peerObj.lastSeenMs, peerObj.hideLastSeen) : 'Сообщения • Голос • Фото';
       }
       document.getElementById('callToggleBtn').style.display = c?.type === 'group' ? 'none' : 'inline-flex';
       if (chatUnsub) chatUnsub();
@@ -4379,21 +4704,116 @@
     }, 30000);
 
     function openEditProfileModal() {
-      document.getElementById('editNameField').value = myDisplayName();
-      document.getElementById('editBioField').value = state.bio || '';
-      document.getElementById('editProfileModal')?.classList.add('open');
+      try {
+        const plain = getMyPlainName();
+        const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(state.nameStyle) ? state.nameStyle : 'normal';
+        document.getElementById('editNameField').value = plain;
+        document.getElementById('editNameStyleSelect').value = styleKey;
+        document.getElementById('editAccountTypeSelect').value = normalizeAccountType(state.accountType);
+        document.getElementById('editBioField').value = state.bio || '';
+        document.getElementById('editHideLastSeenSelect').value = state.hideLastSeen ? '1' : '0';
+        updateNameStylePreview();
+        document.getElementById('editProfileModal')?.classList.add('open');
+      } catch (e) {}
     }
 
     async function saveProfileData() {
-      const n = document.getElementById('editNameField').value.trim();
-      const b = document.getElementById('editBioField').value.trim();
-      if (n) state.name = n;
-      state.bio = b;
-      persist();
-      await syncProfileCloud(currentUser);
-      renderMyProfile();
-      hideModal('editProfileModal');
-      toast('Сохранено');
+      try {
+        const rawName = (document.getElementById('editNameField')?.value || '').trim();
+        const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(document.getElementById('editNameStyleSelect')?.value)
+          ? document.getElementById('editNameStyleSelect').value
+          : 'normal';
+        const accType = normalizeAccountType(document.getElementById('editAccountTypeSelect')?.value);
+        const bioVal = (document.getElementById('editBioField')?.value || '').trim();
+        const hideSeen = document.getElementById('editHideLastSeenSelect')?.value === '1';
+
+        const basePlain = rawName || getMyPlainName();
+        state.namePlain = basePlain;
+        state.nameStyle = styleKey;
+        state.name = formatStyledName(basePlain, styleKey);
+        state.accountType = accType;
+        state.hasChosenAccountType = true;
+        state.bio = bioVal;
+        state.hideLastSeen = hideSeen;
+
+        persist();
+        await syncProfileCloud(currentUser);
+        renderMyProfile();
+        renderFriendsTab();
+        hideModal('editProfileModal');
+        toast('Сохранено');
+      } catch (e) {
+        toast('Не удалось сохранить профиль');
+      }
+    }
+
+    function openDeleteAccountModal() {
+      document.getElementById('deleteAccountModal')?.classList.add('open');
+    }
+
+    async function deleteMyPageCompletely() {
+      const btn = document.getElementById('confirmDeleteAccountBtn');
+      if (btn) btn.disabled = true;
+      const uid = getMyUid();
+
+      try {
+        try { hangupCall(false); } catch (e) {}
+        try { cancelVoiceState(); discardVoiceDraft(); } catch (e) {}
+
+        if (uid) {
+          try { await deleteDoc(doc(db, 'users', uid)); } catch (e) {}
+
+          const myCloudPosts = posts.filter((p) => p && p.authorUid === uid && !String(p.id).startsWith('post_'));
+          for (const p of myCloudPosts) {
+            try { await deleteDoc(doc(db, 'posts', p.id)); } catch (e) {}
+          }
+
+          const relatedReqs = friendsDocs.filter((r) => r && (r.fromUid === uid || r.toUid === uid));
+          for (const r of relatedReqs) {
+            try { await deleteDoc(doc(db, 'friendRequests', r.id)); } catch (e) {}
+          }
+        }
+
+        state = {
+          name: '',
+          namePlain: '',
+          nameStyle: 'normal',
+          accountType: 'user',
+          hasChosenAccountType: false,
+          hideLastSeen: false,
+          bio: '',
+          avatar: '',
+          photos: [],
+          story: '',
+          storyStart: 0,
+          storyEnd: 0,
+          storyLabel: '',
+          karmaClicksByPost: {},
+          manualPrayerTimes: state.manualPrayerTimes,
+          cachedFriends: [],
+          cachedUsers: [],
+          cachedRequests: [],
+          lastUid: '',
+          lastSilentError: null
+        };
+        posts = posts.filter((p) => p.authorUid !== uid);
+        users = users.filter((u) => u.uid !== uid);
+        friendsDocs = friendsDocs.filter((r) => r.fromUid !== uid && r.toUid !== uid);
+
+        try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+        try { localStorage.removeItem(VAULT_BACKUP_KEY); } catch (e) {}
+
+        hideModal('deleteAccountModal');
+        try { await signOut(auth); } catch (e) {}
+        showScreen('splash');
+        toast('Ваша страница удалена');
+      } catch (err) {
+        hideModal('deleteAccountModal');
+        showScreen('splash');
+        toast('Страница очищена');
+      } finally {
+        if (btn) btn.disabled = false;
+      }
     }
 
     function hideModal(id) { document.getElementById(id)?.classList.remove('open'); }
@@ -4401,6 +4821,8 @@
 
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
+      selectInitialAccountType, updateNameStylePreview,
+      openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
       switchReadingSubtab, openReadingItem, changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,
@@ -4414,7 +4836,7 @@
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
       giveKarma, toggleCommentsPanel, addPostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,
-      refreshFriendsView, addFriend, acceptFriendReq,
+      refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,
       openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,

@@ -327,6 +327,17 @@
       white-space: pre-line;
     }
 
+    .dest-hint-box {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -427,7 +438,6 @@
     }
 
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
-    .subtabs-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
     .subtabs-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
     .subtabs-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
 
@@ -1063,18 +1073,9 @@
 
       <div id="tab-books" class="tab-panel">
         <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-            <div>
-              <h3 style="margin: 0; font-size: 18px;">Книги</h3>
-              <div class="meta" style="margin-top: 4px; color: var(--accent); font-weight: 700;">Уважаемые пользователи, скоро будем добавлять электронные книги.</div>
-              <div class="meta" style="margin-top: 3px;">Вы можете добавить свою краткую историю или совет дня — после проверки они появятся для всех.</div>
-            </div>
-            <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px; flex-shrink: 0;" onclick="openAddReadingModal()">+ Добавить</button>
-          </div>
-
-          <div class="subtabs-2">
-            <button type="button" id="bSubStories" class="sub-btn active" onclick="switchReadingSubtab('stories')">Краткие истории</button>
-            <button type="button" id="bSubTips" class="sub-btn" onclick="switchReadingSubtab('tips')">Советы дня</button>
+          <h3 style="margin: 0; font-size: 19px;">Книга</h3>
+          <div style="margin-top: 8px; font-size: 14.5px; line-height: 1.5; color: var(--accent); font-weight: 700;">
+            Уважаемые пользователи, скоро мы будем добавлять электронные книги.
           </div>
         </div>
 
@@ -1089,7 +1090,27 @@
           <div id="booksPendingList" style="margin-top: 10px;"></div>
         </div>
 
-        <div id="booksListContainer"></div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Короткие истории</h3>
+              <div class="meta">Живые рассказы для спокойного чтения</div>
+            </div>
+            <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 12.5px; flex-shrink: 0;" onclick="openAddReadingForKind('stories')">+ Добавить свою</button>
+          </div>
+          <div id="booksStoriesContainer"></div>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Краткие советы</h3>
+              <div class="meta">Короткие мысли на каждый день</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 12.5px; flex-shrink: 0;" onclick="openAddReadingForKind('tips')">+ Добавить свой</button>
+          </div>
+          <div id="booksTipsContainer"></div>
+        </div>
 
         <div id="mySubmittedBooksCard" class="card" style="display: none;">
           <h3 style="margin: 0 0 8px; font-size: 16px;">Мои отправленные тексты</h3>
@@ -1369,7 +1390,7 @@
 
   <div id="readingViewerModal" class="reader-screen">
     <div class="reader-topbar">
-      <button type="button" class="btn btn-ghost" style="padding: 7px 12px; font-size: 13px;" onclick="closeReadingViewer()">← Книги</button>
+      <button type="button" class="btn btn-ghost" style="padding: 7px 12px; font-size: 13px;" onclick="closeReadingViewer()">← Книга</button>
       <div style="display: flex; gap: 6px; align-items: center;">
         <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12.5px;" onclick="toggleReaderPaperMode()">Бумага / Ночь</button>
         <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
@@ -1385,12 +1406,12 @@
 
   <div id="addReadingModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 6px; font-size: 18px;">Добавить в «Книги»</h3>
+      <h3 style="margin: 0 0 6px; font-size: 18px;">Добавить в «Книгу»</h3>
       <div class="meta" style="margin-bottom: 10px;">Материал сначала отправится на проверку, затем появится для всех.</div>
       <label class="meta">Раздел</label>
       <select id="readingKindSelect">
-        <option value="stories">Краткие истории</option>
-        <option value="tips">Советы дня</option>
+        <option value="stories">Короткие истории</option>
+        <option value="tips">Краткие советы</option>
       </select>
       <label class="meta" style="display: block; margin-top: 10px;">Заголовок</label>
       <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
@@ -1579,6 +1600,9 @@
         <div class="grid-2" style="margin-top: 6px;">
           <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">В Пульс</button>
           <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
+        </div>
+        <div id="postDestExplanation" class="dest-hint-box">
+          <strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.
         </div>
       </div>
 
@@ -1902,7 +1926,7 @@
         const booksPick = document.createElement('button');
         booksPick.type = 'button';
         booksPick.className = 'side-drawer-item' + (leftExpandedSection === 'books' ? ' selected' : '');
-        booksPick.textContent = leftExpandedSection === 'books' ? '▾ Книги' : '▸ Книги';
+        booksPick.textContent = leftExpandedSection === 'books' ? '▾ Книга' : '▸ Книга';
         booksPick.onclick = () => {
           leftExpandedSection = leftExpandedSection === 'books' ? null : 'books';
           renderLeftRootList();
@@ -1913,9 +1937,9 @@
           const bSub = document.createElement('div');
           bSub.className = 'left-sublist-box';
           const bookItems = [
-            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
-            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
-            { label: '+ Добавить текст', fn: () => window.openAddReadingModal?.() }
+            { label: 'Открыть Книгу', fn: () => {} },
+            { label: '+ Добавить короткую историю', fn: () => window.openAddReadingForKind?.('stories') },
+            { label: '+ Добавить краткий совет', fn: () => window.openAddReadingForKind?.('tips') }
           ];
           bookItems.forEach((it) => {
             const btn = document.createElement('button');
@@ -2043,7 +2067,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v39';
+    const STORE_KEY = 'sat_clean_state_v40';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -2110,7 +2134,7 @@
         kind: 'tips',
         status: 'approved',
         title: 'Не путай скорость с направлением',
-        audience: 'Совет дня',
+        audience: 'Краткий совет',
         summary: 'Остановитесь на пять минут и проверьте, туда ли ведут сегодняшние дела.',
         content: 'Если день кажется слишком шумным, задайте себе один простой вопрос:\n«То, на что я сейчас трачу силы, будет иметь значение через год?»\n\nЕсли нет — смело убирайте лишний шум и оставьте место для главного.'
       },
@@ -2119,7 +2143,7 @@
         kind: 'tips',
         status: 'approved',
         title: 'Слово, сказанное спокойно, слышно дальше',
-        audience: 'Совет дня',
+        audience: 'Краткий совет',
         summary: 'Сохраняйте внутренний ритм даже там, где вокруг повышают голос.',
         content: 'В резком разговоре хочется ответить быстрее и громче, но спокойный тон почти всегда меняет атмосферу сильнее.\n\nБерегите выдержку — она помогает не сказать лишнего и увидеть суть ситуации.'
       },
@@ -2128,7 +2152,7 @@
         kind: 'tips',
         status: 'approved',
         title: 'Маленькая верность себе',
-        audience: 'Совет дня',
+        audience: 'Краткий совет',
         summary: 'Уважение к себе растёт из небольших обещаний, которые вы держите без свидетелей.',
         content: 'Не ждите особого дня, чтобы начать относиться к себе бережно.\n\nСделайте одно небольшое дело, которое давно откладывали, и дайте себе вечером время на отдых без чувства вины.'
       },
@@ -2137,7 +2161,7 @@
         kind: 'tips',
         status: 'approved',
         title: 'Берегите внимание от лишнего шума',
-        audience: 'Совет дня',
+        audience: 'Краткий совет',
         summary: 'Оставьте часть вечера для живого общения, книги или тишины.',
         content: 'Внимание — главный ресурс дня. Не отдавайте его целиком чужим спорам и бесконечной ленте.\n\nЧас спокойного внимания к себе и тем, кто вам дорог, приносит больше сил, чем часы суеты.'
       }
@@ -2193,6 +2217,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v39',
         'sat_clean_state_v38',
         'sat_clean_state_v37',
         'sat_clean_state_v36',
@@ -2295,7 +2320,7 @@
         status,
         authorUid: String(d.authorUid || ''),
         authorName: String(d.authorName || 'Участник'),
-        audience: String(d.audience || (kind === 'tips' ? 'Совет дня' : 'Краткая история')),
+        audience: String(d.audience || (kind === 'tips' ? 'Краткий совет' : 'Короткая история')),
         title: String(d.title || 'Без названия'),
         summary: String(d.summary || ''),
         content: String(d.content || d.summary || '')
@@ -2310,7 +2335,6 @@
     let supportTickets = [];
     let appErrorLogs = [];
     let readingItems = INITIAL_READING_ITEMS.map((item) => normalizeReadingDoc(item, item.id));
-    let readingSubtab = 'stories';
     let readingFontSize = 17;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
     let unifiedSearchTab = 'all';
@@ -3160,21 +3184,51 @@
       } catch (e) {}
     }
 
-    function switchReadingSubtab(sub) {
-      readingSubtab = sub === 'tips' ? 'tips' : 'stories';
-      document.getElementById('bSubStories')?.classList.toggle('active', readingSubtab === 'stories');
-      document.getElementById('bSubTips')?.classList.toggle('active', readingSubtab === 'tips');
-      renderBooksTab();
+    function openAddReadingForKind(kind) {
+      const sel = document.getElementById('readingKindSelect');
+      if (sel) sel.value = kind === 'tips' ? 'tips' : 'stories';
+      document.getElementById('addReadingModal')?.classList.add('open');
+    }
+
+    function renderReadingCardList(items, kind) {
+      const creator = isCreatorAccount();
+      const myUid = getMyUid();
+      const badgeText = kind === 'tips' ? 'Краткий совет' : 'Короткая история';
+      const emptyText = kind === 'tips' ? 'Кратких советов пока нет.' : 'Коротких историй пока нет.';
+
+      if (!items.length) {
+        return `<div class="meta" style="padding: 6px 0;">${esc(emptyText)}</div>`;
+      }
+
+      return items.map((item) => {
+        const canDelete = creator || (myUid && item.authorUid && item.authorUid === myUid);
+        return `
+          <div style="padding: 12px 0; border-top: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+              <div style="min-width: 0; flex: 1;">
+                <div class="user-name">${esc(item.title)}</div>
+                ${item.summary ? `<div style="margin-top: 6px; font-size: 14px; line-height: 1.48; color: var(--muted);">${esc(item.summary)}</div>` : ''}
+              </div>
+              <span class="tag">${esc(badgeText)}</span>
+            </div>
+            <div class="actions" style="margin-top: 10px;">
+              <button type="button" class="btn btn-primary" style="flex: 1; padding: 8px 12px; font-size: 13px;" onclick="openReadingItem('${esc(item.id)}')">Читать</button>
+              ${canDelete ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteReadingItem('${esc(item.id)}')">Удалить</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderBooksTab() {
-      const box = document.getElementById('booksListContainer');
+      const storiesBox = document.getElementById('booksStoriesContainer');
+      const tipsBox = document.getElementById('booksTipsContainer');
       const modCard = document.getElementById('booksModerationCard');
       const modList = document.getElementById('booksPendingList');
       const modBadge = document.getElementById('booksPendingBadge');
       const mySubCard = document.getElementById('mySubmittedBooksCard');
       const mySubList = document.getElementById('mySubmittedBooksList');
-      if (!box) return;
+      if (!storiesBox || !tipsBox) return;
 
       const creator = isCreatorAccount();
       const myUid = getMyUid();
@@ -3190,7 +3244,7 @@
                 <div class="comment-item">
                   <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
                     <span style="font-weight: 800; font-size: 14.5px; color: var(--text);">${esc(item.title)}</span>
-                    <span class="tag">${esc(item.kind === 'tips' ? 'Совет дня' : 'Краткая история')}</span>
+                    <span class="tag">${esc(item.kind === 'tips' ? 'Краткий совет' : 'Короткая история')}</span>
                   </div>
                   <div class="meta" style="margin-top: 3px;">Автор: ${esc(item.authorName)}</div>
                   ${item.summary ? `<div style="margin-top: 6px; font-size: 13.5px; color: var(--muted);">${esc(item.summary)}</div>` : ''}
@@ -3205,33 +3259,11 @@
         }
       }
 
-      const approvedList = safeItems.filter(
-        (item) => item.status === 'approved' && item.kind === readingSubtab
-      );
-      if (!approvedList.length) {
-        box.innerHTML = `<div class="card"><div class="meta">${readingSubtab === 'tips' ? 'Советов дня пока нет.' : 'Кратких историй пока нет.'}</div></div>`;
-      } else {
-        const badgeText = readingSubtab === 'tips' ? 'Совет дня' : 'Краткая история';
-        box.innerHTML = approvedList.map((item) => {
-          const canDelete = creator || (myUid && item.authorUid && item.authorUid === myUid);
-          return `
-            <article class="card">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                <div style="min-width: 0; flex: 1;">
-                  <div class="user-name">${esc(item.title)}</div>
-                  <div class="meta" style="margin-top: 3px;">${esc(item.audience || badgeText)}</div>
-                </div>
-                <span class="tag">${esc(badgeText)}</span>
-              </div>
-              ${item.summary ? `<div style="margin-top: 10px; font-size: 14.5px; line-height: 1.48; color: var(--muted);">${esc(item.summary)}</div>` : ''}
-              <div class="actions" style="margin-top: 12px;">
-                <button type="button" class="btn btn-primary" style="flex: 1;" onclick="openReadingItem('${esc(item.id)}')">Читать</button>
-                ${canDelete ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteReadingItem('${esc(item.id)}')">Удалить</button>` : ''}
-              </div>
-            </article>
-          `;
-        }).join('');
-      }
+      const approvedStories = safeItems.filter((item) => item.status === 'approved' && item.kind === 'stories');
+      const approvedTips = safeItems.filter((item) => item.status === 'approved' && item.kind === 'tips');
+
+      storiesBox.innerHTML = renderReadingCardList(approvedStories, 'stories');
+      tipsBox.innerHTML = renderReadingCardList(approvedTips, 'tips');
 
       if (mySubCard && mySubList) {
         const myPending = myUid
@@ -3242,7 +3274,7 @@
           <div class="list-item">
             <div style="min-width: 0; flex: 1;">
               <div style="font-weight: 700;">${esc(item.title)}</div>
-              <div class="meta">${esc(item.kind === 'tips' ? 'Совет дня' : 'Краткая история')} • На проверке</div>
+              <div class="meta">${esc(item.kind === 'tips' ? 'Краткий совет' : 'Короткая история')} • На проверке</div>
             </div>
             <button type="button" class="btn btn-danger" style="padding: 6px 10px; font-size: 12px;" onclick="deleteReadingItem('${esc(item.id)}')">Удалить</button>
           </div>
@@ -3257,7 +3289,7 @@
         return;
       }
       document.getElementById('readingModalTitle').textContent = item.title || 'Текст';
-      document.getElementById('readingModalMeta').textContent = item.audience || (item.kind === 'tips' ? 'Совет дня' : 'Краткая история');
+      document.getElementById('readingModalMeta').textContent = item.audience || (item.kind === 'tips' ? 'Краткий совет' : 'Короткая история');
       const bodyEl = document.getElementById('readingModalBody');
       if (bodyEl) {
         bodyEl.textContent = item.content || item.summary || '';
@@ -3286,8 +3318,6 @@
     }
 
     function openAddReadingModal() {
-      const sel = document.getElementById('readingKindSelect');
-      if (sel) sel.value = readingSubtab;
       document.getElementById('addReadingModal')?.classList.add('open');
     }
 
@@ -3306,7 +3336,7 @@
         status: 'pending',
         authorUid: myUid || 'guest',
         authorName: myDisplayName(),
-        audience: kind === 'tips' ? 'Совет дня' : 'Краткая история',
+        audience: kind === 'tips' ? 'Краткий совет' : 'Короткая история',
         title,
         summary,
         content
@@ -3965,6 +3995,16 @@
       }, { passive: false });
     })();
 
+    function updatePostDestExplanation(d) {
+      const box = document.getElementById('postDestExplanation');
+      if (!box) return;
+      if (d === 'self') {
+        box.innerHTML = '<strong>Для своей страницы:</strong> публикацию увидят только те, кто зайдёт на вашу страницу (в общий «Пульс» она не попадёт).';
+      } else {
+        box.innerHTML = '<strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.';
+      }
+    }
+
     function openNewPostModal() {
       const sel = document.getElementById('postCategorySelect');
       if (sel) sel.value = pulseFilter !== 'all' ? pulseFilter : 'posts';
@@ -3973,9 +4013,10 @@
     }
 
     function choosePostDest(d) {
-      draftPostDest = d;
-      document.getElementById('destBtnPulse')?.classList.toggle('active', d === 'pulse');
-      document.getElementById('destBtnSelf')?.classList.toggle('active', d === 'self');
+      draftPostDest = d === 'self' ? 'self' : 'pulse';
+      document.getElementById('destBtnPulse')?.classList.toggle('active', draftPostDest === 'pulse');
+      document.getElementById('destBtnSelf')?.classList.toggle('active', draftPostDest === 'self');
+      updatePostDestExplanation(draftPostDest);
     }
 
     function clearPostAttachment() {
@@ -5449,7 +5490,7 @@
       openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
-      switchReadingSubtab, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
+      openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
       changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,

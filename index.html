@@ -5,21 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>SÄT</title>
-  <meta name="theme-color" content="#0b1f17" />
+  <meta name="theme-color" content="#101216" />
   <link rel="manifest" href="./manifest.json" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%230b261b'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%236cf0b5'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%236cf0b5'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%236cf0b5'%3E%C3%84%3C/text%3E%3C/svg%3E" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%230b261b'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%236cf0b5'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%236cf0b5'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%236cf0b5'%3E%C3%84%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
   <style>
     :root {
-      --border: rgba(94, 224, 165, 0.25);
-      --border-strong: rgba(94, 224, 165, 0.45);
-      --text: #eef8f3;
-      --muted: #9ec2b1;
-      --green: #189b62;
-      --green-soft: rgba(24, 155, 98, 0.18);
+      --bg: #101216;
+      --surface: #171a21;
+      --surface-elev: #202530;
+      --text: #f4f1ea;
+      --muted: #a6a298;
+      --accent: #e09f5a;
+      --accent-2: #7fb3a6;
+      --green: #c8843e;
+      --green-soft: rgba(224, 159, 90, 0.16);
+      --border: rgba(244, 241, 234, 0.12);
+      --border-strong: rgba(224, 159, 90, 0.45);
       --danger: #ff6b7a;
       --gold: #f2c96b;
-      --shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    body.theme-light {
+      --bg: #f6f4ef;
+      --surface: #ffffff;
+      --surface-elev: #efeae1;
+      --text: #1a1c20;
+      --muted: #625f58;
+      --accent: #b86b28;
+      --accent-2: #2f6f62;
+      --green: #b86b28;
+      --green-soft: rgba(184, 107, 40, 0.14);
+      --border: rgba(26, 28, 32, 0.12);
+      --border-strong: rgba(184, 107, 40, 0.45);
+      --shadow: 0 10px 24px rgba(26, 28, 32, 0.08);
     }
 
     * {
@@ -42,7 +62,7 @@
       overscroll-behavior-y: contain;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       color: var(--text);
-      background: linear-gradient(165deg, #05140e 0%, #0b261b 55%, #123828 100%);
+      background: var(--bg);
     }
 
     body {
@@ -70,8 +90,8 @@
       justify-content: center;
       text-align: center;
       padding: 28px 20px;
-      background: radial-gradient(circle at 50% 28%, #ffffff 0%, #eff8f2 58%, #dfeee5 100%);
-      color: #11241a;
+      background: radial-gradient(circle at 50% 28%, #ffffff 0%, #f5f2eb 58%, #e8e2d5 100%);
+      color: #1a1c20;
       z-index: 5;
     }
     #splash.active { display: flex; flex-direction: column; }
@@ -79,10 +99,10 @@
     .logo-box {
       width: 122px;
       height: 122px;
-      border-radius: 34px;
+      border-radius: 34px 12px 34px 34px;
       background: #ffffff;
-      border: 2px solid rgba(15, 107, 67, 0.28);
-      box-shadow: 0 16px 38px rgba(15, 107, 67, 0.14);
+      border: 2px solid rgba(184, 107, 40, 0.28);
+      box-shadow: 0 16px 38px rgba(26, 28, 32, 0.12);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -90,16 +110,16 @@
       margin: 0 auto 20px;
     }
     .logo-dots { display: flex; gap: 16px; margin-bottom: -4px; }
-    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #0f6b43; }
-    .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: #0f6b43; }
-    .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: #0f6b43; }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #b86b28; }
+    .logo-letter { font-size: 54px; font-weight: 900; line-height: 1; color: #b86b28; }
+    .brand-name { font-size: 38px; font-weight: 900; letter-spacing: 3px; margin: 0 0 26px; color: #b86b28; }
 
     #auth {
       align-items: center;
       justify-content: center;
       padding: 24px 18px;
-      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #eff8f2 60%, #dfeee5 100%);
-      color: #11241a;
+      background: radial-gradient(circle at 50% 25%, #ffffff 0%, #f5f2eb 60%, #e8e2d5 100%);
+      color: #1a1c20;
       z-index: 5;
     }
     #auth.active { display: flex; flex-direction: column; }
@@ -108,16 +128,16 @@
       width: 100%;
       max-width: 390px;
       background: #ffffff;
-      border: 1.5px solid rgba(15, 107, 67, 0.35);
-      border-radius: 28px;
+      border: 1.5px solid rgba(184, 107, 40, 0.35);
+      border-radius: 28px 10px 28px 28px;
       padding: 32px 22px;
-      box-shadow: 0 18px 42px rgba(15, 95, 58, 0.12);
+      box-shadow: 0 18px 42px rgba(26, 28, 32, 0.12);
       text-align: center;
     }
 
     .btn {
       border: none;
-      border-radius: 15px;
+      border-radius: 15px 6px 15px 15px;
       padding: 12px 16px;
       font-weight: 700;
       font-size: 14.5px;
@@ -131,41 +151,46 @@
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.65; cursor: default; }
     .btn-primary {
-      background: linear-gradient(135deg, #1ea86b, #0f6b43);
+      background: linear-gradient(135deg, var(--accent), #b86b28);
       color: #ffffff;
-      box-shadow: 0 8px 20px rgba(15, 107, 67, 0.3);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .btn-google {
-      background: linear-gradient(135deg, #168253, #0d623d);
+      background: linear-gradient(135deg, #c87b34, #9c591e);
       color: #ffffff;
       font-size: 16px;
       padding: 15px 20px;
       width: 100%;
-      box-shadow: 0 10px 24px rgba(15, 107, 67, 0.24);
+      box-shadow: 0 10px 24px rgba(156, 89, 30, 0.24);
     }
     .g-circle {
       width: 28px;
       height: 28px;
       border-radius: 50%;
       background: #ffffff;
-      color: #0f6b43;
+      color: #9c591e;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
     }
     .btn-mint {
-      background: rgba(30, 168, 107, 0.2);
-      color: #6cf0b5;
-      border: 1px solid var(--border-strong);
+      background: rgba(127, 179, 166, 0.16);
+      color: var(--accent-2);
+      border: 1px solid rgba(127, 179, 166, 0.35);
     }
     .btn-gold {
       background: rgba(242, 201, 107, 0.18);
       color: var(--gold);
       border: 1px solid rgba(242, 201, 107, 0.42);
     }
+    body.theme-light .btn-gold {
+      color: #9c591e;
+      background: rgba(184, 107, 40, 0.14);
+      border-color: rgba(184, 107, 40, 0.38);
+    }
     .btn-ghost {
-      background: rgba(18, 36, 28, 0.78);
+      background: var(--surface-elev);
       color: var(--text);
       border: 1px solid var(--border);
     }
@@ -179,7 +204,7 @@
       position: sticky;
       top: 0;
       z-index: 25;
-      background: rgba(10, 22, 17, 0.78);
+      background: var(--surface);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       padding: 11px 16px;
@@ -192,27 +217,28 @@
     .mini-logo {
       width: 36px;
       height: 36px;
-      border-radius: 12px;
-      background: rgba(30, 168, 107, 0.2);
+      border-radius: 12px 5px 12px 12px;
+      background: rgba(224, 159, 90, 0.16);
       border: 1.5px solid var(--border-strong);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 900;
       font-size: 19px;
-      color: #6cf0b5;
+      color: var(--accent);
     }
-    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: #6cf0b5; }
+    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: var(--accent); }
 
     .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 28px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
     .card {
-      background: rgba(11, 23, 18, 0.64);
+      background: var(--surface);
       backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: 22px;
+      border-top: 2px solid var(--accent);
+      border-radius: 24px 8px 24px 24px;
       padding: 16px;
       box-shadow: var(--shadow);
       margin-bottom: 14px;
@@ -226,7 +252,7 @@
     }
     .chip-btn {
       border: 1px solid var(--border);
-      background: rgba(14, 28, 22, 0.78);
+      background: var(--surface-elev);
       color: var(--muted);
       border-radius: 999px;
       padding: 7px 12px;
@@ -237,7 +263,7 @@
       flex-shrink: 0;
     }
     .chip-btn.active {
-      background: linear-gradient(135deg, #1ea86b, #0f6b43);
+      background: linear-gradient(135deg, var(--accent), #b86b28);
       color: #ffffff;
       border-color: transparent;
     }
@@ -251,19 +277,19 @@
     .stat-box {
       padding: 10px 6px;
       border-radius: 14px;
-      background: rgba(16, 32, 25, 0.88);
+      background: var(--surface-elev);
       border: 1px solid var(--border);
       text-align: center;
       transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
     }
     .stat-box.current-prayer {
-      background: linear-gradient(155deg, rgba(30, 168, 107, 0.34), rgba(15, 107, 67, 0.28));
-      border: 2px solid #6cf0b5;
-      box-shadow: 0 0 18px rgba(108, 240, 181, 0.32);
+      background: rgba(224, 159, 90, 0.2);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 16px rgba(224, 159, 90, 0.25);
       transform: translateY(-2px);
     }
-    .stat-box.current-prayer .stat-num { color: #6cf0b5; }
-    .stat-box.current-prayer .meta { color: #eef8f3; font-weight: 800; }
+    .stat-box.current-prayer .stat-num { color: var(--accent); }
+    .stat-box.current-prayer .meta { color: var(--text); font-weight: 800; }
     .stat-num { font-size: 18px; font-weight: 900; color: var(--gold); }
     .meta { font-size: 13px; color: var(--muted); }
 
@@ -272,17 +298,17 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #43e59c;
-      box-shadow: 0 0 8px rgba(67, 229, 156, 0.85);
+      background: var(--accent-2);
+      box-shadow: 0 0 8px rgba(127, 179, 166, 0.8);
       margin-right: 5px;
       vertical-align: middle;
     }
-    .online-txt { color: #6cf0b5; font-weight: 700; font-size: 12.5px; }
+    .online-txt { color: var(--accent-2); font-weight: 700; font-size: 12.5px; }
     .offline-txt { color: var(--muted); font-size: 12px; }
 
     .input, textarea, select {
       width: 100%;
-      background: rgba(16, 32, 25, 0.88);
+      background: var(--surface-elev);
       color: var(--text);
       border: 1px solid var(--border-strong);
       border-radius: 14px;
@@ -306,22 +332,22 @@
       touch-action: manipulation;
     }
     .ava-ring.has-story {
-      background: linear-gradient(135deg, #2ce69b, #0f6b43, #e6b84c);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--gold));
       padding: 3.5px;
     }
     .ava-circle {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      background: rgba(20, 42, 33, 0.9);
-      color: #6cf0b5;
+      background: var(--surface-elev);
+      color: var(--accent);
       font-size: 28px;
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.25);
+      border: 2px solid var(--border);
       touch-action: manipulation;
     }
     .ava-circle img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -333,9 +359,9 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: #189b62;
+      background: var(--accent);
       color: #ffffff;
-      border: 2px solid #0c1813;
+      border: 2px solid var(--surface);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -348,9 +374,9 @@
 
     .sub-btn {
       border: 1px solid var(--border);
-      background: rgba(14, 28, 22, 0.72);
+      background: var(--surface-elev);
       color: var(--text);
-      border-radius: 13px;
+      border-radius: 13px 5px 13px 13px;
       padding: 10px 6px;
       font-size: 13px;
       font-weight: 700;
@@ -358,7 +384,7 @@
       text-align: center;
     }
     .sub-btn.active {
-      background: linear-gradient(135deg, #1ea86b, #0f6b43);
+      background: linear-gradient(135deg, var(--accent), #b86b28);
       color: #ffffff;
       border-color: transparent;
     }
@@ -371,10 +397,10 @@
     }
     .photo-cell {
       aspect-ratio: 1 / 1;
-      border-radius: 14px;
+      border-radius: 14px 5px 14px 14px;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: rgba(20, 38, 30, 0.7);
+      background: var(--surface-elev);
       cursor: pointer;
       position: relative;
     }
@@ -387,7 +413,7 @@
       height: 24px;
       border-radius: 50%;
       border: none;
-      background: rgba(12, 18, 15, 0.82);
+      background: rgba(16, 18, 22, 0.82);
       color: #ff8c98;
       font-size: 12px;
       font-weight: 900;
@@ -404,8 +430,9 @@
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: rgba(30, 168, 107, 0.2);
-      color: #6cf0b5;
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
       font-weight: 800;
       font-size: 16px;
       display: flex;
@@ -416,10 +443,10 @@
     }
     .mini-ava img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .user-name { font-weight: 700; font-size: 15.5px; color: var(--text); }
-    .post-caption { margin-top: 8px; font-size: 14.5px; font-weight: 800; color: #6cf0b5; }
+    .post-caption { margin-top: 8px; font-size: 14.5px; font-weight: 800; color: var(--accent); }
     .post-img-wrap {
       margin-top: 10px;
-      border-radius: 16px;
+      border-radius: 16px 6px 16px 16px;
       overflow: hidden;
       border: 1px solid var(--border);
       cursor: pointer;
@@ -430,8 +457,9 @@
       font-weight: 700;
       padding: 5px 11px;
       border-radius: 999px;
-      background: rgba(30, 168, 107, 0.2);
-      color: #6cf0b5;
+      background: rgba(127, 179, 166, 0.16);
+      color: var(--accent-2);
+      border: 1px solid rgba(127, 179, 166, 0.35);
       white-space: nowrap;
     }
     .tag-alert {
@@ -450,7 +478,7 @@
     .comment-item {
       padding: 9px 11px;
       border-radius: 13px;
-      background: rgba(16, 32, 25, 0.85);
+      background: var(--surface-elev);
       border: 1px solid var(--border);
       margin-bottom: 8px;
     }
@@ -458,7 +486,7 @@
     .wp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
     .wp-item {
       border: 1.5px solid var(--border);
-      border-radius: 18px;
+      border-radius: 18px 6px 18px 18px;
       padding: 14px 16px;
       cursor: pointer;
       display: flex;
@@ -467,7 +495,7 @@
       gap: 12px;
       touch-action: manipulation;
     }
-    .wp-item.active { border-color: #6cf0b5; box-shadow: 0 0 0 2px rgba(108, 240, 181, 0.3); }
+    .wp-item.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(224, 159, 90, 0.25); }
 
     .prayer-edit-grid {
       display: grid;
@@ -476,7 +504,7 @@
       margin-top: 10px;
       padding: 12px;
       border-radius: 16px;
-      background: rgba(16, 32, 25, 0.92);
+      background: var(--surface-elev);
       border: 1px solid var(--border-strong);
     }
     .prayer-edit-item label {
@@ -499,7 +527,7 @@
       left: 0;
       right: 0;
       z-index: 30;
-      background: rgba(10, 22, 17, 0.86);
+      background: var(--surface);
       backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
       display: grid;
@@ -519,7 +547,7 @@
       font-size: 12.5px;
       font-weight: 700;
       padding: 7px 4px;
-      border-radius: 14px;
+      border-radius: 14px 6px 14px 14px;
       cursor: pointer;
     }
     .nav-btn svg {
@@ -531,7 +559,62 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .nav-btn.active { color: #6cf0b5; background: rgba(30, 168, 107, 0.18); }
+    .nav-btn.active { color: var(--accent); background: var(--green-soft); }
+
+    .right-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 62;
+      background: rgba(0, 0, 0, 0.35);
+      display: none;
+    }
+    .right-menu-backdrop.open { display: block; }
+
+    .right-section-drawer {
+      position: fixed;
+      top: 62px;
+      right: 12px;
+      width: 268px;
+      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 96px);
+      overflow-y: auto;
+      z-index: 64;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-top: 3px solid var(--accent);
+      border-radius: 22px 6px 22px 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .right-section-drawer.open { display: flex; }
+
+    .right-drawer-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 15px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .right-drawer-item {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 14px 5px 14px 14px;
+      padding: 10px 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .right-drawer-item:hover { border-color: var(--border-strong); }
 
     .modal-bg {
       position: fixed;
@@ -548,11 +631,11 @@
       max-width: 600px;
       max-height: 92vh;
       overflow-y: auto;
-      background: rgba(14, 29, 23, 0.95);
+      background: var(--surface);
       backdrop-filter: blur(10px);
       color: var(--text);
-      border-top: 1px solid var(--border-strong);
-      border-radius: 26px 26px 0 0;
+      border-top: 3px solid var(--accent);
+      border-radius: 26px 8px 0 0;
       padding: 20px 18px 28px;
     }
     #photoPickerModal { z-index: 80; }
@@ -567,7 +650,7 @@
       position: fixed;
       inset: 0;
       z-index: 95;
-      background: #070f0c;
+      background: #0d0f13;
       color: #ffffff;
       display: none;
       flex-direction: column;
@@ -599,8 +682,8 @@
       position: fixed;
       inset: 0;
       z-index: 98;
-      background: linear-gradient(165deg, #05140e 0%, #0b261b 55%, #123828 100%);
-      color: #eef8f3;
+      background: linear-gradient(165deg, #101216 0%, #171a21 55%, #202530 100%);
+      color: #f4f1ea;
       flex-direction: column;
       justify-content: space-between;
       padding: 28px 20px 36px;
@@ -616,7 +699,7 @@
       display: none;
       flex-direction: column;
       padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-      background: rgba(7, 17, 13, 0.96);
+      background: var(--bg);
       backdrop-filter: blur(12px);
     }
     .chat-screen.open { display: flex; }
@@ -635,10 +718,11 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      background: rgba(14, 29, 23, 0.95);
+      background: var(--surface);
       border: 1px solid var(--border);
+      border-top: 2px solid var(--accent);
       padding: 10px 12px;
-      border-radius: 18px;
+      border-radius: 18px 6px 18px 18px;
     }
     .chat-list {
       flex: 1;
@@ -648,22 +732,22 @@
       flex-direction: column;
       gap: 9px;
       padding: 12px;
-      border-radius: 18px;
-      background: rgba(12, 24, 19, 0.88);
+      border-radius: 18px 6px 18px 18px;
+      background: var(--surface);
       border: 1px solid var(--border);
     }
     .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 85%; word-break: break-word; }
-    .msg.them { background: rgba(24, 46, 36, 0.92); align-self: flex-start; border: 1px solid var(--border); }
-    .msg.me { background: linear-gradient(135deg, #1ea86b, #0f6b43); color: #ffffff; align-self: flex-end; }
+    .msg.them { background: var(--surface-elev); color: var(--text); align-self: flex-start; border: 1px solid var(--border); }
+    .msg.me { background: linear-gradient(135deg, var(--accent), #b86b28); color: #ffffff; align-self: flex-end; }
     .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
     .msg-meta-row { display: flex; justify-content: flex-end; align-items: center; gap: 5px; margin-top: 4px; font-size: 11.5px; }
     .msg-edited { font-size: 11px; opacity: 0.78; font-style: italic; }
     .tick-sent { font-size: 12px; font-weight: 800; color: rgba(255, 255, 255, 0.78); letter-spacing: -1px; }
-    .tick-read { font-size: 12px; font-weight: 900; color: #6cf0b5; letter-spacing: -1px; }
+    .tick-read { font-size: 12px; font-weight: 900; color: #ffe5b4; letter-spacing: -1px; }
     .msg-tools { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .msg-tool-btn {
       border: 1px solid rgba(255, 255, 255, 0.24);
-      background: rgba(9, 22, 16, 0.52);
+      background: rgba(16, 18, 22, 0.45);
       color: #ffffff;
       border-radius: 10px;
       padding: 4px 10px;
@@ -689,7 +773,7 @@
       gap: 8px;
       padding: 7px 10px;
       border-radius: 12px;
-      background: rgba(7, 17, 13, 0.42);
+      background: rgba(16, 18, 22, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.16);
     }
     .voice-play-btn {
@@ -697,8 +781,8 @@
       height: 32px;
       border-radius: 50%;
       border: none;
-      background: #6cf0b5;
-      color: #072015;
+      background: #ffffff;
+      color: #9c591e;
       font-weight: 900;
       font-size: 13px;
       cursor: pointer;
@@ -711,11 +795,11 @@
       flex: 1;
       height: 6px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.24);
       overflow: hidden;
       min-width: 72px;
     }
-    .voice-fill { height: 100%; width: 0%; background: #6cf0b5; transition: width 0.12s linear; }
+    .voice-fill { height: 100%; width: 0%; background: #ffffff; transition: width 0.12s linear; }
     .voice-dur { font-size: 11.5px; font-weight: 700; white-space: nowrap; opacity: 0.92; }
 
     .voice-status-bar, .voice-draft-bar, .edit-mode-bar {
@@ -725,11 +809,11 @@
       gap: 8px;
       padding: 9px 12px;
       border-radius: 14px;
-      background: rgba(24, 155, 98, 0.18);
+      background: var(--green-soft);
       border: 1px solid var(--border-strong);
       font-size: 13px;
       font-weight: 700;
-      color: #6cf0b5;
+      color: var(--accent);
       flex-wrap: wrap;
     }
     .voice-status-bar.show, .voice-draft-bar.show, .edit-mode-bar.show { display: flex; }
@@ -740,13 +824,13 @@
       overflow-x: auto;
       padding: 4px 6px;
       border-radius: 14px;
-      background: rgba(14, 29, 23, 0.85);
+      background: var(--surface);
       border: 1px solid var(--border);
     }
     .emoji-btn {
       border: none;
-      background: rgba(24, 46, 36, 0.85);
-      color: #ffffff;
+      background: var(--surface-elev);
+      color: var(--text);
       border-radius: 10px;
       padding: 5px 9px;
       font-size: 17px;
@@ -760,10 +844,10 @@
       display: flex;
       gap: 6px;
       align-items: center;
-      background: rgba(14, 29, 23, 0.92);
+      background: var(--surface);
       border: 1px solid var(--border);
       padding: 8px;
-      border-radius: 18px;
+      border-radius: 18px 6px 18px 18px;
     }
 
     .chat-row-card {
@@ -773,14 +857,13 @@
       gap: 10px;
       padding: 12px;
       margin-top: 8px;
-      border-radius: 16px;
-      background: rgba(16, 32, 25, 0.82);
+      border-radius: 16px 6px 16px 16px;
+      background: var(--surface-elev);
       border: 1px solid var(--border);
       cursor: pointer;
     }
     .chat-row-card.has-unread {
-      border-color: rgba(242, 201, 107, 0.55);
-      background: rgba(28, 46, 32, 0.92);
+      border-color: var(--accent);
     }
 
     .list-item {
@@ -798,7 +881,7 @@
       left: 50%;
       bottom: 94px;
       transform: translateX(-50%) translateY(20px);
-      background: #147a4d;
+      background: #9c591e;
       color: #ffffff;
       padding: 11px 18px;
       border-radius: 999px;
@@ -824,17 +907,17 @@
     </div>
     <h1 class="brand-name">SÄT</h1>
     <button type="button" class="btn btn-primary" style="min-width: 210px; padding: 15px 28px; font-size: 17px;" onclick="enterAppFlow()">Войти</button>
-    <div id="sessionHint" class="meta" style="margin-top: 14px; color: #4b695a; display: none;">Проверяем вход...</div>
+    <div id="sessionHint" class="meta" style="margin-top: 14px; color: #625f58; display: none;">Проверяем вход...</div>
   </section>
 
   <section id="auth" class="screen">
     <div class="auth-card">
-      <div class="logo-box" style="width: 86px; height: 86px; border-radius: 26px; margin-bottom: 14px;">
+      <div class="logo-box" style="width: 86px; height: 86px; border-radius: 26px 10px 26px 26px; margin-bottom: 14px;">
         <div class="logo-dots" style="gap: 12px;"><span class="logo-dot" style="width: 8px; height: 8px;"></span><span class="logo-dot" style="width: 8px; height: 8px;"></span></div>
         <div class="logo-letter" style="font-size: 40px;">Ä</div>
       </div>
-      <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: #0f6b43; letter-spacing: 2px;">SÄT</h2>
-      <p style="margin: 0 0 24px; font-size: 14.5px; color: #4b695a;">Быстрый вход в одно касание без анкет</p>
+      <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: #b86b28; letter-spacing: 2px;">SÄT</h2>
+      <p style="margin: 0 0 24px; font-size: 14.5px; color: #625f58;">Быстрый вход в одно касание без анкет</p>
       <button type="button" class="btn btn-google" onclick="loginWithGoogle()">
         <span class="g-circle">G</span>
         <span>Продолжить через Google</span>
@@ -849,12 +932,15 @@
         <div class="brand-text">SÄT</div>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
-        <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openUnifiedSearchModal()">
+        <button type="button" class="btn btn-primary" style="padding: 8px 11px; font-size: 13px;" onclick="openUnifiedSearchModal()">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
         </button>
-        <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openWallpapers()">
-          <span id="wpActiveName" style="max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Обои</span>
+        <button type="button" class="btn btn-mint" style="padding: 8px 11px; font-size: 13px;" onclick="openWallpapers()">
+          <span id="wpActiveName" style="max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
+        </button>
+        <button type="button" class="btn btn-gold" style="padding: 8px 11px; font-size: 13px;" onclick="openSectionRightDrawer()">
+          <span>Меню →</span>
         </button>
       </div>
     </header>
@@ -877,7 +963,7 @@
           <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
             <div>
               <h3 style="margin: 0; font-size: 18px;">Книги</h3>
-              <div class="meta" style="margin-top: 4px; color: #6cf0b5; font-weight: 700;">Уважаемые пользователи, скоро будем добавлять электронные книги.</div>
+              <div class="meta" style="margin-top: 4px; color: var(--accent); font-weight: 700;">Уважаемые пользователи, скоро будем добавлять электронные книги.</div>
               <div class="meta" style="margin-top: 3px;">Вы можете добавить свою краткую историю или совет дня — после проверки они появятся для всех.</div>
             </div>
             <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px; flex-shrink: 0;" onclick="openAddReadingModal()">+ Добавить</button>
@@ -952,7 +1038,7 @@
             </div>
             <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="openEditProfileModal()">Заполнить</button>
           </div>
-          <div id="myQuestionnaireText" style="margin-top: 8px; font-size: 14px; line-height: 1.48; color: #d8ece2;">
+          <div id="myQuestionnaireText" style="margin-top: 8px; font-size: 14px; line-height: 1.48;">
             Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.
           </div>
         </div>
@@ -967,7 +1053,7 @@
           <div id="myStoryBanner" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <div>
-                <div style="font-weight: 700; font-size: 15px; color: #6cf0b5;">Ваша сторис (действует 3 часа)</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Ваша сторис (действует 3 часа)</div>
                 <div id="myStoryTimerText" class="meta">Активна</div>
               </div>
               <div style="display: flex; gap: 8px;">
@@ -1058,6 +1144,15 @@
       </div>
     </main>
 
+    <div id="rightMenuBackdrop" class="right-menu-backdrop" onclick="closeSectionRightDrawer()"></div>
+    <aside id="sectionRightDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
+      <div class="right-drawer-title">
+        <span id="rightDrawerHeading">Раздел</span>
+        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeSectionRightDrawer()">✕</button>
+      </div>
+      <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
+    </aside>
+
     <nav class="bottom-nav">
       <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
         <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
@@ -1077,7 +1172,7 @@
   <section id="peerProfileScreen" class="screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
-      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: #6cf0b5;">Страница</div>
+      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--accent);">Страница</div>
       <div style="width: 74px;"></div>
     </header>
 
@@ -1228,7 +1323,7 @@
         <div id="boxIsha" class="stat-box"><div class="meta" style="font-size: 11px;">Иша</div><div id="ptIsha" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
       </div>
 
-      <div id="namazActiveBanner" style="margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: rgba(24, 155, 98, 0.16); border: 1px solid var(--border-strong); font-size: 13.5px; font-weight: 800; color: #6cf0b5;">
+      <div id="namazActiveBanner" style="margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--green-soft); border: 1px solid var(--border-strong); font-size: 13.5px; font-weight: 800; color: var(--accent);">
         Сейчас: --
       </div>
       <div id="namazSourceStatus" class="meta" style="margin-top: 8px; font-size: 12px;">Оскемен • Время обновляется вручную</div>
@@ -1339,8 +1434,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">Фоны (5 вариантов)</h3>
-          <div class="meta">Нажмите — фон изменится сразу</div>
+          <h3 style="margin: 0; font-size: 18px;">Темы и фоны (5 вариантов)</h3>
+          <div class="meta">Тёмные без «Матрицы» и светлые — нажмите для выбора</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
       </div>
@@ -1405,7 +1500,7 @@
         <option value="fraktur">Акцентный (𝔄𝔟𝔠)</option>
         <option value="mono">Печатный (𝙰𝚋𝚌)</option>
       </select>
-      <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: #6cf0b5; font-weight: 700;"></div>
+      <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: var(--accent); font-weight: 700;"></div>
 
       <label class="meta" style="display: block; margin-top: 10px;">Тип аккаунта</label>
       <select id="editAccountTypeSelect">
@@ -1462,7 +1557,7 @@
 
   <div id="fullCallScreen">
     <div style="text-align: center; margin-top: 24px;">
-      <div class="meta" style="font-size: 13px; letter-spacing: 1px; color: #6cf0b5;">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
+      <div class="meta" style="font-size: 13px; letter-spacing: 1px; color: var(--accent);">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
       <h2 id="callPeerName" style="margin: 12px 0 6px; font-size: 26px; font-weight: 900;">Собеседник</h2>
       <div id="callStatusText" class="meta" style="font-size: 15px;">Соединение...</div>
       <div id="callTimerText" style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #f2c96b;">00:00</div>
@@ -1541,67 +1636,179 @@
 
   <script>
     (function () {
-      const SIMPLE_BACKGROUNDS = [
-        { id: 'bg1', name: 'Изумрудный', desc: 'Тёмно-зелёный градиент', bg: 'linear-gradient(165deg, #05140e 0%, #0b261b 55%, #123828 100%)' },
-        { id: 'bg2', name: 'Графит', desc: 'Тёмно-серый фон', bg: 'linear-gradient(165deg, #0b0f0e 0%, #151c19 55%, #1f2924 100%)' },
-        { id: 'bg3', name: 'Ночной синий', desc: 'Тёмный морской градиент', bg: 'linear-gradient(165deg, #060d17 0%, #0d1d30 55%, #142c47 100%)' },
-        { id: 'bg4', name: 'Тёплый мокко', desc: 'Тёмно-коричневый оттенок', bg: 'linear-gradient(165deg, #140e09 0%, #261b12 55%, #38271a 100%)' },
-        { id: 'bg5', name: 'Сливовый вечер', desc: 'Тёмный вечерний фиолет', bg: 'linear-gradient(165deg, #0f0a17 0%, #1e142e 55%, #2d1e45 100%)' }
+      const SAT_THEMES = [
+        {
+          id: 'amber_dark',
+          name: 'Тёплый янтарь',
+          desc: 'Тёмный без «Матрицы» • янтарный акцент',
+          light: false,
+          bg: 'linear-gradient(165deg, #101216 0%, #171a21 55%, #1f242e 100%)',
+          accent: '#e09f5a',
+          accent2: '#7fb3a6'
+        },
+        {
+          id: 'bronze_slate',
+          name: 'Бронза и графит',
+          desc: 'Тёмный без «Матрицы» • строгий графит',
+          light: false,
+          bg: 'linear-gradient(165deg, #0e1013 0%, #16191f 55%, #1e232b 100%)',
+          accent: '#d48c52',
+          accent2: '#9fb3c8'
+        },
+        {
+          id: 'sand_night',
+          name: 'Песок и ночь',
+          desc: 'Тёмный без «Матрицы» • вечерний тон',
+          light: false,
+          bg: 'linear-gradient(165deg, #111014 0%, #191721 55%, #221f2d 100%)',
+          accent: '#e5b567',
+          accent2: '#b89fd9'
+        },
+        {
+          id: 'light_linen',
+          name: 'Светлый лён',
+          desc: 'Светлый режим • тёплый песочный тон',
+          light: true,
+          bg: 'linear-gradient(165deg, #f7f5f0 0%, #efece4 55%, #e5e0d5 100%)',
+          accent: '#b86b28',
+          accent2: '#2f6f62'
+        },
+        {
+          id: 'light_stone',
+          name: 'Светлый камень',
+          desc: 'Светлый режим • чистый серый свет',
+          light: true,
+          bg: 'linear-gradient(165deg, #f4f6f7 0%, #eaeeef 55%, #dfe5e7 100%)',
+          accent: '#9c591e',
+          accent2: '#2f6f62'
+        }
       ];
 
-      function showBackgroundToast(msg) {
+      function showThemeToast(msg) {
         try {
           const t = document.getElementById('toast');
           if (!t) return;
           t.textContent = String(msg || '');
           t.classList.add('show');
-          clearTimeout(window._bgToastT);
-          window._bgToastT = setTimeout(() => t.classList.remove('show'), 2000);
+          clearTimeout(window._themeToastT);
+          window._themeToastT = setTimeout(() => t.classList.remove('show'), 2000);
         } catch (e) {}
       }
 
       if (typeof window.toast !== 'function') {
-        window.toast = showBackgroundToast;
+        window.toast = showThemeToast;
       }
 
-      function applySimpleBackground(id) {
-        const item = SIMPLE_BACKGROUNDS.find((x) => x.id === id) || SIMPLE_BACKGROUNDS[0];
-        try { localStorage.setItem('sat_simple_bg', item.id); } catch (e) {}
-        document.documentElement.style.background = item.bg;
-        document.body.style.background = item.bg;
+      function applySatTheme(id) {
+        const th = SAT_THEMES.find((x) => x.id === id) || SAT_THEMES[0];
+        try { localStorage.setItem('sat_theme_v1', th.id); } catch (e) {}
+        document.body.classList.toggle('theme-light', Boolean(th.light));
+        document.documentElement.style.setProperty('--accent', th.accent);
+        document.documentElement.style.setProperty('--accent-2', th.accent2);
+        document.documentElement.style.setProperty('--green', th.accent);
+        document.documentElement.style.background = th.bg;
+        document.body.style.background = th.bg;
+
         const badge = document.getElementById('wpActiveName');
-        if (badge) badge.textContent = item.name;
+        if (badge) badge.textContent = th.name;
+
         const list = document.getElementById('wallpapersList');
         if (list) {
-          list.innerHTML = SIMPLE_BACKGROUNDS.map((b) => {
-            const cur = b.id === item.id;
-            return '<div class="wp-item ' + (cur ? 'active' : '') + '" onclick="selectSimpleBackground(\'' + b.id + '\')" style="background: ' + b.bg + ';">' +
-              '<div><div style="font-weight:800;font-size:15.5px;color:#eef8f3;">' + b.name + '</div><div style="font-size:12.5px;color:#9ec2b1;margin-top:3px;">' + b.desc + '</div></div>' +
-              '<div style="font-size:12.5px;font-weight:700;color:#6cf0b5;white-space:nowrap;">' + (cur ? 'Выбран' : 'Применить') + '</div>' +
+          list.innerHTML = SAT_THEMES.map((item) => {
+            const cur = item.id === th.id;
+            const fg = item.light ? '#1a1c20' : '#f4f1ea';
+            const subFg = item.light ? '#625f58' : '#a6a298';
+            return '<div class="wp-item ' + (cur ? 'active' : '') + '" onclick="selectSatTheme(\'' + item.id + '\')" style="background: ' + item.bg + '; color: ' + fg + ';">' +
+              '<div><div style="font-weight:800;font-size:15px;">' + item.name + '</div><div style="font-size:12px;color:' + subFg + ';margin-top:3px;">' + item.desc + '</div></div>' +
+              '<div style="font-size:12.5px;font-weight:700;color:' + item.accent + ';white-space:nowrap;">' + (cur ? 'Выбран' : 'Применить') + '</div>' +
             '</div>';
           }).join('');
         }
       }
 
       window.openWallpapers = function () {
-        let saved = 'bg1';
-        try { saved = localStorage.getItem('sat_simple_bg') || 'bg1'; } catch (e) {}
-        applySimpleBackground(saved);
+        let saved = 'amber_dark';
+        try { saved = localStorage.getItem('sat_theme_v1') || 'amber_dark'; } catch (e) {}
+        applySatTheme(saved);
         document.getElementById('wallpapersModal')?.classList.add('open');
       };
 
-      window.selectSimpleBackground = function (id) {
-        applySimpleBackground(id);
-        const item = SIMPLE_BACKGROUNDS.find((x) => x.id === id);
-        if (item) {
-          if (typeof window.toast === 'function') window.toast('Фон: ' + item.name);
-          else showBackgroundToast('Фон: ' + item.name);
+      window.selectSatTheme = function (id) {
+        applySatTheme(id);
+        const th = SAT_THEMES.find((x) => x.id === id);
+        if (th) {
+          if (typeof window.toast === 'function') window.toast('Тема: ' + th.name);
+          else showThemeToast('Тема: ' + th.name);
         }
       };
 
-      let initial = 'bg1';
-      try { initial = localStorage.getItem('sat_simple_bg') || 'bg1'; } catch (e) {}
-      applySimpleBackground(initial);
+      window.closeSectionRightDrawer = function () {
+        document.getElementById('sectionRightDrawer')?.classList.remove('open');
+        document.getElementById('rightMenuBackdrop')?.classList.remove('open');
+      };
+
+      window.openSectionRightDrawer = function () {
+        const activePanel = document.querySelector('.tab-panel.active');
+        const tab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
+        const heading = document.getElementById('rightDrawerHeading');
+        const itemsBox = document.getElementById('rightDrawerItems');
+        if (!itemsBox) return;
+
+        let titleText = 'Навигация';
+        let items = [];
+
+        if (tab === 'pulse') {
+          titleText = 'Пульс — выбор';
+          items = [
+            { label: 'Все разделы', fn: () => window.setPulseFilter?.('all') },
+            { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
+            { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
+            { label: 'Помощь', fn: () => window.setPulseFilter?.('help') },
+            { label: 'Прогулки', fn: () => window.setPulseFilter?.('walks') },
+            { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
+            { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
+          ];
+        } else if (tab === 'books') {
+          titleText = 'Книги — выбор';
+          items = [
+            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
+            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
+            { label: '+ Добавить историю / совет', fn: () => window.openAddReadingModal?.() }
+          ];
+        } else {
+          titleText = 'Профиль — выбор';
+          items = [
+            { label: 'Публикации и фото', fn: () => window.switchMySubtab?.('posts') },
+            { label: 'Друзья и заявки', fn: () => window.switchMySubtab?.('friends') },
+            { label: 'Группы', fn: () => window.switchMySubtab?.('groups') },
+            { label: 'Анкета и профиль', fn: () => window.openEditProfileModal?.() },
+            { label: 'Время намаза • Оскемен', fn: () => window.openNamazQiblaModal?.() },
+            { label: 'Техподдержка', fn: () => window.openSupportModal?.() },
+            { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
+          ];
+        }
+
+        if (heading) heading.textContent = titleText;
+        itemsBox.innerHTML = '';
+        items.forEach((it) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'right-drawer-item';
+          btn.textContent = it.label;
+          btn.onclick = () => {
+            window.closeSectionRightDrawer();
+            if (typeof it.fn === 'function') it.fn();
+          };
+          itemsBox.appendChild(btn);
+        });
+
+        document.getElementById('rightMenuBackdrop')?.classList.add('open');
+        document.getElementById('sectionRightDrawer')?.classList.add('open');
+      };
+
+      let initial = 'amber_dark';
+      try { initial = localStorage.getItem('sat_theme_v1') || 'amber_dark'; } catch (e) {}
+      applySatTheme(initial);
     })();
   </script>
 
@@ -1649,7 +1856,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v34';
+    const STORE_KEY = 'sat_clean_state_v35';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -1799,6 +2006,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v34',
         'sat_clean_state_v33',
         'sat_clean_state_v32',
         'sat_clean_state_v31',
@@ -2251,6 +2459,7 @@
     }
 
     function showScreen(id) {
+      window.closeSectionRightDrawer?.();
       document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
       document.getElementById(id)?.classList.add('active');
     }
@@ -2676,13 +2885,11 @@
         const myUid = String(getMyUid() || '');
         const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
         const sourceUsers = Array.isArray(users) ? users : [];
+        const registeredAll = sourceUsers.filter((u) => u && u.uid);
 
-        const matched = sourceUsers
+        const matched = registeredAll
           .filter((u) => {
-            if (!u || !u.uid) return false;
             const uidStr = String(u.uid);
-            if (myUid && uidStr === myUid) return false;
-
             const isBiz = u.accountType === 'business';
             if (unifiedSearchTab === 'users' && isBiz) return false;
             if (unifiedSearchTab === 'business' && !isBiz) return false;
@@ -2705,7 +2912,7 @@
           });
 
         if (sumEl) {
-          sumEl.textContent = `Найдено: ${matched.length} • Сначала те, кто в сети и с объявлениями`;
+          sumEl.textContent = `Зарегистрировано в SÄT: ${registeredAll.length} • Показано: ${matched.length}`;
         }
 
         if (!matched.length) {
@@ -2715,19 +2922,31 @@
 
         box.innerHTML = matched.map((u) => {
           const uidStr = String(u.uid);
+          const isMe = Boolean(myUid && uidStr === myUid);
           const name = String(u.fullName || 'Участник');
           const isBiz = u.accountType === 'business';
           const badge = isBiz ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Бизнес</span>' : '';
+          const meBadge = isMe ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Вы</span>' : '';
           const adLine = getLatestPostTextForUid(uidStr);
           const subDesc = adLine
             ? `Объявление: ${adLine}`
             : String(u.bio || (isBiz ? 'Дело / организация в SÄT' : 'Участник SÄT'));
 
-          const rel = typeof getFriendRel === 'function' ? getFriendRel(uidStr) : { status: 'none' };
-          let actionRight = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="add_friend" data-uid="${esc(uidStr)}">+ Друг</button>`;
-          if (rel.status === 'accepted') actionRight = '<span class="tag">Друг</span>';
-          else if (rel.status === 'outgoing') actionRight = '<span class="meta" style="font-size: 12px;">Заявка</span>';
-          else if (rel.status === 'incoming') actionRight = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="accept_friend" data-uid="${esc(uidStr)}" data-req-id="${esc(String(rel.id || ''))}">Принять</button>`;
+          let actionRight = '';
+          if (!isMe) {
+            const rel = typeof getFriendRel === 'function' ? getFriendRel(uidStr) : { status: 'none' };
+            let friendControl = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="add_friend" data-uid="${esc(uidStr)}">+ Друг</button>`;
+            if (rel.status === 'accepted') friendControl = '<span class="tag">Друг</span>';
+            else if (rel.status === 'outgoing') friendControl = '<span class="meta" style="font-size: 12px;">Заявка</span>';
+            else if (rel.status === 'incoming') friendControl = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="accept_friend" data-uid="${esc(uidStr)}" data-req-id="${esc(String(rel.id || ''))}">Принять</button>`;
+
+            actionRight = `
+              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                ${friendControl}
+                <button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" data-search-action="open_chat" data-uid="${esc(uidStr)}">Чат</button>
+              </div>
+            `;
+          }
 
           const avaHtml = u.photoData
             ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />`
@@ -2738,15 +2957,12 @@
               <div class="post-user" data-search-action="open_profile" data-uid="${esc(uidStr)}">
                 <div class="mini-ava">${avaHtml}</div>
                 <div style="min-width: 0; flex: 1;">
-                  <div class="user-name">${esc(name)}${badge}</div>
+                  <div class="user-name">${esc(name)}${badge}${meBadge}</div>
                   <div class="meta" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(subDesc)}</div>
                   <div style="margin-top: 2px;">${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
                 </div>
               </div>
-              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
-                ${actionRight}
-                <button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" data-search-action="open_chat" data-uid="${esc(uidStr)}">Чат</button>
-              </div>
+              ${actionRight}
             </div>
           `;
         }).join('');
@@ -2782,11 +2998,11 @@
             ? pendingItems.map((item) => `
                 <div class="comment-item">
                   <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                    <span style="font-weight: 800; font-size: 14.5px; color: #eef8f3;">${esc(item.title)}</span>
+                    <span style="font-weight: 800; font-size: 14.5px; color: var(--text);">${esc(item.title)}</span>
                     <span class="tag">${esc(item.kind === 'tips' ? 'Совет дня' : 'Краткая история')}</span>
                   </div>
                   <div class="meta" style="margin-top: 3px;">Автор: ${esc(item.authorName)}</div>
-                  ${item.summary ? `<div style="margin-top: 6px; font-size: 13.5px; color: #d8ece2;">${esc(item.summary)}</div>` : ''}
+                  ${item.summary ? `<div style="margin-top: 6px; font-size: 13.5px; color: var(--muted);">${esc(item.summary)}</div>` : ''}
                   <div class="actions" style="margin-top: 8px;">
                     <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="openReadingItem('${esc(item.id)}')">Читать</button>
                     <button type="button" class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="approveReadingItem('${esc(item.id)}')">Одобрить</button>
@@ -2816,7 +3032,7 @@
                 </div>
                 <span class="tag">${esc(badgeText)}</span>
               </div>
-              ${item.summary ? `<div style="margin-top: 10px; font-size: 14.5px; line-height: 1.48; color: #d8ece2;">${esc(item.summary)}</div>` : ''}
+              ${item.summary ? `<div style="margin-top: 10px; font-size: 14.5px; line-height: 1.48; color: var(--muted);">${esc(item.summary)}</div>` : ''}
               <div class="actions" style="margin-top: 12px;">
                 <button type="button" class="btn btn-primary" style="flex: 1;" onclick="openReadingItem('${esc(item.id)}')">Читать</button>
                 ${canDelete ? `<button type="button" class="btn btn-danger" style="padding: 8px 12px; font-size: 13px;" onclick="deleteReadingItem('${esc(item.id)}')">Удалить</button>` : ''}
@@ -2998,7 +3214,7 @@
           ? supportTickets.map((t) => `
               <div class="comment-item">
                 <div style="display:flex; justify-content:space-between; gap:8px;">
-                  <span style="font-weight:800; font-size:13px; color:#6cf0b5;">${esc(t.senderName || 'Пользователь')}</span>
+                  <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(t.senderName || 'Пользователь')}</span>
                   <span class="meta" style="font-size:11px;">${esc(t.time || '')}</span>
                 </div>
                 <div style="font-size:14px; margin-top:4px;">${esc(t.text || '')}</div>
@@ -3016,7 +3232,7 @@
         const addedCount = getAddedUsersCount();
         const notAddedCount = getNotAddedOrPendingCount();
         const sortedUsers = [...users].sort((a, b) => Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0));
-        const counterHtml = `<div style="margin-bottom:10px; font-weight:800; color:#6cf0b5;">Добавилось участников: ${addedCount} • Не добавилось / ожидают: ${notAddedCount}</div>`;
+        const counterHtml = `<div style="margin-bottom:10px; font-weight:800; color:var(--accent);">Добавилось участников: ${addedCount} • Не добавилось / ожидают: ${notAddedCount}</div>`;
         uBox.innerHTML = counterHtml + (sortedUsers.length
           ? sortedUsers.map((u) => `
               <div class="list-item">
@@ -3096,6 +3312,7 @@
     }
 
     function switchMainTab(tab, btn) {
+      window.closeSectionRightDrawer?.();
       document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
       document.getElementById('tab-' + tab)?.classList.add('active');
       document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
@@ -3723,7 +3940,7 @@
             ${cmtList.length ? cmtList.map((c) => `
               <div class="comment-item">
                 <div style="display:flex; justify-content:space-between; gap:8px;">
-                  <span style="font-weight:800; font-size:13px; color:#6cf0b5;">${esc(c.authorName || 'Участник')}</span>
+                  <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(c.authorName || 'Участник')}</span>
                   <span class="meta" style="font-size:11px;">${esc(c.time || '')}</span>
                 </div>
                 <div style="font-size:14px; margin-top:4px;">${esc(c.text || '')}</div>

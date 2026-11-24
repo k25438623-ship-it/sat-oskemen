@@ -285,6 +285,20 @@
     .pulse-act-btn.gold { color: var(--gold); border-color: rgba(242, 201, 107, 0.35); }
     body.theme-light .pulse-act-btn.gold { color: #9c591e; }
 
+    .vyruchka-form-box {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px 6px 18px 18px;
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+    }
+    .vyruchka-loc {
+      margin-top: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-2);
+    }
+
     /* Анимации «живых картин» в разделе «Книга» */
     @keyframes satLivingGlow {
       0%, 100% { opacity: 0.58; transform: scale(1); }
@@ -1149,7 +1163,6 @@
           <button type="button" id="pFilterAll" class="chip-btn active" onclick="setPulseFilter('all')">Все</button>
           <button type="button" id="pFilterPosts" class="chip-btn" onclick="setPulseFilter('posts')">Публикации</button>
           <button type="button" id="pFilterNews" class="chip-btn" onclick="setPulseFilter('news')">Новости</button>
-          <button type="button" id="pFilterHelp" class="chip-btn" onclick="setPulseFilter('help')">Помощь</button>
           <button type="button" id="pFilterWalks" class="chip-btn" onclick="setPulseFilter('walks')">Прогулки</button>
           <button type="button" id="pFilterCafe" class="chip-btn" onclick="setPulseFilter('cafe')">Кафе</button>
         </div>
@@ -1201,6 +1214,66 @@
           <h3 style="margin: 0 0 8px; font-size: 16px;">Мои отправленные тексты</h3>
           <div id="mySubmittedBooksList"></div>
         </div>
+      </div>
+
+      <div id="tab-vyruchka" class="tab-panel">
+        <div class="card">
+          <h3 style="margin: 0; font-size: 19px;">Выручка рядом</h3>
+          <p class="pulse-body-text" style="margin-top: 8px; font-size: 14.5px; color: var(--muted);">
+            Быстрые ориентиры на месте в Оскемене и ВКО: круглосуточные аптеки, круглосуточные кафе, хостелы и ночлег, а также житейские советы и лайфхаки по городу и быту для тех, кто только осваивается или нуждается в подсказке.
+          </p>
+          <div class="meta" style="margin-top: 8px;">
+            Общедоступные адреса и ориентиры без чужих личных данных. Новые записи проходят проверку, график и наличие мест лучше уточнять на месте.
+          </div>
+          <div class="actions" style="margin-top: 12px;">
+            <button type="button" class="btn btn-primary" style="width: 100%;" onclick="toggleVyruchkaForm()">+ Добавить точку или подсказку</button>
+          </div>
+
+          <form id="vyruchkaFormBox" class="vyruchka-form-box" style="display: none;" onsubmit="submitVyruchkaEntry(event)">
+            <label class="meta">Категория</label>
+            <select id="vyruchkaCatSelect">
+              <option value="pharmacy24">Аптека 24/7</option>
+              <option value="cafe24">Кафе 24/7</option>
+              <option value="stay">Ночлег / Хостелы</option>
+              <option value="tips">Советы и лайфхаки по городу и быту</option>
+            </select>
+
+            <label class="meta" style="display: block; margin-top: 10px;">Название или суть подсказки</label>
+            <input id="vyruchkaTitleInput" class="input" maxlength="95" placeholder="Например: Круглосуточная аптека у остановки или Ориентиры в городе" />
+
+            <label class="meta" style="display: block; margin-top: 10px;">Адрес, район или ориентир</label>
+            <input id="vyruchkaLocationInput" class="input" maxlength="120" placeholder="Например: пр. Абая / район / ориентир (необязательно для совета)" />
+
+            <label class="meta" style="display: block; margin-top: 10px;">Короткая заметка по делу</label>
+            <textarea id="vyruchkaDetailsInput" rows="3" maxlength="360" placeholder="Режим работы, наличие зарядки/мест или практический совет..."></textarea>
+
+            <div class="actions" style="margin-top: 12px;">
+              <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="toggleVyruchkaForm(false)">Отмена</button>
+              <button type="submit" class="btn btn-primary" style="flex: 1;">Отправить</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="filter-row">
+          <button type="button" id="vFilterAll" class="chip-btn active" onclick="setVyruchkaFilter('all')">Все</button>
+          <button type="button" id="vFilterPharmacy24" class="chip-btn" onclick="setVyruchkaFilter('pharmacy24')">Аптеки 24/7</button>
+          <button type="button" id="vFilterCafe24" class="chip-btn" onclick="setVyruchkaFilter('cafe24')">Кафе 24/7</button>
+          <button type="button" id="vFilterStay" class="chip-btn" onclick="setVyruchkaFilter('stay')">Ночлег / Хостелы</button>
+          <button type="button" id="vFilterTips" class="chip-btn" onclick="setVyruchkaFilter('tips')">Советы и лайфхаки</button>
+        </div>
+
+        <div id="vyruchkaModerationCard" class="card" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">На проверке (контроль разработчика)</h3>
+              <div class="meta">Записи от пользователей до публикации в общий список</div>
+            </div>
+            <span class="tag-alert" id="vyruchkaPendingBadge">0</span>
+          </div>
+          <div id="vyruchkaPendingList" style="margin-top: 10px;"></div>
+        </div>
+
+        <div id="vyruchkaListContainer"></div>
       </div>
 
       <div id="tab-profile" class="tab-panel active">
@@ -1675,7 +1748,6 @@
       <select id="postCategorySelect">
         <option value="posts">Публикации</option>
         <option value="news">Новости</option>
-        <option value="help">Помощь</option>
         <option value="walks">Прогулки</option>
         <option value="cafe">Кафе</option>
       </select>
@@ -2003,7 +2075,6 @@
             { label: 'Все темы', fn: () => window.setPulseFilter?.('all') },
             { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
             { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
-            { label: 'Помощь', fn: () => window.setPulseFilter?.('help') },
             { label: 'Прогулки', fn: () => window.setPulseFilter?.('walks') },
             { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
             { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
@@ -2057,6 +2128,43 @@
           });
           box.appendChild(bSub);
         }
+
+        const vyruchkaPick = document.createElement('button');
+        vyruchkaPick.type = 'button';
+        vyruchkaPick.className = 'side-drawer-item' + (leftExpandedSection === 'vyruchka' ? ' selected' : '');
+        vyruchkaPick.textContent = leftExpandedSection === 'vyruchka' ? '▾ Выручка рядом' : '▸ Выручка рядом';
+        vyruchkaPick.onclick = () => {
+          leftExpandedSection = leftExpandedSection === 'vyruchka' ? null : 'vyruchka';
+          renderLeftRootList();
+        };
+        box.appendChild(vyruchkaPick);
+
+        if (leftExpandedSection === 'vyruchka') {
+          const vSub = document.createElement('div');
+          vSub.className = 'left-sublist-box';
+          const vyruchkaItems = [
+            { label: 'Все точки и советы', fn: () => window.setVyruchkaFilter?.('all') },
+            { label: 'Аптеки 24/7', fn: () => window.setVyruchkaFilter?.('pharmacy24') },
+            { label: 'Кафе 24/7', fn: () => window.setVyruchkaFilter?.('cafe24') },
+            { label: 'Ночлег / Хостелы', fn: () => window.setVyruchkaFilter?.('stay') },
+            { label: 'Советы и лайфхаки', fn: () => window.setVyruchkaFilter?.('tips') },
+            { label: '+ Добавить запись', fn: () => window.toggleVyruchkaForm?.(true) }
+          ];
+          vyruchkaItems.forEach((it) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'side-drawer-item';
+            btn.textContent = it.label;
+            btn.onclick = () => {
+              window.closeAllSideDrawers();
+              const vBtn = document.querySelector('.nav-btn[data-tab="vyruchka"]');
+              if (typeof window.switchMainTab === 'function') window.switchMainTab('vyruchka', vBtn || null);
+              if (typeof it.fn === 'function') it.fn();
+            };
+            vSub.appendChild(btn);
+          });
+          box.appendChild(vSub);
+        }
       }
 
       window.openLeftSectionsMenu = function () {
@@ -2069,7 +2177,10 @@
         if (!leftExpandedSection) {
           const activePanel = document.querySelector('.tab-panel.active');
           const curTab = activePanel ? activePanel.id.replace('tab-', '') : '';
-          leftExpandedSection = curTab === 'books' ? 'books' : (curTab === 'pulse' ? 'pulse' : null);
+          if (curTab === 'books') leftExpandedSection = 'books';
+          else if (curTab === 'pulse') leftExpandedSection = 'pulse';
+          else if (curTab === 'vyruchka') leftExpandedSection = 'vyruchka';
+          else leftExpandedSection = null;
         }
         renderLeftRootList();
         document.getElementById('sideMenuBackdrop')?.classList.add('open');
@@ -2495,6 +2606,13 @@
       }
     ];
 
+    const VYRUCKA_CATEGORIES = {
+      pharmacy24: 'Аптека 24/7',
+      cafe24: 'Кафе 24/7',
+      stay: 'Ночлег / Хостелы',
+      tips: 'Советы и лайфхаки'
+    };
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -2527,6 +2645,7 @@
       cachedFriends: [],
       cachedUsers: [],
       cachedRequests: [],
+      cachedVyruchka: [],
       lastUid: '',
       lastSilentError: null
     };
@@ -2620,7 +2739,8 @@
           : state.manualPrayerTimes,
         cachedFriends: Array.isArray(recovered.cachedFriends) ? recovered.cachedFriends : [],
         cachedUsers: Array.isArray(recovered.cachedUsers) ? recovered.cachedUsers : [],
-        cachedRequests: Array.isArray(recovered.cachedRequests) ? recovered.cachedRequests : []
+        cachedRequests: Array.isArray(recovered.cachedRequests) ? recovered.cachedRequests : [],
+        cachedVyruchka: Array.isArray(recovered.cachedVyruchka) ? recovered.cachedVyruchka : []
       };
     }
 
@@ -2678,6 +2798,31 @@
       };
     }
 
+    function normalizeVyruchkaDoc(raw, id) {
+      const d = raw && typeof raw === 'object' ? raw : {};
+      const validCats = ['pharmacy24', 'cafe24', 'stay', 'tips'];
+      const category = validCats.includes(d.category) ? d.category : 'tips';
+      const status = d.status === 'pending' ? 'pending' : 'approved';
+      const createdAtMs = Number(
+        d.createdAtMs ||
+        (d.createdAt && typeof d.createdAt.toMillis === 'function' ? d.createdAt.toMillis() : 0) ||
+        Date.now()
+      );
+      return {
+        id: String(id || d.id || ('vr_' + Date.now())),
+        category,
+        status,
+        title: String(d.title || 'Ориентир'),
+        location: String(d.location || ''),
+        details: String(d.details || ''),
+        authorUid: String(d.authorUid || ''),
+        authorName: String(d.authorName || 'Участник'),
+        hideAuthor: Boolean(d.hideAuthor || d.isDeveloperEntry),
+        isDeveloperEntry: Boolean(d.isDeveloperEntry || d.hideAuthor),
+        createdAtMs
+      };
+    }
+
     let currentUser = null;
     let posts = [];
     let users = [...state.cachedUsers];
@@ -2686,6 +2831,8 @@
     let supportTickets = [];
     let appErrorLogs = [];
     let readingItems = INITIAL_READING_ITEMS.map((item) => normalizeReadingDoc(item, item.id));
+    let vyruchkaItems = (state.cachedVyruchka || []).map((item) => normalizeVyruchkaDoc(item, item.id));
+    let vyruchkaFilter = 'all';
     let readingFontSize = 17;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
     let draftReadingPhoto = '';
@@ -2976,7 +3123,8 @@
     function persist(syncVault = true) {
       const payload = JSON.stringify({
         ...state,
-        photos: normalizePhotos(state.photos).slice(0, 30)
+        photos: normalizePhotos(state.photos).slice(0, 30),
+        cachedVyruchka: Array.isArray(vyruchkaItems) ? vyruchkaItems.slice(0, 100) : []
       });
       try { localStorage.setItem(STORE_KEY, payload); } catch (e) {}
       try { localStorage.setItem(VAULT_BACKUP_KEY, payload); } catch (e) {}
@@ -3054,6 +3202,7 @@
       document.getElementById('creatorCodeBox').style.display = 'none';
       syncSupportAndMonitorCard();
       renderBooksTab();
+      renderVyruchkaTab();
       openSupportModal();
       toast('Доступ открыт');
     }
@@ -3264,6 +3413,7 @@
         renderMyProfile();
         renderFriendsTab();
         renderUnifiedSearch();
+        renderVyruchkaTab();
         if (openPeerUid) renderPeerPageContent();
       }
     });
@@ -3332,6 +3482,15 @@
       renderUnifiedSearch();
       syncSupportAndMonitorCard();
       if (openPeerUid) renderPeerPageContent();
+    }, () => {});
+
+    onSnapshot(query(collection(db, 'vyruchka'), orderBy('createdAt', 'desc')), (snap) => {
+      const cloudItems = snap.docs.map((d) => normalizeVyruchkaDoc(d.data(), d.id));
+      const cloudIds = new Set(cloudItems.map((x) => x.id));
+      const pendingLocal = vyruchkaItems.filter((x) => !cloudIds.has(x.id) && String(x.id).startsWith('vr_'));
+      vyruchkaItems = [...pendingLocal, ...cloudItems].sort((a, b) => Number(b.createdAtMs || 0) - Number(a.createdAtMs || 0));
+      persist(false);
+      renderVyruchkaTab();
     }, () => {});
 
     function rebuildReadingIndex(list) {
@@ -3502,6 +3661,186 @@
         renderOskemenPrayerUI();
       }
     }, () => {});
+
+    function toggleVyruchkaForm(forceState) {
+      const box = document.getElementById('vyruchkaFormBox');
+      if (!box) return;
+      const nextOpen = typeof forceState === 'boolean' ? forceState : (box.style.display === 'none');
+      box.style.display = nextOpen ? 'block' : 'none';
+      if (nextOpen) {
+        const catSel = document.getElementById('vyruchkaCatSelect');
+        if (catSel && vyruchkaFilter !== 'all' && VYRUCKA_CATEGORIES[vyruchkaFilter]) {
+          catSel.value = vyruchkaFilter;
+        }
+      }
+    }
+
+    function setVyruchkaFilter(cat) {
+      vyruchkaFilter = ['all', 'pharmacy24', 'cafe24', 'stay', 'tips'].includes(cat) ? cat : 'all';
+      const map = {
+        all: 'vFilterAll',
+        pharmacy24: 'vFilterPharmacy24',
+        cafe24: 'vFilterCafe24',
+        stay: 'vFilterStay',
+        tips: 'vFilterTips'
+      };
+      Object.entries(map).forEach(([k, id]) => {
+        document.getElementById(id)?.classList.toggle('active', k === vyruchkaFilter);
+      });
+      renderVyruchkaTab();
+    }
+
+    async function submitVyruchkaEntry(ev) {
+      if (ev) ev.preventDefault();
+      const cat = document.getElementById('vyruchkaCatSelect')?.value || 'tips';
+      const title = (document.getElementById('vyruchkaTitleInput')?.value || '').trim();
+      const location = (document.getElementById('vyruchkaLocationInput')?.value || '').trim();
+      const details = (document.getElementById('vyruchkaDetailsInput')?.value || '').trim();
+
+      if (!title || !details) {
+        toast('Укажите название или суть и заметку');
+        return;
+      }
+
+      const creator = isCreatorAccount();
+      const myUid = getMyUid() || 'guest';
+      const nowMs = Date.now();
+      const entryId = `vr_${nowMs}_${Math.random().toString(36).slice(2, 6)}`;
+
+      const item = normalizeVyruchkaDoc({
+        id: entryId,
+        category: cat,
+        status: creator ? 'approved' : 'pending',
+        title,
+        location,
+        details,
+        authorUid: myUid,
+        authorName: myDisplayName(),
+        hideAuthor: creator,
+        isDeveloperEntry: creator,
+        createdAtMs: nowMs
+      }, entryId);
+
+      vyruchkaItems = [item, ...vyruchkaItems.filter((x) => x.id !== item.id)];
+      persist(false);
+      renderVyruchkaTab();
+
+      document.getElementById('vyruchkaTitleInput').value = '';
+      document.getElementById('vyruchkaLocationInput').value = '';
+      document.getElementById('vyruchkaDetailsInput').value = '';
+      toggleVyruchkaForm(false);
+
+      const cloudPayload = {
+        category: item.category,
+        status: item.status,
+        title: item.title,
+        location: item.location,
+        details: item.details,
+        authorUid: item.authorUid,
+        authorName: item.authorName,
+        hideAuthor: item.hideAuthor,
+        isDeveloperEntry: item.isDeveloperEntry,
+        createdAtMs: item.createdAtMs,
+        createdAt: serverTimestamp()
+      };
+
+      const writeOp = () => setDoc(doc(db, 'vyruchka', item.id), cloudPayload, { merge: true });
+      writeOp().catch(() => queueCloudRetry(writeOp));
+
+      toast(creator ? 'Добавлено (автор скрыт)' : 'Отправлено на проверку');
+    }
+
+    async function approveVyruchkaItem(id) {
+      if (!isCreatorAccount() || !id) return;
+      const targetId = String(id);
+      vyruchkaItems = vyruchkaItems.map((x) => (x.id === targetId ? { ...x, status: 'approved' } : x));
+      persist(false);
+      renderVyruchkaTab();
+      const op = () => updateDoc(doc(db, 'vyruchka', targetId), {
+        status: 'approved',
+        reviewedAt: serverTimestamp()
+      });
+      op().catch(() => queueCloudRetry(op));
+      toast('Запись опубликована');
+    }
+
+    async function deleteVyruchkaItem(id) {
+      if (!isCreatorAccount() || !id) return;
+      const targetId = String(id);
+      vyruchkaItems = vyruchkaItems.filter((x) => x.id !== targetId);
+      persist(false);
+      renderVyruchkaTab();
+      const op = () => deleteDoc(doc(db, 'vyruchka', targetId));
+      op().catch(() => queueCloudRetry(op));
+      toast('Удалено');
+    }
+
+    function renderVyruchkaTab() {
+      const listEl = document.getElementById('vyruchkaListContainer');
+      const modCard = document.getElementById('vyruchkaModerationCard');
+      const modList = document.getElementById('vyruchkaPendingList');
+      const modBadge = document.getElementById('vyruchkaPendingBadge');
+      if (!listEl) return;
+
+      const creator = isCreatorAccount();
+      const safeItems = vyruchkaItems.map((x) => normalizeVyruchkaDoc(x, x.id));
+
+      if (modCard && modList && modBadge) {
+        const pending = safeItems.filter((x) => x.status === 'pending');
+        modCard.style.display = creator ? 'block' : 'none';
+        modBadge.textContent = String(pending.length);
+        if (creator) {
+          modList.innerHTML = pending.length
+            ? pending.map((item) => `
+                <div class="comment-item">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-weight:800; font-size:14px; color:var(--text);">${esc(item.title)}</span>
+                    <span class="tag">${esc(VYRUCKA_CATEGORIES[item.category] || 'Ориентир')}</span>
+                  </div>
+                  ${item.location ? `<div class="vyruchka-loc">Ориентир: ${esc(item.location)}</div>` : ''}
+                  <div style="font-size:13.5px; margin-top:6px; line-height:1.45;">${esc(item.details)}</div>
+                  <div class="meta" style="margin-top:4px; font-size:12px;">От: ${esc(item.authorName)} • ${esc(formatTime(item.createdAtMs))}</div>
+                  <div class="actions" style="margin-top:8px;">
+                    <button type="button" class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="approveVyruchkaItem('${esc(item.id)}')">Одобрить</button>
+                    <button type="button" class="btn btn-danger" style="padding:6px 10px; font-size:12px;" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>
+                  </div>
+                </div>
+              `).join('')
+            : '<div class="meta">Новых записей на проверке нет.</div>';
+        }
+      }
+
+      const approvedFiltered = safeItems
+        .filter((x) => x.status === 'approved')
+        .filter((x) => vyruchkaFilter === 'all' || x.category === vyruchkaFilter);
+
+      if (!approvedFiltered.length) {
+        listEl.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">Записей пока нет</div><div class="meta">Нажмите «+ Добавить точку или подсказку», чтобы внести первую запись.</div></div>';
+        return;
+      }
+
+      listEl.innerHTML = approvedFiltered.map((item) => {
+        const showAuthor = !item.hideAuthor && !item.isDeveloperEntry;
+        const delBtn = creator
+          ? `<button type="button" class="pulse-act-btn" style="color:var(--danger);" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>`
+          : '';
+        return `
+          <article class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <span class="tag">${esc(VYRUCKA_CATEGORIES[item.category] || 'Ориентир')}</span>
+              <span class="meta" style="font-size:12px;">${esc(formatTime(item.createdAtMs))}</span>
+            </div>
+            <div class="post-caption" style="margin-top:10px; font-size:16px;">${esc(item.title)}</div>
+            ${item.location ? `<div class="vyruchka-loc">Ориентир: ${esc(item.location)}</div>` : ''}
+            <div class="pulse-body-text" style="margin-top:8px;">${esc(item.details)}</div>
+            <div class="pulse-actions-clean">
+              <span class="meta" style="font-size:12px;">${showAuthor ? `Добавил: ${esc(item.authorName)}` : 'Справочная запись'}</span>
+              ${delBtn}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
 
     function openUnifiedSearchModal() {
       try {
@@ -4107,7 +4446,7 @@
 
     function switchMainTab(tab, btn) {
       window.closeAllSideDrawers?.();
-      const nextTab = ['pulse', 'books', 'profile'].includes(tab) ? tab : 'profile';
+      const nextTab = ['pulse', 'books', 'vyruchka', 'profile'].includes(tab) ? tab : 'profile';
       document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
       document.getElementById('tab-' + nextTab)?.classList.add('active');
       document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
@@ -4117,17 +4456,16 @@
     }
 
     function setPulseFilter(f) {
-      pulseFilter = f;
+      pulseFilter = ['all', 'posts', 'news', 'walks', 'cafe'].includes(f) ? f : 'all';
       const map = {
         all: 'pFilterAll',
         posts: 'pFilterPosts',
         news: 'pFilterNews',
-        help: 'pFilterHelp',
         walks: 'pFilterWalks',
         cafe: 'pFilterCafe'
       };
       Object.entries(map).forEach(([k, id]) => {
-        document.getElementById(id)?.classList.toggle('active', k === f);
+        document.getElementById(id)?.classList.toggle('active', k === pulseFilter);
       });
       renderPulse();
     }
@@ -4147,6 +4485,7 @@
       renderMyProfile();
       renderPulse();
       renderBooksTab();
+      renderVyruchkaTab();
       renderUnifiedSearch();
       renderMyPosts();
       renderFriendsTab();
@@ -4573,7 +4912,7 @@
 
     function openNewPostModal() {
       const sel = document.getElementById('postCategorySelect');
-      if (sel) sel.value = pulseFilter !== 'all' ? pulseFilter : 'posts';
+      if (sel) sel.value = ['posts', 'news', 'walks', 'cafe'].includes(pulseFilter) ? pulseFilter : 'posts';
       choosePostDest('pulse');
       document.getElementById('newPostModal')?.classList.add('open');
     }
@@ -4592,9 +4931,13 @@
       document.getElementById('postPhotoLabel').textContent = 'Прикрепить фото (камера или галерея)';
     }
 
-    function normalizePostCategory(cat) { return cat === 'people' ? 'posts' : (cat || 'posts'); }
+    function normalizePostCategory(cat) {
+      if (cat === 'people' || cat === 'help') return 'posts';
+      return ['posts', 'news', 'walks', 'cafe'].includes(cat) ? cat : 'posts';
+    }
+
     function getCategoryDisplayLabel(p) {
-      const map = { posts: 'Публикации', news: 'Новости', help: 'Помощь', walks: 'Прогулки', cafe: 'Кафе' };
+      const map = { posts: 'Публикации', news: 'Новости', walks: 'Прогулки', cafe: 'Кафе' };
       return map[normalizePostCategory(p.category)] || p.categoryLabel || 'Публикации';
     }
 
@@ -4612,7 +4955,7 @@
 
     async function submitNewPost() {
       if (isSubmittingPost) return;
-      const cat = document.getElementById('postCategorySelect').value;
+      const cat = normalizePostCategory(document.getElementById('postCategorySelect').value);
       const caption = document.getElementById('postCaptionInput').value.trim();
       const text = document.getElementById('postTextInput').value.trim();
       if (!caption && !text && !draftPostPhoto) {
@@ -5089,7 +5432,7 @@
         ? listToShow.map((u) => `
             <div class="list-item">
               <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName)}')">
-                <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div>
+                <div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div>
                 <div style="min-width:0; flex:1;">
                   <div class="user-name">${esc(u.fullName)}${renderAccountBadgeHtml(u.accountType)}</div>
                   <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
@@ -5115,11 +5458,11 @@
             const uName = u.fullName || 'Участник';
             let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(uName)}')">Добавить</button>`;
             if (rel.status === 'outgoing') btn = '<span class="meta">Отправлена</span>';
-            else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${esc(rel.id)}', '${esc(u.uid)}', '${esc(uName)}')">Принять</button>`;
+            else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${rel.id}', '${esc(u.uid)}', '${esc(uName)}')">Принять</button>`;
             return `
               <div class="list-item">
                 <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(uName)}')">
-                  <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((uName[0] || 'S').toUpperCase())}</div>
+                  <div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((uName[0] || 'S').toUpperCase())}</div>
                   <div style="min-width:0; flex:1;">
                     <div class="user-name">${esc(uName)}${renderAccountBadgeHtml(u.accountType)}</div>
                     <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
@@ -6075,6 +6418,7 @@
           cachedFriends: [],
           cachedUsers: [],
           cachedRequests: [],
+          cachedVyruchka: [],
           lastUid: '',
           lastSilentError: null
         };
@@ -6108,6 +6452,7 @@
       openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
+      toggleVyruchkaForm, setVyruchkaFilter, submitVyruchkaEntry, approveVyruchkaItem, deleteVyruchkaItem, renderVyruchkaTab,
       clearReadingAttachment, openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
       changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,
@@ -6135,6 +6480,7 @@
 
     silentHealMediaAndPosts();
     renderBooksTab();
+    renderVyruchkaTab();
     renderFriendsTab();
     renderUnifiedSearch();
     renderProfileChatsList();

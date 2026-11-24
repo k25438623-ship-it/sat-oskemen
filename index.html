@@ -249,7 +249,7 @@
       margin-top: 10px;
     }
     .stat-box {
-      padding: 10px 8px;
+      padding: 10px 6px;
       border-radius: 14px;
       background: rgba(16, 32, 25, 0.88);
       border: 1px solid var(--border);
@@ -450,63 +450,172 @@
     }
     .wp-item.active { border-color: #6cf0b5; box-shadow: 0 0 0 2px rgba(108, 240, 181, 0.3); }
 
-    .qibla-compass-wrap {
+    /* Детально точный компас Киблы для Оскемена */
+    .qibla-card-box {
       margin-top: 14px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(14, 28, 22, 0.85);
-      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(12, 26, 20, 0.92);
+      border: 1.5px solid var(--border-strong);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .qibla-card-box.aligned {
+      border-color: #6cf0b5;
+      box-shadow: 0 0 24px rgba(108, 240, 181, 0.28);
+    }
+    .qibla-stage {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 14px;
-    }
-    .qibla-dial {
-      width: 116px;
-      height: 116px;
-      border-radius: 50%;
-      border: 2px solid var(--border-strong);
-      background: radial-gradient(circle at 50% 50%, rgba(24, 155, 98, 0.16), rgba(8, 18, 14, 0.96));
+      justify-content: center;
       position: relative;
-      flex-shrink: 0;
+      padding-top: 8px;
     }
-    .qibla-cardinal { position: absolute; font-size: 11px; font-weight: 800; color: var(--muted); }
-    .qibla-cardinal.n { top: 5px; left: 50%; transform: translateX(-50%); color: #ff8c98; }
-    .qibla-cardinal.s { bottom: 5px; left: 50%; transform: translateX(-50%); }
-    .qibla-cardinal.w { left: 6px; top: 50%; transform: translateY(-50%); }
-    .qibla-cardinal.e { right: 6px; top: 50%; transform: translateY(-50%); }
-    .qibla-needle-layer { position: absolute; inset: 0; transition: transform 0.12s linear; }
-    .qibla-arrow-tip {
-      position: absolute;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
+    .phone-top-pointer {
       width: 0;
       height: 0;
       border-left: 8px solid transparent;
       border-right: 8px solid transparent;
-      border-bottom: 18px solid #6cf0b5;
+      border-top: 12px solid #ff6b7a;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
-    .qibla-arrow-stem {
+    .qibla-dial-outer {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: 2.5px solid var(--border-strong);
+      background: radial-gradient(circle at 50% 50%, rgba(24, 155, 98, 0.16), rgba(6, 15, 11, 0.98) 72%);
+      position: relative;
+      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.65), 0 8px 22px rgba(0, 0, 0, 0.4);
+    }
+    .qibla-rose-rotator {
       position: absolute;
-      top: 30px;
+      inset: 0;
+      border-radius: 50%;
+      will-change: transform;
+    }
+    .qibla-tick {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      margin-left: -1px;
+      pointer-events: none;
+    }
+    .qibla-tick::before {
+      content: '';
+      display: block;
+      width: 2px;
+      height: 7px;
+      background: rgba(158, 194, 177, 0.4);
+    }
+    .qibla-tick.major::before {
+      height: 11px;
+      background: rgba(238, 248, 243, 0.85);
+    }
+    .qibla-dir-lbl {
+      position: absolute;
+      font-size: 12.5px;
+      font-weight: 900;
+      color: var(--text);
+      pointer-events: none;
+    }
+    .qibla-dir-lbl.n { top: 14px; left: 50%; transform: translateX(-50%); color: #ff6b7a; font-size: 14px; }
+    .qibla-dir-lbl.s { bottom: 14px; left: 50%; transform: translateX(-50%); }
+    .qibla-dir-lbl.e { right: 15px; top: 50%; transform: translateY(-50%); }
+    .qibla-dir-lbl.w { left: 15px; top: 50%; transform: translateY(-50%); }
+    .qibla-dir-sub {
+      position: absolute;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .qibla-dir-sub.ne { top: 38px; right: 36px; }
+    .qibla-dir-sub.se { bottom: 38px; right: 36px; }
+    .qibla-dir-sub.sw { bottom: 38px; left: 36px; color: var(--gold); }
+    .qibla-dir-sub.nw { top: 38px; left: 36px; }
+
+    /* Стрелка Киблы, закреплённая на 244.8° (истинный азимут Оскемен -> Кааба) */
+    .qibla-kaaba-beam {
+      position: absolute;
+      inset: 0;
+      transform: rotate(244.8deg);
+      pointer-events: none;
+    }
+    .qibla-kaaba-head {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 22px solid #6cf0b5;
+      filter: drop-shadow(0 0 8px rgba(108, 240, 181, 0.8));
+    }
+    .qibla-kaaba-line {
+      position: absolute;
+      top: 32px;
       left: 50%;
       transform: translateX(-50%);
       width: 4px;
-      height: 52px;
+      height: 74px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #6cf0b5, rgba(108, 240, 181, 0.25));
+      background: linear-gradient(180deg, #6cf0b5 0%, rgba(108, 240, 181, 0.35) 100%);
     }
-    .qibla-center-dot {
+    .qibla-kaaba-tag {
+      position: absolute;
+      top: 38px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-244.8deg);
+      background: rgba(11, 31, 23, 0.92);
+      border: 1px solid #6cf0b5;
+      color: #6cf0b5;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+    .qibla-hub {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 10px;
-      height: 10px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
       background: var(--gold);
-      border: 2px solid #0b1f17;
-      z-index: 2;
+      border: 2.5px solid #0b1f17;
+      z-index: 4;
+    }
+
+    .prayer-edit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(16, 32, 25, 0.92);
+      border: 1px solid var(--border-strong);
+    }
+    .prayer-edit-item label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .prayer-edit-item input {
+      margin-top: 4px;
+      padding: 9px 10px;
+      font-size: 15px;
+      font-weight: 800;
+      text-align: center;
     }
 
     .bottom-nav {
@@ -972,7 +1081,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
               <h3 style="margin: 0; font-size: 17px;">Намаз и Кибла</h3>
-              <div id="profileNamazPreview" class="meta">Оскемен • Время пяти намазов и компас Киблы</div>
+              <div id="profileNamazPreview" class="meta">Оскемен • Расписание намаза и точный компас Киблы (245°)</div>
             </div>
             <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openNamazQiblaModal()">Открыть</button>
           </div>
@@ -1030,16 +1139,16 @@
     </div>
   </section>
 
-  <!-- Намаз по Оскемену и живой компас Киблы -->
+  <!-- Намаз по Оскемену (с ежедневной правкой) и точный компас Киблы -->
   <div id="namazQiblaModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <div>
           <h3 style="margin: 0; font-size: 18px;">Намаз и Кибла</h3>
-          <div id="namazLocationLabel" class="meta">Оскемен • Расписание на сегодня</div>
+          <div id="namazLocationLabel" class="meta">Оскемен • Расписание намаза</div>
         </div>
         <div style="display: flex; gap: 6px;">
-          <button type="button" class="btn btn-mint" style="padding: 6px 11px; font-size: 12px;" onclick="syncOskemenPrayerTimes(true)">Обновить</button>
+          <button type="button" id="togglePrayerEditBtn" class="btn btn-gold" style="padding: 6px 11px; font-size: 12px;" onclick="togglePrayerEditor()">Изменить время</button>
           <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('namazQiblaModal')">✕</button>
         </div>
       </div>
@@ -1052,26 +1161,74 @@
         <div class="stat-box"><div class="meta" style="font-size: 11px;">Иша</div><div id="ptIsha" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
       </div>
 
-      <div id="namazSourceStatus" class="meta" style="margin-top: 8px; font-size: 12px;">Оскемен • Загружаем расписание...</div>
+      <div id="namazSourceStatus" class="meta" style="margin-top: 8px; font-size: 12px;">Оскемен • Время обновляется для всех участников</div>
 
-      <div class="qibla-compass-wrap">
-        <div id="qiblaDial" class="qibla-dial">
-          <span class="qibla-cardinal n">С</span>
-          <span class="qibla-cardinal e">В</span>
-          <span class="qibla-cardinal s">Ю</span>
-          <span class="qibla-cardinal w">З</span>
-          <div id="qiblaNeedleLayer" class="qibla-needle-layer">
-            <div class="qibla-arrow-tip"></div>
-            <div class="qibla-arrow-stem"></div>
+      <!-- Ежедневное редактирование времени намаза по Оскемену -->
+      <div id="prayerEditPanel" style="display: none;">
+        <div class="prayer-edit-grid">
+          <div class="prayer-edit-item">
+            <label>Фаджр (утренний)</label>
+            <input id="inFajr" class="input" type="time" />
           </div>
-          <div class="qibla-center-dot"></div>
+          <div class="prayer-edit-item">
+            <label>Зухр (обеденный)</label>
+            <input id="inDhuhr" class="input" type="time" />
+          </div>
+          <div class="prayer-edit-item">
+            <label>Аср (послеполуденный)</label>
+            <input id="inAsr" class="input" type="time" />
+          </div>
+          <div class="prayer-edit-item">
+            <label>Магриб (вечерний)</label>
+            <input id="inMaghrib" class="input" type="time" />
+          </div>
+          <div class="prayer-edit-item" style="grid-column: 1 / -1;">
+            <label>Иша (ночной)</label>
+            <input id="inIsha" class="input" type="time" />
+          </div>
         </div>
-        <div style="min-width: 0; flex: 1;">
-          <div id="qiblaBearingTitle" style="font-weight: 800; font-size: 15.5px; color: #eef8f3;">Кибла: 238° (ЮЗ)</div>
-          <div id="qiblaLiveCourse" class="meta" style="margin-top: 4px; color: #6cf0b5; font-weight: 700;">Курс телефона: 0° (С)</div>
-          <div id="qiblaSensorStatus" class="meta" style="margin-top: 4px; font-size: 12px;">Стрелка указывает направление на Киблу из Оскемена</div>
-          <div class="actions" style="margin-top: 10px;">
-            <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 12.5px;" onclick="activateLiveCompass()">Включить компас</button>
+        <div class="actions" style="margin-top: 10px;">
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="togglePrayerEditor(false)">Отмена</button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveManualOskemenTimes()">Сохранить для всех</button>
+        </div>
+      </div>
+
+      <!-- Детально точный компас Киблы для Оскемена -->
+      <div id="qiblaCardBox" class="qibla-card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <div id="qiblaBearingTitle" style="font-weight: 900; font-size: 16px; color: #eef8f3;">Кибла: 245° (ЮЗ)</div>
+          <span id="qiblaDeltaBadge" class="tag">Поверните верх телефона на стрелку</span>
+        </div>
+
+        <div class="qibla-stage">
+          <div class="phone-top-pointer" title="Верх телефона"></div>
+          <div class="qibla-dial-outer">
+            <div id="qiblaRoseRotator" class="qibla-rose-rotator">
+              <div id="qiblaTicksLayer"></div>
+              <span class="qibla-dir-lbl n">С</span>
+              <span class="qibla-dir-lbl e">В</span>
+              <span class="qibla-dir-lbl s">Ю</span>
+              <span class="qibla-dir-lbl w">З</span>
+              <span class="qibla-dir-sub ne">СВ</span>
+              <span class="qibla-dir-sub se">ЮВ</span>
+              <span class="qibla-dir-sub sw">ЮЗ</span>
+              <span class="qibla-dir-sub nw">СЗ</span>
+
+              <div id="qiblaKaabaBeam" class="qibla-kaaba-beam">
+                <div class="qibla-kaaba-head"></div>
+                <div class="qibla-kaaba-line"></div>
+                <div class="qibla-kaaba-tag">Кааба 245°</div>
+              </div>
+            </div>
+            <div class="qibla-hub"></div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+          <div id="qiblaLiveCourse" style="font-weight: 800; font-size: 14px; color: #6cf0b5;">Курс телефона: ожидаем датчик</div>
+          <div id="qiblaSensorStatus" class="meta" style="margin-top: 4px; font-size: 12px;">Держите телефон ровно горизонтально. Истинный азимут: 244.8° (по магнитному компасу ~239°).</div>
+          <div class="actions" style="justify-content: center; margin-top: 10px;">
+            <button type="button" class="btn btn-primary" style="padding: 9px 16px; font-size: 13px;" onclick="activateLiveCompass()">Включить / калибровать компас</button>
           </div>
         </div>
       </div>
@@ -1367,11 +1524,14 @@
 
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v18';
+    const STORE_KEY = 'sat_clean_state_v19';
+
+    // Точные координаты Оскемена и Каабы для расчёта азимута Киблы
     const OSKEMEN_LAT = 49.9488;
     const OSKEMEN_LNG = 82.6285;
     const KAABA_LAT = 21.4225;
     const KAABA_LNG = 39.8262;
+    const OSKEMEN_MAGNETIC_DECLINATION = 6.2;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1389,7 +1549,14 @@
       storyEnd: 0,
       storyLabel: '',
       karmaClicksByPost: {},
-      cachedOskemenDay: null,
+      manualPrayerTimes: {
+        Fajr: '05:45',
+        Dhuhr: '12:15',
+        Asr: '14:40',
+        Maghrib: '16:40',
+        Isha: '18:20',
+        updatedDateLabel: ''
+      },
       cachedFriends: [],
       cachedUsers: [],
       cachedRequests: [],
@@ -1397,10 +1564,13 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v17') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v18') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
+      if (!state.manualPrayerTimes || typeof state.manualPrayerTimes !== 'object') {
+        state.manualPrayerTimes = { Fajr: '05:45', Dhuhr: '12:15', Asr: '14:40', Maghrib: '16:40', Isha: '18:20', updatedDateLabel: '' };
+      }
       if (!Array.isArray(state.cachedFriends)) state.cachedFriends = [];
       if (!Array.isArray(state.cachedUsers)) state.cachedUsers = [];
       if (!Array.isArray(state.cachedRequests)) state.cachedRequests = [];
@@ -1422,6 +1592,7 @@
     let chatUnsub = null;
     let chatMsgs = [];
     let editingMsgId = null;
+    let prayerEditOpen = false;
 
     let vScale = 1, vPanX = 0, vPanY = 0, vStartScale = 1, vStartDist = 0, vStartX = 0, vStartY = 0, vPanOriginX = 0, vPanOriginY = 0, vMode = 'none', vLastTap = 0;
 
@@ -1435,7 +1606,7 @@
 
     let pc = null, localCallStream = null, callDocId = null, callUnsub = null;
 
-    let qiblaAzimuth = calcQiblaBearing(OSKEMEN_LAT, OSKEMEN_LNG);
+    const QIBLA_TRUE_BEARING = calcQiblaBearing(OSKEMEN_LAT, OSKEMEN_LNG); // ~244.8° для Оскемена
     let smoothedHeading = null;
     let compassListening = false;
 
@@ -1628,6 +1799,24 @@
       renderProfileChatsList();
     }, () => {});
 
+    // Живая синхронизация ежедневного расписания намаза по Оскемену из Firestore для всех пользователей
+    onSnapshot(doc(db, 'settings', 'oskemen_prayer'), (snap) => {
+      if (!snap.exists()) return;
+      const d = snap.data();
+      if (d && d.Fajr && d.Dhuhr && d.Asr && d.Maghrib && d.Isha) {
+        state.manualPrayerTimes = {
+          Fajr: cleanHHMM(d.Fajr),
+          Dhuhr: cleanHHMM(d.Dhuhr),
+          Asr: cleanHHMM(d.Asr),
+          Maghrib: cleanHHMM(d.Maghrib),
+          Isha: cleanHHMM(d.Isha),
+          updatedDateLabel: d.updatedDateLabel || ''
+        };
+        persist();
+        renderOskemenPrayerUI();
+      }
+    }, () => {});
+
     function switchMainTab(tab, btn) {
       document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
       document.getElementById('tab-' + tab)?.classList.add('active');
@@ -1669,7 +1858,7 @@
       renderFriendsTab();
       renderGroupsTab();
       renderProfileChatsList();
-      syncOskemenPrayerTimes(false);
+      renderOskemenPrayerUI();
     }
 
     function renderMyProfile() {
@@ -2673,12 +2862,14 @@
       if (btn) btn.textContent = 'Позвонить';
     }
 
-    /* --- Точное время намаза по Оскемену и компас Киблы --- */
+    /* --- Ежедневное ручное время намаза по Оскемену + Детальный точный компас Киблы --- */
     function deg2rad(d) { return (d * Math.PI) / 180; }
     function rad2deg(r) { return (r * 180) / Math.PI; }
 
     function calcQiblaBearing(lat, lng) {
-      const phi1 = deg2rad(lat), phi2 = deg2rad(KAABA_LAT), dLon = deg2rad(KAABA_LNG - lng);
+      const phi1 = deg2rad(lat);
+      const phi2 = deg2rad(KAABA_LAT);
+      const dLon = deg2rad(KAABA_LNG - lng);
       const y = Math.sin(dLon);
       const x = Math.cos(phi1) * Math.tan(phi2) - Math.sin(phi1) * Math.cos(dLon);
       return (rad2deg(Math.atan2(y, x)) + 360) % 360;
@@ -2703,91 +2894,170 @@
       return `${String(Number(h)).padStart(2, '0')}:${String(Number(min)).padStart(2, '0')}`;
     }
 
-    function fallbackOskemenTimes(dateObj) {
-      const tz = 5;
-      const doy = Math.floor((dateObj - new Date(dateObj.getFullYear(), 0, 0)) / 86400000);
-      const gamma = ((2 * Math.PI) / 365) * (doy - 1);
-      const eq = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
-      const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
-      const noon = 720 - 4 * OSKEMEN_LNG - eq + tz * 60;
-      const latR = deg2rad(OSKEMEN_LAT);
-      const ha = (ang) => { const c = (Math.cos(deg2rad(90 + ang)) - Math.sin(latR) * Math.sin(decl)) / (Math.cos(latR) * Math.cos(decl)); return (c >= -1 && c <= 1) ? rad2deg(Math.acos(c)) * 4 : null; };
-      const toStr = (v) => { const tot = ((Math.round(v) % 1440) + 1440) % 1440; return `${String(Math.floor(tot / 60)).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`; };
-      const asrT = 1 + Math.tan(Math.abs(latR - decl));
-      const asrC = (Math.sin(Math.atan(1 / asrT)) - Math.sin(latR) * Math.sin(decl)) / (Math.cos(latR) * Math.cos(decl));
-      const aOff = (asrC >= -1 && asrC <= 1) ? rad2deg(Math.acos(asrC)) * 4 : 180;
-      return { Fajr: toStr(noon - (ha(18) || 330)), Dhuhr: toStr(noon + 5), Asr: toStr(noon + aOff), Maghrib: toStr(noon + (ha(0.833) || 240) + 2), Isha: toStr(noon + (ha(17) || 315)) };
+    function buildCompassTicksOnce() {
+      const box = document.getElementById('qiblaTicksLayer');
+      if (!box || box.childElementCount > 0) return;
+      let html = '';
+      for (let deg = 0; deg < 360; deg += 15) {
+        const major = deg % 45 === 0 ? ' major' : '';
+        html += `<div class="qibla-tick${major}" style="transform: rotate(${deg}deg);"></div>`;
+      }
+      box.innerHTML = html;
+      const beam = document.getElementById('qiblaKaabaBeam');
+      if (beam) beam.style.transform = `rotate(${QIBLA_TRUE_BEARING.toFixed(1)}deg)`;
     }
 
-    function applyOskemenPrayerUI(times, note) {
-      if (!times) return;
+    function renderOskemenPrayerUI() {
+      const t = state.manualPrayerTimes || {};
       ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((k) => {
         const el = document.getElementById('pt' + k);
-        if (el) el.textContent = cleanHHMM(times[k]);
+        if (el) el.textContent = cleanHHMM(t[k]);
       });
-      if (note && document.getElementById('namazSourceStatus')) document.getElementById('namazSourceStatus').textContent = note;
+
+      const stEl = document.getElementById('namazSourceStatus');
+      if (stEl) {
+        stEl.textContent = t.updatedDateLabel
+          ? `Оскемен • Обновлено: ${t.updatedDateLabel}`
+          : 'Оскемен • Нажмите «Изменить время», чтобы задать точное расписание на день';
+      }
+
       const prev = document.getElementById('profileNamazPreview');
-      if (prev) prev.textContent = `Оскемен • Фаджр ${cleanHHMM(times.Fajr)} • Магриб ${cleanHHMM(times.Maghrib)} • Кибла ${Math.round(qiblaAzimuth)}°`;
+      if (prev) {
+        prev.textContent = `Оскемен • Фаджр ${cleanHHMM(t.Fajr)} • Магриб ${cleanHHMM(t.Maghrib)} • Кибла ${Math.round(QIBLA_TRUE_BEARING)}°`;
+      }
+      updateCompassVisuals();
     }
 
-    function updateCompassNeedle() {
-      qiblaAzimuth = calcQiblaBearing(OSKEMEN_LAT, OSKEMEN_LNG);
-      const degRound = Math.round(qiblaAzimuth);
-      const dirText = bearingToRuDir(qiblaAzimuth);
-      document.getElementById('namazLocationLabel').textContent = 'Оскемен • Расписание на сегодня';
-      document.getElementById('qiblaBearingTitle').textContent = `Кибла: ${degRound}° (${dirText})`;
-      const layer = document.getElementById('qiblaNeedleLayer');
-      const courseEl = document.getElementById('qiblaLiveCourse');
-      if (smoothedHeading !== null) {
-        const rot = (qiblaAzimuth - smoothedHeading + 360) % 360;
-        if (layer) layer.style.transform = `rotate(${rot.toFixed(1)}deg)`;
-        if (courseEl) courseEl.textContent = `Курс телефона: ${Math.round(smoothedHeading)}° (${bearingToRuDir(smoothedHeading)})`;
-      } else {
-        if (layer) layer.style.transform = `rotate(${degRound}deg)`;
-        if (courseEl) courseEl.textContent = `Направление на Киблу: ${degRound}° (${dirText})`;
+    function togglePrayerEditor(forceState) {
+      prayerEditOpen = typeof forceState === 'boolean' ? forceState : !prayerEditOpen;
+      const panel = document.getElementById('prayerEditPanel');
+      if (!panel) return;
+      panel.style.display = prayerEditOpen ? 'block' : 'none';
+      if (prayerEditOpen) {
+        const t = state.manualPrayerTimes || {};
+        document.getElementById('inFajr').value = cleanHHMM(t.Fajr) !== '--:--' ? cleanHHMM(t.Fajr) : '05:45';
+        document.getElementById('inDhuhr').value = cleanHHMM(t.Dhuhr) !== '--:--' ? cleanHHMM(t.Dhuhr) : '12:15';
+        document.getElementById('inAsr').value = cleanHHMM(t.Asr) !== '--:--' ? cleanHHMM(t.Asr) : '14:40';
+        document.getElementById('inMaghrib').value = cleanHHMM(t.Maghrib) !== '--:--' ? cleanHHMM(t.Maghrib) : '16:40';
+        document.getElementById('inIsha').value = cleanHHMM(t.Isha) !== '--:--' ? cleanHHMM(t.Isha) : '18:20';
       }
     }
 
-    async function syncOskemenPrayerTimes(forceNetwork = false) {
-      const now = new Date();
-      const dayKey = `oskemen_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-      updateCompassNeedle();
-      if (!forceNetwork && state.cachedOskemenDay?.key === dayKey && state.cachedOskemenDay?.times) {
-        applyOskemenPrayerUI(state.cachedOskemenDay.times, 'Оскемен • Актуальное расписание на сегодня');
+    async function saveManualOskemenTimes() {
+      const f = cleanHHMM(document.getElementById('inFajr')?.value);
+      const d = cleanHHMM(document.getElementById('inDhuhr')?.value);
+      const a = cleanHHMM(document.getElementById('inAsr')?.value);
+      const m = cleanHHMM(document.getElementById('inMaghrib')?.value);
+      const i = cleanHHMM(document.getElementById('inIsha')?.value);
+      if ([f, d, a, m, i].includes('--:--')) {
+        toast('Заполните все 5 времён намаза');
         return;
       }
-      const fb = fallbackOskemenTimes(now);
-      applyOskemenPrayerUI(fb, 'Оскемен • Загружаем расписание...');
+
+      const now = new Date();
+      const label = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+      state.manualPrayerTimes = {
+        Fajr: f,
+        Dhuhr: d,
+        Asr: a,
+        Maghrib: m,
+        Isha: i,
+        updatedDateLabel: label
+      };
+      persist();
+      renderOskemenPrayerUI();
+      togglePrayerEditor(false);
+
       try {
-        const dd = String(now.getDate()).padStart(2, '0');
-        const mm = String(now.getMonth() + 1).padStart(2, '0');
-        const yyyy = now.getFullYear();
-        const resp = await fetch(`https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${OSKEMEN_LAT}&longitude=${OSKEMEN_LNG}&method=15&timezonestring=Asia/Almaty`, { cache: 'no-store' });
-        if (!resp.ok) throw new Error('HTTP');
-        const t = (await resp.json())?.data?.timings;
-        if (t?.Fajr && t?.Dhuhr && t?.Asr && t?.Maghrib && t?.Isha) {
-          const cleanSet = { Fajr: cleanHHMM(t.Fajr), Dhuhr: cleanHHMM(t.Dhuhr), Asr: cleanHHMM(t.Asr), Maghrib: cleanHHMM(t.Maghrib), Isha: cleanHHMM(t.Isha) };
-          state.cachedOskemenDay = { key: dayKey, times: cleanSet };
-          persist();
-          applyOskemenPrayerUI(cleanSet, `Оскемен • Расписание на ${dd}.${mm}.${yyyy}`);
-          if (forceNetwork) toast('Время по Оскемену обновлено');
-          return;
-        }
+        await setDoc(doc(db, 'settings', 'oskemen_prayer'), {
+          Fajr: f,
+          Dhuhr: d,
+          Asr: a,
+          Maghrib: m,
+          Isha: i,
+          updatedDateLabel: label,
+          updatedBy: myDisplayName(),
+          updatedAt: serverTimestamp()
+        }, { merge: true });
       } catch (e) {}
-      applyOskemenPrayerUI(fb, 'Оскемен • Резервное расписание');
+
+      toast('Время намаза по Оскемену сохранено');
+    }
+
+    function updateCompassVisuals() {
+      buildCompassTicksOnce();
+      const degRound = Math.round(QIBLA_TRUE_BEARING);
+      const magDeg = Math.round((QIBLA_TRUE_BEARING - OSKEMEN_MAGNETIC_DECLINATION + 360) % 360);
+      const titleEl = document.getElementById('qiblaBearingTitle');
+      if (titleEl) titleEl.textContent = `Кибла: ${degRound}° (ЮЗ)`;
+
+      const rotator = document.getElementById('qiblaRoseRotator');
+      const courseEl = document.getElementById('qiblaLiveCourse');
+      const badgeEl = document.getElementById('qiblaDeltaBadge');
+      const cardBox = document.getElementById('qiblaCardBox');
+
+      if (smoothedHeading !== null) {
+        // Поворачиваем лимб на -heading: Север на лимбе всегда указывает на настоящий Север,
+        // а стрелка Кааба 245° на лимбе указывает на настоящую Киблу.
+        if (rotator) rotator.style.transform = `rotate(${(-smoothedHeading).toFixed(1)}deg)`;
+        const headRound = Math.round(smoothedHeading);
+        if (courseEl) courseEl.textContent = `Курс телефона: ${headRound}° (${bearingToRuDir(smoothedHeading)})`;
+
+        const diff = ((QIBLA_TRUE_BEARING - smoothedHeading + 540) % 360) - 180;
+        const absDiff = Math.abs(Math.round(diff));
+        if (absDiff <= 4) {
+          cardBox?.classList.add('aligned');
+          if (badgeEl) badgeEl.textContent = 'Точно на Киблу ✓';
+        } else {
+          cardBox?.classList.remove('aligned');
+          const turnDir = diff > 0 ? `вправо на ${absDiff}°` : `влево на ${absDiff}°`;
+          if (badgeEl) badgeEl.textContent = `Поверните ${turnDir}`;
+        }
+      } else {
+        if (rotator) rotator.style.transform = 'rotate(0deg)';
+        if (courseEl) courseEl.textContent = `Истинный азимут: ${degRound}° • По магнитному компасу: ~${magDeg}°`;
+        if (badgeEl) badgeEl.textContent = 'Нажмите «Включить компас»';
+        cardBox?.classList.remove('aligned');
+      }
+    }
+
+    function getScreenOrientationAngle() {
+      if (window.screen?.orientation && typeof window.screen.orientation.angle === 'number') {
+        return window.screen.orientation.angle;
+      }
+      if (typeof window.orientation === 'number') {
+        return window.orientation;
+      }
+      return 0;
     }
 
     function onCompassSensor(ev) {
-      let h = null;
-      if (typeof ev.webkitCompassHeading === 'number' && !Number.isNaN(ev.webkitCompassHeading)) h = ((ev.webkitCompassHeading % 360) + 360) % 360;
-      else if (typeof ev.alpha === 'number' && !Number.isNaN(ev.alpha)) h = ((360 - ev.alpha) % 360 + 360) % 360;
-      if (h === null) return;
-      if (smoothedHeading === null) smoothedHeading = h;
-      else {
-        const delta = ((h - smoothedHeading + 540) % 360) - 180;
-        smoothedHeading = ((smoothedHeading + delta * 0.28) % 360 + 360) % 360;
+      let trueHeading = null;
+
+      if (typeof ev.webkitCompassHeading === 'number' && !Number.isNaN(ev.webkitCompassHeading)) {
+        // iOS Safari отдаёт готовый истинный/магнитный курс по часовой стрелке от Севера
+        trueHeading = ((ev.webkitCompassHeading % 360) + 360) % 360;
+      } else if (typeof ev.alpha === 'number' && !Number.isNaN(ev.alpha)) {
+        // Android Chrome: alpha против часовой стрелки; при ev.absolute === true это истинный Север,
+        // иначе добавляем локальное магнитное склонение Оскемена (+6.2°).
+        const screenAngle = getScreenOrientationAngle();
+        let rawCompass = (360 - ev.alpha + screenAngle) % 360;
+        if (ev.absolute !== true) {
+          rawCompass = (rawCompass + OSKEMEN_MAGNETIC_DECLINATION) % 360;
+        }
+        trueHeading = (rawCompass + 360) % 360;
       }
-      updateCompassNeedle();
+
+      if (trueHeading === null) return;
+
+      if (smoothedHeading === null) {
+        smoothedHeading = trueHeading;
+      } else {
+        // Плавное сглаживание по кратчайшей угловой дуге без рывков через 0°/360°
+        const delta = ((trueHeading - smoothedHeading + 540) % 360) - 180;
+        smoothedHeading = ((smoothedHeading + delta * 0.25) % 360 + 360) % 360;
+      }
+      updateCompassVisuals();
     }
 
     async function activateLiveCompass() {
@@ -2795,22 +3065,26 @@
       try {
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
           const res = await DeviceOrientationEvent.requestPermission();
-          if (res !== 'granted') { toast('Разрешите доступ к датчику'); return; }
+          if (res !== 'granted') {
+            toast('Разрешите доступ к датчику ориентации');
+            return;
+          }
         }
         if (!compassListening) {
           window.addEventListener('deviceorientationabsolute', onCompassSensor, true);
           window.addEventListener('deviceorientation', onCompassSensor, true);
           compassListening = true;
         }
-        if (st) st.textContent = 'Компас активен — поверните телефон для наведения на Киблу';
-        toast('Компас включён');
+        if (st) st.textContent = 'Компас активен: держите телефон горизонтально и совмещайте верх телефона со стрелкой «Кааба 245°».';
+        toast('Точный компас включён');
       } catch (e) {
-        if (st) st.textContent = 'Стрелка показывает азимут на Киблу из Оскемена';
+        if (st) st.textContent = 'Датчик не ответил — ориентируйтесь по градусу 245° (юго-запад).';
       }
     }
 
     function openNamazQiblaModal() {
-      syncOskemenPrayerTimes(false);
+      togglePrayerEditor(false);
+      renderOskemenPrayerUI();
       if (!compassListening) activateLiveCompass().catch(() => {});
       document.getElementById('namazQiblaModal')?.classList.add('open');
     }
@@ -2839,7 +3113,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab, setPulseFilter,
-      openNamazQiblaModal, syncOskemenPrayerTimes, activateLiveCompass,
+      openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes, activateLiveCompass,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       deleteGalleryPhoto, saveChatPhotoToGallery, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
@@ -2861,7 +3135,7 @@
 
     renderFriendsTab();
     renderProfileChatsList();
-    syncOskemenPrayerTimes(false);
+    renderOskemenPrayerUI();
   </script>
 </body>
 </html>

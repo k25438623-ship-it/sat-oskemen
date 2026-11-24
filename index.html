@@ -1223,7 +1223,7 @@
             Быстрые ориентиры на месте в Оскемене и ВКО: круглосуточные аптеки, круглосуточные кафе, хостелы и ночлег, а также житейские советы и лайфхаки по городу и быту для тех, кто только осваивается или нуждается в подсказке.
           </p>
           <div class="meta" style="margin-top: 8px;">
-            Общедоступные адреса и ориентиры без чужих личных данных. Новые записи проходят проверку, график и наличие мест лучше уточнять на месте.
+            Общедоступные адреса, ориентиры и снимки с разрешения заведений без чужих личных данных. Новые записи проходят проверку, график и наличие мест лучше уточнять на месте.
           </div>
           <div class="actions" style="margin-top: 12px;">
             <button type="button" class="btn btn-primary" style="width: 100%;" onclick="toggleVyruchkaForm()">+ Добавить точку или подсказку</button>
@@ -1239,10 +1239,20 @@
             </select>
 
             <label class="meta" style="display: block; margin-top: 10px;">Название или суть подсказки</label>
-            <input id="vyruchkaTitleInput" class="input" maxlength="95" placeholder="Например: Круглосуточная аптека у остановки или Ориентиры в городе" />
+            <input id="vyruchkaTitleInput" class="input" maxlength="95" placeholder="Например: Ночное кафе у перекрёстка или Ориентиры в городе" />
 
             <label class="meta" style="display: block; margin-top: 10px;">Адрес, район или ориентир</label>
             <input id="vyruchkaLocationInput" class="input" maxlength="120" placeholder="Например: пр. Абая / район / ориентир (необязательно для совета)" />
+
+            <div style="margin-top: 10px;">
+              <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('vyruchka_photo')">
+                <span id="vyruchkaPhotoLabel">Прикрепить фото места с разрешения (необязательно)</span>
+              </button>
+              <div id="vyruchkaPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
+                <img id="vyruchkaPreviewImg" src="" alt="" style="width: 100%; max-height: 190px; object-fit: cover; border-radius: 14px;" />
+                <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearVyruchkaAttachment()">Убрать</button>
+              </div>
+            </div>
 
             <label class="meta" style="display: block; margin-top: 10px;">Короткая заметка по делу</label>
             <textarea id="vyruchkaDetailsInput" rows="3" maxlength="360" placeholder="Режим работы, наличие зарядки/мест или практический совет..."></textarea>
@@ -1810,6 +1820,12 @@
 
       <label class="meta" style="display: block; margin-top: 10px;">Анкета / О себе (видно другим пользователям)</label>
       <textarea id="editBioField" rows="3" placeholder="Коротко о себе или о вашем деле..."></textarea>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Видимость в общем поиске</label>
+      <select id="editHideFromSearchSelect">
+        <option value="0">Показывать мою страницу в общем поиске</option>
+        <option value="1">Скрыть из общего поиска (видят только те, кому я пишу)</option>
+      </select>
 
       <label class="meta" style="display: block; margin-top: 10px;">Статус активности</label>
       <select id="editHideLastSeenSelect">
@@ -2625,6 +2641,7 @@
       nameStyle: 'normal',
       accountType: 'user',
       hasChosenAccountType: false,
+      hideFromSearch: false,
       hideLastSeen: false,
       bio: '',
       avatar: '',
@@ -2731,6 +2748,7 @@
         nameStyle: ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(recovered.nameStyle) ? recovered.nameStyle : 'normal',
         accountType: recovered.accountType === 'business' ? 'business' : 'user',
         hasChosenAccountType: Boolean(recovered.hasChosenAccountType || recovered.accountType),
+        hideFromSearch: Boolean(recovered.hideFromSearch),
         hideLastSeen: Boolean(recovered.hideLastSeen),
         photos: normalizePhotos(recovered.photos),
         karmaClicksByPost: recovered.karmaClicksByPost && typeof recovered.karmaClicksByPost === 'object' ? recovered.karmaClicksByPost : {},
@@ -2815,6 +2833,7 @@
         title: String(d.title || 'Ориентир'),
         location: String(d.location || ''),
         details: String(d.details || ''),
+        photoData: String(d.photoData || ''),
         authorUid: String(d.authorUid || ''),
         authorName: String(d.authorName || 'Участник'),
         hideAuthor: Boolean(d.hideAuthor || d.isDeveloperEntry),
@@ -2833,6 +2852,7 @@
     let readingItems = INITIAL_READING_ITEMS.map((item) => normalizeReadingDoc(item, item.id));
     let vyruchkaItems = (state.cachedVyruchka || []).map((item) => normalizeVyruchkaDoc(item, item.id));
     let vyruchkaFilter = 'all';
+    let draftVyruchkaPhoto = '';
     let readingFontSize = 17;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
     let draftReadingPhoto = '';
@@ -3374,6 +3394,7 @@
         namePlain: getMyPlainName(),
         nameStyle: state.nameStyle || 'normal',
         accountType: normalizeAccountType(state.accountType),
+        hideFromSearch: Boolean(state.hideFromSearch),
         hideLastSeen: Boolean(state.hideLastSeen),
         bio: state.bio || 'Мой профиль SÄT',
         photoData: myAvatarUrl(),
@@ -3538,6 +3559,9 @@
             state.accountType = normalizeAccountType(meCloud.accountType);
             state.hasChosenAccountType = true;
           }
+          if (typeof meCloud.hideFromSearch === 'boolean') {
+            state.hideFromSearch = meCloud.hideFromSearch;
+          }
           if (typeof meCloud.hideLastSeen === 'boolean') {
             state.hideLastSeen = meCloud.hideLastSeen;
           }
@@ -3662,6 +3686,16 @@
       }
     }, () => {});
 
+    function clearVyruchkaAttachment() {
+      draftVyruchkaPhoto = '';
+      const wrap = document.getElementById('vyruchkaPreviewWrap');
+      const img = document.getElementById('vyruchkaPreviewImg');
+      const lbl = document.getElementById('vyruchkaPhotoLabel');
+      if (wrap) wrap.style.display = 'none';
+      if (img) img.src = '';
+      if (lbl) lbl.textContent = 'Прикрепить фото места с разрешения (необязательно)';
+    }
+
     function toggleVyruchkaForm(forceState) {
       const box = document.getElementById('vyruchkaFormBox');
       if (!box) return;
@@ -3672,6 +3706,8 @@
         if (catSel && vyruchkaFilter !== 'all' && VYRUCKA_CATEGORIES[vyruchkaFilter]) {
           catSel.value = vyruchkaFilter;
         }
+      } else {
+        clearVyruchkaAttachment();
       }
     }
 
@@ -3714,6 +3750,7 @@
         title,
         location,
         details,
+        photoData: draftVyruchkaPhoto || '',
         authorUid: myUid,
         authorName: myDisplayName(),
         hideAuthor: creator,
@@ -3728,6 +3765,7 @@
       document.getElementById('vyruchkaTitleInput').value = '';
       document.getElementById('vyruchkaLocationInput').value = '';
       document.getElementById('vyruchkaDetailsInput').value = '';
+      clearVyruchkaAttachment();
       toggleVyruchkaForm(false);
 
       const cloudPayload = {
@@ -3736,6 +3774,7 @@
         title: item.title,
         location: item.location,
         details: item.details,
+        photoData: item.photoData,
         authorUid: item.authorUid,
         authorName: item.authorName,
         hideAuthor: item.hideAuthor,
@@ -3791,21 +3830,32 @@
         modBadge.textContent = String(pending.length);
         if (creator) {
           modList.innerHTML = pending.length
-            ? pending.map((item) => `
-                <div class="comment-item">
-                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                    <span style="font-weight:800; font-size:14px; color:var(--text);">${esc(item.title)}</span>
-                    <span class="tag">${esc(VYRUCKA_CATEGORIES[item.category] || 'Ориентир')}</span>
+            ? pending.map((item) => {
+                const pKey = `vr_pending_${item.id}`;
+                if (item.photoData) {
+                  photoViewerRegistry.set(pKey, {
+                    src: item.photoData,
+                    title: item.title,
+                    sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом')
+                  });
+                }
+                return `
+                  <div class="comment-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                      <span style="font-weight:800; font-size:14px; color:var(--text);">${esc(item.title)}</span>
+                      <span class="tag">${esc(VYRUCKA_CATEGORIES[item.category] || 'Ориентир')}</span>
+                    </div>
+                    ${item.location ? `<div class="vyruchka-loc">Ориентир: ${esc(item.location)}</div>` : ''}
+                    ${item.photoData ? `<div class="post-img-wrap" style="max-width:220px;" data-view-photo="${esc(pKey)}"><img src="${item.photoData}" alt="" draggable="false" /></div>` : ''}
+                    <div style="font-size:13.5px; margin-top:6px; line-height:1.45;">${esc(item.details)}</div>
+                    <div class="meta" style="margin-top:4px; font-size:12px;">От: ${esc(item.authorName)} • ${esc(formatTime(item.createdAtMs))}</div>
+                    <div class="actions" style="margin-top:8px;">
+                      <button type="button" class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="approveVyruchkaItem('${esc(item.id)}')">Одобрить</button>
+                      <button type="button" class="btn btn-danger" style="padding:6px 10px; font-size:12px;" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>
+                    </div>
                   </div>
-                  ${item.location ? `<div class="vyruchka-loc">Ориентир: ${esc(item.location)}</div>` : ''}
-                  <div style="font-size:13.5px; margin-top:6px; line-height:1.45;">${esc(item.details)}</div>
-                  <div class="meta" style="margin-top:4px; font-size:12px;">От: ${esc(item.authorName)} • ${esc(formatTime(item.createdAtMs))}</div>
-                  <div class="actions" style="margin-top:8px;">
-                    <button type="button" class="btn btn-primary" style="padding:6px 12px; font-size:12px;" onclick="approveVyruchkaItem('${esc(item.id)}')">Одобрить</button>
-                    <button type="button" class="btn btn-danger" style="padding:6px 10px; font-size:12px;" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>
-                  </div>
-                </div>
-              `).join('')
+                `;
+              }).join('')
             : '<div class="meta">Новых записей на проверке нет.</div>';
         }
       }
@@ -3824,6 +3874,14 @@
         const delBtn = creator
           ? `<button type="button" class="pulse-act-btn" style="color:var(--danger);" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>`
           : '';
+        const photoKey = `vr_photo_${item.id}`;
+        if (item.photoData) {
+          photoViewerRegistry.set(photoKey, {
+            src: item.photoData,
+            title: item.title,
+            sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом')
+          });
+        }
         return `
           <article class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -3832,6 +3890,7 @@
             </div>
             <div class="post-caption" style="margin-top:10px; font-size:16px;">${esc(item.title)}</div>
             ${item.location ? `<div class="vyruchka-loc">Ориентир: ${esc(item.location)}</div>` : ''}
+            ${item.photoData ? `<div class="post-img-wrap" data-view-photo="${esc(photoKey)}"><img src="${item.photoData}" alt="" draggable="false" /></div>` : ''}
             <div class="pulse-body-text" style="margin-top:8px;">${esc(item.details)}</div>
             <div class="pulse-actions-clean">
               <span class="meta" style="font-size:12px;">${showAuthor ? `Добавил: ${esc(item.authorName)}` : 'Справочная запись'}</span>
@@ -3921,6 +3980,7 @@
           uid: uidStr,
           fullName: String(u.fullName || prev.fullName || 'Участник').trim() || 'Участник',
           accountType: normalizeAccountType(u.accountType || prev.accountType),
+          hideFromSearch: typeof u.hideFromSearch === 'boolean' ? u.hideFromSearch : Boolean(prev.hideFromSearch),
           lastSeenMs: Math.max(Number(prev.lastSeenMs || 0), Number(u.lastSeenMs || 0)),
           photoData: u.photoData || prev.photoData || '',
           bio: u.bio || prev.bio || ''
@@ -3970,9 +4030,13 @@
 
         const myUid = String(getMyUid() || '');
         const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
-        const registeredAll = getRegisteredSearchPool();
+        const visiblePool = getRegisteredSearchPool().filter((u) => {
+          const uidStr = String(u.uid);
+          if (myUid && uidStr === myUid) return !state.hideFromSearch;
+          return !u.hideFromSearch;
+        });
 
-        const matched = registeredAll
+        const matched = visiblePool
           .filter((u) => {
             const uidStr = String(u.uid);
             const isBiz = normalizeAccountType(u.accountType) === 'business';
@@ -3997,7 +4061,7 @@
           });
 
         if (sumEl) {
-          sumEl.textContent = `Зарегистрировано в SÄT: ${registeredAll.length} • Найдено: ${matched.length}`;
+          sumEl.textContent = `В поиске SÄT: ${visiblePool.length} • Найдено: ${matched.length}`;
         }
 
         if (!matched.length) {
@@ -4370,7 +4434,7 @@
           ? sortedUsers.map((u) => `
               <div class="list-item">
                 <div>
-                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}${renderAccountBadgeHtml(u.accountType)}</div>
+                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}${renderAccountBadgeHtml(u.accountType)}${u.hideFromSearch ? '<span class="meta" style="margin-left:6px;">(скрыт из поиска)</span>' : ''}</div>
                   <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
                 </div>
                 ${u.uid ? `<button type="button" class="btn btn-mint" style="padding:6px 10px; font-size:12px;" onclick="hideModal('supportModal'); openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Страница</button>` : ''}
@@ -4521,9 +4585,10 @@
 
       const qMeta = document.getElementById('myQuestionnaireMeta');
       if (qMeta) {
-        qMeta.textContent = isBiz
-          ? 'Анкета бизнес-аккаунта • Видна другим пользователям'
-          : 'Анкета пользователя • Видна другим пользователям';
+        const searchHint = state.hideFromSearch ? ' • Скрыта из общего поиска' : '';
+        qMeta.textContent = (isBiz
+          ? 'Анкета бизнес-аккаунта • Видна при переходе на страницу'
+          : 'Анкета пользователя • Видна при переходе на страницу') + searchHint;
       }
       const qBody = document.getElementById('myQuestionnaireText');
       if (qBody) {
@@ -4534,9 +4599,10 @@
 
       const myOnlineBadge = document.getElementById('myOnlineBadge');
       if (myOnlineBadge) {
-        myOnlineBadge.innerHTML = state.hideLastSeen
-          ? '<span class="online-dot"></span><span class="online-txt">в сети</span> <span class="offline-txt">• время визита скрыто</span>'
-          : '<span class="online-dot"></span><span class="online-txt">в сети</span>';
+        const parts = ['<span class="online-dot"></span><span class="online-txt">в сети</span>'];
+        if (state.hideFromSearch) parts.push('<span class="offline-txt">• скрыт(а) из поиска</span>');
+        if (state.hideLastSeen) parts.push('<span class="offline-txt">• время визита скрыто</span>');
+        myOnlineBadge.innerHTML = parts.join(' ');
       }
 
       const box = document.getElementById('myAvatarBox');
@@ -4687,6 +4753,11 @@
             document.getElementById('readingPreviewImg').src = dataUrl;
             document.getElementById('readingPreviewWrap').style.display = 'block';
             document.getElementById('readingPhotoLabel').textContent = 'Фото по теме загружено — заменить';
+          } else if (pickTarget === 'vyruchka_photo') {
+            draftVyruchkaPhoto = dataUrl;
+            document.getElementById('vyruchkaPreviewImg').src = dataUrl;
+            document.getElementById('vyruchkaPreviewWrap').style.display = 'block';
+            document.getElementById('vyruchkaPhotoLabel').textContent = 'Фото места загружено — заменить';
           } else if (pickTarget === 'chat_photo') {
             await sendPhotoToChat(dataUrl);
           }
@@ -5445,7 +5516,7 @@
 
       const q = (document.getElementById('searchPeopleInput')?.value || '').trim().toLowerCase();
       const candidates = users.filter((u) => {
-        if (!u || !u.uid || u.uid === myUid || acceptedMap.has(u.uid)) return false;
+        if (!u || !u.uid || u.uid === myUid || acceptedMap.has(u.uid) || u.hideFromSearch) return false;
         if (!q) return true;
         const nDisp = String(u.fullName || '').toLowerCase();
         const nPlain = String(u.namePlain || '').toLowerCase();
@@ -6335,6 +6406,7 @@
         document.getElementById('editNameStyleSelect').value = styleKey;
         document.getElementById('editAccountTypeSelect').value = normalizeAccountType(state.accountType);
         document.getElementById('editBioField').value = state.bio || '';
+        document.getElementById('editHideFromSearchSelect').value = state.hideFromSearch ? '1' : '0';
         document.getElementById('editHideLastSeenSelect').value = state.hideLastSeen ? '1' : '0';
         updateNameStylePreview();
         document.getElementById('editProfileModal')?.classList.add('open');
@@ -6349,6 +6421,7 @@
           : 'normal';
         const accType = normalizeAccountType(document.getElementById('editAccountTypeSelect')?.value);
         const bioVal = (document.getElementById('editBioField')?.value || '').trim();
+        const hideSearch = document.getElementById('editHideFromSearchSelect')?.value === '1';
         const hideSeen = document.getElementById('editHideLastSeenSelect')?.value === '1';
 
         const basePlain = rawName || getMyPlainName();
@@ -6358,6 +6431,7 @@
         state.accountType = accType;
         state.hasChosenAccountType = true;
         state.bio = bioVal;
+        state.hideFromSearch = hideSearch;
         state.hideLastSeen = hideSeen;
 
         persist();
@@ -6405,6 +6479,7 @@
           nameStyle: 'normal',
           accountType: 'user',
           hasChosenAccountType: false,
+          hideFromSearch: false,
           hideLastSeen: false,
           bio: '',
           avatar: '',
@@ -6452,7 +6527,7 @@
       openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
-      toggleVyruchkaForm, setVyruchkaFilter, submitVyruchkaEntry, approveVyruchkaItem, deleteVyruchkaItem, renderVyruchkaTab,
+      clearVyruchkaAttachment, toggleVyruchkaForm, setVyruchkaFilter, submitVyruchkaEntry, approveVyruchkaItem, deleteVyruchkaItem, renderVyruchkaTab,
       clearReadingAttachment, openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
       changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,

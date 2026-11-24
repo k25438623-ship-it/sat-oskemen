@@ -262,19 +262,23 @@
       box-shadow: 0 0 18px rgba(108, 240, 181, 0.32);
       transform: translateY(-2px);
     }
-    .stat-box.current-prayer .stat-num {
-      color: #6cf0b5;
-    }
-    .stat-box.current-prayer .meta {
-      color: #eef8f3;
-      font-weight: 800;
-    }
-    .stat-num {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--gold);
-    }
+    .stat-box.current-prayer .stat-num { color: #6cf0b5; }
+    .stat-box.current-prayer .meta { color: #eef8f3; font-weight: 800; }
+    .stat-num { font-size: 18px; font-weight: 900; color: var(--gold); }
     .meta { font-size: 13px; color: var(--muted); }
+
+    .online-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #43e59c;
+      box-shadow: 0 0 8px rgba(67, 229, 156, 0.85);
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .online-txt { color: #6cf0b5; font-weight: 700; font-size: 12.5px; }
+    .offline-txt { color: var(--muted); font-size: 12px; }
 
     .input, textarea, select {
       width: 100%;
@@ -637,6 +641,8 @@
     .msg-who { font-size: 11px; font-weight: 700; opacity: 0.85; margin-bottom: 3px; }
     .msg-meta-row { display: flex; justify-content: flex-end; align-items: center; gap: 5px; margin-top: 4px; font-size: 11.5px; }
     .msg-edited { font-size: 11px; opacity: 0.78; font-style: italic; }
+    .tick-sent { font-size: 12px; font-weight: 800; color: rgba(255, 255, 255, 0.78); letter-spacing: -1px; }
+    .tick-read { font-size: 12px; font-weight: 900; color: #6cf0b5; letter-spacing: -1px; }
     .msg-tools { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .msg-tool-btn {
       border: 1px solid rgba(255, 255, 255, 0.24);
@@ -857,6 +863,7 @@
             <div style="min-width: 0; flex: 1;">
               <h2 id="myNameText" style="margin: 0; font-size: 20px;">Участник</h2>
               <div id="myBioText" class="meta" style="margin-top: 4px;">Мой профиль SÄT</div>
+              <div id="myOnlineBadge" style="margin-top: 5px;"><span class="online-dot"></span><span class="online-txt">в сети</span></div>
             </div>
           </div>
 
@@ -986,6 +993,7 @@
           </div>
           <div style="min-width: 0; flex: 1;">
             <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
+            <div id="peerOnlineStatus" style="margin-top: 3px;"></div>
             <div id="peerAboutLine" class="meta" style="margin-top: 4px;">Участник SÄT</div>
             <div id="peerStoryTag" style="display: none; margin-top: 8px;">
               <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
@@ -1356,7 +1364,8 @@
 
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
-    const STORE_KEY = 'sat_clean_state_v21';
+    const ONLINE_WINDOW_MS = 90 * 1000;
+    const STORE_KEY = 'sat_clean_state_v23';
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -1389,7 +1398,7 @@
     };
 
     try {
-      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v20') || '{}');
+      const parsed = JSON.parse(localStorage.getItem(STORE_KEY) || localStorage.getItem('sat_clean_state_v22') || '{}');
       state = { ...state, ...parsed };
       if (!Array.isArray(state.photos)) state.photos = [];
       if (!state.karmaClicksByPost || typeof state.karmaClicksByPost !== 'object') state.karmaClicksByPost = {};
@@ -1418,6 +1427,8 @@
     let chatMsgs = [];
     let editingMsgId = null;
     let prayerEditOpen = false;
+    let initialChatsLoaded = false;
+    const notifiedChatLastMsg = new Map();
 
     let vScale = 1, vPanX = 0, vPanY = 0, vStartScale = 1, vStartDist = 0, vStartX = 0, vStartY = 0, vPanOriginX = 0, vPanOriginY = 0, vMode = 'none', vLastTap = 0;
 
@@ -1430,6 +1441,7 @@
     let playingVoiceMsgId = null, voiceProgressTimer = null;
 
     let pc = null, localCallStream = null, callDocId = null, callUnsub = null;
+    let audioCtx = null;
 
     document.getElementById('sessionHint').style.display = 'block';
 
@@ -1448,7 +1460,42 @@
       el.textContent = msg;
       el.classList.add('show');
       clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('show'), 2500);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function playTone(type) {
+      try {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        if (!audioCtx) audioCtx = new Ctx();
+        if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'sent') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(580, now);
+          osc.frequency.exponentialRampToValueAtTime(840, now + 0.08);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.08, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(660, now);
+          osc.frequency.setValueAtTime(880, now + 0.09);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.11, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {}
     }
 
     function formatTime(ms) {
@@ -1456,6 +1503,17 @@
       const t = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const dt = d.toLocaleDateString([], { day: '2-digit', month: 'short' });
       return `${t} • ${dt}`;
+    }
+
+    function formatPresenceHtml(lastSeenMs) {
+      const ts = Number(lastSeenMs || 0);
+      if (ts && (Date.now() - ts) <= ONLINE_WINDOW_MS) {
+        return '<span class="online-dot"></span><span class="online-txt">в сети</span>';
+      }
+      if (ts > 0) {
+        return `<span class="offline-txt">был(а) в сети ${esc(formatTime(ts))}</span>`;
+      }
+      return '<span class="offline-txt">не в сети</span>';
     }
 
     function normalizePhotos(list) {
@@ -1524,6 +1582,7 @@
       if (!user) return;
       checkOwnStoryExpiry();
       state.lastUid = user.uid;
+      const nowMs = Date.now();
       persist();
       try {
         await setDoc(doc(db, 'users', user.uid), {
@@ -1536,10 +1595,34 @@
           storyCreatedAt: state.storyStart || 0,
           storyExpiresAt: state.storyEnd || 0,
           storyTimeLabel: state.storyLabel || '',
+          lastSeenMs: nowMs,
           updatedAt: serverTimestamp()
         }, { merge: true });
       } catch (e) {}
     }
+
+    async function pingOnlinePresence() {
+      if (!currentUser) return;
+      try {
+        await setDoc(doc(db, 'users', currentUser.uid), {
+          lastSeenMs: Date.now()
+        }, { merge: true });
+      } catch (e) {}
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        pingOnlinePresence();
+        renderFriendsTab();
+        if (openPeerUid) renderPeerPageContent();
+      }
+    });
+
+    setInterval(() => {
+      pingOnlinePresence();
+      renderFriendsTab();
+      if (openPeerUid) renderPeerPageContent();
+    }, 20000);
 
     getRedirectResult(auth).catch(() => {});
 
@@ -1611,11 +1694,37 @@
     }, () => {});
 
     onSnapshot(collection(db, 'chats'), (snap) => {
-      chats = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => {
+      const myUid = getMyUid();
+      const sorted = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => {
         const ta = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0;
         const tb = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
         return tb - ta;
       });
+
+      if (initialChatsLoaded && myUid) {
+        sorted.forEach((c) => {
+          const isMember = Array.isArray(c.members) ? c.members.includes(myUid) : true;
+          const isIncoming = isMember && c.lastSenderUid && c.lastSenderUid !== myUid;
+          const updMs = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+          const sig = `${c.lastMessage || ''}_${updMs}`;
+          if (isIncoming && updMs > 0 && notifiedChatLastMsg.get(c.id) !== sig) {
+            notifiedChatLastMsg.set(c.id, sig);
+            const senderTitle = getChatDisplayTitle(c);
+            playTone('incoming');
+            if (activeChatId !== c.id) {
+              toast(`Новое от ${senderTitle}: ${c.lastMessage || 'сообщение'}`);
+            }
+          }
+        });
+      } else {
+        sorted.forEach((c) => {
+          const updMs = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
+          notifiedChatLastMsg.set(c.id, `${c.lastMessage || ''}_${updMs}`);
+        });
+        initialChatsLoaded = true;
+      }
+
+      chats = sorted;
       renderGroupsTab();
       renderProfileChatsList();
     }, () => {});
@@ -2222,6 +2331,8 @@
       const bio = u.bio || 'Участник SÄT';
       document.getElementById('peerHeaderTitle').textContent = name;
       document.getElementById('peerFullName').textContent = name;
+      const pOnline = document.getElementById('peerOnlineStatus');
+      if (pOnline) pOnline.innerHTML = formatPresenceHtml(u.lastSeenMs);
       document.getElementById('peerAboutLine').textContent = bio;
       document.getElementById('peerAvatarCircle').innerHTML = u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((name[0] || 'S').toUpperCase());
 
@@ -2266,6 +2377,7 @@
 
       document.getElementById('peerInfoBox').innerHTML = `
         <div class="list-item"><span class="meta">Имя</span><span style="font-weight:700;">${esc(name)}</span></div>
+        <div class="list-item"><span class="meta">Статус</span><span>${formatPresenceHtml(u.lastSeenMs)}</span></div>
         <div class="list-item"><span class="meta">О себе</span><span>${esc(bio)}</span></div>
         <div class="list-item"><span class="meta">Публикаций</span><span>${uPosts.length}</span></div>
       `;
@@ -2297,7 +2409,7 @@
       return { status: 'incoming', id: r.id };
     }
 
-    function refreshFriendsView() { renderFriendsTab(); toast('Обновлено'); }
+    function refreshFriendsView() { pingOnlinePresence(); renderFriendsTab(); toast('Обновлено'); }
 
     function renderFriendsTab() {
       const myBox = document.getElementById('myFriendsBox');
@@ -2311,7 +2423,12 @@
         const otherUid = (myUid && r.fromUid === myUid) ? r.toUid : ((myUid && r.toUid === myUid) ? r.fromUid : '');
         if (otherUid && otherUid !== myUid) {
           const prof = users.find((u) => u.uid === otherUid) || {};
-          acceptedMap.set(otherUid, { uid: otherUid, fullName: prof.fullName || r.toName || r.fromName || 'Участник', photoData: prof.photoData || '' });
+          acceptedMap.set(otherUid, {
+            uid: otherUid,
+            fullName: prof.fullName || r.toName || r.fromName || 'Участник',
+            photoData: prof.photoData || '',
+            lastSeenMs: prof.lastSeenMs || 0
+          });
         }
       });
 
@@ -2321,7 +2438,10 @@
             <div class="list-item">
               <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName)}')">
                 <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div>
-                <div class="user-name">${esc(u.fullName)}</div>
+                <div style="min-width:0; flex:1;">
+                  <div class="user-name">${esc(u.fullName)}</div>
+                  <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                </div>
               </div>
               <button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openDirectChat('${esc(u.uid)}', '${esc(u.fullName)}')">Чат</button>
             </div>
@@ -2340,7 +2460,10 @@
               <div class="list-item">
                 <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">
                   <div class="mini-ava">${u.photoData ? `<img src="${u.photoData}" alt="" draggable="false" />` : esc(((u.fullName || 'S')[0]).toUpperCase())}</div>
-                  <div class="user-name">${esc(u.fullName || 'Участник')}</div>
+                  <div style="min-width:0; flex:1;">
+                    <div class="user-name">${esc(u.fullName || 'Участник')}</div>
+                    <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                  </div>
                 </div>
                 ${btn}
               </div>
@@ -2437,14 +2560,38 @@
       activeChatId = id;
       cancelEditMessage(); discardVoiceDraft();
       const c = chats.find((x) => x.id === id);
+      const myUid = getMyUid();
       document.getElementById('chatHeaderTitle').textContent = c ? getChatDisplayTitle(c) : (title || 'Чат');
+      const subEl = document.getElementById('chatHeaderSub');
+      if (subEl && c?.type !== 'group' && Array.isArray(c?.members)) {
+        const peerId = c.members.find((u) => u && u !== myUid);
+        const peerObj = users.find((u) => u.uid === peerId);
+        subEl.innerHTML = peerObj ? formatPresenceHtml(peerObj.lastSeenMs) : 'Сообщения • Голос • Фото';
+      }
       document.getElementById('callToggleBtn').style.display = c?.type === 'group' ? 'none' : 'inline-flex';
       if (chatUnsub) chatUnsub();
       chatUnsub = onSnapshot(query(collection(db, 'chats', id, 'messages'), orderBy('createdAt', 'asc')), async (snap) => {
-        chatMsgs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        const curUid = getMyUid();
+        const prevCount = chatMsgs.length;
+        const loaded = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        if (loaded.length > prevCount && prevCount > 0) {
+          const newest = loaded[loaded.length - 1];
+          if (newest && curUid && newest.senderUid && newest.senderUid !== curUid) {
+            playTone('incoming');
+          }
+        }
+        chatMsgs = loaded;
         renderChatBox();
-        const myUid = getMyUid();
-        if (myUid) await updateDoc(doc(db, 'chats', id), { readByUsers: arrayUnion(myUid) }).catch(() => {});
+        if (curUid) {
+          await updateDoc(doc(db, 'chats', id), { readByUsers: arrayUnion(curUid) }).catch(() => {});
+          for (const d of snap.docs) {
+            const md = d.data();
+            const seenList = Array.isArray(md.seenBy) ? md.seenBy : (md.senderUid ? [md.senderUid] : []);
+            if (md.senderUid && md.senderUid !== curUid && !seenList.includes(curUid)) {
+              updateDoc(doc(db, 'chats', id, 'messages', d.id), { seenBy: arrayUnion(curUid) }).catch(() => {});
+            }
+          }
+        }
       }, () => {});
       document.getElementById('chatScreen')?.classList.add('open');
     }
@@ -2463,7 +2610,33 @@
       addSavedPhoto(m.photoData, `Из чата: ${m.senderName || 'Чат'}`);
       renderMyProfile();
       await syncProfileCloud(currentUser);
-      toast('Фото сохранено в галерею');
+      toast('Фото сохранено в альбом SÄT');
+    }
+
+    function downloadChatPhoto(msgId, ev) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      const m = chatMsgs.find((x) => x.id === msgId);
+      if (!m?.photoData) return;
+      try {
+        const a = document.createElement('a');
+        a.href = m.photoData;
+        a.download = `sat-photo-${Date.now()}.jpg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        toast('Фото скачано на устройство');
+      } catch (e) {
+        openImageViewer(m.photoData, m.senderName || 'Фото', 'Удерживайте фото, чтобы сохранить в галерею');
+      }
+    }
+
+    function renderTicksHtml(m, mine, myUid) {
+      if (!mine) return '';
+      const seenArr = Array.isArray(m.seenBy) ? m.seenBy : [];
+      const readByOther = seenArr.some((uid) => uid && uid !== myUid);
+      return readByOther
+        ? '<span class="tick-read" title="Прочитано">✓✓</span>'
+        : '<span class="tick-sent" title="Отправлено">✓</span>';
     }
 
     function renderChatBox() {
@@ -2477,17 +2650,19 @@
             const mine = Boolean(myUid && m.senderUid === myUid) || String(m.id).startsWith('tmp_');
             const ms = m.createdAt?.toMillis ? m.createdAt.toMillis() : (m.sentAtMs || Date.now());
             const tm = new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const ticks = renderTicksHtml(m, mine, myUid);
             const tools = mine ? `<div class="msg-tools">${(m.kind !== 'photo' && m.kind !== 'voice') ? `<button type="button" class="msg-tool-btn" onclick="beginEditMessage('${esc(m.id)}')">Ред.</button>` : ''}<button type="button" class="msg-tool-btn del" onclick="deleteChatMessage('${esc(m.id)}')">Удалить</button></div>` : '';
             if (m.kind === 'photo' && m.photoData) {
-              const saveBtn = (!mine && isDirect) ? `<div class="msg-tools"><button type="button" class="msg-tool-btn" onclick="saveChatPhotoToGallery('${esc(m.id)}', event)">В галерею</button></div>` : '';
-              return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(ms))}')" />${saveBtn}<div class="msg-meta-row"><span>${esc(tm)}</span></div>${tools}</div>`;
+              const dlBtn = `<button type="button" class="msg-tool-btn" onclick="downloadChatPhoto('${esc(m.id)}', event)">Скачать</button>`;
+              const albumBtn = (!mine && isDirect) ? `<button type="button" class="msg-tool-btn" onclick="saveChatPhotoToGallery('${esc(m.id)}', event)">В альбом</button>` : '';
+              return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(ms))}')" /><div class="msg-tools">${dlBtn}${albumBtn}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${ticks}</div>${tools}</div>`;
             }
             if (m.kind === 'voice' && m.audioData) {
               const dur = Number(m.durationSec || 1);
               const sid = esc(m.id);
-              return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div class="voice-player"><button type="button" id="vpBtn_${sid}" class="voice-play-btn" onclick="toggleVoicePlay('${sid}', '${m.audioData}')">▶</button><div class="voice-track"><div id="vpFill_${sid}" class="voice-fill"></div></div><span class="voice-dur">${dur} сек</span></div><div class="msg-meta-row"><span>${esc(tm)}</span></div>${tools}</div>`;
+              return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div class="voice-player"><button type="button" id="vpBtn_${sid}" class="voice-play-btn" onclick="toggleVoicePlay('${sid}', '${m.audioData}')">▶</button><div class="voice-track"><div id="vpFill_${sid}" class="voice-fill"></div></div><span class="voice-dur">${dur} сек</span></div><div class="msg-meta-row"><span>${esc(tm)}</span>${ticks}</div>${tools}</div>`;
             }
-            return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div>${esc(m.text || '')}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${m.edited ? '<span class="msg-edited">изм.</span>' : ''}</div>${tools}</div>`;
+            return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div>${esc(m.text || '')}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${m.edited ? '<span class="msg-edited">изм.</span>' : ''}${ticks}</div>${tools}</div>`;
           }).join('')
         : '<div class="meta" style="text-align:center; padding:14px;">Сообщений пока нет.</div>';
       box.scrollTop = box.scrollHeight;
@@ -2547,10 +2722,13 @@
       if (!text || !activeChatId || !myUid) return;
       const cid = activeChatId; inp.value = '';
       const now = Date.now();
-      chatMsgs = [...chatMsgs, { id: 'tmp_' + now, senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now }];
+      chatMsgs = [...chatMsgs, { id: 'tmp_' + now, senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, seenBy: [myUid] }];
       renderChatBox();
+      playTone('sent');
       try {
-        await addDoc(collection(db, 'chats', cid, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, createdAt: serverTimestamp() });
+        await addDoc(collection(db, 'chats', cid, 'messages'), {
+          senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, seenBy: [myUid], createdAt: serverTimestamp()
+        });
         await updateDoc(doc(db, 'chats', cid), { lastMessage: text, lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() });
       } catch (e) {}
     }
@@ -2558,7 +2736,10 @@
     async function sendPhotoToChat(dataUrl) {
       const myUid = getMyUid();
       if (!activeChatId || !myUid || !dataUrl) return;
-      await addDoc(collection(db, 'chats', activeChatId, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'photo', text: '', photoData: dataUrl, createdAt: serverTimestamp() }).catch(() => {});
+      playTone('sent');
+      await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
+        senderUid: myUid, senderName: myDisplayName(), kind: 'photo', text: '', photoData: dataUrl, seenBy: [myUid], createdAt: serverTimestamp()
+      }).catch(() => {});
       await updateDoc(doc(db, 'chats', activeChatId), { lastMessage: 'Фотография', lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() }).catch(() => {});
       toast('Фото отправлено');
     }
@@ -2627,7 +2808,10 @@
       if (!pendingVoiceDraft || !activeChatId || !myUid) return;
       const { audioData, durSec } = pendingVoiceDraft; const cid = activeChatId;
       discardVoiceDraft();
-      await addDoc(collection(db, 'chats', cid, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'voice', audioData, durationSec: durSec, createdAt: serverTimestamp() }).catch(() => {});
+      playTone('sent');
+      await addDoc(collection(db, 'chats', cid, 'messages'), {
+        senderUid: myUid, senderName: myDisplayName(), kind: 'voice', audioData, durationSec: durSec, seenBy: [myUid], createdAt: serverTimestamp()
+      }).catch(() => {});
       await updateDoc(doc(db, 'chats', cid), { lastMessage: `Голосовое (${durSec} сек)`, lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() }).catch(() => {});
       toast('Голосовое отправлено');
     }
@@ -2698,13 +2882,7 @@
 
     function highlightCurrentPrayer(t) {
       const keys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-      const labels = {
-        Fajr: 'Фаджр',
-        Dhuhr: 'Зухр',
-        Asr: 'Аср',
-        Maghrib: 'Магриб',
-        Isha: 'Иша'
-      };
+      const labels = { Fajr: 'Фаджр', Dhuhr: 'Зухр', Asr: 'Аср', Maghrib: 'Магриб', Isha: 'Иша' };
 
       keys.forEach((k) => {
         document.getElementById('box' + k)?.classList.remove('current-prayer');
@@ -2860,7 +3038,7 @@
       switchMainTab, switchMySubtab, setPulseFilter,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
-      deleteGalleryPhoto, saveChatPhotoToGallery, askPhotoCaption, applyCaptionNow,
+      deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,

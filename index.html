@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta name="author" content="Б.Ш.А. (B.Sh.A.)" />
+  <meta name="copyright" content="© 2026 SÄT • Б.Ш.А. Все права защищены." />
   <title>SÄT</title>
   <meta name="theme-color" content="#101216" />
   <link rel="manifest" href="./manifest.json" />
@@ -662,6 +664,15 @@
       font-size: 15px;
       font-weight: 800;
       text-align: center;
+    }
+
+    .copyright-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 12px 14px;
+      letter-spacing: 0.3px;
+      opacity: 0.85;
     }
 
     .bottom-nav-single {
@@ -1338,6 +1349,10 @@
             </div>
             <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Открыть</button>
           </div>
+        </div>
+
+        <div class="copyright-footer">
+          © SÄT • Б.Ш.А. Все права защищены.
         </div>
       </div>
     </main>
@@ -2153,7 +2168,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v43';
+    const STORE_KEY = 'sat_clean_state_v44';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     function makeSvgCover(svgInner) {
@@ -2529,6 +2544,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v43',
         'sat_clean_state_v42',
         'sat_clean_state_v41',
         'sat_clean_state_v40',

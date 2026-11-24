@@ -521,7 +521,6 @@
       text-align: center;
     }
 
-    /* Упрощённая нижняя панель без лишнего визуального шума */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -556,7 +555,7 @@
       height: 21px;
       stroke: currentColor;
       fill: none;
-      stroke-width: 2;
+      stroke-width: 2.1;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
@@ -1152,7 +1151,7 @@
     <div id="rightMenuBackdrop" class="right-menu-backdrop" onclick="closeSectionRightDrawer()"></div>
     <aside id="sectionRightDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
       <div class="right-drawer-title">
-        <span id="rightDrawerHeading">Раздел</span>
+        <span id="rightDrawerHeading">Профиль</span>
         <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeSectionRightDrawer()">✕</button>
       </div>
       <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
@@ -1160,8 +1159,8 @@
 
     <nav class="bottom-nav">
       <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
-        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-        <span>Лента</span>
+        <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
+        <span>Пульс</span>
       </button>
       <button type="button" class="nav-btn" data-tab="books" onclick="switchMainTab('books', this)">
         <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1759,39 +1758,23 @@
         const itemsBox = document.getElementById('rightDrawerItems');
         if (!itemsBox) return;
 
-        let titleText = 'Навигация';
-        let items = [];
-
-        if (tab === 'pulse') {
-          titleText = 'Лента — выбор';
-          items = [
-            { label: 'Все разделы', fn: () => window.setPulseFilter?.('all') },
-            { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
-            { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
-            { label: 'Помощь', fn: () => window.setPulseFilter?.('help') },
-            { label: 'Прогулки', fn: () => window.setPulseFilter?.('walks') },
-            { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
-            { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
-          ];
-        } else if (tab === 'books') {
-          titleText = 'Книги — выбор';
-          items = [
-            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
-            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
-            { label: '+ Добавить историю / совет', fn: () => window.openAddReadingModal?.() }
-          ];
-        } else {
-          titleText = 'Профиль — выбор';
-          items = [
-            { label: 'Публикации и фото', fn: () => window.switchMySubtab?.('posts') },
-            { label: 'Друзья и заявки', fn: () => window.switchMySubtab?.('friends') },
-            { label: 'Группы', fn: () => window.switchMySubtab?.('groups') },
-            { label: 'Анкета и профиль', fn: () => window.openEditProfileModal?.() },
-            { label: 'Время намаза • Оскемен', fn: () => window.openNamazQiblaModal?.() },
-            { label: 'Техподдержка', fn: () => window.openSupportModal?.() },
-            { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
-          ];
+        if (tab !== 'profile') {
+          if (typeof window.toast === 'function') {
+            window.toast('Правое меню открывается в разделе «Профиль»');
+          }
+          return;
         }
+
+        const titleText = 'Профиль — быстрые разделы';
+        const items = [
+          { label: 'Публикации и фото', fn: () => window.switchMySubtab?.('posts') },
+          { label: 'Друзья и заявки', fn: () => window.switchMySubtab?.('friends') },
+          { label: 'Группы', fn: () => window.switchMySubtab?.('groups') },
+          { label: 'Анкета и имя', fn: () => window.openEditProfileModal?.() },
+          { label: 'Время намаза • Оскемен', fn: () => window.openNamazQiblaModal?.() },
+          { label: 'Техподдержка', fn: () => window.openSupportModal?.() },
+          { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
+        ];
 
         if (heading) heading.textContent = titleText;
         itemsBox.innerHTML = '';
@@ -1861,7 +1844,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v36';
+    const STORE_KEY = 'sat_clean_state_v37';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -2011,6 +1994,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v36',
         'sat_clean_state_v35',
         'sat_clean_state_v34',
         'sat_clean_state_v33',
@@ -3851,7 +3835,7 @@
         document.getElementById('postTextInput').value = '';
         clearPostAttachment();
         hideModal('newPostModal');
-        toast(vis === 'pulse' ? 'Опубликовано в Ленте' : 'Сохранено на вашей странице');
+        toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
       } finally {
         setTimeout(() => { isSubmittingPost = false; }, 400);
       }

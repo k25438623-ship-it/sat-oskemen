@@ -207,16 +207,16 @@
       background: var(--surface);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      padding: 11px 16px;
+      padding: 11px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
     }
-    .brand-row { display: flex; align-items: center; gap: 10px; }
+    .brand-row { display: flex; align-items: center; gap: 8px; }
     .mini-logo {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 12px 5px 12px 12px;
       background: rgba(224, 159, 90, 0.16);
       border: 1.5px solid var(--border-strong);
@@ -224,10 +224,10 @@
       align-items: center;
       justify-content: center;
       font-weight: 900;
-      font-size: 19px;
+      font-size: 18px;
       color: var(--accent);
     }
-    .brand-text { font-weight: 900; font-size: 19px; letter-spacing: 1.2px; color: var(--accent); }
+    .brand-text { font-weight: 900; font-size: 18px; letter-spacing: 1px; color: var(--accent); }
 
     .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 28px; }
     .tab-panel { display: none; }
@@ -266,6 +266,78 @@
       background: linear-gradient(135deg, var(--accent), #b86b28);
       color: #ffffff;
       border-color: transparent;
+    }
+
+    .pulse-body-text {
+      font-size: 15.5px;
+      line-height: 1.55;
+      margin-top: 8px;
+      white-space: pre-line;
+    }
+    .pulse-actions-clean {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .pulse-act-btn {
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
+      color: var(--text);
+      border-radius: 11px;
+      padding: 7px 11px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pulse-act-btn.gold { color: var(--gold); border-color: rgba(242, 201, 107, 0.35); }
+    body.theme-light .pulse-act-btn.gold { color: #9c591e; }
+
+    .reader-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 96;
+      background: var(--bg);
+      color: var(--text);
+      display: none;
+      flex-direction: column;
+    }
+    .reader-screen.open { display: flex; }
+    .reader-screen.paper-mode {
+      background: #f5efe2;
+      color: #1f1b16;
+    }
+    .reader-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: inherit;
+    }
+    .reader-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px 48px;
+      max-width: 620px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .reader-article-title {
+      margin: 0 0 6px;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1.3;
+    }
+    .reader-article-body {
+      margin-top: 16px;
+      font-size: 17px;
+      line-height: 1.75;
+      white-space: pre-line;
     }
 
     .stats-grid {
@@ -565,14 +637,36 @@
       border-color: var(--border-strong);
     }
 
-    .right-menu-backdrop {
+    .side-menu-backdrop {
       position: fixed;
       inset: 0;
       z-index: 62;
       background: rgba(0, 0, 0, 0.35);
       display: none;
     }
-    .right-menu-backdrop.open { display: block; }
+    .side-menu-backdrop.open { display: block; }
+
+    .left-section-drawer {
+      position: fixed;
+      top: 62px;
+      left: 12px;
+      width: 256px;
+      max-width: calc(100vw - 24px);
+      max-height: calc(100vh - 96px);
+      overflow-y: auto;
+      z-index: 64;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-top: 3px solid var(--accent-2);
+      border-radius: 6px 22px 22px 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .left-section-drawer.open { display: flex; }
 
     .right-section-drawer {
       position: fixed;
@@ -596,7 +690,7 @@
     }
     .right-section-drawer.open { display: flex; }
 
-    .right-drawer-title {
+    .side-drawer-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -606,7 +700,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .right-drawer-item {
+    .side-drawer-item {
       width: 100%;
       text-align: left;
       border: 1px solid var(--border);
@@ -618,7 +712,7 @@
       font-weight: 700;
       cursor: pointer;
     }
-    .right-drawer-item:hover { border-color: var(--border-strong); }
+    .side-drawer-item:hover { border-color: var(--border-strong); }
 
     .modal-bg {
       position: fixed;
@@ -932,19 +1026,21 @@
   <section id="app" class="screen">
     <header class="topbar">
       <div class="brand-row">
-        <div class="mini-logo">Ä</div>
+        <button type="button" id="leftDrawerBtn" class="btn btn-mint" style="padding: 7px 10px; font-size: 12.5px;" onclick="openLeftDrawerForPulseOrBooks()">
+          <span>← Разделы</span>
+        </button>
         <div class="brand-text">SÄT</div>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
-        <button type="button" class="btn btn-primary" style="padding: 8px 11px; font-size: 13px;" onclick="openUnifiedSearchModal()">
+        <button type="button" class="btn btn-primary" style="padding: 8px 10px; font-size: 12.5px;" onclick="openUnifiedSearchModal()">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
         </button>
-        <button type="button" class="btn btn-mint" style="padding: 8px 11px; font-size: 13px;" onclick="openWallpapers()">
-          <span id="wpActiveName" style="max-width: 78px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
+        <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
+          <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
         </button>
-        <button type="button" class="btn btn-gold" style="padding: 8px 11px; font-size: 13px;" onclick="openSectionRightDrawer()">
-          <span>Меню →</span>
+        <button type="button" id="rightProfileDrawerBtn" class="btn btn-gold" style="padding: 8px 10px; font-size: 12.5px;" onclick="openProfileRightDrawer()">
+          <span>Профиль →</span>
         </button>
       </div>
     </header>
@@ -1148,11 +1244,20 @@
       </div>
     </main>
 
-    <div id="rightMenuBackdrop" class="right-menu-backdrop" onclick="closeSectionRightDrawer()"></div>
-    <aside id="sectionRightDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
-      <div class="right-drawer-title">
+    <div id="sideMenuBackdrop" class="side-menu-backdrop" onclick="closeAllSideDrawers()"></div>
+
+    <aside id="leftSectionDrawer" class="left-section-drawer" onclick="event.stopPropagation()">
+      <div class="side-drawer-title">
+        <span id="leftDrawerHeading">Раздел</span>
+        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
+      </div>
+      <div id="leftDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
+    </aside>
+
+    <aside id="rightProfileDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
+      <div class="side-drawer-title">
         <span id="rightDrawerHeading">Профиль</span>
-        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeSectionRightDrawer()">✕</button>
+        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
       </div>
       <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
     </aside>
@@ -1267,20 +1372,19 @@
     </div>
   </div>
 
-  <div id="readingViewerModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div style="min-width: 0; flex: 1;">
-          <h3 id="readingModalTitle" style="margin: 0; font-size: 18px;">Заголовок</h3>
-          <div id="readingModalMeta" class="meta">Раздел</div>
-        </div>
-        <div style="display: flex; gap: 6px; flex-shrink: 0;">
-          <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
-          <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(2)">А+</button>
-          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('readingViewerModal')">✕</button>
-        </div>
+  <div id="readingViewerModal" class="reader-screen">
+    <div class="reader-topbar">
+      <button type="button" class="btn btn-ghost" style="padding: 7px 12px; font-size: 13px;" onclick="closeReadingViewer()">← Книги</button>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12.5px;" onclick="toggleReaderPaperMode()">Бумага / Ночь</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(2)">А+</button>
       </div>
-      <div id="readingModalBody" style="margin-top: 14px; font-size: 16px; line-height: 1.68; white-space: pre-line;"></div>
+    </div>
+    <div class="reader-scroll">
+      <div id="readingModalMeta" class="meta" style="font-weight: 700; color: var(--accent);">Раздел</div>
+      <h2 id="readingModalTitle" class="reader-article-title">Заголовок</h2>
+      <div id="readingModalBody" class="reader-article-body"></div>
     </div>
   </div>
 
@@ -1746,26 +1850,78 @@
         }
       };
 
-      window.closeSectionRightDrawer = function () {
-        document.getElementById('sectionRightDrawer')?.classList.remove('open');
-        document.getElementById('rightMenuBackdrop')?.classList.remove('open');
+      window.closeAllSideDrawers = function () {
+        document.getElementById('leftSectionDrawer')?.classList.remove('open');
+        document.getElementById('rightProfileDrawer')?.classList.remove('open');
+        document.getElementById('sideMenuBackdrop')?.classList.remove('open');
       };
 
-      window.openSectionRightDrawer = function () {
-        const activePanel = document.querySelector('.tab-panel.active');
-        const tab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
-        const heading = document.getElementById('rightDrawerHeading');
-        const itemsBox = document.getElementById('rightDrawerItems');
-        if (!itemsBox) return;
+      function fillDrawerList(containerId, items) {
+        const box = document.getElementById(containerId);
+        if (!box) return;
+        box.innerHTML = '';
+        items.forEach((it) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'side-drawer-item';
+          btn.textContent = it.label;
+          btn.onclick = () => {
+            window.closeAllSideDrawers();
+            if (typeof it.fn === 'function') it.fn();
+          };
+          box.appendChild(btn);
+        });
+      }
 
-        if (tab !== 'profile') {
-          if (typeof window.toast === 'function') {
-            window.toast('Правое меню открывается в разделе «Профиль»');
-          }
-          return;
+      window.openLeftDrawerForPulseOrBooks = function () {
+        const activePanel = document.querySelector('.tab-panel.active');
+        const currentTab = activePanel ? activePanel.id.replace('tab-', '') : 'pulse';
+        const targetTab = currentTab === 'books' ? 'books' : 'pulse';
+
+        if (currentTab !== targetTab && typeof window.switchMainTab === 'function') {
+          const navBtn = document.querySelector('.nav-btn[data-tab="' + targetTab + '"]');
+          window.switchMainTab(targetTab, navBtn || null);
         }
 
-        const titleText = 'Профиль — быстрые разделы';
+        const heading = document.getElementById('leftDrawerHeading');
+        let items = [];
+        if (targetTab === 'books') {
+          if (heading) heading.textContent = 'Книги — слева';
+          items = [
+            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
+            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
+            { label: '+ Добавить текст', fn: () => window.openAddReadingModal?.() }
+          ];
+        } else {
+          if (heading) heading.textContent = 'Пульс — слева';
+          items = [
+            { label: 'Все темы', fn: () => window.setPulseFilter?.('all') },
+            { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
+            { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
+            { label: 'Помощь', fn: () => window.setPulseFilter?.('help') },
+            { label: 'Прогулки', fn: () => window.setPulseFilter?.('walks') },
+            { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
+            { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
+          ];
+        }
+
+        fillDrawerList('leftDrawerItems', items);
+        document.getElementById('rightProfileDrawer')?.classList.remove('open');
+        document.getElementById('sideMenuBackdrop')?.classList.add('open');
+        document.getElementById('leftSectionDrawer')?.classList.add('open');
+      };
+
+      window.openProfileRightDrawer = function () {
+        const activePanel = document.querySelector('.tab-panel.active');
+        const currentTab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
+        if (currentTab !== 'profile' && typeof window.switchMainTab === 'function') {
+          const pBtn = document.querySelector('.nav-btn[data-tab="profile"]');
+          window.switchMainTab('profile', pBtn || null);
+        }
+
+        const heading = document.getElementById('rightDrawerHeading');
+        if (heading) heading.textContent = 'Профиль — меню';
+
         const items = [
           { label: 'Публикации и фото', fn: () => window.switchMySubtab?.('posts') },
           { label: 'Друзья и заявки', fn: () => window.switchMySubtab?.('friends') },
@@ -1776,22 +1932,23 @@
           { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
         ];
 
-        if (heading) heading.textContent = titleText;
-        itemsBox.innerHTML = '';
-        items.forEach((it) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'right-drawer-item';
-          btn.textContent = it.label;
-          btn.onclick = () => {
-            window.closeSectionRightDrawer();
-            if (typeof it.fn === 'function') it.fn();
-          };
-          itemsBox.appendChild(btn);
-        });
+        fillDrawerList('rightDrawerItems', items);
+        document.getElementById('leftSectionDrawer')?.classList.remove('open');
+        document.getElementById('sideMenuBackdrop')?.classList.add('open');
+        document.getElementById('rightProfileDrawer')?.classList.add('open');
+      };
 
-        document.getElementById('rightMenuBackdrop')?.classList.add('open');
-        document.getElementById('sectionRightDrawer')?.classList.add('open');
+      window.syncHeaderSideButtons = function (tabName) {
+        const leftBtn = document.getElementById('leftDrawerBtn');
+        const rightBtn = document.getElementById('rightProfileDrawerBtn');
+        if (leftBtn) {
+          leftBtn.style.display = (tabName === 'pulse' || tabName === 'books') ? 'inline-flex' : 'none';
+          const lbl = leftBtn.querySelector('span');
+          if (lbl) lbl.textContent = tabName === 'books' ? '← Книги' : '← Пульс';
+        }
+        if (rightBtn) {
+          rightBtn.style.display = tabName === 'profile' ? 'inline-flex' : 'none';
+        }
       };
 
       let initial = 'amber_dark';
@@ -1844,7 +2001,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v37';
+    const STORE_KEY = 'sat_clean_state_v38';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -1994,6 +2151,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v37',
         'sat_clean_state_v36',
         'sat_clean_state_v35',
         'sat_clean_state_v34',
@@ -2110,7 +2268,7 @@
     let appErrorLogs = [];
     let readingItems = INITIAL_READING_ITEMS.map((item) => normalizeReadingDoc(item, item.id));
     let readingSubtab = 'stories';
-    let readingFontSize = 16;
+    let readingFontSize = 17;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
     let unifiedSearchTab = 'all';
     let pulseFilter = 'all';
@@ -2449,7 +2607,7 @@
     }
 
     function showScreen(id) {
-      window.closeSectionRightDrawer?.();
+      window.closeAllSideDrawers?.();
       document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
       document.getElementById(id)?.classList.add('active');
     }
@@ -3062,7 +3220,20 @@
         bodyEl.textContent = item.content || item.summary || '';
         bodyEl.style.fontSize = `${readingFontSize}px`;
       }
-      document.getElementById('readingViewerModal')?.classList.add('open');
+      const scr = document.getElementById('readingViewerModal');
+      if (scr) {
+        scr.classList.add('open');
+        const scrollBox = scr.querySelector('.reader-scroll');
+        if (scrollBox) scrollBox.scrollTop = 0;
+      }
+    }
+
+    function closeReadingViewer() {
+      document.getElementById('readingViewerModal')?.classList.remove('open');
+    }
+
+    function toggleReaderPaperMode() {
+      document.getElementById('readingViewerModal')?.classList.toggle('paper-mode');
     }
 
     function changeReadingFont(delta) {
@@ -3302,11 +3473,14 @@
     }
 
     function switchMainTab(tab, btn) {
-      window.closeSectionRightDrawer?.();
+      window.closeAllSideDrawers?.();
+      const nextTab = ['pulse', 'books', 'profile'].includes(tab) ? tab : 'profile';
       document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
-      document.getElementById('tab-' + tab)?.classList.add('active');
+      document.getElementById('tab-' + nextTab)?.classList.add('active');
       document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
+      else document.querySelector(`.nav-btn[data-tab="${nextTab}"]`)?.classList.add('active');
+      window.syncHeaderSideButtons?.(nextTab);
       renderEverything();
     }
 
@@ -3337,6 +3511,9 @@
     }
 
     function renderEverything() {
+      const activePanel = document.querySelector('.tab-panel.active');
+      const curTab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
+      window.syncHeaderSideButtons?.(curTab);
       renderMyProfile();
       renderPulse();
       renderBooksTab();
@@ -3944,14 +4121,11 @@
         ` : '';
 
         const karmaBtnHtml = !isSelf
-          ? `<button type="button" class="btn btn-gold" style="padding:8px 12px; font-size:13px;" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">
-              ${reached ? `Карма: ${karmaVal} (лимит 3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
-            </button>`
-          : `<span class="tag" style="padding:8px 12px;">Карма: ${karmaVal}</span>`;
+          ? `<button type="button" class="pulse-act-btn gold" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">★ ${karmaVal}</button>`
+          : `<span class="meta" style="font-weight:700;">★ ${karmaVal}</span>`;
 
-        const peerButtonsHtml = (!isSelf && resolvedUid)
-          ? `<button type="button" class="btn btn-mint" style="padding:8px 12px; font-size:13px;" onclick="openPersonPage('${safeAuthorUid}', '${safeAuthorName}')">Страница</button>
-             ${!resolvedUid.startsWith('by_name:') ? `<button type="button" class="btn btn-primary" style="padding:8px 12px; font-size:13px;" onclick="openDirectChat('${safeAuthorUid}', '${safeAuthorName}')">Написать</button>` : ''}`
+        const peerButtonsHtml = (!isSelf && resolvedUid && !resolvedUid.startsWith('by_name:'))
+          ? `<button type="button" class="pulse-act-btn" onclick="openDirectChat('${safeAuthorUid}', '${safeAuthorName}')">Написать</button>`
           : '';
 
         return `
@@ -3967,13 +4141,17 @@
               <span class="tag">${esc(getCategoryDisplayLabel(p))}</span>
             </div>
             ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
-            ${p.body ? `<div style="font-size:15px; line-height:1.48; margin-top:6px;">${esc(p.body)}</div>` : ''}
+            ${p.body ? `<div class="pulse-body-text">${esc(p.body)}</div>` : ''}
             ${p.photoData ? `<div class="post-img-wrap" data-view-photo="${esc(photoKey)}"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
-            <div class="actions">
-              ${karmaBtnHtml}
-              <button type="button" class="btn btn-ghost" style="padding:8px 12px; font-size:13px;" onclick="toggleCommentsPanel('${safeId}')">Комментарии (${cmtList.length})</button>
-              ${peerButtonsHtml}
-              ${isMine ? `<button type="button" class="btn btn-danger" style="padding:8px 12px; font-size:13px;" onclick="removePost('${safeId}')">Удалить</button>` : ''}
+            <div class="pulse-actions-clean">
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${karmaBtnHtml}
+                <button type="button" class="pulse-act-btn" onclick="toggleCommentsPanel('${safeId}')">💬 ${cmtList.length}</button>
+              </div>
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${peerButtonsHtml}
+                ${isMine ? `<button type="button" class="pulse-act-btn" style="color:var(--danger);" onclick="removePost('${safeId}')">Удалить</button>` : ''}
+              </div>
             </div>
             ${commentsHtml}
           </article>
@@ -5232,7 +5410,8 @@
       openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
-      switchReadingSubtab, openReadingItem, changeReadingFont, openAddReadingModal,
+      switchReadingSubtab, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
+      changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
       onSupportTitleTripleTap, unlockCreatorByCode,
@@ -5256,6 +5435,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {}));
     }
 
+    window.syncHeaderSideButtons?.('profile');
     renderBooksTab();
     renderFriendsTab();
     renderUnifiedSearch();

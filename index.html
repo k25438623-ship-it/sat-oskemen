@@ -2168,8 +2168,9 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v44';
+    const STORE_KEY = 'sat_clean_state_v45';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
+    const MEDIA_VAULT_KEY = 'sat_media_vault_v1';
 
     function makeSvgCover(svgInner) {
       const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid slice">${svgInner}</svg>`;
@@ -2540,10 +2541,16 @@
       }).filter(Boolean);
     }
 
+    function storyAlive(data, endMs) {
+      return Boolean(data && endMs && Date.now() < Number(endMs));
+    }
+
     function recoverFromAnyBackup() {
       const keys = [
+        MEDIA_VAULT_KEY,
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v44',
         'sat_clean_state_v43',
         'sat_clean_state_v42',
         'sat_clean_state_v41',
@@ -2582,6 +2589,12 @@
           else {
             if (!best.avatar && p.avatar) best.avatar = p.avatar;
             if ((!best.photos || !best.photos.length) && Array.isArray(p.photos) && p.photos.length) best.photos = p.photos;
+            if ((!best.story || !storyAlive(best.story, best.storyEnd)) && p.story && storyAlive(p.story, p.storyEnd)) {
+              best.story = p.story;
+              best.storyStart = p.storyStart;
+              best.storyEnd = p.storyEnd;
+              best.storyLabel = p.storyLabel;
+            }
             if (!best.name && p.name) best.name = p.name;
             if (!best.bio && p.bio) best.bio = p.bio;
           }
@@ -2838,14 +2851,139 @@
       return '<span class="offline-txt">не в сети</span>';
     }
 
-    function persist() {
+    function loadMediaVault() {
+      const keys = [MEDIA_VAULT_KEY, VAULT_BACKUP_KEY, STORE_KEY];
+      let vault = {
+        avatar: '',
+        photos: [],
+        story: '',
+        storyStart: 0,
+        storyEnd: 0,
+        storyLabel: '',
+        postsById: {}
+      };
+      for (const k of keys) {
+        try {
+          const raw = localStorage.getItem(k);
+          if (!raw) continue;
+          const p = JSON.parse(raw);
+          if (!p || typeof p !== 'object') continue;
+          if (!vault.avatar && p.avatar) vault.avatar = String(p.avatar);
+          if ((!vault.photos || !vault.photos.length) && Array.isArray(p.photos) && p.photos.length) {
+            vault.photos = normalizePhotos(p.photos);
+          }
+          if (!vault.story && p.story && storyAlive(p.story, p.storyEnd)) {
+            vault.story = String(p.story);
+            vault.storyStart = Number(p.storyStart || 0);
+            vault.storyEnd = Number(p.storyEnd || 0);
+            vault.storyLabel = String(p.storyLabel || '');
+          }
+          if (p.postsById && typeof p.postsById === 'object') {
+            vault.postsById = { ...p.postsById, ...vault.postsById };
+          }
+        } catch (e) {}
+      }
+      return vault;
+    }
+
+    function saveMediaVault(extraPosts = []) {
+      try {
+        checkOwnStoryExpiry();
+        const prevVault = loadMediaVault();
+        const postsMap = { ...(prevVault.postsById || {}) };
+        if (Array.isArray(extraPosts)) {
+          extraPosts.forEach((pt) => {
+            if (!pt || (!pt.id && !pt.clientPostId)) return;
+            const key = String(pt.clientPostId || pt.id);
+            const oldObj = postsMap[key] || {};
+            postsMap[key] = {
+              ...oldObj,
+              ...pt,
+              id: pt.id || key,
+              clientPostId: pt.clientPostId || key,
+              photoData: pt.photoData || oldObj.photoData || '',
+              body: pt.body || oldObj.body || '',
+              caption: pt.caption || oldObj.caption || ''
+            };
+          });
+        }
+        const activeStory = storyAlive(state.story, state.storyEnd);
+        const backupStoryAlive = storyAlive(prevVault.story, prevVault.storyEnd);
+        const payload = JSON.stringify({
+          avatar: state.avatar || prevVault.avatar || '',
+          photos: normalizePhotos(state.photos).length ? normalizePhotos(state.photos).slice(0, 30) : (prevVault.photos || []),
+          story: activeStory ? state.story : (backupStoryAlive ? prevVault.story : ''),
+          storyStart: activeStory ? state.storyStart : (backupStoryAlive ? prevVault.storyStart : 0),
+          storyEnd: activeStory ? state.storyEnd : (backupStoryAlive ? prevVault.storyEnd : 0),
+          storyLabel: activeStory ? state.storyLabel : (backupStoryAlive ? prevVault.storyLabel : ''),
+          postsById: postsMap
+        });
+        localStorage.setItem(MEDIA_VAULT_KEY, payload);
+      } catch (e) {}
+    }
+
+    function silentHealMediaAndPosts() {
+      try {
+        checkOwnStoryExpiry();
+        const vault = loadMediaVault();
+        let changed = false;
+
+        if (!state.avatar && vault.avatar) {
+          state.avatar = vault.avatar;
+          changed = true;
+        }
+        const curPhotos = normalizePhotos(state.photos);
+        if (!curPhotos.length && Array.isArray(vault.photos) && vault.photos.length) {
+          state.photos = normalizePhotos(vault.photos);
+          changed = true;
+        }
+        if ((!state.story || !storyAlive(state.story, state.storyEnd)) && vault.story && storyAlive(vault.story, vault.storyEnd)) {
+          state.story = vault.story;
+          state.storyStart = vault.storyStart;
+          state.storyEnd = vault.storyEnd;
+          state.storyLabel = vault.storyLabel;
+          changed = true;
+        }
+
+        const vaultPostsArr = Object.values(vault.postsById || {}).filter((x) => x && (x.id || x.clientPostId));
+        if (vaultPostsArr.length) {
+          const existingKeys = new Set(posts.map((p) => String(p.clientPostId || p.id)));
+          const missingFromFeed = vaultPostsArr.filter((vp) => !existingKeys.has(String(vp.clientPostId || vp.id)));
+          if (missingFromFeed.length) {
+            posts = [...missingFromFeed, ...posts].sort((a, b) => Number(b.sentAtMs || 0) - Number(a.sentAtMs || 0));
+          }
+          posts = posts.map((p) => {
+            const k = String(p.clientPostId || p.id);
+            const vp = vault.postsById[k];
+            if (!vp) return p;
+            return {
+              ...vp,
+              ...p,
+              photoData: p.photoData || vp.photoData || '',
+              body: p.body || vp.body || '',
+              caption: p.caption || vp.caption || ''
+            };
+          });
+        }
+
+        if (changed) {
+          persist(false);
+        }
+        saveMediaVault(posts);
+      } catch (e) {}
+    }
+
+    function persist(syncVault = true) {
       const payload = JSON.stringify({
         ...state,
         photos: normalizePhotos(state.photos).slice(0, 30)
       });
       try { localStorage.setItem(STORE_KEY, payload); } catch (e) {}
       try { localStorage.setItem(VAULT_BACKUP_KEY, payload); } catch (e) {}
+      if (syncVault) saveMediaVault(posts);
     }
+
+    silentHealMediaAndPosts();
 
     function queueCloudRetry(fn) {
       retryQueue.push({ fn, tries: 0 });
@@ -2998,17 +3136,13 @@
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
     });
 
-    function storyAlive(data, endMs) {
-      return Boolean(data && endMs && Date.now() < Number(endMs));
-    }
-
     function checkOwnStoryExpiry() {
       if (state.story && !storyAlive(state.story, state.storyEnd)) {
         state.story = '';
         state.storyStart = 0;
         state.storyEnd = 0;
         state.storyLabel = '';
-        persist();
+        persist(false);
       }
     }
 
@@ -3019,12 +3153,13 @@
     }
 
     function enterAppFlow() {
+      silentHealMediaAndPosts();
       if (currentUser) goToProfileStart();
       else showScreen('auth');
     }
 
     function goToProfileStart() {
-      checkOwnStoryExpiry();
+      silentHealMediaAndPosts();
       showScreen('app');
       switchMainTab('profile', document.querySelector('.nav-btn[data-tab="profile"]'));
       renderEverything();
@@ -3077,7 +3212,7 @@
 
     async function syncProfileCloud(user) {
       if (!user) return;
-      checkOwnStoryExpiry();
+      silentHealMediaAndPosts();
       state.lastUid = user.uid;
       if (!state.avatar && recovered?.avatar) state.avatar = recovered.avatar;
       if ((!state.photos || !state.photos.length) && recovered?.photos?.length) {
@@ -3094,10 +3229,10 @@
         bio: state.bio || 'Мой профиль SÄT',
         photoData: myAvatarUrl(),
         savedPhotos: normalizePhotos(state.photos).slice(0, 30),
-        storyData: state.story || '',
-        storyCreatedAt: state.storyStart || 0,
-        storyExpiresAt: state.storyEnd || 0,
-        storyTimeLabel: state.storyLabel || '',
+        storyData: storyAlive(state.story, state.storyEnd) ? state.story : '',
+        storyCreatedAt: storyAlive(state.story, state.storyEnd) ? (state.storyStart || 0) : 0,
+        storyExpiresAt: storyAlive(state.story, state.storyEnd) ? (state.storyEnd || 0) : 0,
+        storyTimeLabel: storyAlive(state.story, state.storyEnd) ? (state.storyLabel || '') : '',
         lastSeenMs: nowMs,
         updatedAt: serverTimestamp()
       };
@@ -3124,7 +3259,9 @@
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
+        silentHealMediaAndPosts();
         pingOnlinePresence();
+        renderMyProfile();
         renderFriendsTab();
         renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
@@ -3132,6 +3269,7 @@
     });
 
     setInterval(() => {
+      silentHealMediaAndPosts();
       pingOnlinePresence();
       renderFriendsTab();
       renderUnifiedSearch();
@@ -3145,6 +3283,7 @@
       const hint = document.getElementById('sessionHint');
       if (hint) hint.style.display = 'none';
       if (user) {
+        silentHealMediaAndPosts();
         state.lastUid = user.uid;
         if (!state.namePlain && user.displayName) state.namePlain = user.displayName;
         if (!state.name && user.displayName) state.name = user.displayName;
@@ -3187,6 +3326,7 @@
         return !cloudKeys.has(key) && String(p.id).startsWith('post_');
       });
       posts = [...pendingLocal, ...cloudPosts];
+      silentHealMediaAndPosts();
       renderPulse();
       renderMyPosts();
       renderUnifiedSearch();
@@ -3228,6 +3368,12 @@
           if ((!state.photos || !state.photos.length) && Array.isArray(meCloud.savedPhotos) && meCloud.savedPhotos.length) {
             state.photos = normalizePhotos(meCloud.savedPhotos);
           }
+          if ((!state.story || !storyAlive(state.story, state.storyEnd)) && meCloud.storyData && storyAlive(meCloud.storyData, meCloud.storyExpiresAt)) {
+            state.story = meCloud.storyData;
+            state.storyStart = Number(meCloud.storyCreatedAt || 0);
+            state.storyEnd = Number(meCloud.storyExpiresAt || 0);
+            state.storyLabel = String(meCloud.storyTimeLabel || '');
+          }
           if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
           if (meCloud.accountType) {
             state.accountType = normalizeAccountType(meCloud.accountType);
@@ -3237,6 +3383,7 @@
             state.hideLastSeen = meCloud.hideLastSeen;
           }
         }
+        silentHealMediaAndPosts();
         persist();
       }
       renderMyProfile();
@@ -3358,11 +3505,23 @@
 
     function openUnifiedSearchModal() {
       try {
+        if (!getMyUid()) {
+          toast('Войдите в аккаунт, чтобы искать людей и бизнес');
+          return;
+        }
+        pingOnlinePresence();
         const inp = document.getElementById('unifiedSearchInput');
-        if (inp) inp.value = '';
+        if (inp) {
+          inp.value = '';
+          setTimeout(() => {
+            try { inp.focus(); } catch (e) {}
+          }, 60);
+        }
         setUnifiedSearchTab(unifiedSearchTab || 'all');
         document.getElementById('unifiedSearchModal')?.classList.add('open');
-      } catch (e) {}
+      } catch (e) {
+        toast('Не удалось открыть поиск');
+      }
     }
 
     function setUnifiedSearchTab(tab) {
@@ -3393,8 +3552,42 @@
     }
 
     function findSearchUserByUid(uid) {
-      if (!uid || !Array.isArray(users)) return null;
-      return users.find((u) => u && String(u.uid || '') === String(uid)) || null;
+      if (!uid) return null;
+      const strUid = String(uid);
+      if (Array.isArray(users)) {
+        const hit = users.find((u) => u && String(u.uid || '') === strUid);
+        if (hit) return hit;
+      }
+      if (Array.isArray(state.cachedUsers)) {
+        const cachedHit = state.cachedUsers.find((u) => u && String(u.uid || '') === strUid);
+        if (cachedHit) return cachedHit;
+      }
+      return null;
+    }
+
+    function getRegisteredSearchPool() {
+      const poolMap = new Map();
+      const allSources = [
+        ...(Array.isArray(state.cachedUsers) ? state.cachedUsers : []),
+        ...(Array.isArray(users) ? users : [])
+      ];
+      allSources.forEach((u) => {
+        if (!u || !u.uid) return;
+        const uidStr = String(u.uid).trim();
+        if (!uidStr || uidStr.startsWith('by_name:')) return;
+        const prev = poolMap.get(uidStr) || {};
+        poolMap.set(uidStr, {
+          ...prev,
+          ...u,
+          uid: uidStr,
+          fullName: String(u.fullName || prev.fullName || 'Участник').trim() || 'Участник',
+          accountType: normalizeAccountType(u.accountType || prev.accountType),
+          lastSeenMs: Math.max(Number(prev.lastSeenMs || 0), Number(u.lastSeenMs || 0)),
+          photoData: u.photoData || prev.photoData || '',
+          bio: u.bio || prev.bio || ''
+        });
+      });
+      return Array.from(poolMap.values());
     }
 
     async function onUnifiedSearchListClick(ev) {
@@ -3422,7 +3615,7 @@
           renderUnifiedSearch();
         } else if (action === 'accept_friend') {
           const reqId = String(target.getAttribute('data-req-id') || '').trim();
-          if (reqId && typeof acceptFriendReq === 'function') await acceptFriendReq(reqId, uid, safeName);
+          if (typeof acceptFriendReq === 'function') await acceptFriendReq(reqId, uid, safeName);
           renderUnifiedSearch();
         }
       } catch (e) {
@@ -3438,13 +3631,12 @@
 
         const myUid = String(getMyUid() || '');
         const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
-        const sourceUsers = Array.isArray(users) ? users : [];
-        const registeredAll = sourceUsers.filter((u) => u && u.uid);
+        const registeredAll = getRegisteredSearchPool();
 
         const matched = registeredAll
           .filter((u) => {
             const uidStr = String(u.uid);
-            const isBiz = u.accountType === 'business';
+            const isBiz = normalizeAccountType(u.accountType) === 'business';
             if (unifiedSearchTab === 'users' && isBiz) return false;
             if (unifiedSearchTab === 'business' && !isBiz) return false;
 
@@ -3466,11 +3658,11 @@
           });
 
         if (sumEl) {
-          sumEl.textContent = `Зарегистрировано в SÄT: ${registeredAll.length} • Показано: ${matched.length}`;
+          sumEl.textContent = `Зарегистрировано в SÄT: ${registeredAll.length} • Найдено: ${matched.length}`;
         }
 
         if (!matched.length) {
-          box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Попробуйте другое слово или имя.</div>';
+          box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Проверьте написание имени или выберите вкладку «Все».</div>';
           return;
         }
 
@@ -3478,20 +3670,20 @@
           const uidStr = String(u.uid);
           const isMe = Boolean(myUid && uidStr === myUid);
           const name = String(u.fullName || 'Участник');
-          const isBiz = u.accountType === 'business';
+          const isBiz = normalizeAccountType(u.accountType) === 'business';
           const badge = isBiz ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Бизнес</span>' : '';
           const meBadge = isMe ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Вы</span>' : '';
           const adLine = getLatestPostTextForUid(uidStr);
           const subDesc = adLine
-            ? `Объявление: ${adLine}`
-            : String(u.bio || (isBiz ? 'Дело / организация в SÄT' : 'Участник SÄT'));
+            ? `Публикация: ${adLine}`
+            : String(u.bio || (isBiz ? 'Зарегистрированный бизнес в SÄT' : 'Зарегистрированный участник SÄT'));
 
           let actionRight = '';
           if (!isMe) {
             const rel = typeof getFriendRel === 'function' ? getFriendRel(uidStr) : { status: 'none' };
-            let friendControl = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="add_friend" data-uid="${esc(uidStr)}">+ Друг</button>`;
-            if (rel.status === 'accepted') friendControl = '<span class="tag">Друг</span>';
-            else if (rel.status === 'outgoing') friendControl = '<span class="meta" style="font-size: 12px;">Заявка</span>';
+            let friendControl = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="add_friend" data-uid="${esc(uidStr)}">+ В друзья</button>`;
+            if (rel.status === 'accepted') friendControl = '<span class="tag">В друзьях</span>';
+            else if (rel.status === 'outgoing') friendControl = '<span class="meta" style="font-size: 12px;">Заявка отправлена</span>';
             else if (rel.status === 'incoming') friendControl = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="accept_friend" data-uid="${esc(uidStr)}" data-req-id="${esc(String(rel.id || ''))}">Принять</button>`;
 
             actionRight = `
@@ -3951,6 +4143,7 @@
     }
 
     function renderEverything() {
+      silentHealMediaAndPosts();
       renderMyProfile();
       renderPulse();
       renderBooksTab();
@@ -4454,6 +4647,7 @@
 
         const item = { id: clientPostId, ...payload };
         posts = [item, ...posts.filter((p) => (p.clientPostId || p.id) !== clientPostId)];
+        saveMediaVault(posts);
         renderPulse();
         renderMyPosts();
         renderUnifiedSearch();
@@ -4684,6 +4878,13 @@
 
     async function removePost(id) {
       posts = posts.filter((p) => p.id !== id);
+      try {
+        const v = loadMediaVault();
+        if (v.postsById && v.postsById[id]) {
+          delete v.postsById[id];
+          localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v));
+        }
+      } catch (e) {}
       renderPulse(); renderMyPosts(); renderUnifiedSearch();
       try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
       toast('Удалено');
@@ -4812,9 +5013,10 @@
     }
 
     function getFriendRel(otherUid) {
-      const myUid = getMyUid();
-      if (!myUid || !otherUid || otherUid === myUid) return { status: 'none' };
-      const r = friendsDocs.find((x) => (x.fromUid === myUid && x.toUid === otherUid) || (x.toUid === myUid && x.fromUid === otherUid));
+      const myUid = String(getMyUid() || '');
+      const targetUid = String(otherUid || '');
+      if (!myUid || !targetUid || targetUid === myUid) return { status: 'none' };
+      const r = friendsDocs.find((x) => x && ((x.fromUid === myUid && x.toUid === targetUid) || (x.toUid === myUid && x.fromUid === targetUid)));
       if (!r) return { status: 'none' };
       if (r.status === 'accepted') return { status: 'accepted', id: r.id };
       if (r.fromUid === myUid) return { status: 'outgoing', id: r.id };
@@ -4933,26 +5135,54 @@
     async function addFriend(toUid, toName) {
       try {
         const myUid = String(getMyUid() || '');
-        const safeToUid = String(toUid || '');
-        if (!myUid || !safeToUid || safeToUid === myUid) return;
+        const safeToUid = String(toUid || '').trim();
+        if (!myUid) {
+          toast('Сначала войдите в аккаунт');
+          return;
+        }
+        if (!safeToUid || safeToUid === myUid || safeToUid.startsWith('by_name:')) {
+          toast('Выберите зарегистрированного участника');
+          return;
+        }
+
+        const existingRel = getFriendRel(safeToUid);
+        if (existingRel.status === 'accepted') {
+          toast('Уже в друзьях');
+          return;
+        }
+        if (existingRel.status === 'outgoing') {
+          toast('Заявка уже отправлена');
+          return;
+        }
+
         const docId = 'req_' + [myUid, safeToUid].sort().join('_');
+        const targetUser = findSearchUserByUid(safeToUid);
+        const resolvedToName = String(toName || targetUser?.fullName || 'Участник');
+
         const payload = {
           fromUid: myUid,
           fromName: myDisplayName(),
           toUid: safeToUid,
-          toName: toName || 'Участник',
+          toName: resolvedToName,
           status: 'pending',
           createdAt: serverTimestamp()
         };
+
         const existingIdx = friendsDocs.findIndex((x) => x && x.id === docId);
         if (existingIdx >= 0) friendsDocs[existingIdx] = { ...friendsDocs[existingIdx], ...payload, id: docId };
         else friendsDocs = [{ id: docId, ...payload }, ...friendsDocs];
+        state.cachedRequests = friendsDocs.slice(0, 200);
+        persist();
+
         renderFriendsTab();
         renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
+
         const op = () => setDoc(doc(db, 'friendRequests', docId), payload, { merge: true });
-        op().catch(() => queueCloudRetry(op));
-        toast('Заявка отправлена');
+        await op().catch(() => {
+          queueCloudRetry(op);
+        });
+        toast('Заявка в друзья отправлена');
       } catch (e) {
         toast('Не удалось отправить заявку');
       }
@@ -4965,23 +5195,31 @@
           toast('Сначала войдите в аккаунт');
           return;
         }
-        const safeId = String(reqId || '').trim() || ('req_' + [myUid, String(fromUid || '')].sort().join('_'));
+        const safeFromUid = String(fromUid || '').trim();
+        const safeId = String(reqId || '').trim() || (safeFromUid ? ('req_' + [myUid, safeFromUid].sort().join('_')) : '');
         if (!safeId || safeId === 'req_') return;
 
         friendsDocs = friendsDocs.map((r) => (
-          r && (r.id === safeId || (r.fromUid === fromUid && r.toUid === myUid))
+          r && (r.id === safeId || (safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid))
             ? { ...r, id: safeId, status: 'accepted' }
             : r
         ));
+        state.cachedRequests = friendsDocs.slice(0, 200);
+        persist();
+
         renderFriendsTab();
         renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
 
-        const op = () => updateDoc(doc(db, 'friendRequests', safeId), {
+        const op = () => setDoc(doc(db, 'friendRequests', safeId), {
+          fromUid: safeFromUid || undefined,
+          toUid: myUid,
           status: 'accepted',
           acceptedAt: serverTimestamp()
+        }, { merge: true });
+        await op().catch(() => {
+          queueCloudRetry(op);
         });
-        op().catch(() => queueCloudRetry(op));
         toast(`Вы добавили ${String(fromName || 'участника')} в друзья`);
       } catch (e) {
         toast('Не удалось принять заявку');
@@ -4992,18 +5230,24 @@
       try {
         const myUid = String(getMyUid() || '');
         if (!myUid) return;
-        const safeId = String(reqId || '').trim() || ('req_' + [myUid, String(fromUid || '')].sort().join('_'));
+        const safeFromUid = String(fromUid || '').trim();
+        const safeId = String(reqId || '').trim() || (safeFromUid ? ('req_' + [myUid, safeFromUid].sort().join('_')) : '');
         if (!safeId || safeId === 'req_') return;
 
         friendsDocs = friendsDocs.filter((r) => (
-          r && r.id !== safeId && !(r.fromUid === fromUid && r.toUid === myUid && r.status === 'pending')
+          r && r.id !== safeId && !(safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid && r.status === 'pending')
         ));
+        state.cachedRequests = friendsDocs.slice(0, 200);
+        persist();
+
         renderFriendsTab();
         renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
 
         const op = () => deleteDoc(doc(db, 'friendRequests', safeId));
-        op().catch(() => queueCloudRetry(op));
+        await op().catch(() => {
+          queueCloudRetry(op);
+        });
         toast('Заявка отклонена');
       } catch (e) {
         toast('Не удалось отклонить заявку');
@@ -5840,6 +6084,7 @@
 
         try { localStorage.removeItem(STORE_KEY); } catch (e) {}
         try { localStorage.removeItem(VAULT_BACKUP_KEY); } catch (e) {}
+        try { localStorage.removeItem(MEDIA_VAULT_KEY); } catch (e) {}
 
         hideModal('deleteAccountModal');
         try { await signOut(auth); } catch (e) {}
@@ -5888,6 +6133,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {}));
     }
 
+    silentHealMediaAndPosts();
     renderBooksTab();
     renderFriendsTab();
     renderUnifiedSearch();

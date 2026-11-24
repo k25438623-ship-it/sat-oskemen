@@ -214,19 +214,6 @@
       gap: 6px;
     }
     .brand-row { display: flex; align-items: center; gap: 8px; }
-    .mini-logo {
-      width: 34px;
-      height: 34px;
-      border-radius: 12px 5px 12px 12px;
-      background: rgba(224, 159, 90, 0.16);
-      border: 1.5px solid var(--border-strong);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 18px;
-      color: var(--accent);
-    }
     .brand-text { font-weight: 900; font-size: 18px; letter-spacing: 1px; color: var(--accent); }
 
     .container { max-width: 600px; margin: 0 auto; padding: 14px 14px 28px; }
@@ -593,7 +580,7 @@
       text-align: center;
     }
 
-    .bottom-nav {
+    .bottom-nav-single {
       position: fixed;
       bottom: 0;
       left: 0;
@@ -603,8 +590,8 @@
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 6px 10px calc(8px + env(safe-area-inset-bottom));
-      gap: 6px;
+      padding: 6px 12px calc(8px + env(safe-area-inset-bottom));
+      gap: 8px;
     }
     .nav-btn {
       border: 1px solid transparent;
@@ -636,6 +623,10 @@
       background: var(--green-soft);
       border-color: var(--border-strong);
     }
+    .bottom-nav-profile-right {
+      grid-column: 3;
+      width: 100%;
+    }
 
     .side-menu-backdrop {
       position: fixed;
@@ -650,7 +641,7 @@
       position: fixed;
       top: 62px;
       left: 12px;
-      width: 256px;
+      width: 262px;
       max-width: calc(100vw - 24px);
       max-height: calc(100vh - 96px);
       overflow-y: auto;
@@ -712,7 +703,19 @@
       font-weight: 700;
       cursor: pointer;
     }
-    .side-drawer-item:hover { border-color: var(--border-strong); }
+    .side-drawer-item:hover, .side-drawer-item.selected {
+      border-color: var(--border-strong);
+      background: var(--green-soft);
+      color: var(--accent);
+    }
+
+    .left-sublist-box {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-left: 8px;
+      border-left: 2px solid var(--accent-2);
+    }
 
     .modal-bg {
       position: fixed;
@@ -1026,8 +1029,8 @@
   <section id="app" class="screen">
     <header class="topbar">
       <div class="brand-row">
-        <button type="button" id="leftDrawerBtn" class="btn btn-mint" style="padding: 7px 10px; font-size: 12.5px;" onclick="openLeftDrawerForPulseOrBooks()">
-          <span>← Разделы</span>
+        <button type="button" id="leftHamburgerBtn" class="btn btn-mint" style="padding: 8px 11px; font-size: 15px; line-height: 1;" onclick="openLeftSectionsMenu()">
+          <span>☰</span>
         </button>
         <div class="brand-text">SÄT</div>
       </div>
@@ -1248,7 +1251,7 @@
 
     <aside id="leftSectionDrawer" class="left-section-drawer" onclick="event.stopPropagation()">
       <div class="side-drawer-title">
-        <span id="leftDrawerHeading">Раздел</span>
+        <span id="leftDrawerHeading">Разделы</span>
         <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
       </div>
       <div id="leftDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
@@ -1262,16 +1265,8 @@
       <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
     </aside>
 
-    <nav class="bottom-nav">
-      <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
-        <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
-        <span>Пульс</span>
-      </button>
-      <button type="button" class="nav-btn" data-tab="books" onclick="switchMainTab('books', this)">
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        <span>Книги</span>
-      </button>
-      <button type="button" class="nav-btn active" data-tab="profile" onclick="switchMainTab('profile', this)">
+    <nav class="bottom-nav-single">
+      <button type="button" class="nav-btn active bottom-nav-profile-right" data-tab="profile" onclick="switchMainTab('profile', this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span>Профиль</span>
       </button>
@@ -1792,6 +1787,8 @@
         }
       ];
 
+      let leftExpandedSection = null;
+
       function showThemeToast(msg) {
         try {
           const t = document.getElementById('toast');
@@ -1851,50 +1848,33 @@
       };
 
       window.closeAllSideDrawers = function () {
+        leftExpandedSection = null;
         document.getElementById('leftSectionDrawer')?.classList.remove('open');
         document.getElementById('rightProfileDrawer')?.classList.remove('open');
         document.getElementById('sideMenuBackdrop')?.classList.remove('open');
       };
 
-      function fillDrawerList(containerId, items) {
-        const box = document.getElementById(containerId);
-        if (!box) return;
-        box.innerHTML = '';
-        items.forEach((it) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'side-drawer-item';
-          btn.textContent = it.label;
-          btn.onclick = () => {
-            window.closeAllSideDrawers();
-            if (typeof it.fn === 'function') it.fn();
-          };
-          box.appendChild(btn);
-        });
-      }
-
-      window.openLeftDrawerForPulseOrBooks = function () {
-        const activePanel = document.querySelector('.tab-panel.active');
-        const currentTab = activePanel ? activePanel.id.replace('tab-', '') : 'pulse';
-        const targetTab = currentTab === 'books' ? 'books' : 'pulse';
-
-        if (currentTab !== targetTab && typeof window.switchMainTab === 'function') {
-          const navBtn = document.querySelector('.nav-btn[data-tab="' + targetTab + '"]');
-          window.switchMainTab(targetTab, navBtn || null);
-        }
-
+      function renderLeftRootList() {
         const heading = document.getElementById('leftDrawerHeading');
-        let items = [];
-        if (targetTab === 'books') {
-          if (heading) heading.textContent = 'Книги — слева';
-          items = [
-            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
-            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
-            { label: '+ Добавить текст', fn: () => window.openAddReadingModal?.() }
-          ];
-        } else {
-          if (heading) heading.textContent = 'Пульс — слева';
-          items = [
+        const box = document.getElementById('leftDrawerItems');
+        if (!box) return;
+        if (heading) heading.textContent = 'Разделы';
+        box.innerHTML = '';
+
+        const pulsePick = document.createElement('button');
+        pulsePick.type = 'button';
+        pulsePick.className = 'side-drawer-item' + (leftExpandedSection === 'pulse' ? ' selected' : '');
+        pulsePick.textContent = leftExpandedSection === 'pulse' ? '▾ Пульс' : '▸ Пульс';
+        pulsePick.onclick = () => {
+          leftExpandedSection = leftExpandedSection === 'pulse' ? null : 'pulse';
+          renderLeftRootList();
+        };
+        box.appendChild(pulsePick);
+
+        if (leftExpandedSection === 'pulse') {
+          const pSub = document.createElement('div');
+          pSub.className = 'left-sublist-box';
+          const pulseItems = [
             { label: 'Все темы', fn: () => window.setPulseFilter?.('all') },
             { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
             { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
@@ -1903,10 +1883,70 @@
             { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
             { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
           ];
+          pulseItems.forEach((it) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'side-drawer-item';
+            btn.textContent = it.label;
+            btn.onclick = () => {
+              window.closeAllSideDrawers();
+              const pBtn = document.querySelector('.nav-btn[data-tab="pulse"]');
+              if (typeof window.switchMainTab === 'function') window.switchMainTab('pulse', pBtn || null);
+              if (typeof it.fn === 'function') it.fn();
+            };
+            pSub.appendChild(btn);
+          });
+          box.appendChild(pSub);
         }
 
-        fillDrawerList('leftDrawerItems', items);
+        const booksPick = document.createElement('button');
+        booksPick.type = 'button';
+        booksPick.className = 'side-drawer-item' + (leftExpandedSection === 'books' ? ' selected' : '');
+        booksPick.textContent = leftExpandedSection === 'books' ? '▾ Книги' : '▸ Книги';
+        booksPick.onclick = () => {
+          leftExpandedSection = leftExpandedSection === 'books' ? null : 'books';
+          renderLeftRootList();
+        };
+        box.appendChild(booksPick);
+
+        if (leftExpandedSection === 'books') {
+          const bSub = document.createElement('div');
+          bSub.className = 'left-sublist-box';
+          const bookItems = [
+            { label: 'Краткие истории', fn: () => window.switchReadingSubtab?.('stories') },
+            { label: 'Советы дня', fn: () => window.switchReadingSubtab?.('tips') },
+            { label: '+ Добавить текст', fn: () => window.openAddReadingModal?.() }
+          ];
+          bookItems.forEach((it) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'side-drawer-item';
+            btn.textContent = it.label;
+            btn.onclick = () => {
+              window.closeAllSideDrawers();
+              const bBtn = document.querySelector('.nav-btn[data-tab="books"]');
+              if (typeof window.switchMainTab === 'function') window.switchMainTab('books', bBtn || null);
+              if (typeof it.fn === 'function') it.fn();
+            };
+            bSub.appendChild(btn);
+          });
+          box.appendChild(bSub);
+        }
+      }
+
+      window.openLeftSectionsMenu = function () {
         document.getElementById('rightProfileDrawer')?.classList.remove('open');
+        const isOpen = document.getElementById('leftSectionDrawer')?.classList.contains('open');
+        if (isOpen) {
+          window.closeAllSideDrawers();
+          return;
+        }
+        if (!leftExpandedSection) {
+          const activePanel = document.querySelector('.tab-panel.active');
+          const curTab = activePanel ? activePanel.id.replace('tab-', '') : '';
+          leftExpandedSection = curTab === 'books' ? 'books' : (curTab === 'pulse' ? 'pulse' : null);
+        }
+        renderLeftRootList();
         document.getElementById('sideMenuBackdrop')?.classList.add('open');
         document.getElementById('leftSectionDrawer')?.classList.add('open');
       };
@@ -1920,6 +1960,8 @@
         }
 
         const heading = document.getElementById('rightDrawerHeading');
+        const box = document.getElementById('rightDrawerItems');
+        if (!box) return;
         if (heading) heading.textContent = 'Профиль — меню';
 
         const items = [
@@ -1932,23 +1974,23 @@
           { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
         ];
 
-        fillDrawerList('rightDrawerItems', items);
+        box.innerHTML = '';
+        items.forEach((it) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'side-drawer-item';
+          btn.textContent = it.label;
+          btn.onclick = () => {
+            window.closeAllSideDrawers();
+            if (typeof it.fn === 'function') it.fn();
+          };
+          box.appendChild(btn);
+        });
+
+        leftExpandedSection = null;
         document.getElementById('leftSectionDrawer')?.classList.remove('open');
         document.getElementById('sideMenuBackdrop')?.classList.add('open');
         document.getElementById('rightProfileDrawer')?.classList.add('open');
-      };
-
-      window.syncHeaderSideButtons = function (tabName) {
-        const leftBtn = document.getElementById('leftDrawerBtn');
-        const rightBtn = document.getElementById('rightProfileDrawerBtn');
-        if (leftBtn) {
-          leftBtn.style.display = (tabName === 'pulse' || tabName === 'books') ? 'inline-flex' : 'none';
-          const lbl = leftBtn.querySelector('span');
-          if (lbl) lbl.textContent = tabName === 'books' ? '← Книги' : '← Пульс';
-        }
-        if (rightBtn) {
-          rightBtn.style.display = tabName === 'profile' ? 'inline-flex' : 'none';
-        }
       };
 
       let initial = 'amber_dark';
@@ -2001,7 +2043,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v38';
+    const STORE_KEY = 'sat_clean_state_v39';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -2151,6 +2193,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v38',
         'sat_clean_state_v37',
         'sat_clean_state_v36',
         'sat_clean_state_v35',
@@ -3480,7 +3523,6 @@
       document.querySelectorAll('.nav-btn').forEach((b) => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
       else document.querySelector(`.nav-btn[data-tab="${nextTab}"]`)?.classList.add('active');
-      window.syncHeaderSideButtons?.(nextTab);
       renderEverything();
     }
 
@@ -3511,9 +3553,6 @@
     }
 
     function renderEverything() {
-      const activePanel = document.querySelector('.tab-panel.active');
-      const curTab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
-      window.syncHeaderSideButtons?.(curTab);
       renderMyProfile();
       renderPulse();
       renderBooksTab();
@@ -5435,7 +5474,6 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {}));
     }
 
-    window.syncHeaderSideButtons?.('profile');
     renderBooksTab();
     renderFriendsTab();
     renderUnifiedSearch();

@@ -1359,6 +1359,21 @@
         { id: 'bg5', name: 'Сливовый вечер', desc: 'Тёмный вечерний фиолет', bg: 'linear-gradient(165deg, #0f0a17 0%, #1e142e 55%, #2d1e45 100%)' }
       ];
 
+      function showBackgroundToast(msg) {
+        try {
+          const t = document.getElementById('toast');
+          if (!t) return;
+          t.textContent = String(msg || '');
+          t.classList.add('show');
+          clearTimeout(window._bgToastT);
+          window._bgToastT = setTimeout(() => t.classList.remove('show'), 2000);
+        } catch (e) {}
+      }
+
+      if (typeof window.toast !== 'function') {
+        window.toast = showBackgroundToast;
+      }
+
       function applySimpleBackground(id) {
         const item = SIMPLE_BACKGROUNDS.find((x) => x.id === id) || SIMPLE_BACKGROUNDS[0];
         try { localStorage.setItem('sat_simple_bg', item.id); } catch (e) {}
@@ -1388,12 +1403,9 @@
       window.selectSimpleBackground = function (id) {
         applySimpleBackground(id);
         const item = SIMPLE_BACKGROUNDS.find((x) => x.id === id);
-        const t = document.getElementById('toast');
-        if (t && item) {
-          t.textContent = 'Фон: ' + item.name;
-          t.classList.add('show');
-          clearTimeout(window._bgToastT);
-          window._bgToastT = setTimeout(() => t.classList.remove('show'), 2000);
+        if (item) {
+          if (typeof window.toast === 'function') window.toast('Фон: ' + item.name);
+          else showBackgroundToast('Фон: ' + item.name);
         }
       };
 
@@ -1447,7 +1459,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v31';
+    const STORE_KEY = 'sat_clean_state_v32';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
@@ -1495,6 +1507,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v31',
         'sat_clean_state_v30',
         'sat_clean_state_v29',
         'sat_clean_state_v28',
@@ -1600,14 +1613,26 @@
         .replace(/'/g, '&#39;');
     }
 
-    function toast(msg) {
-      const el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.classList.add('show');
-      clearTimeout(toast._t);
-      toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+    function safeToast(msg) {
+      try {
+        const el = document.getElementById('toast');
+        if (!el) return;
+        el.textContent = String(msg || '');
+        el.classList.add('show');
+        clearTimeout(safeToast._t);
+        safeToast._t = setTimeout(() => el.classList.remove('show'), 2600);
+      } catch (e) {}
     }
+
+    function toast(msg) {
+      if (typeof window.toast === 'function' && window.toast !== toast) {
+        window.toast(msg);
+      } else {
+        safeToast(msg);
+      }
+    }
+
+    window.toast = safeToast;
 
     function playTone(type) {
       try {
@@ -3503,6 +3528,10 @@
           const blob = new Blob(voiceChunks, { type: voiceRecorder?.mimeType || 'audio/webm' });
           voiceChunks = [];
           if (!blob.size) return;
+          if (blob.size > 750000) {
+            toast('Запись слишком длинная — запишите покороче');
+            return;
+          }
           const r = new FileReader();
           r.onload = () => {
             pendingVoiceDraft = { audioData: String(r.result || ''), durSec: dur };
@@ -3513,7 +3542,7 @@
           r.readAsDataURL(blob);
         };
         voiceRecorder.start();
-        st.textContent = 'Идёт HD запись с шумоподавлением... Нажмите «Остановить»';
+        st.textContent = 'Идёт чистая HD запись... Нажмите «Остановить»';
       }, 2000);
     }
 
@@ -3613,6 +3642,53 @@
       toast(callMuted ? 'Микрофон выключен' : 'Микрофон включён');
     }
 
+    async function flushRemoteIceQueue(targetPeerConnection, queue) {
+      if (!targetPeerConnection || !targetPeerConnection.remoteDescription || !Array.isArray(queue)) return;
+      while (queue.length) {
+        const cand = queue.shift();
+        try {
+          await targetPeerConnection.addIceCandidate(new RTCIceCandidate(cand));
+        } catch (e) {}
+      }
+    }
+
+    function attachIceExchange(peerConn, callId, role) {
+      const myRole = role === 'caller' ? 'callerCandidates' : 'calleeCandidates';
+      const remoteRole = role === 'caller' ? 'calleeCandidates' : 'callerCandidates';
+      const remoteIceQueue = [];
+
+      peerConn.onicecandidate = (ev) => {
+        if (!ev.candidate || !callId) return;
+        const candObj = ev.candidate.toJSON ? ev.candidate.toJSON() : {
+          candidate: ev.candidate.candidate,
+          sdpMid: ev.candidate.sdpMid,
+          sdpMLineIndex: ev.candidate.sdpMLineIndex
+        };
+        addDoc(collection(db, 'calls', callId, myRole), candObj).catch(() => {});
+      };
+
+      peerConn.onconnectionstatechange = () => {
+        const stEl = document.getElementById('callStatusText');
+        if (!stEl) return;
+        if (peerConn.connectionState === 'connected') {
+          stEl.textContent = 'HD связь активна';
+        } else if (peerConn.connectionState === 'failed' || peerConn.connectionState === 'disconnected') {
+          stEl.textContent = 'Связь прервалась';
+        }
+      };
+
+      const iceUnsub = onSnapshot(collection(db, 'calls', callId, remoteRole), async (snap) => {
+        snap.docChanges().forEach((ch) => {
+          if (ch.type === 'added') {
+            remoteIceQueue.push(ch.doc.data());
+          }
+        });
+        await flushRemoteIceQueue(peerConn, remoteIceQueue);
+      }, () => {});
+
+      return { iceUnsub, remoteIceQueue };
+    }
+
     async function acceptIncomingCall() {
       if (!incomingCallData || !incomingCallData.offer) return;
       const callObj = incomingCallData;
@@ -3635,7 +3711,10 @@
           }
         };
         callDocId = callObj.id;
+        const iceCtx = attachIceExchange(pc, callObj.id, 'callee');
+        callUnsub = iceCtx.iceUnsub;
         await pc.setRemoteDescription(new RTCSessionDescription(callObj.offer));
+        await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         await updateDoc(doc(db, 'calls', callObj.id), {
@@ -3676,6 +3755,8 @@
         callDocId = newId;
         openFullCallUi(peerName, 'Идут гудки... • Шумоподавление');
         startRingingLoop('ringback');
+        const iceCtx = attachIceExchange(pc, newId, 'caller');
+        callUnsub = iceCtx.iceUnsub;
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
         await setDoc(doc(db, 'calls', newId), {
@@ -3695,6 +3776,7 @@
             const stEl = document.getElementById('callStatusText');
             if (stEl) stEl.textContent = 'HD связь активна';
             await pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(() => {});
+            await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
           } else if (d.status === 'ended' || d.status === 'declined') {
             hangupCall(false);
             toast('Звонок завершён');

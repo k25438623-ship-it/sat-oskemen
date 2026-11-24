@@ -342,6 +342,7 @@
     }
 
     .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+    .subtabs-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
     .subtabs-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
     .subtabs-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
 
@@ -502,7 +503,7 @@
       backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
       gap: 8px;
     }
@@ -865,6 +866,25 @@
         <div id="feedContainer"></div>
       </div>
 
+      <div id="tab-books" class="tab-panel">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 18px;">Книги</h3>
+              <div class="meta">Краткие истории и советы дня</div>
+            </div>
+            <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="openAddReadingModal()">+ Добавить</button>
+          </div>
+
+          <div class="subtabs-2">
+            <button type="button" id="bSubStories" class="sub-btn active" onclick="switchReadingSubtab('stories')">Краткие истории</button>
+            <button type="button" id="bSubTips" class="sub-btn" onclick="switchReadingSubtab('tips')">Советы дня</button>
+          </div>
+        </div>
+
+        <div id="booksListContainer"></div>
+      </div>
+
       <div id="tab-profile" class="tab-panel active">
         <div class="card">
           <div class="profile-top">
@@ -995,6 +1015,10 @@
         <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
         <span>Пульс</span>
       </button>
+      <button type="button" class="nav-btn" data-tab="books" onclick="switchMainTab('books', this)">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span>Книги</span>
+      </button>
       <button type="button" class="nav-btn active" data-tab="profile" onclick="switchMainTab('profile', this)">
         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span>Профиль</span>
@@ -1040,6 +1064,44 @@
       <div id="peerPanelInfo" class="card" style="display: none;"><div id="peerInfoBox"></div></div>
     </div>
   </section>
+
+  <div id="readingViewerModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div style="min-width: 0; flex: 1;">
+          <h3 id="readingModalTitle" style="margin: 0; font-size: 18px;">Заголовок</h3>
+          <div id="readingModalMeta" class="meta">Раздел</div>
+        </div>
+        <div style="display: flex; gap: 6px; flex-shrink: 0;">
+          <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
+          <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(2)">А+</button>
+          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('readingViewerModal')">✕</button>
+        </div>
+      </div>
+      <div id="readingModalBody" style="margin-top: 14px; font-size: 16px; line-height: 1.68; white-space: pre-line;"></div>
+    </div>
+  </div>
+
+  <div id="addReadingModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 10px; font-size: 18px;">Добавить в «Книги»</h3>
+      <label class="meta">Раздел</label>
+      <select id="readingKindSelect">
+        <option value="stories">Краткие истории</option>
+        <option value="tips">Советы дня</option>
+      </select>
+      <label class="meta" style="display: block; margin-top: 10px;">Заголовок</label>
+      <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
+      <label class="meta" style="display: block; margin-top: 10px;">Короткое описание</label>
+      <input id="readingDescInput" class="input" placeholder="О чём текст..." />
+      <label class="meta" style="display: block; margin-top: 10px;">Текст</label>
+      <textarea id="readingContentInput" rows="6" placeholder="Напишите текст..."></textarea>
+      <div class="actions" style="margin-top: 14px;">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('addReadingModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveNewReadingItem()">Сохранить</button>
+      </div>
+    </div>
+  </div>
 
   <div id="namazQiblaModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1462,6 +1524,73 @@
     const STORE_KEY = 'sat_clean_state_v32';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
+    const INITIAL_READING_ITEMS = [
+      {
+        id: 'story_call_no_reason',
+        kind: 'stories',
+        title: 'Звонок без повода',
+        audience: 'Для взрослых и молодёжи',
+        summary: 'О том, как мы откладываем важные разговоры на потом и как один простой звонок возвращает тепло.',
+        content: 'В будни всегда кажется, что времени мало: работа, учёба, дорога, список мелких задач. Мы говорим себе: «Позвоню на выходных, когда освобожусь».\n\nНо часто именно в обычный вечер наступает момент, когда кому-то рядом или в другом городе важно просто услышать твой спокойный голос — без повода и долгих объяснений.\n\nОдин честный звонок иногда лечит тишину лучше, чем десятки отложенных планов.'
+      },
+      {
+        id: 'story_fourth_year_room',
+        kind: 'stories',
+        title: 'Комната на четвёртом курсе',
+        audience: 'Для молодёжи',
+        summary: 'О сомнениях перед следующим шагом, сравнении с другими и умении идти в своём темпе.',
+        content: 'Когда вокруг кажется, что все уже всё решили и знают свой путь, легко начать сомневаться в каждом своём шаге.\n\nНа самом деле у каждого свой ритм взросления. Кто-то находит своё дело раньше, кто-то — через ошибки и поиски, но честный шаг вперёд всегда ценнее красивой картинки со стороны.\n\nНе спеши сверять свою жизнь по чужому таймеру — береги свой путь и не бойся учиться заново.'
+      },
+      {
+        id: 'story_light_across',
+        kind: 'stories',
+        title: 'Свет в окне напротив',
+        audience: 'Для взрослых',
+        summary: 'О человеке, который привык нести ответственность за всех, и о том, почему важно позволить себе опереться на других.',
+        content: 'Когда человек годами привыкает быть надёжной опорой для семьи, коллег и друзей, он часто перестаёт замечать собственную усталость.\n\nКажется, что попросить помощи или просто признаться «мне сейчас тяжело» — значит проявить слабость.\n\nНа самом деле настоящая зрелость в том, чтобы помнить: ты не обязан тянуть весь мир в одиночку. Позволить близким быть рядом — это тоже доверие и тепло.'
+      },
+      {
+        id: 'story_bridge_in_fog',
+        kind: 'stories',
+        title: 'Мост в тумане',
+        audience: 'Жизненная история',
+        summary: 'О молчании, догадках и смелости сделать шаг навстречу первому честному разговору.',
+        content: 'Когда над рекой ложится туман, кажется, что впереди нет дороги. Но берег никуда не пропадает — он просто скрыт за плотной завесой.\n\nТак бывает и между людьми: мы можем месяцами молчать, додумывая чужие мысли, хотя всё решается одним спокойным вопросом без упрёков.\n\nСделать первый шаг навстречу — не поражение, а выбор живого диалога вместо пустой тишины.'
+      },
+      {
+        id: 'tip_1',
+        kind: 'tips',
+        title: 'Не путай скорость с направлением',
+        audience: 'Совет дня',
+        summary: 'Остановитесь на пять минут и проверьте, туда ли ведут сегодняшние дела.',
+        content: 'Если день кажется слишком шумным, задайте себе один простой вопрос:\n«То, на что я сейчас трачу силы, будет иметь значение через год?»\n\nЕсли нет — смело убирайте лишний шум и оставьте место для главного.'
+      },
+      {
+        id: 'tip_2',
+        kind: 'tips',
+        title: 'Слово, сказанное спокойно, слышно дальше',
+        audience: 'Совет дня',
+        summary: 'Сохраняйте внутренний ритм даже там, где вокруг повышают голос.',
+        content: 'В резком разговоре хочется ответить быстрее и громче, но спокойный тон почти всегда меняет атмосферу сильнее.\n\nБерегите выдержку — она помогает не сказать лишнего и увидеть суть ситуации.'
+      },
+      {
+        id: 'tip_3',
+        kind: 'tips',
+        title: 'Маленькая верность себе',
+        audience: 'Совет дня',
+        summary: 'Уважение к себе растёт из небольших обещаний, которые вы держите без свидетелей.',
+        content: 'Не ждите особого дня, чтобы начать относиться к себе бережно.\n\nСделайте одно небольшое дело, которое давно откладывали, и дайте себе вечером время на отдых без чувства вины.'
+      },
+      {
+        id: 'tip_4',
+        kind: 'tips',
+        title: 'Берегите внимание от лишнего шума',
+        audience: 'Совет дня',
+        summary: 'Оставьте часть вечера для живого общения, книги или тишины.',
+        content: 'Внимание — главный ресурс дня. Не отдавайте его целиком чужим спорам и бесконечной ленте.\n\nЧас спокойного внимания к себе и тем, кто вам дорог, приносит больше сил, чем часы суеты.'
+      }
+    ];
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -1564,6 +1693,10 @@
     let chats = [];
     let supportTickets = [];
     let appErrorLogs = [];
+    let readingItems = [...INITIAL_READING_ITEMS];
+    let readingSubtab = 'stories';
+    let readingFontSize = 16;
+    const readingByIdMap = new Map(INITIAL_READING_ITEMS.map((item) => [item.id, item]));
     let pulseFilter = 'all';
     let pickTarget = 'avatar';
     let draftPostPhoto = '';
@@ -2045,6 +2178,24 @@
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
+    onSnapshot(collection(db, 'books'), (snap) => {
+      const cloudBooks = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const merged = new Map();
+      INITIAL_READING_ITEMS.forEach((item) => merged.set(item.id, item));
+      cloudBooks.forEach((item) => {
+        const kind = item.kind === 'tips' ? 'tips' : 'stories';
+        merged.set(item.id, {
+          ...item,
+          kind,
+          audience: item.audience || (kind === 'tips' ? 'Совет дня' : 'Краткая история')
+        });
+      });
+      readingItems = Array.from(merged.values());
+      readingByIdMap.clear();
+      readingItems.forEach((item) => readingByIdMap.set(item.id, item));
+      renderBooksTab();
+    }, () => {});
+
     onSnapshot(collection(db, 'users'), (snap) => {
       const fresh = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       if (fresh.length) {
@@ -2175,6 +2326,99 @@
         renderOskemenPrayerUI();
       }
     }, () => {});
+
+    function switchReadingSubtab(sub) {
+      readingSubtab = sub === 'tips' ? 'tips' : 'stories';
+      document.getElementById('bSubStories')?.classList.toggle('active', readingSubtab === 'stories');
+      document.getElementById('bSubTips')?.classList.toggle('active', readingSubtab === 'tips');
+      renderBooksTab();
+    }
+
+    function renderBooksTab() {
+      const box = document.getElementById('booksListContainer');
+      if (!box) return;
+      const list = readingItems.filter((item) => (item.kind === 'tips' ? 'tips' : 'stories') === readingSubtab);
+      if (!list.length) {
+        box.innerHTML = `<div class="card"><div class="meta">${readingSubtab === 'tips' ? 'Советов дня пока нет.' : 'Кратких историй пока нет.'}</div></div>`;
+        return;
+      }
+      const badgeText = readingSubtab === 'tips' ? 'Совет дня' : 'Краткая история';
+      box.innerHTML = list.map((item) => `
+        <article class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+            <div style="min-width: 0; flex: 1;">
+              <div class="user-name">${esc(item.title || 'Без названия')}</div>
+              <div class="meta" style="margin-top: 3px;">${esc(item.audience || badgeText)}</div>
+            </div>
+            <span class="tag">${esc(badgeText)}</span>
+          </div>
+          ${item.summary ? `<div style="margin-top: 10px; font-size: 14.5px; line-height: 1.48; color: #d8ece2;">${esc(item.summary)}</div>` : ''}
+          <div class="actions" style="margin-top: 12px;">
+            <button type="button" class="btn btn-primary" style="flex: 1;" onclick="openReadingItem('${esc(item.id)}')">Читать</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function openReadingItem(id) {
+      const item = readingByIdMap.get(id);
+      if (!item) {
+        toast('Текст не найден');
+        return;
+      }
+      document.getElementById('readingModalTitle').textContent = item.title || 'Текст';
+      document.getElementById('readingModalMeta').textContent = item.audience || (item.kind === 'tips' ? 'Совет дня' : 'Краткая история');
+      const bodyEl = document.getElementById('readingModalBody');
+      if (bodyEl) {
+        bodyEl.textContent = item.content || item.summary || '';
+        bodyEl.style.fontSize = `${readingFontSize}px`;
+      }
+      document.getElementById('readingViewerModal')?.classList.add('open');
+    }
+
+    function changeReadingFont(delta) {
+      readingFontSize = Math.min(24, Math.max(13, readingFontSize + delta));
+      const bodyEl = document.getElementById('readingModalBody');
+      if (bodyEl) bodyEl.style.fontSize = `${readingFontSize}px`;
+    }
+
+    function openAddReadingModal() {
+      const sel = document.getElementById('readingKindSelect');
+      if (sel) sel.value = readingSubtab;
+      document.getElementById('addReadingModal')?.classList.add('open');
+    }
+
+    async function saveNewReadingItem() {
+      const kind = document.getElementById('readingKindSelect')?.value === 'tips' ? 'tips' : 'stories';
+      const title = document.getElementById('readingTitleInput')?.value.trim() || '';
+      const summary = document.getElementById('readingDescInput')?.value.trim() || '';
+      const content = document.getElementById('readingContentInput')?.value.trim() || '';
+      if (!title || !content) {
+        toast('Укажите заголовок и текст');
+        return;
+      }
+      const newItem = {
+        kind,
+        audience: kind === 'tips' ? 'Совет дня' : 'Краткая история',
+        title,
+        summary,
+        content,
+        authorUid: getMyUid() || 'guest',
+        createdAt: serverTimestamp()
+      };
+      document.getElementById('readingTitleInput').value = '';
+      document.getElementById('readingDescInput').value = '';
+      document.getElementById('readingContentInput').value = '';
+      hideModal('addReadingModal');
+
+      try {
+        await addDoc(collection(db, 'books'), newItem);
+        toast(kind === 'tips' ? 'Совет дня добавлен' : 'История добавлена');
+      } catch (e) {
+        queueCloudRetry(() => addDoc(collection(db, 'books'), newItem));
+        toast('Сохраним при восстановлении связи');
+      }
+    }
 
     function switchCreatorTab(tab) {
       document.getElementById('cTabTickets')?.classList.toggle('active', tab === 'tickets');
@@ -2330,6 +2574,7 @@
     function renderEverything() {
       renderMyProfile();
       renderPulse();
+      renderBooksTab();
       renderMyPosts();
       renderFriendsTab();
       renderGroupsTab();
@@ -3977,6 +4222,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab, setPulseFilter,
+      switchReadingSubtab, openReadingItem, changeReadingFont, openAddReadingModal, saveNewReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
       onSupportTitleTripleTap, unlockCreatorByCode,
       openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket,
@@ -3999,6 +4245,7 @@
       window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {}));
     }
 
+    renderBooksTab();
     renderFriendsTab();
     renderProfileChatsList();
     renderOskemenPrayerUI();

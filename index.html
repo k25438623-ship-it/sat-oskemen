@@ -558,6 +558,7 @@
     #captionBox { z-index: 85; }
     #avatarChoiceModal { z-index: 90; }
     #namazQiblaModal { z-index: 92; }
+    #supportModal { z-index: 94; }
 
     .viewer-screen {
       position: fixed;
@@ -963,6 +964,16 @@
             <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openNamazQiblaModal()">Открыть</button>
           </div>
         </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Техподдержка</h3>
+              <div id="supportCardSub" class="meta">Написать в техподдержку SÄT</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Открыть</button>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -1070,6 +1081,44 @@
           <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="togglePrayerEditor(false)">Отмена</button>
           <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveManualOskemenTimes()">Сохранить для всех</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="supportModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div onclick="onSupportTitleTripleTap()">
+          <h3 id="supportModalTitle" style="margin: 0; font-size: 18px;">Техподдержка SÄT</h3>
+          <div id="supportModalSub" class="meta">Опишите вопрос или обращение</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
+      </div>
+
+      <div id="userSupportForm" style="margin-top: 12px;">
+        <textarea id="supportMsgInput" rows="3" placeholder="Напишите ваше обращение в техподдержку..."></textarea>
+        <div class="actions" style="margin-top: 10px;">
+          <button type="button" class="btn btn-primary" style="width: 100%;" onclick="sendSupportMessage()">Отправить</button>
+        </div>
+      </div>
+
+      <div id="creatorCodeBox" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
+        <input id="creatorCodeInput" class="input" type="password" placeholder="Код доступа" onkeydown="if(event.key==='Enter') unlockCreatorByCode()" />
+        <div class="actions" style="margin-top: 8px;">
+          <button type="button" class="btn btn-mint" style="width: 100%;" onclick="unlockCreatorByCode()">Войти</button>
+        </div>
+      </div>
+
+      <div id="creatorOnlyPanel" style="display: none; margin-top: 14px;">
+        <div class="subtabs-3">
+          <button type="button" id="cTabTickets" class="sub-btn active" onclick="switchCreatorTab('tickets')">Обращения</button>
+          <button type="button" id="cTabUsers" class="sub-btn" onclick="switchCreatorTab('users')">Люди</button>
+          <button type="button" id="cTabErrors" class="sub-btn" onclick="switchCreatorTab('errors')">Ошибки</button>
+        </div>
+
+        <div id="cPanelTickets"></div>
+        <div id="cPanelUsers" style="display: none;"></div>
+        <div id="cPanelErrors" style="display: none;"></div>
       </div>
     </div>
   </div>
@@ -1364,10 +1413,12 @@
       appId: "1:622960056003:web:8182bc730dff46ed02f476"
     };
 
+    const CREATOR_UNLOCK_CODE = '7777';
+    const CREATOR_UNLOCK_KEY = 'sat_creator_unlocked_v1';
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v26';
+    const STORE_KEY = 'sat_clean_state_v28';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
@@ -1415,6 +1466,8 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v27',
+        'sat_clean_state_v26',
         'sat_clean_state_v25',
         'sat_clean_state_v24',
         'sat_clean_state_v23',
@@ -1464,6 +1517,8 @@
     let users = [...state.cachedUsers];
     let friendsDocs = [...state.cachedRequests];
     let chats = [];
+    let supportTickets = [];
+    let appErrorLogs = [];
     let pulseFilter = 'all';
     let pickTarget = 'avatar';
     let draftPostPhoto = '';
@@ -1477,8 +1532,14 @@
     let editingMsgId = null;
     let prayerEditOpen = false;
     let initialChatsLoaded = false;
+    let initialTicketsLoaded = false;
+    let initialErrorsLoaded = false;
     let isSubmittingPost = false;
+    let titleTapCount = 0;
+    let titleTapTimer = null;
     const notifiedChatLastMsg = new Map();
+    const seenTicketIds = new Set();
+    const seenErrorIds = new Set();
     const retryQueue = [];
     const photoViewerRegistry = new Map();
 
@@ -1593,25 +1654,6 @@
       }
     }, 4500);
 
-    window.addEventListener('error', (ev) => {
-      state.lastSilentError = {
-        time: Date.now(),
-        msg: ev?.message || 'error',
-        line: ev?.lineno || 0
-      };
-      persist();
-      return true;
-    });
-
-    window.addEventListener('unhandledrejection', (ev) => {
-      state.lastSilentError = {
-        time: Date.now(),
-        msg: String(ev?.reason?.message || ev?.reason || 'promise_error')
-      };
-      persist();
-      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
-    });
-
     function getMyUid() {
       return currentUser?.uid || state.lastUid || '';
     }
@@ -1623,6 +1665,80 @@
     function myAvatarUrl() {
       return state.avatar || currentUser?.photoURL || '';
     }
+
+    function isCreatorAccount() {
+      try {
+        return localStorage.getItem(CREATOR_UNLOCK_KEY) === '1';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function onSupportTitleTripleTap() {
+      titleTapCount += 1;
+      clearTimeout(titleTapTimer);
+      titleTapTimer = setTimeout(() => { titleTapCount = 0; }, 700);
+      if (titleTapCount >= 3) {
+        titleTapCount = 0;
+        const box = document.getElementById('creatorCodeBox');
+        if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+      }
+    }
+
+    function unlockCreatorByCode() {
+      const inp = document.getElementById('creatorCodeInput');
+      const val = (inp ? inp.value : '').trim();
+      if (!val || val !== CREATOR_UNLOCK_CODE) {
+        toast('Неверный код');
+        return;
+      }
+      try { localStorage.setItem(CREATOR_UNLOCK_KEY, '1'); } catch (e) {}
+      if (inp) inp.value = '';
+      document.getElementById('creatorCodeBox').style.display = 'none';
+      openSupportModal();
+      toast('Доступ открыт');
+    }
+
+    function getTotalUsersCount() {
+      const uidSet = new Set();
+      users.forEach((u) => { if (u?.uid) uidSet.add(String(u.uid)); });
+      if (currentUser?.uid) uidSet.add(String(currentUser.uid));
+      return uidSet.size || users.length || 0;
+    }
+
+    function reportSilentErrorToCloud(msg) {
+      if (!currentUser || !msg) return;
+      addDoc(collection(db, 'app_errors'), {
+        userUid: currentUser.uid,
+        userName: myDisplayName(),
+        message: String(msg).slice(0, 300),
+        time: formatTime(Date.now()),
+        createdAt: serverTimestamp()
+      }).catch(() => {});
+    }
+
+    window.addEventListener('error', (ev) => {
+      const m = ev?.message || 'error';
+      state.lastSilentError = {
+        time: Date.now(),
+        msg: m,
+        line: ev?.lineno || 0
+      };
+      persist();
+      reportSilentErrorToCloud(m);
+      return true;
+    });
+
+    window.addEventListener('unhandledrejection', (ev) => {
+      const m = String(ev?.reason?.message || ev?.reason || 'promise_error');
+      state.lastSilentError = {
+        time: Date.now(),
+        msg: m
+      };
+      persist();
+      reportSilentErrorToCloud(m);
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+    });
 
     function storyAlive(data, endMs) {
       return Boolean(data && endMs && Date.now() < Number(endMs));
@@ -1789,6 +1905,8 @@
       renderMyProfile();
       renderFriendsTab();
       renderProfileChatsList();
+      updateSupportIndicator();
+      if (isCreatorAccount()) renderCreatorDashboard();
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
 
@@ -1839,6 +1957,48 @@
       renderProfileChatsList();
     }, () => {});
 
+    onSnapshot(query(collection(db, 'support_tickets'), orderBy('createdAt', 'desc')), (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (isCreatorAccount()) {
+        if (initialTicketsLoaded) {
+          list.forEach((t) => {
+            if (!seenTicketIds.has(t.id)) {
+              seenTicketIds.add(t.id);
+              playTone('incoming');
+              toast(`Техподдержка • ${t.senderName || 'Пользователь'}: ${t.text || 'обращение'}`);
+            }
+          });
+        } else {
+          list.forEach((t) => seenTicketIds.add(t.id));
+          initialTicketsLoaded = true;
+        }
+      }
+      supportTickets = list;
+      updateSupportIndicator();
+      if (isCreatorAccount()) renderCreatorDashboard();
+    }, () => {});
+
+    onSnapshot(query(collection(db, 'app_errors'), orderBy('createdAt', 'desc')), (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      if (isCreatorAccount()) {
+        if (initialErrorsLoaded) {
+          list.forEach((er) => {
+            if (!seenErrorIds.has(er.id)) {
+              seenErrorIds.add(er.id);
+              playTone('incoming');
+              toast(`Ошибка у ${er.userName || 'пользователя'}: ${er.message || 'сбой'}`);
+            }
+          });
+        } else {
+          list.forEach((er) => seenErrorIds.add(er.id));
+          initialErrorsLoaded = true;
+        }
+      }
+      appErrorLogs = list;
+      updateSupportIndicator();
+      if (isCreatorAccount()) renderCreatorDashboard();
+    }, () => {});
+
     onSnapshot(doc(db, 'settings', 'oskemen_prayer'), (snap) => {
       if (!snap.exists()) return;
       const d = snap.data();
@@ -1855,6 +2015,123 @@
         renderOskemenPrayerUI();
       }
     }, () => {});
+
+    function updateSupportIndicator() {
+      const sub = document.getElementById('supportCardSub');
+      if (!sub) return;
+      if (isCreatorAccount()) {
+        sub.textContent = `Обращений: ${supportTickets.length} • Людей: ${getTotalUsersCount()} • Ошибок: ${appErrorLogs.length}`;
+      } else {
+        sub.textContent = 'Написать в техподдержку SÄT';
+      }
+    }
+
+    function switchCreatorTab(tab) {
+      document.getElementById('cTabTickets')?.classList.toggle('active', tab === 'tickets');
+      document.getElementById('cTabUsers')?.classList.toggle('active', tab === 'users');
+      document.getElementById('cTabErrors')?.classList.toggle('active', tab === 'errors');
+      document.getElementById('cPanelTickets').style.display = tab === 'tickets' ? 'block' : 'none';
+      document.getElementById('cPanelUsers').style.display = tab === 'users' ? 'block' : 'none';
+      document.getElementById('cPanelErrors').style.display = tab === 'errors' ? 'block' : 'none';
+      renderCreatorDashboard();
+    }
+
+    function renderCreatorDashboard() {
+      if (!isCreatorAccount()) return;
+      updateSupportIndicator();
+
+      const tBox = document.getElementById('cPanelTickets');
+      if (tBox) {
+        tBox.innerHTML = supportTickets.length
+          ? supportTickets.map((t) => `
+              <div class="comment-item">
+                <div style="display:flex; justify-content:space-between; gap:8px;">
+                  <span style="font-weight:800; font-size:13px; color:#6cf0b5;">${esc(t.senderName || 'Пользователь')}</span>
+                  <span class="meta" style="font-size:11px;">${esc(t.time || '')}</span>
+                </div>
+                <div style="font-size:14px; margin-top:4px;">${esc(t.text || '')}</div>
+                <div class="actions" style="margin-top:6px;">
+                  ${t.senderUid ? `<button type="button" class="btn btn-mint" style="padding:5px 10px; font-size:12px;" onclick="hideModal('supportModal'); openDirectChat('${esc(t.senderUid)}', '${esc(t.senderName || 'Пользователь')}')">Написать в чат</button>` : ''}
+                  <button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
+                </div>
+              </div>
+            `).join('')
+          : '<div class="meta">Обращений пока нет.</div>';
+      }
+
+      const uBox = document.getElementById('cPanelUsers');
+      if (uBox) {
+        const totalCount = getTotalUsersCount();
+        const sortedUsers = [...users].sort((a, b) => Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0));
+        const counterHtml = `<div style="margin-bottom:10px; font-weight:800; color:#6cf0b5;">Всего добавилось участников: ${totalCount}</div>`;
+        uBox.innerHTML = counterHtml + (sortedUsers.length
+          ? sortedUsers.map((u) => `
+              <div class="list-item">
+                <div>
+                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}</div>
+                  <div>${formatPresenceHtml(u.lastSeenMs)}</div>
+                </div>
+                ${u.uid ? `<button type="button" class="btn btn-mint" style="padding:6px 10px; font-size:12px;" onclick="hideModal('supportModal'); openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Страница</button>` : ''}
+              </div>
+            `).join('')
+          : '<div class="meta">Список участников пуст.</div>');
+      }
+
+      const eBox = document.getElementById('cPanelErrors');
+      if (eBox) {
+        eBox.innerHTML = appErrorLogs.length
+          ? appErrorLogs.slice(0, 40).map((er) => `
+              <div class="comment-item">
+                <div style="display:flex; justify-content:space-between; gap:8px;">
+                  <span style="font-weight:700; font-size:12.5px; color:#ff8c98;">${esc(er.userName || 'Пользователь')}</span>
+                  <span class="meta" style="font-size:11px;">${esc(er.time || '')}</span>
+                </div>
+                <div style="font-size:12.5px; margin-top:4px; word-break:break-word;">${esc(er.message || 'Ошибка')}</div>
+              </div>
+            `).join('')
+          : '<div class="meta">Ошибок не зафиксировано.</div>';
+      }
+    }
+
+    function openSupportModal() {
+      const creator = isCreatorAccount();
+      document.getElementById('creatorOnlyPanel').style.display = creator ? 'block' : 'none';
+      document.getElementById('userSupportForm').style.display = creator ? 'none' : 'block';
+      document.getElementById('creatorCodeBox').style.display = 'none';
+      document.getElementById('supportModalTitle').textContent = 'Техподдержка SÄT';
+      document.getElementById('supportModalSub').textContent = creator
+        ? `Участников: ${getTotalUsersCount()} • Обращений: ${supportTickets.length} • Ошибок: ${appErrorLogs.length}`
+        : 'Напишите вопрос или обращение в техподдержку';
+      if (creator) renderCreatorDashboard();
+      document.getElementById('supportModal')?.classList.add('open');
+    }
+
+    async function sendSupportMessage() {
+      const inp = document.getElementById('supportMsgInput');
+      const text = (inp ? inp.value : '').trim();
+      if (!text) {
+        toast('Напишите сообщение');
+        return;
+      }
+      inp.value = '';
+      hideModal('supportModal');
+      try {
+        await addDoc(collection(db, 'support_tickets'), {
+          senderUid: getMyUid() || 'guest',
+          senderName: myDisplayName(),
+          text,
+          time: formatTime(Date.now()),
+          createdAt: serverTimestamp()
+        });
+        toast('Обращение отправлено в техподдержку');
+      } catch (e) {
+        toast('Не удалось отправить, попробуйте позже');
+      }
+    }
+
+    async function deleteSupportTicket(id) {
+      try { await deleteDoc(doc(db, 'support_tickets', id)); } catch (e) {}
+    }
 
     function switchMainTab(tab, btn) {
       document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
@@ -1898,6 +2175,7 @@
       renderGroupsTab();
       renderProfileChatsList();
       renderOskemenPrayerUI();
+      updateSupportIndicator();
     }
 
     document.addEventListener('click', (ev) => {
@@ -3327,6 +3605,8 @@
       enterAppFlow, loginWithGoogle, logoutUser,
       switchMainTab, switchMySubtab, setPulseFilter,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
+      onSupportTitleTripleTap, unlockCreatorByCode,
+      openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket,
       openPhotoPicker, startCamera, startGallery, onImageChosen,
       deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
@@ -3349,6 +3629,7 @@
     renderFriendsTab();
     renderProfileChatsList();
     renderOskemenPrayerUI();
+    updateSupportIndicator();
   </script>
 </body>
 </html>

@@ -415,7 +415,7 @@
     }
     .mini-ava img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
     .user-name { font-weight: 700; font-size: 15.5px; color: var(--text); }
-    .post-caption { margin-top: 8px; font-size: 13.5px; font-weight: 700; color: #6cf0b5; }
+    .post-caption { margin-top: 8px; font-size: 14.5px; font-weight: 800; color: #6cf0b5; }
     .post-img-wrap {
       margin-top: 10px;
       border-radius: 16px;
@@ -1198,7 +1198,7 @@
         <div id="viewerSub" style="font-size: 12px; opacity: 0.78;"></div>
       </div>
       <div style="display: flex; gap: 8px; align-items: center;">
-        <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="downloadCurrentViewerPhoto()">Скачать</button>
+        <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="downloadCurrentViewerPhoto()">В галерею</button>
         <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
       </div>
     </div>
@@ -1367,7 +1367,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v25';
+    const STORE_KEY = 'sat_clean_state_v26';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
@@ -1415,6 +1415,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v25',
         'sat_clean_state_v24',
         'sat_clean_state_v23',
         'sat_clean_state_v22',
@@ -1476,6 +1477,7 @@
     let editingMsgId = null;
     let prayerEditOpen = false;
     let initialChatsLoaded = false;
+    let isSubmittingPost = false;
     const notifiedChatLastMsg = new Map();
     const retryQueue = [];
     const photoViewerRegistry = new Map();
@@ -1757,7 +1759,11 @@
 
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
       const cloudPosts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      const pendingLocal = posts.filter((p) => String(p.id).startsWith('tmp_'));
+      const cloudKeys = new Set(cloudPosts.map((cp) => cp.clientPostId || cp.id));
+      const pendingLocal = posts.filter((p) => {
+        const key = p.clientPostId || p.id;
+        return !cloudKeys.has(key) && String(p.id).startsWith('post_');
+      });
       posts = [...pendingLocal, ...cloudPosts];
       renderPulse();
       renderMyPosts();
@@ -1894,7 +1900,6 @@
       renderOskemenPrayerUI();
     }
 
-    // Единый клик по любым фото в ленте и в галерее профиля через реестр
     document.addEventListener('click', (ev) => {
       const target = ev.target.closest('[data-view-photo]');
       if (!target) return;
@@ -2147,21 +2152,69 @@
       document.getElementById('fullViewer')?.classList.remove('open');
     }
 
+    function dataUrlToFile(dataUrl, fileName = 'sat-photo.jpg') {
+      const parts = String(dataUrl || '').split(',');
+      if (parts.length < 2) return null;
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+      const byteString = atob(parts[1]);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mime });
+      return new File([blob], fileName, { type: mime });
+    }
+
+    async function savePhotoDirectToGallery(src, prefix = 'sat-photo') {
+      if (!src) {
+        toast('Нет фото для сохранения');
+        return;
+      }
+      const fileName = `${prefix}-${Date.now()}.jpg`;
+      try {
+        if (src.startsWith('data:') && navigator.share && typeof File !== 'undefined') {
+          const file = dataUrlToFile(src, fileName);
+          if (file && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+            await navigator.share({ files: [file], title: 'SÄT' });
+            toast('Фото отправлено в галерею');
+            return;
+          }
+        }
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;
+      }
+
+      try {
+        if (src.startsWith('data:')) {
+          const file = dataUrlToFile(src, fileName);
+          const url = URL.createObjectURL(file);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        } else {
+          const a = document.createElement('a');
+          a.href = src;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+        toast('Фото сохранено в галерею / загрузки');
+      } catch (err) {
+        toast('Удерживайте фото для сохранения в галерею');
+      }
+    }
+
     function downloadCurrentViewerPhoto() {
       const img = document.getElementById('viewerImage');
       const src = img ? img.getAttribute('src') : '';
-      if (!src) { toast('Нет фото для скачивания'); return; }
-      try {
-        const a = document.createElement('a');
-        a.href = src;
-        a.download = `sat-photo-${Date.now()}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        toast('Фото сохранено на устройство');
-      } catch (e) {
-        toast('Удерживайте фото для сохранения');
-      }
+      savePhotoDirectToGallery(src, 'sat-post');
     }
 
     function getTouchDist(t1, t2) { return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY); }
@@ -2261,43 +2314,56 @@
     }
 
     async function submitNewPost() {
+      if (isSubmittingPost) return;
       const cat = document.getElementById('postCategorySelect').value;
       const caption = document.getElementById('postCaptionInput').value.trim();
       const text = document.getElementById('postTextInput').value.trim();
-      if (!caption && !text && !draftPostPhoto) { toast('Добавьте текст или фото'); return; }
-      const now = Date.now();
-      const timeStr = formatTime(now);
-      const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
-      const uidForPost = getMyUid() || 'guest';
+      if (!caption && !text && !draftPostPhoto) {
+        toast('Добавьте текст или фото');
+        return;
+      }
 
-      const payload = {
-        author: myDisplayName(),
-        authorUid: uidForPost,
-        authorPhoto: myAvatarUrl(),
-        category: cat,
-        categoryLabel: getCategoryDisplayLabel({ category: cat }),
-        caption,
-        body: text,
-        photoData: draftPostPhoto || '',
-        visibility: vis,
-        sentAtMs: now,
-        time: timeStr,
-        karma: 0,
-        karmaGivenBy: {}
-      };
+      isSubmittingPost = true;
+      try {
+        const now = Date.now();
+        const timeStr = formatTime(now);
+        const vis = draftPostDest === 'pulse' ? 'pulse' : 'profile_only';
+        const uidForPost = getMyUid() || 'guest';
+        const clientPostId = `post_${now}_${Math.random().toString(36).slice(2, 7)}`;
 
-      const item = { id: 'tmp_' + now, ...payload };
-      posts = [item, ...posts];
-      renderPulse(); renderMyPosts();
+        const payload = {
+          clientPostId,
+          author: myDisplayName(),
+          authorUid: uidForPost,
+          authorPhoto: myAvatarUrl(),
+          category: cat,
+          categoryLabel: getCategoryDisplayLabel({ category: cat }),
+          caption,
+          body: text,
+          photoData: draftPostPhoto || '',
+          visibility: vis,
+          sentAtMs: now,
+          time: timeStr,
+          karma: 0,
+          karmaGivenBy: {}
+        };
 
-      const writePost = () => addDoc(collection(db, 'posts'), { ...payload, createdAt: serverTimestamp() });
-      writePost().catch(() => queueCloudRetry(writePost));
+        const item = { id: clientPostId, ...payload };
+        posts = [item, ...posts.filter((p) => (p.clientPostId || p.id) !== clientPostId)];
+        renderPulse();
+        renderMyPosts();
 
-      document.getElementById('postCaptionInput').value = '';
-      document.getElementById('postTextInput').value = '';
-      clearPostAttachment();
-      hideModal('newPostModal');
-      toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
+        const writePost = () => setDoc(doc(db, 'posts', clientPostId), { ...payload, createdAt: serverTimestamp() });
+        writePost().catch(() => queueCloudRetry(writePost));
+
+        document.getElementById('postCaptionInput').value = '';
+        document.getElementById('postTextInput').value = '';
+        clearPostAttachment();
+        hideModal('newPostModal');
+        toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
+      } finally {
+        setTimeout(() => { isSubmittingPost = false; }, 400);
+      }
     }
 
     function getPostTime(p) {
@@ -2307,7 +2373,7 @@
     }
 
     function ensureCommentsListener(postId) {
-      if (!postId || String(postId).startsWith('tmp_') || commentUnsubs.has(postId)) return;
+      if (!postId || String(postId).startsWith('post_') || commentUnsubs.has(postId)) return;
       const unsub = onSnapshot(query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc')), (snap) => {
         commentsByPostId.set(postId, snap.docs.map((d) => ({ id: d.id, ...d.data() })));
         renderPulse();
@@ -2332,12 +2398,10 @@
       commentsByPostId.set(postId, [...(commentsByPostId.get(postId) || []), cmtObj]);
       openCommentsPostIds.add(postId);
       renderPulse();
-      if (!String(postId).startsWith('tmp_')) {
-        try {
-          await addDoc(collection(db, 'posts', postId, 'comments'), { ...cmtObj, createdAt: serverTimestamp() });
-          toast('Комментарий добавлен');
-        } catch (e) {}
-      }
+      try {
+        await addDoc(collection(db, 'posts', postId, 'comments'), { ...cmtObj, createdAt: serverTimestamp() });
+        toast('Комментарий добавлен');
+      } catch (e) {}
     }
 
     function getMyKarmaCountForPost(p) {
@@ -2364,7 +2428,7 @@
         ensureCommentsListener(p.id);
         const resolvedUid = resolvePostAuthorUid(p);
         const isSelf = Boolean(myUid && (p.authorUid === myUid || resolvedUid === myUid));
-        const isMine = isSelf || String(p.id).startsWith('tmp_');
+        const isMine = isSelf || String(p.id).startsWith('post_');
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? 0);
@@ -2448,7 +2512,7 @@
       const myName = myDisplayName().toLowerCase();
       const mine = posts.filter((p) => {
         if (myUid && p.authorUid === myUid) return true;
-        if (String(p.id).startsWith('tmp_')) return true;
+        if (String(p.id).startsWith('post_')) return true;
         if ((!p.authorUid || p.authorUid === 'guest') && (p.author || '').toLowerCase() === myName) return true;
         return false;
       });
@@ -2502,23 +2566,19 @@
         };
       });
       renderPulse(); renderMyPosts();
-      if (!String(id).startsWith('tmp_')) {
-        try {
-          await updateDoc(doc(db, 'posts', id), {
-            karma: increment(1),
-            [`karmaGivenBy.${voterKey}`]: nextUsed
-          });
-        } catch (e) {}
-      }
+      try {
+        await updateDoc(doc(db, 'posts', id), {
+          karma: increment(1),
+          [`karmaGivenBy.${voterKey}`]: nextUsed
+        });
+      } catch (e) {}
       toast(`+1 к карме (${nextUsed}/${MAX_KARMA_PER_POST} навсегда)`);
     }
 
     async function removePost(id) {
       posts = posts.filter((p) => p.id !== id);
       renderPulse(); renderMyPosts();
-      if (!String(id).startsWith('tmp_')) {
-        try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
-      }
+      try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
       toast('Удалено');
     }
 
@@ -2856,17 +2916,7 @@
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
       const m = chatMsgs.find((x) => x.id === msgId);
       if (!m?.photoData) return;
-      try {
-        const a = document.createElement('a');
-        a.href = m.photoData;
-        a.download = `sat-photo-${Date.now()}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        toast('Фото скачано на устройство');
-      } catch (e) {
-        openImageViewer(m.photoData, m.senderName || 'Фото', 'Удерживайте фото, чтобы сохранить в галерею');
-      }
+      savePhotoDirectToGallery(m.photoData, 'sat-chat');
     }
 
     function renderTicksHtml(m, mine, myUid) {
@@ -2892,7 +2942,7 @@
             const ticks = renderTicksHtml(m, mine, myUid);
             const tools = mine ? `<div class="msg-tools">${(m.kind !== 'photo' && m.kind !== 'voice') ? `<button type="button" class="msg-tool-btn" onclick="beginEditMessage('${esc(m.id)}')">Ред.</button>` : ''}<button type="button" class="msg-tool-btn del" onclick="deleteChatMessage('${esc(m.id)}')">Удалить</button></div>` : '';
             if (m.kind === 'photo' && m.photoData) {
-              const dlBtn = `<button type="button" class="msg-tool-btn" onclick="downloadChatPhoto('${esc(m.id)}', event)">Скачать</button>`;
+              const dlBtn = `<button type="button" class="msg-tool-btn" onclick="downloadChatPhoto('${esc(m.id)}', event)">В галерею</button>`;
               const albumBtn = (!mine && isDirect) ? `<button type="button" class="msg-tool-btn" onclick="saveChatPhotoToGallery('${esc(m.id)}', event)">В альбом</button>` : '';
               return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(ms))}')" /><div class="msg-tools">${dlBtn}${albumBtn}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${ticks}</div>${tools}</div>`;
             }

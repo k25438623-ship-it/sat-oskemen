@@ -1367,7 +1367,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v24';
+    const STORE_KEY = 'sat_clean_state_v25';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
@@ -1415,6 +1415,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v24',
         'sat_clean_state_v23',
         'sat_clean_state_v22',
         'sat_clean_state_v21',
@@ -1477,7 +1478,7 @@
     let initialChatsLoaded = false;
     const notifiedChatLastMsg = new Map();
     const retryQueue = [];
-    const postPhotoRegistry = new Map();
+    const photoViewerRegistry = new Map();
 
     let vScale = 1, vPanX = 0, vPanY = 0, vStartScale = 1, vStartDist = 0, vStartX = 0, vStartY = 0, vPanOriginX = 0, vPanOriginY = 0, vMode = 'none', vLastTap = 0;
 
@@ -1893,6 +1894,19 @@
       renderOskemenPrayerUI();
     }
 
+    // Единый клик по любым фото в ленте и в галерее профиля через реестр
+    document.addEventListener('click', (ev) => {
+      const target = ev.target.closest('[data-view-photo]');
+      if (!target) return;
+      const key = target.getAttribute('data-view-photo');
+      const item = photoViewerRegistry.get(key);
+      if (item && item.src) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        openImageViewer(item.src, item.title || 'Фото', item.sub || '');
+      }
+    });
+
     function renderMyProfile() {
       checkOwnStoryExpiry();
       const name = myDisplayName();
@@ -1923,9 +1937,14 @@
         pGrid.innerHTML = '<div class="meta" style="grid-column: 1 / -1;">Фотографий пока нет. Нажмите «+ Фото».</div>';
       } else {
         pGrid.innerHTML = galleryList.map((item, i) => {
-          const subText = item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}`;
+          const key = `my_gal_${i}`;
+          photoViewerRegistry.set(key, {
+            src: item.src,
+            title: name,
+            sub: item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}`
+          });
           return `
-            <div class="photo-cell" onclick="openImageViewer('${item.src}', '${esc(name)}', '${esc(subText)}')">
+            <div class="photo-cell" data-view-photo="${key}">
               <button type="button" class="photo-del-btn" onclick="deleteGalleryPhoto(${i}, event)">✕</button>
               <img src="${item.src}" alt="" draggable="false" />
             </div>
@@ -2263,7 +2282,8 @@
         visibility: vis,
         sentAtMs: now,
         time: timeStr,
-        karma: 0
+        karma: 0,
+        karmaGivenBy: {}
       };
 
       const item = { id: 'tmp_' + now, ...payload };
@@ -2320,21 +2340,18 @@
       }
     }
 
-    document.getElementById('feedContainer')?.addEventListener('click', (ev) => {
-      const wrap = ev.target.closest('[data-post-photo]');
-      if (!wrap) return;
-      const pid = wrap.getAttribute('data-post-photo');
-      const item = postPhotoRegistry.get(pid);
-      if (item && item.src) {
-        openImageViewer(item.src, item.author, item.time);
-      }
-    });
+    function getMyKarmaCountForPost(p) {
+      const myUid = getMyUid() || 'anon';
+      const cloudMap = p && p.karmaGivenBy && typeof p.karmaGivenBy === 'object' ? p.karmaGivenBy : {};
+      const cloudCount = Number(cloudMap[myUid] || 0);
+      const localCount = Number(state.karmaClicksByPost?.[p?.id] || 0);
+      return Math.max(cloudCount, localCount);
+    }
 
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       if (!box) return;
       const myUid = getMyUid();
-      postPhotoRegistry.clear();
       const list = posts.filter((p) => {
         if ((p.visibility || 'pulse') !== 'pulse') return false;
         return pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter;
@@ -2351,19 +2368,20 @@
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? 0);
-        const usedKarma = Number(state.karmaClicksByPost?.[p.id] || 0);
+        const usedKarma = getMyKarmaCountForPost(p);
         const reached = usedKarma >= MAX_KARMA_PER_POST;
         const cmtList = commentsByPostId.get(p.id) || [];
         const isCmtOpen = openCommentsPostIds.has(p.id);
         const safeId = esc(p.id);
         const safeAuthorUid = esc(resolvedUid);
         const safeAuthorName = esc(p.author || 'Участник');
+        const photoKey = `post_photo_${p.id}`;
 
         if (p.photoData) {
-          postPhotoRegistry.set(String(p.id), {
+          photoViewerRegistry.set(photoKey, {
             src: p.photoData,
-            author: p.author || 'Фото',
-            time: t
+            title: p.author || 'Фото',
+            sub: t
           });
         }
 
@@ -2387,7 +2405,7 @@
 
         const karmaBtnHtml = !isSelf
           ? `<button type="button" class="btn btn-gold" style="padding:8px 12px; font-size:13px;" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">
-              ${reached ? `Карма: ${karmaVal} (3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
+              ${reached ? `Карма: ${karmaVal} (лимит 3/3)` : `+1 Карма (${karmaVal} • ${usedKarma}/3)`}
             </button>`
           : `<span class="tag" style="padding:8px 12px;">Карма: ${karmaVal}</span>`;
 
@@ -2410,7 +2428,7 @@
             </div>
             ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
             ${p.body ? `<div style="font-size:15px; line-height:1.48; margin-top:6px;">${esc(p.body)}</div>` : ''}
-            ${p.photoData ? `<div class="post-img-wrap" data-post-photo="${safeId}"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
+            ${p.photoData ? `<div class="post-img-wrap" data-view-photo="${esc(photoKey)}"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
             <div class="actions">
               ${karmaBtnHtml}
               <button type="button" class="btn btn-ghost" style="padding:8px 12px; font-size:13px;" onclick="toggleCommentsPanel('${safeId}')">Комментарии (${cmtList.length})</button>
@@ -2435,16 +2453,27 @@
         return false;
       });
       if (!mine.length) { box.innerHTML = '<div class="meta">Публикаций пока нет.</div>'; return; }
-      box.innerHTML = mine.map((p) => `
-        <div style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:8px;">
-          <div>
-            <div class="meta">${esc(getPostTime(p))} • Карма: ${Number(p.karma ?? 0)}</div>
-            ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
-            ${p.body ? `<div style="font-size:14.5px; margin-top:4px;">${esc(p.body)}</div>` : ''}
+      box.innerHTML = mine.map((p, idx) => {
+        const photoKey = `my_post_photo_${p.id || idx}`;
+        if (p.photoData) {
+          photoViewerRegistry.set(photoKey, {
+            src: p.photoData,
+            title: myDisplayName(),
+            sub: getPostTime(p)
+          });
+        }
+        return `
+          <div style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:8px;">
+            <div>
+              <div class="meta">${esc(getPostTime(p))} • Карма: ${Number(p.karma ?? 0)}</div>
+              ${p.caption ? `<div class="post-caption">${esc(p.caption)}</div>` : ''}
+              ${p.body ? `<div style="font-size:14.5px; margin-top:4px;">${esc(p.body)}</div>` : ''}
+              ${p.photoData ? `<div class="post-img-wrap" style="max-width:220px;" data-view-photo="${esc(photoKey)}"><img src="${p.photoData}" alt="" draggable="false" /></div>` : ''}
+            </div>
+            <button type="button" class="btn btn-danger" style="padding:6px 10px; font-size:12px; align-self:flex-start;" onclick="removePost('${esc(p.id)}')">Удалить</button>
           </div>
-          <button type="button" class="btn btn-danger" style="padding:6px 10px; font-size:12px;" onclick="removePost('${esc(p.id)}')">Удалить</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function giveKarma(id) {
@@ -2454,16 +2483,34 @@
         toast('Карму нельзя ставить себе');
         return;
       }
-      const used = Number(state.karmaClicksByPost?.[id] || 0);
-      if (used >= MAX_KARMA_PER_POST) { toast('Лимит кармы: 3 раза на запись'); return; }
-      state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: used + 1 };
+      const used = targetPost ? getMyKarmaCountForPost(targetPost) : Number(state.karmaClicksByPost?.[id] || 0);
+      if (used >= MAX_KARMA_PER_POST) {
+        toast('На этот пост уже поставлено максимум 3 раза');
+        return;
+      }
+      const nextUsed = used + 1;
+      const voterKey = myUid || 'anon';
+      state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: nextUsed };
       persist();
-      posts = posts.map((p) => p.id === id ? { ...p, karma: Number(p.karma ?? 0) + 1 } : p);
+      posts = posts.map((p) => {
+        if (p.id !== id) return p;
+        const prevGiven = p.karmaGivenBy && typeof p.karmaGivenBy === 'object' ? p.karmaGivenBy : {};
+        return {
+          ...p,
+          karma: Number(p.karma ?? 0) + 1,
+          karmaGivenBy: { ...prevGiven, [voterKey]: nextUsed }
+        };
+      });
       renderPulse(); renderMyPosts();
       if (!String(id).startsWith('tmp_')) {
-        try { await updateDoc(doc(db, 'posts', id), { karma: increment(1) }); } catch (e) {}
+        try {
+          await updateDoc(doc(db, 'posts', id), {
+            karma: increment(1),
+            [`karmaGivenBy.${voterKey}`]: nextUsed
+          });
+        } catch (e) {}
       }
-      toast(`+1 к карме (${used + 1}/${MAX_KARMA_PER_POST})`);
+      toast(`+1 к карме (${nextUsed}/${MAX_KARMA_PER_POST} навсегда)`);
     }
 
     async function removePost(id) {
@@ -2547,7 +2594,11 @@
 
       const uPhotos = normalizePhotos(u.savedPhotos);
       document.getElementById('peerPhotosGrid').innerHTML = uPhotos.length
-        ? uPhotos.map((ph) => `<div class="photo-cell" onclick="openImageViewer('${ph.src}', '${esc(name)}', '${esc(ph.caption)}')"><img src="${ph.src}" alt="" draggable="false" /></div>`).join('')
+        ? uPhotos.map((ph, idx) => {
+            const key = `peer_gal_${uid}_${idx}`;
+            photoViewerRegistry.set(key, { src: ph.src, title: name, sub: ph.caption || '' });
+            return `<div class="photo-cell" data-view-photo="${esc(key)}"><img src="${ph.src}" alt="" draggable="false" /></div>`;
+          }).join('')
         : '<div class="meta" style="grid-column:1/-1;">Фотографий нет.</div>';
 
       const fSet = new Set();

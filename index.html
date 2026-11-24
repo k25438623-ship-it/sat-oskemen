@@ -849,8 +849,12 @@
         <div class="brand-text">SÄT</div>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
+        <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="openUnifiedSearchModal()">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Поиск</span>
+        </button>
         <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="openWallpapers()">
-          <span id="wpActiveName" style="max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Обои</span>
+          <span id="wpActiveName" style="max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Обои</span>
         </button>
       </div>
     </header>
@@ -1111,6 +1115,28 @@
       <div id="peerPanelInfo" class="card" style="display: none;"><div id="peerInfoBox"></div></div>
     </div>
   </section>
+
+  <div id="unifiedSearchModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Поиск в SÄT</h3>
+          <div id="searchResultsSummary" class="meta">Живые люди, дела и объявления без шума</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('unifiedSearchModal')">✕</button>
+      </div>
+
+      <input id="unifiedSearchInput" class="input" style="margin-top: 10px; margin-bottom: 10px;" placeholder="Имя, объявление или дело..." oninput="renderUnifiedSearch()" />
+
+      <div class="subtabs-3" style="margin-bottom: 10px;">
+        <button type="button" id="sTabAll" class="sub-btn active" onclick="setUnifiedSearchTab('all')">Все</button>
+        <button type="button" id="sTabUsers" class="sub-btn" onclick="setUnifiedSearchTab('users')">Люди</button>
+        <button type="button" id="sTabBusiness" class="sub-btn" onclick="setUnifiedSearchTab('business')">Дела и объявления</button>
+      </div>
+
+      <div id="unifiedSearchList" onclick="onUnifiedSearchListClick(event)"></div>
+    </div>
+  </div>
 
   <div id="accountRoleModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1623,7 +1649,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v33';
+    const STORE_KEY = 'sat_clean_state_v34';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -1773,6 +1799,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v33',
         'sat_clean_state_v32',
         'sat_clean_state_v31',
         'sat_clean_state_v30',
@@ -1887,6 +1914,7 @@
     let readingSubtab = 'stories';
     let readingFontSize = 16;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
+    let unifiedSearchTab = 'all';
     let pulseFilter = 'all';
     let pickTarget = 'avatar';
     let draftPostPhoto = '';
@@ -2251,6 +2279,7 @@
         hideModal('accountRoleModal');
         renderMyProfile();
         renderFriendsTab();
+        renderUnifiedSearch();
         await syncProfileCloud(currentUser);
         toast(chosen === 'business' ? 'Выбран бизнес-аккаунт' : 'Выбран аккаунт пользователя');
       } catch (e) {
@@ -2334,6 +2363,7 @@
       if (document.visibilityState === 'visible') {
         pingOnlinePresence();
         renderFriendsTab();
+        renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
       }
     });
@@ -2341,6 +2371,7 @@
     setInterval(() => {
       pingOnlinePresence();
       renderFriendsTab();
+      renderUnifiedSearch();
       if (openPeerUid) renderPeerPageContent();
     }, 20000);
 
@@ -2395,6 +2426,7 @@
       posts = [...pendingLocal, ...cloudPosts];
       renderPulse();
       renderMyPosts();
+      renderUnifiedSearch();
       syncSupportAndMonitorCard();
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
@@ -2446,6 +2478,7 @@
       }
       renderMyProfile();
       renderFriendsTab();
+      renderUnifiedSearch();
       renderProfileChatsList();
       syncSupportAndMonitorCard();
       if (isCreatorAccount()) renderCreatorDashboard();
@@ -2460,6 +2493,7 @@
         persist();
       }
       renderFriendsTab();
+      renderUnifiedSearch();
       syncSupportAndMonitorCard();
       if (openPeerUid) renderPeerPageContent();
     }, () => {});
@@ -2558,6 +2592,166 @@
         renderOskemenPrayerUI();
       }
     }, () => {});
+
+    function openUnifiedSearchModal() {
+      try {
+        const inp = document.getElementById('unifiedSearchInput');
+        if (inp) inp.value = '';
+        setUnifiedSearchTab(unifiedSearchTab || 'all');
+        document.getElementById('unifiedSearchModal')?.classList.add('open');
+      } catch (e) {}
+    }
+
+    function setUnifiedSearchTab(tab) {
+      try {
+        unifiedSearchTab = ['all', 'users', 'business'].includes(tab) ? tab : 'all';
+        document.getElementById('sTabAll')?.classList.toggle('active', unifiedSearchTab === 'all');
+        document.getElementById('sTabUsers')?.classList.toggle('active', unifiedSearchTab === 'users');
+        document.getElementById('sTabBusiness')?.classList.toggle('active', unifiedSearchTab === 'business');
+        renderUnifiedSearch();
+      } catch (e) {}
+    }
+
+    function getLatestPostTextForUid(uid) {
+      try {
+        if (!uid || !Array.isArray(posts)) return '';
+        const found = posts.find((p) => p && String(p.authorUid || '') === String(uid) && (p.caption || p.body));
+        if (!found) return '';
+        const raw = String(found.caption || found.body || '').trim();
+        return raw.length > 76 ? raw.slice(0, 76) + '...' : raw;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function isUserOnlineNow(u) {
+      const ts = Number(u?.lastSeenMs || 0);
+      return Boolean(ts && (Date.now() - ts) <= ONLINE_WINDOW_MS);
+    }
+
+    function findSearchUserByUid(uid) {
+      if (!uid || !Array.isArray(users)) return null;
+      return users.find((u) => u && String(u.uid || '') === String(uid)) || null;
+    }
+
+    async function onUnifiedSearchListClick(ev) {
+      try {
+        const target = ev && ev.target ? ev.target.closest('[data-search-action]') : null;
+        if (!target) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        const action = String(target.getAttribute('data-search-action') || '');
+        const uid = String(target.getAttribute('data-uid') || '').trim();
+        if (!uid) return;
+
+        const userObj = findSearchUserByUid(uid);
+        const safeName = String(userObj?.fullName || 'Участник');
+
+        if (action === 'open_profile') {
+          hideModal('unifiedSearchModal');
+          if (typeof openPersonPage === 'function') openPersonPage(uid, safeName);
+        } else if (action === 'open_chat') {
+          hideModal('unifiedSearchModal');
+          if (typeof openDirectChat === 'function') await openDirectChat(uid, safeName);
+        } else if (action === 'add_friend') {
+          if (typeof addFriend === 'function') await addFriend(uid, safeName);
+          renderUnifiedSearch();
+        } else if (action === 'accept_friend') {
+          const reqId = String(target.getAttribute('data-req-id') || '').trim();
+          if (reqId && typeof acceptFriendReq === 'function') await acceptFriendReq(reqId, uid, safeName);
+          renderUnifiedSearch();
+        }
+      } catch (e) {
+        toast('Не удалось выполнить действие');
+      }
+    }
+
+    function renderUnifiedSearch() {
+      try {
+        const box = document.getElementById('unifiedSearchList');
+        const sumEl = document.getElementById('searchResultsSummary');
+        if (!box) return;
+
+        const myUid = String(getMyUid() || '');
+        const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
+        const sourceUsers = Array.isArray(users) ? users : [];
+
+        const matched = sourceUsers
+          .filter((u) => {
+            if (!u || !u.uid) return false;
+            const uidStr = String(u.uid);
+            if (myUid && uidStr === myUid) return false;
+
+            const isBiz = u.accountType === 'business';
+            if (unifiedSearchTab === 'users' && isBiz) return false;
+            if (unifiedSearchTab === 'business' && !isBiz) return false;
+
+            if (!q) return true;
+            const nameDisp = String(u.fullName || '').toLowerCase();
+            const namePlain = String(u.namePlain || '').toLowerCase();
+            const bio = String(u.bio || '').toLowerCase();
+            const latestAd = getLatestPostTextForUid(uidStr).toLowerCase();
+            return nameDisp.includes(q) || namePlain.includes(q) || bio.includes(q) || latestAd.includes(q);
+          })
+          .sort((a, b) => {
+            const onA = isUserOnlineNow(a) ? 1 : 0;
+            const onB = isUserOnlineNow(b) ? 1 : 0;
+            if (onA !== onB) return onB - onA;
+            const adA = getLatestPostTextForUid(String(a.uid)) ? 1 : 0;
+            const adB = getLatestPostTextForUid(String(b.uid)) ? 1 : 0;
+            if (adA !== adB) return adB - adA;
+            return Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0);
+          });
+
+        if (sumEl) {
+          sumEl.textContent = `Найдено: ${matched.length} • Сначала те, кто в сети и с объявлениями`;
+        }
+
+        if (!matched.length) {
+          box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Попробуйте другое слово или имя.</div>';
+          return;
+        }
+
+        box.innerHTML = matched.map((u) => {
+          const uidStr = String(u.uid);
+          const name = String(u.fullName || 'Участник');
+          const isBiz = u.accountType === 'business';
+          const badge = isBiz ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Бизнес</span>' : '';
+          const adLine = getLatestPostTextForUid(uidStr);
+          const subDesc = adLine
+            ? `Объявление: ${adLine}`
+            : String(u.bio || (isBiz ? 'Дело / организация в SÄT' : 'Участник SÄT'));
+
+          const rel = typeof getFriendRel === 'function' ? getFriendRel(uidStr) : { status: 'none' };
+          let actionRight = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="add_friend" data-uid="${esc(uidStr)}">+ Друг</button>`;
+          if (rel.status === 'accepted') actionRight = '<span class="tag">Друг</span>';
+          else if (rel.status === 'outgoing') actionRight = '<span class="meta" style="font-size: 12px;">Заявка</span>';
+          else if (rel.status === 'incoming') actionRight = `<button type="button" class="btn btn-mint" style="padding: 7px 10px; font-size: 12px;" data-search-action="accept_friend" data-uid="${esc(uidStr)}" data-req-id="${esc(String(rel.id || ''))}">Принять</button>`;
+
+          const avaHtml = u.photoData
+            ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />`
+            : esc((name[0] || 'S').toUpperCase());
+
+          return `
+            <div class="list-item">
+              <div class="post-user" data-search-action="open_profile" data-uid="${esc(uidStr)}">
+                <div class="mini-ava">${avaHtml}</div>
+                <div style="min-width: 0; flex: 1;">
+                  <div class="user-name">${esc(name)}${badge}</div>
+                  <div class="meta" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(subDesc)}</div>
+                  <div style="margin-top: 2px;">${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                ${actionRight}
+                <button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" data-search-action="open_chat" data-uid="${esc(uidStr)}">Чат</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {}
+    }
 
     function switchReadingSubtab(sub) {
       readingSubtab = sub === 'tips' ? 'tips' : 'stories';
@@ -2939,6 +3133,7 @@
       renderMyProfile();
       renderPulse();
       renderBooksTab();
+      renderUnifiedSearch();
       renderMyPosts();
       renderFriendsTab();
       renderGroupsTab();
@@ -3424,6 +3619,7 @@
         posts = [item, ...posts.filter((p) => (p.clientPostId || p.id) !== clientPostId)];
         renderPulse();
         renderMyPosts();
+        renderUnifiedSearch();
 
         const writePost = () => setDoc(doc(db, 'posts', clientPostId), { ...payload, createdAt: serverTimestamp() });
         writePost().catch(() => queueCloudRetry(writePost));
@@ -3650,7 +3846,7 @@
 
     async function removePost(id) {
       posts = posts.filter((p) => p.id !== id);
-      renderPulse(); renderMyPosts();
+      renderPulse(); renderMyPosts(); renderUnifiedSearch();
       try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
       toast('Удалено');
     }
@@ -3914,6 +4110,7 @@
         if (existingIdx >= 0) friendsDocs[existingIdx] = { ...friendsDocs[existingIdx], ...payload, id: docId };
         else friendsDocs = [{ id: docId, ...payload }, ...friendsDocs];
         renderFriendsTab();
+        renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
         const op = () => setDoc(doc(db, 'friendRequests', docId), payload, { merge: true });
         op().catch(() => queueCloudRetry(op));
@@ -3939,6 +4136,7 @@
             : r
         ));
         renderFriendsTab();
+        renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
 
         const op = () => updateDoc(doc(db, 'friendRequests', safeId), {
@@ -3963,6 +4161,7 @@
           r && r.id !== safeId && !(r.fromUid === fromUid && r.toUid === myUid && r.status === 'pending')
         ));
         renderFriendsTab();
+        renderUnifiedSearch();
         if (openPeerUid) renderPeerPageContent();
 
         const op = () => deleteDoc(doc(db, 'friendRequests', safeId));
@@ -4740,6 +4939,7 @@
         await syncProfileCloud(currentUser);
         renderMyProfile();
         renderFriendsTab();
+        renderUnifiedSearch();
         hideModal('editProfileModal');
         toast('Сохранено');
       } catch (e) {
@@ -4822,6 +5022,7 @@
     Object.assign(window, {
       enterAppFlow, loginWithGoogle, logoutUser,
       selectInitialAccountType, updateNameStylePreview,
+      openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
       switchReadingSubtab, openReadingItem, changeReadingFont, openAddReadingModal,
@@ -4850,6 +5051,7 @@
 
     renderBooksTab();
     renderFriendsTab();
+    renderUnifiedSearch();
     renderProfileChatsList();
     renderOskemenPrayerUI();
     syncSupportAndMonitorCard();

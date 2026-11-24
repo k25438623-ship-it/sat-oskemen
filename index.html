@@ -283,6 +283,39 @@
     .pulse-act-btn.gold { color: var(--gold); border-color: rgba(242, 201, 107, 0.35); }
     body.theme-light .pulse-act-btn.gold { color: #9c591e; }
 
+    /* Тематические обложки в разделе «Книга» */
+    .book-cover-card {
+      width: 100%;
+      height: 138px;
+      border-radius: 16px 6px 16px 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      background: var(--surface-elev);
+      cursor: pointer;
+    }
+    .book-cover-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+    .reader-hero-cover {
+      width: 100%;
+      max-height: 220px;
+      border-radius: 18px 6px 18px 18px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .reader-hero-cover img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
     .reader-screen {
       position: fixed;
       inset: 0;
@@ -1094,7 +1127,7 @@
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
             <div>
               <h3 style="margin: 0; font-size: 17px;">Короткие истории</h3>
-              <div class="meta">Живые рассказы для спокойного чтения</div>
+              <div class="meta">Живые рассказы с иллюстрациями по теме</div>
             </div>
             <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 12.5px; flex-shrink: 0;" onclick="openAddReadingForKind('stories')">+ Добавить свою</button>
           </div>
@@ -1398,6 +1431,9 @@
       </div>
     </div>
     <div class="reader-scroll">
+      <div id="readingModalCoverWrap" class="reader-hero-cover" style="display: none;">
+        <img id="readingModalCoverImg" src="" alt="" />
+      </div>
       <div id="readingModalMeta" class="meta" style="font-weight: 700; color: var(--accent);">Раздел</div>
       <h2 id="readingModalTitle" class="reader-article-title">Заголовок</h2>
       <div id="readingModalBody" class="reader-article-body"></div>
@@ -1417,6 +1453,15 @@
       <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
       <label class="meta" style="display: block; margin-top: 10px;">Короткое описание</label>
       <input id="readingDescInput" class="input" placeholder="О чём текст..." />
+      <div style="margin-top: 10px;">
+        <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('reading_cover')">
+          <span id="readingPhotoLabel">Прикрепить фото по теме (необязательно)</span>
+        </button>
+        <div id="readingPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
+          <img id="readingPreviewImg" src="" alt="" style="width: 100%; max-height: 170px; object-fit: cover; border-radius: 14px;" />
+          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearReadingAttachment()">Убрать</button>
+        </div>
+      </div>
       <label class="meta" style="display: block; margin-top: 10px;">Текст</label>
       <textarea id="readingContentInput" rows="6" placeholder="Напишите текст..."></textarea>
       <div class="actions" style="margin-top: 14px;">
@@ -2067,8 +2112,105 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v40';
+    const STORE_KEY = 'sat_clean_state_v41';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
+
+    function makeSvgCover(svgInner) {
+      const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240">${svgInner}</svg>`;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(full);
+    }
+
+    const BOOK_THEME_COVERS = {
+      story_call_no_reason: makeSvgCover(`
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#191d26"/><stop offset="100%" stop-color="#2c241e"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#g1)"/>
+        <circle cx="510" cy="68" r="34" fill="#f2c96b" opacity="0.22"/>
+        <circle cx="510" cy="68" r="18" fill="#f2c96b" opacity="0.75"/>
+        <rect x="74" y="46" width="130" height="150" rx="18" fill="#232936" stroke="#e09f5a" stroke-width="2.5"/>
+        <line x1="139" y1="46" x2="139" y2="196" stroke="#e09f5a" stroke-width="2" opacity="0.5"/>
+        <line x1="74" y1="118" x2="204" y2="118" stroke="#e09f5a" stroke-width="2" opacity="0.5"/>
+        <path d="M278 158 C315 110, 385 110, 422 158" stroke="#7fb3a6" stroke-width="3" fill="none" stroke-dasharray="6 6"/>
+        <circle cx="272" cy="162" r="10" fill="#e09f5a"/>
+        <circle cx="428" cy="162" r="10" fill="#7fb3a6"/>
+      `),
+      story_fourth_year_room: makeSvgCover(`
+        <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#171b24"/><stop offset="100%" stop-color="#222a33"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#g2)"/>
+        <polygon points="150,55 215,105 85,105" fill="#e09f5a" opacity="0.9"/>
+        <polygon points="105,105 195,105 245,215 65,215" fill="#f2c96b" opacity="0.14"/>
+        <rect x="145" y="105" width="10" height="75" fill="#a6a298"/>
+        <rect x="115" y="180" width="70" height="10" rx="5" fill="#e09f5a"/>
+        <rect x="285" y="128" width="120" height="58" rx="10" fill="#252c38" stroke="#7fb3a6" stroke-width="2"/>
+        <path d="M445 170 L500 120 L555 145" stroke="#e09f5a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      `),
+      story_light_across: makeSvgCover(`
+        <defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#141821"/><stop offset="100%" stop-color="#26222c"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#g3)"/>
+        <rect x="92" y="64" width="145" height="145" rx="14" fill="#1e2430" stroke="#7fb3a6" stroke-width="2"/>
+        <rect x="403" y="64" width="145" height="145" rx="14" fill="#232028" stroke="#e09f5a" stroke-width="2"/>
+        <rect x="445" y="96" width="60" height="54" rx="8" fill="#f2c96b" opacity="0.88"/>
+        <line x1="255" y1="130" x2="385" y2="130" stroke="#f2c96b" stroke-width="2.5" stroke-dasharray="5 7"/>
+      `),
+      story_bridge_in_fog: makeSvgCover(`
+        <defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#161b22"/><stop offset="100%" stop-color="#222d33"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#g4)"/>
+        <path d="M70 165 Q320 75 570 165" stroke="#e09f5a" stroke-width="5" fill="none"/>
+        <line x1="170" y1="133" x2="170" y2="175" stroke="#e09f5a" stroke-width="3"/>
+        <line x1="320" y1="120" x2="320" y2="175" stroke="#e09f5a" stroke-width="3"/>
+        <line x1="470" y1="133" x2="470" y2="175" stroke="#e09f5a" stroke-width="3"/>
+        <path d="M40 185 Q180 172 320 185 T600 185" stroke="#7fb3a6" stroke-width="3" fill="none" opacity="0.7"/>
+        <ellipse cx="320" cy="110" rx="230" ry="26" fill="#f4f1ea" opacity="0.08"/>
+      `),
+      tip_1: makeSvgCover(`
+        <defs><linearGradient id="gt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#172026"/><stop offset="100%" stop-color="#232c33"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gt1)"/>
+        <circle cx="320" cy="120" r="68" fill="none" stroke="#7fb3a6" stroke-width="3"/>
+        <polygon points="320,66 336,120 320,174 304,120" fill="#e09f5a"/>
+        <circle cx="320" cy="120" r="8" fill="#172026"/>
+      `),
+      tip_2: makeSvgCover(`
+        <defs><linearGradient id="gt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#191d26"/><stop offset="100%" stop-color="#252b36"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gt2)"/>
+        <path d="M90 120 Q165 75 240 120 T390 120 T550 120" stroke="#7fb3a6" stroke-width="4" fill="none"/>
+        <path d="M120 152 Q195 118 270 152 T420 152 T520 152" stroke="#e09f5a" stroke-width="2.5" fill="none" opacity="0.75"/>
+      `),
+      tip_3: makeSvgCover(`
+        <defs><linearGradient id="gt3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1b1a22"/><stop offset="100%" stop-color="#2b2422"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gt3)"/>
+        <polygon points="320,48 340,104 398,104 351,138 369,192 320,158 271,192 289,138 242,104 300,104" fill="#f2c96b" opacity="0.82"/>
+      `),
+      tip_4: makeSvgCover(`
+        <defs><linearGradient id="gt4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#151922"/><stop offset="100%" stop-color="#1f2733"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gt4)"/>
+        <path d="M350 62 A58 58 0 1 0 405 148 A46 46 0 1 1 350 62 Z" fill="#e09f5a"/>
+        <circle cx="225" cy="84" r="4" fill="#f2c96b"/>
+        <circle cx="265" cy="150" r="3" fill="#7fb3a6"/>
+        <circle cx="445" cy="86" r="4" fill="#f2c96b"/>
+      `),
+      default_stories: makeSvgCover(`
+        <defs><linearGradient id="gds" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#181c24"/><stop offset="100%" stop-color="#2a2420"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gds)"/>
+        <rect x="215" y="54" width="210" height="132" rx="16" fill="#232834" stroke="#e09f5a" stroke-width="2.5"/>
+        <line x1="320" y1="54" x2="320" y2="186" stroke="#e09f5a" stroke-width="2"/>
+        <line x1="238" y1="90" x2="298" y2="90" stroke="#a6a298" stroke-width="3"/>
+        <line x1="238" y1="115" x2="298" y2="115" stroke="#a6a298" stroke-width="3"/>
+        <line x1="342" y1="90" x2="402" y2="90" stroke="#a6a298" stroke-width="3"/>
+        <line x1="342" y1="115" x2="402" y2="115" stroke="#a6a298" stroke-width="3"/>
+      `),
+      default_tips: makeSvgCover(`
+        <defs><linearGradient id="gdt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#162024"/><stop offset="100%" stop-color="#222c30"/></linearGradient></defs>
+        <rect width="640" height="240" fill="url(#gdt)"/>
+        <circle cx="320" cy="112" r="46" fill="#f2c96b" opacity="0.22"/>
+        <circle cx="320" cy="112" r="24" fill="#e09f5a"/>
+        <rect x="304" y="144" width="32" height="16" rx="6" fill="#7fb3a6"/>
+      `)
+    };
+
+    function getReadingCoverSrc(item) {
+      if (item && item.photoData) return item.photoData;
+      if (item && item.id && BOOK_THEME_COVERS[item.id]) return BOOK_THEME_COVERS[item.id];
+      return item && item.kind === 'tips' ? BOOK_THEME_COVERS.default_tips : BOOK_THEME_COVERS.default_stories;
+    }
 
     const NAME_STYLE_MAPS = {
       bold: {
@@ -2217,6 +2359,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v40',
         'sat_clean_state_v39',
         'sat_clean_state_v38',
         'sat_clean_state_v37',
@@ -2314,8 +2457,10 @@
       const d = raw && typeof raw === 'object' ? raw : {};
       const kind = d.kind === 'tips' ? 'tips' : 'stories';
       const status = d.status === 'pending' ? 'pending' : 'approved';
-      return {
-        id: String(id || d.id || ('item_' + Date.now())),
+      const normId = String(id || d.id || ('item_' + Date.now()));
+      const photoData = String(d.photoData || '');
+      const base = {
+        id: normId,
         kind,
         status,
         authorUid: String(d.authorUid || ''),
@@ -2323,7 +2468,12 @@
         audience: String(d.audience || (kind === 'tips' ? 'Краткий совет' : 'Короткая история')),
         title: String(d.title || 'Без названия'),
         summary: String(d.summary || ''),
-        content: String(d.content || d.summary || '')
+        content: String(d.content || d.summary || ''),
+        photoData
+      };
+      return {
+        ...base,
+        coverSrc: getReadingCoverSrc(base)
       };
     }
 
@@ -2337,6 +2487,7 @@
     let readingItems = INITIAL_READING_ITEMS.map((item) => normalizeReadingDoc(item, item.id));
     let readingFontSize = 17;
     const readingByIdMap = new Map(readingItems.map((item) => [item.id, item]));
+    let draftReadingPhoto = '';
     let unifiedSearchTab = 'all';
     let pulseFilter = 'all';
     let pickTarget = 'avatar';
@@ -3184,7 +3335,18 @@
       } catch (e) {}
     }
 
+    function clearReadingAttachment() {
+      draftReadingPhoto = '';
+      const wrap = document.getElementById('readingPreviewWrap');
+      const img = document.getElementById('readingPreviewImg');
+      const lbl = document.getElementById('readingPhotoLabel');
+      if (wrap) wrap.style.display = 'none';
+      if (img) img.src = '';
+      if (lbl) lbl.textContent = 'Прикрепить фото по теме (необязательно)';
+    }
+
     function openAddReadingForKind(kind) {
+      clearReadingAttachment();
       const sel = document.getElementById('readingKindSelect');
       if (sel) sel.value = kind === 'tips' ? 'tips' : 'stories';
       document.getElementById('addReadingModal')?.classList.add('open');
@@ -3202,8 +3364,12 @@
 
       return items.map((item) => {
         const canDelete = creator || (myUid && item.authorUid && item.authorUid === myUid);
+        const cover = getReadingCoverSrc(item);
         return `
           <div style="padding: 12px 0; border-top: 1px solid var(--border);">
+            <div class="book-cover-card" onclick="openReadingItem('${esc(item.id)}')">
+              <img src="${esc(cover)}" alt="" draggable="false" />
+            </div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
               <div style="min-width: 0; flex: 1;">
                 <div class="user-name">${esc(item.title)}</div>
@@ -3288,6 +3454,15 @@
         toast('Текст не найден');
         return;
       }
+      const coverWrap = document.getElementById('readingModalCoverWrap');
+      const coverImg = document.getElementById('readingModalCoverImg');
+      const coverSrc = getReadingCoverSrc(item);
+      if (coverWrap && coverImg && coverSrc) {
+        coverImg.src = coverSrc;
+        coverWrap.style.display = 'block';
+      } else if (coverWrap) {
+        coverWrap.style.display = 'none';
+      }
       document.getElementById('readingModalTitle').textContent = item.title || 'Текст';
       document.getElementById('readingModalMeta').textContent = item.audience || (item.kind === 'tips' ? 'Краткий совет' : 'Короткая история');
       const bodyEl = document.getElementById('readingModalBody');
@@ -3318,6 +3493,7 @@
     }
 
     function openAddReadingModal() {
+      clearReadingAttachment();
       document.getElementById('addReadingModal')?.classList.add('open');
     }
 
@@ -3339,12 +3515,14 @@
         audience: kind === 'tips' ? 'Краткий совет' : 'Короткая история',
         title,
         summary,
-        content
+        content,
+        photoData: draftReadingPhoto || ''
       });
 
       document.getElementById('readingTitleInput').value = '';
       document.getElementById('readingDescInput').value = '';
       document.getElementById('readingContentInput').value = '';
+      clearReadingAttachment();
       hideModal('addReadingModal');
 
       try {
@@ -3357,9 +3535,10 @@
           title: newItem.title,
           summary: newItem.summary,
           content: newItem.content,
+          photoData: newItem.photoData,
           createdAt: serverTimestamp()
         });
-        const saved = { ...newItem, id: ref.id };
+        const saved = normalizeReadingDoc({ ...newItem, id: ref.id }, ref.id);
         readingByIdMap.set(saved.id, saved);
         readingItems = [saved, ...readingItems.filter((x) => x.id !== saved.id)];
         renderBooksTab();
@@ -3377,6 +3556,7 @@
           title: newItem.title,
           summary: newItem.summary,
           content: newItem.content,
+          photoData: newItem.photoData,
           createdAt: serverTimestamp()
         }));
         toast('Сохраним и отправим при связи');
@@ -3782,6 +3962,11 @@
             document.getElementById('postPreviewImg').src = dataUrl;
             document.getElementById('postPreviewWrap').style.display = 'block';
             document.getElementById('postPhotoLabel').textContent = 'Фото загружено — заменить';
+          } else if (pickTarget === 'reading_cover') {
+            draftReadingPhoto = dataUrl;
+            document.getElementById('readingPreviewImg').src = dataUrl;
+            document.getElementById('readingPreviewWrap').style.display = 'block';
+            document.getElementById('readingPhotoLabel').textContent = 'Фото по теме загружено — заменить';
           } else if (pickTarget === 'chat_photo') {
             await sendPhotoToChat(dataUrl);
           }
@@ -5490,7 +5675,7 @@
       openUnifiedSearchModal, setUnifiedSearchTab, renderUnifiedSearch, onUnifiedSearchListClick,
       openDeleteAccountModal, deleteMyPageCompletely,
       switchMainTab, switchMySubtab, setPulseFilter,
-      openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
+      clearReadingAttachment, openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
       changeReadingFont, openAddReadingModal,
       saveNewReadingItem, approveReadingItem, deleteReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,

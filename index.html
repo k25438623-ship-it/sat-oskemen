@@ -1278,7 +1278,8 @@
       <div id="callTimerText" style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #f2c96b;">00:00</div>
     </div>
 
-    <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
+    <div id="callControlsBox" style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
+      <button type="button" id="callAcceptBtn" class="btn btn-primary" style="display: none; padding: 14px 22px; border-radius: 20px;" onclick="acceptIncomingCall()">Ответить</button>
       <button type="button" id="callMuteBtn" class="btn btn-ghost" style="padding: 14px 18px; border-radius: 20px;" onclick="toggleCallMute()">Микрофон вкл</button>
       <button type="button" class="btn btn-danger" style="padding: 14px 24px; border-radius: 20px;" onclick="hangupCall(); toast('Звонок завершён')">Сбросить</button>
     </div>
@@ -1428,6 +1429,7 @@
       onSnapshot,
       orderBy,
       query,
+      where,
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
 
@@ -1445,7 +1447,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v30';
+    const STORE_KEY = 'sat_clean_state_v31';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const app = initializeApp(firebaseConfig);
@@ -1493,6 +1495,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v30',
         'sat_clean_state_v29',
         'sat_clean_state_v28',
         'sat_clean_state_v27',
@@ -1582,8 +1585,8 @@
     const voiceAudioMap = new Map();
     let playingVoiceMsgId = null, voiceProgressTimer = null;
 
-    let pc = null, localCallStream = null, callDocId = null, callUnsub = null;
-    let callTimerInterval = null, callSeconds = 0, callMuted = false;
+    let pc = null, localCallStream = null, callDocId = null, callUnsub = null, incomingCallsUnsub = null, outgoingCallUnsub = null, incomingCallData = null;
+    let callTimerInterval = null, callSeconds = 0, callMuted = false, ringInterval = null;
     let audioCtx = null;
 
     document.getElementById('sessionHint').style.display = 'block';
@@ -1628,6 +1631,26 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
           osc.start(now);
           osc.stop(now + 0.12);
+        } else if (type === 'ringback') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.06, now + 0.04);
+          gain.gain.setValueAtTime(0.06, now + 0.75);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+          osc.start(now);
+          osc.stop(now + 0.92);
+        } else if (type === 'ringing') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.setValueAtTime(783.99, now + 0.16);
+          osc.frequency.setValueAtTime(587.33, now + 0.32);
+          osc.frequency.setValueAtTime(783.99, now + 0.48);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.11, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+          osc.start(now);
+          osc.stop(now + 0.68);
         } else {
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(660, now);
@@ -1639,6 +1662,21 @@
           osc.stop(now + 0.25);
         }
       } catch (e) {}
+    }
+
+    function startRingingLoop(mode) {
+      stopRingingLoop();
+      playTone(mode);
+      ringInterval = setInterval(() => {
+        playTone(mode);
+      }, 2400);
+    }
+
+    function stopRingingLoop() {
+      if (ringInterval) {
+        clearInterval(ringInterval);
+        ringInterval = null;
+      }
     }
 
     function formatTime(ms) {
@@ -1839,6 +1877,31 @@
       renderEverything();
     }
 
+    function subscribeIncomingCallsForUser(uid) {
+      if (incomingCallsUnsub) {
+        incomingCallsUnsub();
+        incomingCallsUnsub = null;
+      }
+      if (!uid) return;
+      incomingCallsUnsub = onSnapshot(query(collection(db, 'calls'), where('toUid', '==', uid)), (snap) => {
+        snap.docChanges().forEach((ch) => {
+          const d = ch.doc.data() || {};
+          const docId = ch.doc.id;
+          if ((ch.type === 'added' || ch.type === 'modified') && d.status === 'ringing' && d.offer && !callDocId) {
+            incomingCallData = { id: docId, ...d };
+            startRingingLoop('ringing');
+            openFullCallUi(d.fromName || 'Участник', 'Входящий звонок...', { isIncoming: true });
+            toast(`Входящий звонок от ${d.fromName || 'участника'}`);
+          } else if (ch.type === 'modified' && callDocId === docId && (d.status === 'ended' || d.status === 'declined')) {
+            hangupCall(false);
+            toast('Собеседник завершил звонок');
+          } else if (ch.type === 'removed' && callDocId === docId) {
+            hangupCall(false);
+          }
+        });
+      }, () => {});
+    }
+
     async function syncProfileCloud(user) {
       if (!user) return;
       checkOwnStoryExpiry();
@@ -1913,9 +1976,11 @@
         state.lastUid = user.uid;
         if (!state.name && user.displayName) state.name = user.displayName;
         persist();
+        subscribeIncomingCallsForUser(user.uid);
         await syncProfileCloud(user);
         goToProfileStart();
       } else {
+        if (incomingCallsUnsub) { incomingCallsUnsub(); incomingCallsUnsub = null; }
         showScreen('splash');
       }
     });
@@ -3491,19 +3556,34 @@
       }).catch(() => {});
     }
 
-    function openFullCallUi(peerName, statusText) {
+    function openFullCallUi(peerName, statusText, opts = {}) {
       callSeconds = 0;
       callMuted = false;
       const nameEl = document.getElementById('callPeerName');
       const stEl = document.getElementById('callStatusText');
       const tmEl = document.getElementById('callTimerText');
       const muteBtn = document.getElementById('callMuteBtn');
+      const acceptBtn = document.getElementById('callAcceptBtn');
       if (nameEl) nameEl.textContent = peerName || 'Собеседник';
       if (stEl) stEl.textContent = statusText || 'Вызов...';
       if (tmEl) tmEl.textContent = '00:00';
       if (muteBtn) muteBtn.textContent = 'Микрофон вкл';
+      if (acceptBtn) acceptBtn.style.display = opts.isIncoming ? 'inline-flex' : 'none';
       document.getElementById('fullCallScreen')?.classList.add('open');
 
+      clearInterval(callTimerInterval);
+      if (!opts.isIncoming) {
+        callTimerInterval = setInterval(() => {
+          callSeconds += 1;
+          const mm = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+          const ss = String(callSeconds % 60).padStart(2, '0');
+          if (tmEl) tmEl.textContent = `${mm}:${ss}`;
+        }, 1000);
+      }
+    }
+
+    function startActiveCallTimer() {
+      const tmEl = document.getElementById('callTimerText');
       clearInterval(callTimerInterval);
       callTimerInterval = setInterval(() => {
         callSeconds += 1;
@@ -3514,10 +3594,13 @@
     }
 
     function closeFullCallUi() {
+      stopRingingLoop();
       clearInterval(callTimerInterval);
       callTimerInterval = null;
       callSeconds = 0;
       callMuted = false;
+      const acceptBtn = document.getElementById('callAcceptBtn');
+      if (acceptBtn) acceptBtn.style.display = 'none';
       document.getElementById('fullCallScreen')?.classList.remove('open');
     }
 
@@ -3530,8 +3613,49 @@
       toast(callMuted ? 'Микрофон выключен' : 'Микрофон включён');
     }
 
+    async function acceptIncomingCall() {
+      if (!incomingCallData || !incomingCallData.offer) return;
+      const callObj = incomingCallData;
+      incomingCallData = null;
+      stopRingingLoop();
+      const acceptBtn = document.getElementById('callAcceptBtn');
+      if (acceptBtn) acceptBtn.style.display = 'none';
+      const stEl = document.getElementById('callStatusText');
+      if (stEl) stEl.textContent = 'HD связь активна';
+
+      try {
+        localCallStream = await navigator.mediaDevices.getUserMedia(getHdAudioConstraints());
+        pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+        localCallStream.getTracks().forEach((tr) => pc.addTrack(tr, localCallStream));
+        pc.ontrack = (ev) => {
+          const a = document.getElementById('remoteAudioEl');
+          if (a && ev.streams?.[0]) {
+            a.srcObject = ev.streams[0];
+            a.play().catch(() => {});
+          }
+        };
+        callDocId = callObj.id;
+        await pc.setRemoteDescription(new RTCSessionDescription(callObj.offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await updateDoc(doc(db, 'calls', callObj.id), {
+          status: 'answered',
+          answer: { type: answer.type, sdp: answer.sdp }
+        }).catch(() => {});
+        startActiveCallTimer();
+        toast('Звонок принят');
+      } catch (e) {
+        hangupCall();
+        toast('Нет доступа к микрофону');
+      }
+    }
+
     async function toggleAudioCall() {
-      if (callDocId) { hangupCall(); toast('Звонок завершён'); return; }
+      if (callDocId || incomingCallData) {
+        hangupCall();
+        toast('Звонок завершён');
+        return;
+      }
       const myUid = getMyUid();
       const chat = chats.find((x) => x.id === activeChatId);
       const peerUid = chat?.members?.find((u) => u && u !== myUid);
@@ -3543,27 +3667,56 @@
         localCallStream.getTracks().forEach((tr) => pc.addTrack(tr, localCallStream));
         pc.ontrack = (ev) => {
           const a = document.getElementById('remoteAudioEl');
-          const stEl = document.getElementById('callStatusText');
-          if (stEl) stEl.textContent = 'HD связь активна';
-          if (a && ev.streams?.[0]) { a.srcObject = ev.streams[0]; a.play().catch(() => {}); }
+          if (a && ev.streams?.[0]) {
+            a.srcObject = ev.streams[0];
+            a.play().catch(() => {});
+          }
         };
         const newId = 'call_' + Date.now();
         callDocId = newId;
-        openFullCallUi(peerName, 'HD вызов • Шумоподавление');
+        openFullCallUi(peerName, 'Идут гудки... • Шумоподавление');
+        startRingingLoop('ringback');
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
-        await setDoc(doc(db, 'calls', newId), { fromUid: myUid, toUid: peerUid, status: 'ringing', offer: { type: offer.type, sdp: offer.sdp }, createdAt: serverTimestamp() });
-        document.getElementById('callToggleBtn').textContent = 'Сбросить';
-        toast('Вызов отправлен');
+        await setDoc(doc(db, 'calls', newId), {
+          fromUid: myUid,
+          fromName: myDisplayName(),
+          toUid: peerUid,
+          status: 'ringing',
+          offer: { type: offer.type, sdp: offer.sdp },
+          createdAt: serverTimestamp()
+        });
+        if (outgoingCallUnsub) outgoingCallUnsub();
+        outgoingCallUnsub = onSnapshot(doc(db, 'calls', newId), async (snap) => {
+          const d = snap.data();
+          if (!d) return;
+          if (d.status === 'answered' && d.answer && pc && !pc.currentRemoteDescription) {
+            stopRingingLoop();
+            const stEl = document.getElementById('callStatusText');
+            if (stEl) stEl.textContent = 'HD связь активна';
+            await pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(() => {});
+          } else if (d.status === 'ended' || d.status === 'declined') {
+            hangupCall(false);
+            toast('Звонок завершён');
+          }
+        }, () => {});
+        const btn = document.getElementById('callToggleBtn');
+        if (btn) btn.textContent = 'Сбросить';
       } catch (e) {
         closeFullCallUi();
         toast('Нет доступа к микрофону');
       }
     }
 
-    function hangupCall() {
+    function hangupCall(notifyPeer = true) {
+      const targetCallId = callDocId || incomingCallData?.id;
+      if (notifyPeer && targetCallId) {
+        updateDoc(doc(db, 'calls', targetCallId), { status: 'ended' }).catch(() => {});
+      }
       callDocId = null;
+      incomingCallData = null;
       closeFullCallUi();
+      if (outgoingCallUnsub) { outgoingCallUnsub(); outgoingCallUnsub = null; }
       if (callUnsub) { callUnsub(); callUnsub = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
       if (localCallStream) { localCallStream.getTracks().forEach((tr) => tr.stop()); localCallStream = null; }
@@ -3757,7 +3910,7 @@
       openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
       startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft, toggleVoicePlay,
-      toggleAudioCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop
+      toggleAudioCall, acceptIncomingCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop
     });
 
     if ('serviceWorker' in navigator) {

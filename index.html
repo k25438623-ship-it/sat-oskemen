@@ -284,31 +284,31 @@
     body.theme-light .pulse-act-btn.gold { color: #9c591e; }
 
     /* Анимации «живых картин» в разделе «Книга» */
-    @keyframes satGlowPulse {
-      0%, 100% { opacity: 0.55; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.06); }
+    @keyframes satLivingGlow {
+      0%, 100% { opacity: 0.58; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.07); }
     }
-    @keyframes satFogDrift {
-      0%, 100% { transform: translateX(-18px); opacity: 0.45; }
-      50% { transform: translateX(18px); opacity: 0.85; }
+    @keyframes satLivingDriftSlow {
+      0%, 100% { transform: translateX(-22px); opacity: 0.45; }
+      50% { transform: translateX(22px); opacity: 0.85; }
     }
-    @keyframes satWaveMove {
-      0%, 100% { transform: translateX(-10px); }
-      50% { transform: translateX(10px); }
+    @keyframes satLivingRipple {
+      0%, 100% { transform: translateX(-12px); }
+      50% { transform: translateX(12px); }
     }
-    @keyframes satCompassSwing {
-      0%, 100% { transform: rotate(-10deg); }
-      50% { transform: rotate(10deg); }
+    @keyframes satLivingPendulum {
+      0%, 100% { transform: rotate(-12deg); }
+      50% { transform: rotate(12deg); }
     }
 
     .book-cover-card {
       position: relative;
       width: 100%;
-      height: 142px;
-      border-radius: 16px 6px 16px 16px;
+      height: 154px;
+      border-radius: 18px 6px 18px 18px;
       overflow: hidden;
       border: 1px solid var(--border);
-      margin-bottom: 10px;
+      margin-bottom: 11px;
       background: var(--surface-elev);
       cursor: pointer;
     }
@@ -322,7 +322,7 @@
     .reader-hero-cover {
       position: relative;
       width: 100%;
-      max-height: 224px;
+      max-height: 236px;
       border-radius: 18px 6px 18px 18px;
       overflow: hidden;
       border: 1px solid var(--border);
@@ -331,7 +331,7 @@
     }
     .reader-hero-cover img {
       width: 100%;
-      max-height: 224px;
+      max-height: 236px;
       object-fit: cover;
       display: block;
     }
@@ -339,22 +339,22 @@
     .sat-anim-glow {
       transform-box: fill-box;
       transform-origin: center;
-      animation: satGlowPulse 3.6s ease-in-out infinite;
+      animation: satLivingGlow 3.8s ease-in-out infinite;
     }
     .sat-anim-fog {
       transform-box: fill-box;
       transform-origin: center;
-      animation: satFogDrift 6.5s ease-in-out infinite;
+      animation: satLivingDriftSlow 7s ease-in-out infinite;
     }
     .sat-anim-wave {
       transform-box: fill-box;
       transform-origin: center;
-      animation: satWaveMove 4.8s ease-in-out infinite;
+      animation: satLivingRipple 5s ease-in-out infinite;
     }
     .sat-anim-needle {
       transform-box: fill-box;
       transform-origin: center;
-      animation: satCompassSwing 4.2s ease-in-out infinite;
+      animation: satLivingPendulum 4.4s ease-in-out infinite;
     }
 
     .reader-screen {
@@ -2153,147 +2153,226 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v42';
+    const STORE_KEY = 'sat_clean_state_v43';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     function makeSvgCover(svgInner) {
-      const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240">${svgInner}</svg>`;
+      const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid slice">${svgInner}</svg>`;
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(full);
     }
 
     const BOOK_THEME_COVERS = {
       story_call_no_reason: makeSvgCover(`
         <defs>
-          <linearGradient id="sky1" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#121622"/>
-            <stop offset="55%" stop-color="#1e2235"/>
-            <stop offset="100%" stop-color="#33231d"/>
+          <linearGradient id="skyCall" x1="0" y1="0" x2="0.8" y2="1">
+            <stop offset="0%" stop-color="#0d111a"/>
+            <stop offset="52%" stop-color="#1e2236"/>
+            <stop offset="100%" stop-color="#3b261d"/>
           </linearGradient>
-          <radialGradient id="warmHalo1" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#f6c86b" stop-opacity="0.78"/>
+          <radialGradient id="haloCall" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffd27d" stop-opacity="0.85"/>
+            <stop offset="55%" stop-color="#e09f5a" stop-opacity="0.32"/>
             <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
           </radialGradient>
+          <linearGradient id="cityWall" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#171b26"/>
+            <stop offset="100%" stop-color="#0d1017"/>
+          </linearGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#sky1)"/>
-        <circle cx="470" cy="92" r="95" fill="url(#warmHalo1)" class="sat-anim-glow"/>
-        <circle cx="470" cy="92" r="24" fill="#f7cf79"/>
-        <path d="M90 195 L90 95 Q90 74 111 74 L179 74 Q200 74 200 95 L200 195 Z" fill="#1b202c" stroke="#e09f5a" stroke-width="2"/>
-        <rect x="114" y="102" width="62" height="58" rx="10" fill="#2b2723" stroke="#f2c96b" stroke-width="1.5"/>
-        <circle cx="145" cy="180" r="5" fill="#7fb3a6"/>
-        <path d="M235 152 C295 96, 385 96, 445 104" stroke="#f2c96b" stroke-width="2.5" stroke-dasharray="5 6" fill="none" class="sat-anim-fog"/>
+        <rect width="640" height="260" fill="url(#skyCall)"/>
+        <circle cx="485" cy="96" r="115" fill="url(#haloCall)" class="sat-anim-glow"/>
+        <circle cx="485" cy="96" r="24" fill="#ffe19c"/>
+        <rect x="36" y="104" width="84" height="156" rx="10" fill="url(#cityWall)"/>
+        <rect x="130" y="72" width="96" height="188" rx="12" fill="url(#cityWall)"/>
+        <rect x="435" y="112" width="168" height="148" rx="12" fill="url(#cityWall)"/>
+        <rect x="56" y="132" width="14" height="18" rx="3" fill="#f2c96b" opacity="0.85" class="sat-anim-glow"/>
+        <rect x="82" y="164" width="14" height="18" rx="3" fill="#7fb3a6" opacity="0.75"/>
+        <rect x="154" y="102" width="16" height="20" rx="3" fill="#f2c96b" opacity="0.9"/>
+        <rect x="184" y="138" width="16" height="20" rx="3" fill="#f2c96b" opacity="0.65" class="sat-anim-glow"/>
+        <rect x="466" y="142" width="18" height="22" rx="4" fill="#ffe19c" class="sat-anim-glow"/>
+        <rect x="502" y="142" width="18" height="22" rx="4" fill="#f2c96b" opacity="0.7"/>
+        <rect x="538" y="142" width="18" height="22" rx="4" fill="#7fb3a6" opacity="0.75"/>
+        <path d="M250 156 C315 96, 400 94, 462 104" stroke="#ffd27d" stroke-width="2.5" stroke-dasharray="5 7" fill="none" class="sat-anim-fog"/>
+        <rect x="0" y="218" width="640" height="42" fill="#0b0e14" opacity="0.9"/>
       `),
       story_fourth_year_room: makeSvgCover(`
         <defs>
-          <linearGradient id="room2" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#141822"/>
-            <stop offset="100%" stop-color="#272420"/>
+          <linearGradient id="roomGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#111520"/>
+            <stop offset="60%" stop-color="#1d222e"/>
+            <stop offset="100%" stop-color="#2c241d"/>
           </linearGradient>
-          <linearGradient id="lampCone" x1="0.5" y1="0" x2="0.5" y2="1">
-            <stop offset="0%" stop-color="#f2c96b" stop-opacity="0.45"/>
+          <linearGradient id="coneGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+            <stop offset="0%" stop-color="#ffe094" stop-opacity="0.52"/>
+            <stop offset="70%" stop-color="#e09f5a" stop-opacity="0.14"/>
             <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#room2)"/>
-        <polygon points="155,68 205,104 105,104" fill="#e09f5a"/>
-        <polygon points="115,104 195,104 265,225 45,225" fill="url(#lampCone)" class="sat-anim-glow"/>
-        <rect x="151" y="104" width="8" height="72" fill="#9c968c"/>
-        <rect x="122" y="176" width="66" height="10" rx="5" fill="#c8843e"/>
-        <path d="M315 125 L495 125 L515 192 L295 192 Z" fill="#1e2430" stroke="#7fb3a6" stroke-width="2"/>
-        <line x1="405" y1="125" x2="405" y2="192" stroke="#7fb3a6" stroke-width="1.5" opacity="0.6"/>
+        <rect width="640" height="260" fill="url(#roomGrad)"/>
+        <polygon points="156,56 212,102 100,102" fill="#e5a75e"/>
+        <polygon points="112,102 200,102 282,250 30,250" fill="url(#coneGrad)" class="sat-anim-glow"/>
+        <path d="M156 102 L156 168 Q156 184 134 184" stroke="#b5afa4" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <rect x="108" y="184" width="96" height="11" rx="5.5" fill="#c8843e"/>
+        <path d="M312 132 L408 122 L408 198 L312 208 Z" fill="#232938" stroke="#7fb3a6" stroke-width="2"/>
+        <path d="M504 132 L408 122 L408 198 L504 208 Z" fill="#1c212d" stroke="#e09f5a" stroke-width="2"/>
+        <line x1="330" y1="152" x2="390" y2="146" stroke="#a6a298" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="330" y1="170" x2="382" y2="164" stroke="#a6a298" stroke-width="2.5" stroke-linecap="round"/>
+        <rect x="0" y="208" width="640" height="52" fill="#14171f"/>
       `),
       story_light_across: makeSvgCover(`
         <defs>
-          <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#111520"/>
-            <stop offset="100%" stop-color="#241f2a"/>
+          <linearGradient id="nightAcross" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0e131d"/>
+            <stop offset="50%" stop-color="#191e2b"/>
+            <stop offset="100%" stop-color="#29212a"/>
           </linearGradient>
-          <radialGradient id="winLight" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#ffe08a" stop-opacity="0.88"/>
+          <radialGradient id="windowGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe7a3" stop-opacity="0.95"/>
+            <stop offset="55%" stop-color="#e09f5a" stop-opacity="0.35"/>
             <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
           </radialGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#bg3)"/>
-        <rect x="85" y="54" width="160" height="156" rx="16" fill="#191e29" stroke="rgba(244,241,234,0.18)" stroke-width="2"/>
-        <rect x="115" y="86" width="44" height="44" rx="6" fill="#232938"/>
-        <rect x="171" y="86" width="44" height="44" rx="6" fill="#232938"/>
-        <rect x="395" y="54" width="160" height="156" rx="16" fill="#211d24" stroke="#e09f5a" stroke-width="2"/>
-        <circle cx="447" cy="108" r="56" fill="url(#winLight)" class="sat-anim-glow"/>
-        <rect x="425" y="86" width="44" height="44" rx="6" fill="#f5ca6b"/>
-        <rect x="503" y="86" width="44" height="44" rx="6" fill="#2b262f"/>
-        <path d="M265 130 Q320 105 375 130" stroke="#7fb3a6" stroke-width="2.5" stroke-dasharray="4 6" fill="none" class="sat-anim-fog"/>
+        <rect width="640" height="260" fill="url(#nightAcross)"/>
+        <circle cx="468" cy="118" r="105" fill="url(#windowGlow)" class="sat-anim-glow"/>
+        <rect x="64" y="48" width="184" height="176" rx="18" fill="#181d28" stroke="rgba(244,241,234,0.16)" stroke-width="2"/>
+        <rect x="94" y="82" width="52" height="52" rx="8" fill="#222836"/>
+        <rect x="166" y="82" width="52" height="52" rx="8" fill="#222836"/>
+        <rect x="94" y="150" width="52" height="46" rx="8" fill="#222836"/>
+        <rect x="166" y="150" width="52" height="46" rx="8" fill="#222836"/>
+        <rect x="392" y="48" width="184" height="176" rx="18" fill="#221d26" stroke="#e09f5a" stroke-width="2"/>
+        <rect x="442" y="92" width="52" height="52" rx="8" fill="#ffd982"/>
+        <line x1="468" y1="92" x2="468" y2="144" stroke="#9c591e" stroke-width="2.5"/>
+        <line x1="442" y1="118" x2="494" y2="118" stroke="#9c591e" stroke-width="2.5"/>
+        <rect x="506" y="92" width="44" height="44" rx="8" fill="#2d2732"/>
+        <rect x="422" y="158" width="124" height="42" rx="8" fill="#2d2732"/>
+        <path d="M262 128 Q320 96 378 128" stroke="#7fb3a6" stroke-width="2.5" stroke-dasharray="5 6" fill="none" class="sat-anim-fog"/>
+        <rect x="0" y="224" width="640" height="36" fill="#0c0f16"/>
       `),
       story_bridge_in_fog: makeSvgCover(`
         <defs>
-          <linearGradient id="fogSky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#131922"/>
-            <stop offset="65%" stop-color="#1e2933"/>
-            <stop offset="100%" stop-color="#152229"/>
+          <linearGradient id="mistSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#10151f"/>
+            <stop offset="55%" stop-color="#1c2732"/>
+            <stop offset="100%" stop-color="#132028"/>
+          </linearGradient>
+          <linearGradient id="mistBand" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e8f1f2" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#e8f1f2" stop-opacity="0.28"/>
+            <stop offset="100%" stop-color="#e8f1f2" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#fogSky)"/>
-        <path d="M40 156 Q320 62 600 156" stroke="#e09f5a" stroke-width="5" fill="none"/>
-        <line x1="175" y1="120" x2="175" y2="168" stroke="#e09f5a" stroke-width="3"/>
-        <line x1="320" y1="108" x2="320" y2="168" stroke="#e09f5a" stroke-width="3"/>
-        <line x1="465" y1="120" x2="465" y2="168" stroke="#e09f5a" stroke-width="3"/>
-        <ellipse cx="320" cy="128" rx="250" ry="26" fill="#d8e6e8" class="sat-anim-fog"/>
-        <path d="M20 186 Q170 174 320 186 T620 186" stroke="#7fb3a6" stroke-width="3.5" fill="none" class="sat-anim-wave"/>
-        <path d="M45 208 Q195 196 345 208 T610 208" stroke="#e09f5a" stroke-width="2" fill="none" opacity="0.6" class="sat-anim-wave"/>
+        <rect width="640" height="260" fill="url(#mistSky)"/>
+        <path d="M18 164 Q320 56 622 164" stroke="#e5a75e" stroke-width="6" fill="none"/>
+        <path d="M18 176 Q320 74 622 176" stroke="#7fb3a6" stroke-width="2" fill="none" opacity="0.55"/>
+        <line x1="165" y1="120" x2="165" y2="178" stroke="#e5a75e" stroke-width="3.5"/>
+        <line x1="320" y1="106" x2="320" y2="178" stroke="#e5a75e" stroke-width="3.5"/>
+        <line x1="475" y1="120" x2="475" y2="178" stroke="#e5a75e" stroke-width="3.5"/>
+        <rect x="30" y="102" width="580" height="56" rx="28" fill="url(#mistBand)" class="sat-anim-fog"/>
+        <rect x="0" y="178" width="640" height="82" fill="#0e1820"/>
+        <path d="M20 198 Q170 185 320 198 T620 198" stroke="#7fb3a6" stroke-width="3.5" fill="none" class="sat-anim-wave"/>
+        <path d="M40 224 Q190 211 340 224 T610 224" stroke="#e09f5a" stroke-width="2.5" fill="none" opacity="0.65" class="sat-anim-wave"/>
       `),
       tip_1: makeSvgCover(`
-        <defs><linearGradient id="c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#141e24"/><stop offset="100%" stop-color="#222e36"/></linearGradient></defs>
-        <rect width="640" height="240" fill="url(#c1)"/>
-        <circle cx="320" cy="120" r="72" fill="#1a252d" stroke="#7fb3a6" stroke-width="3"/>
-        <circle cx="320" cy="120" r="56" fill="none" stroke="rgba(244,241,234,0.16)" stroke-width="1.5" stroke-dasharray="3 8"/>
+        <defs>
+          <linearGradient id="tipBg1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#121b22"/>
+            <stop offset="100%" stop-color="#222e38"/>
+          </linearGradient>
+          <radialGradient id="compassGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#7fb3a6" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="#7fb3a6" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="640" height="260" fill="url(#tipBg1)"/>
+        <circle cx="320" cy="130" r="108" fill="url(#compassGlow)" class="sat-anim-glow"/>
+        <circle cx="320" cy="130" r="80" fill="#18222b" stroke="#7fb3a6" stroke-width="3"/>
+        <circle cx="320" cy="130" r="62" fill="none" stroke="rgba(244,241,234,0.18)" stroke-width="1.5" stroke-dasharray="4 8"/>
         <g class="sat-anim-needle">
-          <polygon points="320,62 334,120 320,132 306,120" fill="#e09f5a"/>
-          <polygon points="320,178 334,120 320,108 306,120" fill="#7fb3a6"/>
+          <polygon points="320,66 335,130 320,144 305,130" fill="#e5a75e"/>
+          <polygon points="320,194 335,130 320,116 305,130" fill="#7fb3a6"/>
         </g>
-        <circle cx="320" cy="120" r="7" fill="#f4f1ea"/>
+        <circle cx="320" cy="130" r="8" fill="#f4f1ea"/>
       `),
       tip_2: makeSvgCover(`
-        <defs><linearGradient id="c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#161b26"/><stop offset="100%" stop-color="#262b38"/></linearGradient></defs>
-        <rect width="640" height="240" fill="url(#c2)"/>
-        <path d="M80 112 Q160 66 240 112 T400 112 T560 112" stroke="#7fb3a6" stroke-width="4" fill="none" class="sat-anim-wave"/>
-        <path d="M100 144 Q180 104 260 144 T420 144 T540 144" stroke="#e09f5a" stroke-width="3" fill="none" opacity="0.82" class="sat-anim-fog"/>
+        <defs>
+          <linearGradient id="tipBg2" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#141924"/>
+            <stop offset="100%" stop-color="#262c3a"/>
+          </linearGradient>
+        </defs>
+        <rect width="640" height="260" fill="url(#tipBg2)"/>
+        <path d="M64 106 Q150 56 236 106 T408 106 T576 106" stroke="#7fb3a6" stroke-width="4.5" fill="none" class="sat-anim-wave"/>
+        <path d="M84 142 Q170 96 256 142 T428 142 T556 142" stroke="#e5a75e" stroke-width="3.5" fill="none" opacity="0.88" class="sat-anim-fog"/>
+        <path d="M110 176 Q190 140 270 176 T430 176 T530 176" stroke="#f2c96b" stroke-width="2" fill="none" opacity="0.5" class="sat-anim-wave"/>
       `),
       tip_3: makeSvgCover(`
         <defs>
-          <linearGradient id="c3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#191822"/><stop offset="100%" stop-color="#2d2320"/></linearGradient>
-          <radialGradient id="starGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f7cf79" stop-opacity="0.72"/><stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/></radialGradient>
+          <linearGradient id="tipBg3" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#171622"/>
+            <stop offset="100%" stop-color="#2e2320"/>
+          </linearGradient>
+          <radialGradient id="starHalo3" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe094" stop-opacity="0.75"/>
+            <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
+          </radialGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#c3)"/>
-        <circle cx="320" cy="120" r="85" fill="url(#starGlow)" class="sat-anim-glow"/>
-        <polygon points="320,52 339,104 394,104 349,136 366,188 320,156 274,188 291,136 246,104 301,104" fill="#f2c96b"/>
+        <rect width="640" height="260" fill="url(#tipBg3)"/>
+        <circle cx="320" cy="130" r="98" fill="url(#starHalo3)" class="sat-anim-glow"/>
+        <polygon points="320,56 341,112 400,112 352,146 370,202 320,168 270,202 288,146 240,112 299,112" fill="#f5ca6b"/>
       `),
       tip_4: makeSvgCover(`
         <defs>
-          <linearGradient id="c4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121621"/><stop offset="100%" stop-color="#1d2533"/></linearGradient>
-          <radialGradient id="moonHalo" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f2c96b" stop-opacity="0.58"/><stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/></radialGradient>
+          <linearGradient id="tipBg4" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#0f1420"/>
+            <stop offset="100%" stop-color="#1d2636"/>
+          </linearGradient>
+          <radialGradient id="moonGlow4" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe299" stop-opacity="0.62"/>
+            <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
+          </radialGradient>
         </defs>
-        <rect width="640" height="240" fill="url(#c4)"/>
-        <circle cx="350" cy="116" r="88" fill="url(#moonHalo)" class="sat-anim-glow"/>
-        <path d="M352 60 A58 58 0 1 0 408 148 A46 46 0 1 1 352 60 Z" fill="#f2c96b"/>
-        <circle cx="205" cy="82" r="3.5" fill="#7fb3a6" class="sat-anim-glow"/>
-        <circle cx="245" cy="156" r="3" fill="#f2c96b" class="sat-anim-glow"/>
-        <circle cx="475" cy="78" r="3.5" fill="#f2c96b" class="sat-anim-glow"/>
+        <rect width="640" height="260" fill="url(#tipBg4)"/>
+        <circle cx="348" cy="126" r="102" fill="url(#moonGlow4)" class="sat-anim-glow"/>
+        <path d="M350 64 A64 64 0 1 0 412 160 A50 50 0 1 1 350 64 Z" fill="#f5ca6b"/>
+        <circle cx="192" cy="84" r="4" fill="#7fb3a6" class="sat-anim-glow"/>
+        <circle cx="236" cy="168" r="3.5" fill="#f2c96b" class="sat-anim-glow"/>
+        <circle cx="484" cy="82" r="4" fill="#f2c96b" class="sat-anim-glow"/>
       `),
       default_stories: makeSvgCover(`
-        <defs><linearGradient id="cds2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#161b24"/><stop offset="100%" stop-color="#2b241f"/></linearGradient></defs>
-        <rect width="640" height="240" fill="url(#cds2)"/>
-        <circle cx="320" cy="120" r="78" fill="#e09f5a" opacity="0.16" class="sat-anim-glow"/>
-        <rect x="210" y="56" width="220" height="128" rx="16" fill="#202632" stroke="#e09f5a" stroke-width="2.2"/>
-        <line x1="320" y1="56" x2="320" y2="184" stroke="#e09f5a" stroke-width="2"/>
-        <line x1="235" y1="92" x2="296" y2="92" stroke="#a6a298" stroke-width="3"/>
-        <line x1="235" y1="118" x2="296" y2="118" stroke="#a6a298" stroke-width="3"/>
-        <line x1="344" y1="92" x2="405" y2="92" stroke="#a6a298" stroke-width="3"/>
-        <line x1="344" y1="118" x2="405" y2="118" stroke="#a6a298" stroke-width="3"/>
+        <defs>
+          <linearGradient id="defStoryBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#141923"/>
+            <stop offset="100%" stop-color="#2c241e"/>
+          </linearGradient>
+          <radialGradient id="defStoryGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#e09f5a" stop-opacity="0.34"/>
+            <stop offset="100%" stop-color="#e09f5a" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="640" height="260" fill="url(#defStoryBg)"/>
+        <circle cx="320" cy="130" r="102" fill="url(#defStoryGlow)" class="sat-anim-glow"/>
+        <path d="M205 64 Q262 54 320 74 Q378 54 435 64 L435 196 Q378 186 320 206 Q262 186 205 196 Z" fill="#1e2432" stroke="#e5a75e" stroke-width="2.2"/>
+        <line x1="320" y1="74" x2="320" y2="206" stroke="#e5a75e" stroke-width="2"/>
+        <line x1="232" y1="100" x2="294" y2="96" stroke="#a6a298" stroke-width="3" stroke-linecap="round"/>
+        <line x1="232" y1="126" x2="288" y2="122" stroke="#a6a298" stroke-width="3" stroke-linecap="round"/>
+        <line x1="346" y1="96" x2="408" y2="100" stroke="#a6a298" stroke-width="3" stroke-linecap="round"/>
+        <line x1="346" y1="122" x2="402" y2="126" stroke="#a6a298" stroke-width="3" stroke-linecap="round"/>
       `),
       default_tips: makeSvgCover(`
-        <defs><linearGradient id="cdt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#152026"/><stop offset="100%" stop-color="#222e34"/></linearGradient></defs>
-        <rect width="640" height="240" fill="url(#cdt2)"/>
-        <circle cx="320" cy="112" r="64" fill="#f2c96b" opacity="0.24" class="sat-anim-glow"/>
-        <circle cx="320" cy="112" r="24" fill="#e09f5a"/>
-        <rect x="304" y="144" width="32" height="16" rx="6" fill="#7fb3a6"/>
+        <defs>
+          <linearGradient id="defTipBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#131e24"/>
+            <stop offset="100%" stop-color="#222e36"/>
+          </linearGradient>
+          <radialGradient id="defTipGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffe094" stop-opacity="0.45"/>
+            <stop offset="100%" stop-color="#7fb3a6" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="640" height="260" fill="url(#defTipBg)"/>
+        <circle cx="320" cy="122" r="94" fill="url(#defTipGlow)" class="sat-anim-glow"/>
+        <circle cx="320" cy="116" r="28" fill="#f5ca6b"/>
+        <rect x="302" y="152" width="36" height="18" rx="7" fill="#7fb3a6"/>
       `)
     };
 
@@ -2450,6 +2529,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v42',
         'sat_clean_state_v41',
         'sat_clean_state_v40',
         'sat_clean_state_v39',

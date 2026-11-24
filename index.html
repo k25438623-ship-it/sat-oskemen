@@ -66,7 +66,7 @@
     }
 
     body {
-      padding-bottom: 92px;
+      padding-bottom: 88px;
       overflow-x: hidden;
     }
 
@@ -521,6 +521,7 @@
       text-align: center;
     }
 
+    /* Упрощённая нижняя панель без лишнего визуального шума */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -528,38 +529,42 @@
       right: 0;
       z-index: 30;
       background: var(--surface);
-      backdrop-filter: blur(12px);
       border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-      gap: 8px;
+      padding: 6px 10px calc(8px + env(safe-area-inset-bottom));
+      gap: 6px;
     }
     .nav-btn {
-      border: none;
+      border: 1px solid transparent;
       background: transparent;
       color: var(--muted);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      font-size: 12.5px;
+      gap: 3px;
+      font-size: 12px;
       font-weight: 700;
       padding: 7px 4px;
-      border-radius: 14px 6px 14px 14px;
+      border-radius: 12px;
       cursor: pointer;
+      white-space: nowrap;
     }
     .nav-btn svg {
-      width: 22px;
-      height: 22px;
+      width: 21px;
+      height: 21px;
       stroke: currentColor;
       fill: none;
-      stroke-width: 2.1;
+      stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .nav-btn.active { color: var(--accent); background: var(--green-soft); }
+    .nav-btn.active {
+      color: var(--accent);
+      background: var(--green-soft);
+      border-color: var(--border-strong);
+    }
 
     .right-menu-backdrop {
       position: fixed;
@@ -1155,8 +1160,8 @@
 
     <nav class="bottom-nav">
       <button type="button" class="nav-btn" data-tab="pulse" onclick="switchMainTab('pulse', this)">
-        <svg viewBox="0 0 24 24"><path d="M2 12h4l2.5-6 5 12 2.5-6H22"/></svg>
-        <span>Пульс</span>
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <span>Лента</span>
       </button>
       <button type="button" class="nav-btn" data-tab="books" onclick="switchMainTab('books', this)">
         <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -1758,7 +1763,7 @@
         let items = [];
 
         if (tab === 'pulse') {
-          titleText = 'Пульс — выбор';
+          titleText = 'Лента — выбор';
           items = [
             { label: 'Все разделы', fn: () => window.setPulseFilter?.('all') },
             { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
@@ -1856,7 +1861,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v35';
+    const STORE_KEY = 'sat_clean_state_v36';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
 
     const NAME_STYLE_MAPS = {
@@ -2006,6 +2011,7 @@
       const keys = [
         STORE_KEY,
         VAULT_BACKUP_KEY,
+        'sat_clean_state_v35',
         'sat_clean_state_v34',
         'sat_clean_state_v33',
         'sat_clean_state_v32',
@@ -3845,7 +3851,7 @@
         document.getElementById('postTextInput').value = '';
         clearPostAttachment();
         hideModal('newPostModal');
-        toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
+        toast(vis === 'pulse' ? 'Опубликовано в Ленте' : 'Сохранено на вашей странице');
       } finally {
         setTimeout(() => { isSubmittingPost = false; }, 400);
       }

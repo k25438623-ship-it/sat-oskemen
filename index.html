@@ -641,6 +641,17 @@
       border: 1px solid var(--border);
       margin-bottom: 8px;
     }
+    .comment-del-btn {
+      border: 1px solid rgba(255, 107, 122, 0.35);
+      background: rgba(255, 107, 122, 0.14);
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
 
     .wp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
     .wp-item {
@@ -3269,6 +3280,7 @@
       syncSupportAndMonitorCard();
       renderBooksTab();
       renderVyruchkaTab();
+      renderPulse();
       openSupportModal();
       toast('Доступ открыт');
     }
@@ -5164,14 +5176,62 @@
       if (!checkTextBeforeSubmit(text)) return;
 
       if (inp) inp.value = '';
-      const cmtObj = { id: 'tmp_cmt_' + Date.now(), authorUid: getMyUid() || 'guest', authorName: myDisplayName(), text, time: formatTime(Date.now()) };
+      const cmtId = 'cmt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      const authorUid = getMyUid() || 'guest';
+      const cmtObj = { id: cmtId, authorUid, authorName: myDisplayName(), text, time: formatTime(Date.now()) };
       commentsByPostId.set(postId, [...(commentsByPostId.get(postId) || []), cmtObj]);
       openCommentsPostIds.add(postId);
       renderPulse();
       try {
-        await addDoc(collection(db, 'posts', postId, 'comments'), { ...cmtObj, createdAt: serverTimestamp() });
+        await setDoc(doc(db, 'posts', postId, 'comments', cmtId), {
+          authorUid,
+          authorName: cmtObj.authorName,
+          text: cmtObj.text,
+          time: cmtObj.time,
+          createdAt: serverTimestamp()
+        });
         toast('Комментарий добавлен');
-      } catch (e) {}
+      } catch (e) {
+        queueCloudRetry(() => setDoc(doc(db, 'posts', postId, 'comments', cmtId), {
+          authorUid,
+          authorName: cmtObj.authorName,
+          text: cmtObj.text,
+          time: cmtObj.time,
+          createdAt: serverTimestamp()
+        }));
+      }
+    }
+
+    async function deletePostComment(postId, commentId) {
+      const pid = String(postId || '');
+      const cid = String(commentId || '');
+      if (!pid || !cid) return;
+
+      const curList = commentsByPostId.get(pid) || [];
+      const target = curList.find((x) => String(x.id) === cid);
+      const myUid = getMyUid();
+      const canDelete = isCreatorAccount() || (target && (
+        String(target.id).startsWith('tmp_cmt_') ||
+        String(target.id).startsWith('cmt_') && myUid && target.authorUid === myUid ||
+        (myUid && target.authorUid === myUid)
+      ));
+
+      if (!canDelete) {
+        toast('Удалять можно свой комментарий или в режиме разработчика');
+        return;
+      }
+
+      commentsByPostId.set(pid, curList.filter((x) => String(x.id) !== cid));
+      renderPulse();
+
+      if (!cid.startsWith('tmp_cmt_') && !pid.startsWith('post_')) {
+        try {
+          await deleteDoc(doc(db, 'posts', pid, 'comments', cid));
+        } catch (e) {
+          queueCloudRetry(() => deleteDoc(doc(db, 'posts', pid, 'comments', cid)));
+        }
+      }
+      toast('Комментарий удалён');
     }
 
     function getMyKarmaCountForPost(p) {
@@ -5186,6 +5246,7 @@
       const box = document.getElementById('feedContainer');
       if (!box) return;
       const myUid = getMyUid();
+      const creator = isCreatorAccount();
       const list = posts.filter((p) => {
         if ((p.visibility || 'pulse') !== 'pulse') return false;
         return pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter;
@@ -5199,7 +5260,7 @@
         const resolvedUid = resolvePostAuthorUid(p);
         const authorObj = users.find((u) => u && u.uid === resolvedUid) || {};
         const isSelf = Boolean(myUid && (p.authorUid === myUid || resolvedUid === myUid));
-        const isMine = isSelf || String(p.id).startsWith('post_');
+        const isMine = creator || isSelf || String(p.id).startsWith('post_');
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? 0);
@@ -5222,15 +5283,21 @@
 
         const commentsHtml = isCmtOpen ? `
           <div class="comments-box">
-            ${cmtList.length ? cmtList.map((c) => `
-              <div class="comment-item">
-                <div style="display:flex; justify-content:space-between; gap:8px;">
-                  <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(c.authorName || 'Участник')}</span>
-                  <span class="meta" style="font-size:11px;">${esc(c.time || '')}</span>
+            ${cmtList.length ? cmtList.map((c) => {
+              const canDelCmt = creator || (myUid && c.authorUid && c.authorUid === myUid) || String(c.id).startsWith('tmp_cmt_');
+              return `
+                <div class="comment-item">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(c.authorName || 'Участник')}</span>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <span class="meta" style="font-size:11px;">${esc(c.time || '')}</span>
+                      ${canDelCmt ? `<button type="button" class="comment-del-btn" onclick="deletePostComment('${safeId}', '${esc(c.id)}')">Удалить</button>` : ''}
+                    </div>
+                  </div>
+                  <div style="font-size:14px; margin-top:4px;">${esc(c.text || '')}</div>
                 </div>
-                <div style="font-size:14px; margin-top:4px;">${esc(c.text || '')}</div>
-              </div>
-            `).join('') : '<div class="meta" style="margin-bottom:8px;">Комментариев пока нет.</div>'}
+              `;
+            }).join('') : '<div class="meta" style="margin-bottom:8px;">Комментариев пока нет.</div>'}
             <div style="display:flex; gap:6px;">
               <input id="cmtInput_${safeId}" class="input" style="margin-top:0; flex:1; padding:9px 12px; font-size:14px;" placeholder="Комментарий..." onkeydown="if(event.key==='Enter') addPostComment('${safeId}')" />
               <button type="button" class="btn btn-primary" style="padding:9px 13px; font-size:13px;" onclick="addPostComment('${safeId}')">➤</button>
@@ -6600,7 +6667,7 @@
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
       openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
-      giveKarma, toggleCommentsPanel, addPostComment, removePost,
+      giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,
       refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
       openCreateGroupModal, createNewGroup, joinChatGroup,

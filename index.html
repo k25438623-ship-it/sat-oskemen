@@ -2299,6 +2299,52 @@
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
     const MEDIA_VAULT_KEY = 'sat_media_vault_v1';
 
+    // Базовый фильтр мата и грубости для сохранения спокойного тона в SÄT
+    const SAT_PROFANITY_ROOTS = [
+      'бля', 'бляд', 'блят',
+      'еба', 'ебл', 'ебан', 'ебат', 'ебуч', 'заеб', 'наеб', 'отъеб', 'поеб', 'съеб', 'уеб', 'долбоеб', 'долбоёб',
+      'хуй', 'хуя', 'хуе', 'хуи', 'хули', 'охуе', 'ахуе', 'нахер', 'нахуй', 'похуй',
+      'пизд', 'пидор', 'пидар', 'пздц',
+      'сука', 'суки', 'сучар',
+      'шлюх', 'мраз', 'ублюд', 'выбляд', 'гондон', 'мудак', 'мудил', 'чмошн', 'даун',
+      'котак', 'қотақ', 'сигин', 'сігін', 'амы', 'амын', 'жалп', 'далбаеб'
+    ];
+
+    function normalizeTextForFilter(rawText) {
+      if (!rawText || typeof rawText !== 'string') return '';
+      return rawText
+        .toLowerCase()
+        .replace(/ё/g, 'е')
+        .replace(/(?<=\b[а-яёa-z])[\s._*+-]+(?=[а-яёa-z]\b)/gi, '')
+        .replace(/[^а-яa-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function hasBlockedProfanity(rawText) {
+      const clean = normalizeTextForFilter(rawText);
+      if (!clean) return false;
+      const words = clean.split(' ').filter(Boolean);
+      return words.some((word) => {
+        return SAT_PROFANITY_ROOTS.some((root) => {
+          if (word === root) return true;
+          if (root.length >= 4 && word.startsWith(root)) return true;
+          if (root.length === 3 && (word === root || word.startsWith(root + 'т') || word.startsWith(root + 'н') || word.startsWith(root + 'л'))) {
+            return true;
+          }
+          return false;
+        });
+      });
+    }
+
+    function checkTextBeforeSubmit(rawText) {
+      if (hasBlockedProfanity(rawText)) {
+        toast('Пожалуйста, напишите без мата и грубости — сохраним спокойный тон в SÄT.');
+        return false;
+      }
+      return true;
+    }
+
     function makeSvgCover(svgInner) {
       const full = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 260" preserveAspectRatio="xMidYMid slice">${svgInner}</svg>`;
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(full);
@@ -3738,6 +3784,8 @@
         return;
       }
 
+      if (!checkTextBeforeSubmit(`${title} ${location} ${details}`)) return;
+
       const creator = isCreatorAccount();
       const myUid = getMyUid() || 'guest';
       const nowMs = Date.now();
@@ -4289,6 +4337,8 @@
         toast('Укажите заголовок и текст');
         return;
       }
+      if (!checkTextBeforeSubmit(`${title} ${summary} ${content}`)) return;
+
       const myUid = getMyUid();
       const newItem = normalizeReadingDoc({
         kind,
@@ -4484,6 +4534,8 @@
         toast('Напишите сообщение');
         return;
       }
+      if (!checkTextBeforeSubmit(text)) return;
+
       inp.value = '';
       hideModal('supportModal');
 
@@ -4678,6 +4730,7 @@
 
     function applyCaptionNow() {
       const val = (document.getElementById('captionInput')?.value || '').trim().slice(0, 120);
+      if (val && !checkTextBeforeSubmit(val)) return;
       hideModal('captionBox');
       if (_capResolver) {
         const fn = _capResolver;
@@ -5034,6 +5087,8 @@
         return;
       }
 
+      if (!checkTextBeforeSubmit(`${caption} ${text}`)) return;
+
       isSubmittingPost = true;
       try {
         const now = Date.now();
@@ -5106,6 +5161,8 @@
       const inp = document.getElementById('cmtInput_' + postId);
       const text = (inp ? inp.value : '').trim();
       if (!text) { toast('Напишите комментарий'); return; }
+      if (!checkTextBeforeSubmit(text)) return;
+
       if (inp) inp.value = '';
       const cmtObj = { id: 'tmp_cmt_' + Date.now(), authorUid: getMyUid() || 'guest', authorName: myDisplayName(), text, time: formatTime(Date.now()) };
       commentsByPostId.set(postId, [...(commentsByPostId.get(postId) || []), cmtObj]);
@@ -5688,6 +5745,8 @@
       const desc = document.getElementById('groupDescInput').value.trim();
       const myUid = getMyUid();
       if (!title || !myUid) return;
+      if (!checkTextBeforeSubmit(`${title} ${desc}`)) return;
+
       const ref = await addDoc(collection(db, 'chats'), {
         type: 'group', title, description: desc || 'Группа SÄT', creatorUid: myUid, members: [myUid],
         lastMessage: 'Группа создана', lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp()
@@ -6423,6 +6482,8 @@
         const bioVal = (document.getElementById('editBioField')?.value || '').trim();
         const hideSearch = document.getElementById('editHideFromSearchSelect')?.value === '1';
         const hideSeen = document.getElementById('editHideLastSeenSelect')?.value === '1';
+
+        if (!checkTextBeforeSubmit(`${rawName} ${bioVal}`)) return;
 
         const basePlain = rawName || getMyPlainName();
         state.namePlain = basePlain;

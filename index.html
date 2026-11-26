@@ -2388,10 +2388,36 @@
         return '';
       }
 
+      function extractAnyTextDeep(parsed, rawText) {
+        const direct = extractAiReplyText(parsed);
+        if (direct) return direct;
+        if (parsed && typeof parsed === 'object') {
+          if (typeof parsed.error === 'string' && parsed.error.trim()) {
+            return 'Воркер вернул ошибку: ' + parsed.error.trim();
+          }
+          if (parsed.error && typeof parsed.error === 'object' && parsed.error.message) {
+            return 'Воркер вернул ошибку: ' + String(parsed.error.message);
+          }
+          if (Array.isArray(parsed.content) && parsed.content[0] && parsed.content[0].text) {
+            return String(parsed.content[0].text).trim();
+          }
+          if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] && parsed.candidates[0].content.parts[0].text) {
+            return String(parsed.candidates[0].content.parts[0].text).trim();
+          }
+          const compact = JSON.stringify(parsed);
+          if (compact && compact !== '{}') return 'Ответ сервера (JSON): ' + compact.slice(0, 600);
+        }
+        if (rawText && String(rawText).trim()) return String(rawText).trim().slice(0, 600);
+        return '';
+      }
+
       async function requestSatAi(promptText) {
         const payload = {
           prompt: promptText,
           message: promptText,
+          text: promptText,
+          question: promptText,
+          query: promptText,
           region: 'Оскемен / ВКО',
           app: 'SÄT',
           history: aiHistory.slice(-10)
@@ -2407,17 +2433,31 @@
             body: JSON.stringify(payload),
             signal: controller ? controller.signal : undefined
           });
-          if (!res.ok) throw new Error('HTTP ' + res.status);
           const rawText = await res.text();
           let parsed = null;
           try {
-            parsed = JSON.parse(rawText);
+            parsed = rawText ? JSON.parse(rawText) : null;
           } catch (e) {
             parsed = rawText;
           }
-          const reply = extractAiReplyText(parsed);
-          if (!reply) throw new Error('Empty AI response');
+
+          if (!res.ok) {
+            const detail = parsed && typeof parsed === 'object' && parsed.error
+              ? (typeof parsed.error === 'string' ? parsed.error : (parsed.error.message || JSON.stringify(parsed.error)))
+              : (rawText ? String(rawText).slice(0, 240) : '');
+            return 'Ошибка сервера ИИ (HTTP ' + res.status + ')' + (detail ? ': ' + detail : '');
+          }
+
+          const reply = extractAnyTextDeep(parsed, rawText);
+          if (!reply) return 'Сервер ИИ вернул пустой ответ.';
           return reply;
+        } catch (err) {
+          const errName = err && err.name ? err.name : 'Error';
+          const errMsg = err && err.message ? err.message : String(err || 'unknown');
+          if (errName === 'AbortError') {
+            return 'Сервер ИИ не ответил за 25 сек (таймаут). Попробуйте ещё раз.';
+          }
+          return 'Запрос в браузере заблокирован или нет сети (' + errName + ': ' + errMsg + '). Проверьте CORS в воркере sat-ai.bakytzhanazat.workers.dev.';
         } finally {
           if (timer) clearTimeout(timer);
         }
@@ -2468,7 +2508,7 @@
           aiHistory.push({ role: 'assistant', content: reply });
           persistAiHistory();
         } catch (err) {
-          const fallback = 'Сейчас не удалось получить ответ от сервера ИИ. Проверьте соединение или попробуйте ещё раз чуть позже.';
+          const fallback = 'Сбой клиента ИИ: ' + String(err && err.message ? err.message : err);
           if (typingEl) typingEl.textContent = fallback;
           aiHistory.pop();
           persistAiHistory();

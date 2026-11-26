@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="ru">
-<голова>
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta name="author" content="Б.Ш.А. (Б.Ш.А.)" />
+  <meta name="author" content="Б.Ш.А. (B.Sh.A.)" />
   <meta name="copyright" content="© 2026 SÄT • Б.Ш.А. Все права защищены." />
   <title>SÄT</title>
-  <meta name="theme-color" content м101216" />
+  <meta name="theme-color" content="#101216" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
   <style>
-    :корень {
+    :root {
       --bg: #101216;
-      --поверхность: #171a21;
+      --surface: #171a21;
       --surface-elev: #202530;
-      --текст: #f4f1ea;
+      --text: #f4f1ea;
       --muted: #a6a298;
       --accent: #e09f5a;
       --accent-2: #7fb3a6;
-      --зеленый: #c8843e;
+      --green: #c8843e;
       --green-soft: rgba(224, 159, 90, 0.16);
       --border: rgba(244, 241, 234, 0.12);
       --border-strong: rgba(224, 159, 90, 0.45);
-      --опасность: #ff6b7a;
-      --золото: #f2c96b;
+      --danger: #ff6b7a;
+      --gold: #f2c96b;
       --shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
     }
 
     body.theme-light {
       --bg: #f6f4ef;
-      --поверхность: #ffffff;
+      --surface: #ffffff;
       --surface-elev: #efeae1;
-      --текст: #1a1c20;
-      --заглушено: #625f58;
+      --text: #1a1c20;
+      --muted: #625f58;
       --accent: #b86b28;
       --accent-2: #2f6f62;
-      --зеленый: #b86b28;
+      --green: #b86b28;
       --green-soft: rgba(184, 107, 40, 0.14);
       --border: rgba(26, 28, 32, 0.12);
       --border-strong: rgba(184, 107, 40, 0.45);
@@ -45,7 +45,7 @@
     }
 
     * {
-      box-izing: border-box;
+      box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
       -webkit-touch-callout: none;
       user-select: none;
@@ -58,26 +58,26 @@
     }
 
     html, body {
-      отступ: 0;
-      отступ: 0;
-      минимальная высота: 100vh;
-      overscroll-поведение-y: содержать;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      overscroll-behavior-y: contain;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      цвет: var(--text);
-      фон: var(--bg);
+      color: var(--text);
+      background: var(--bg);
     }
 
-    тело {
+    body {
       padding-bottom: 88px;
       overflow-x: hidden;
     }
 
     .ico {
-      ширина: 19 пикселей;
-      высота: 19 пикселей;
+      width: 19px;
+      height: 19px;
       stroke: currentColor;
-      Заполнить: нет;
-      ширина хода: 2;
+      fill: none;
+      stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;
       flex-shrink: 0;
@@ -87,22 +87,22 @@
     .screen { display: none; min-height: 100vh; position: relative; z-index: 1; }
     .screen.active { display: block; }
 
-    #всплеск {
+    #splash {
       align-items: center;
       justify-content: center;
       text-align: center;
       padding: 28px 20px;
       background: radial-gradient(circle at 50% 28%, #ffffff 0%, #f5f2eb 58%, #e8e2d5 100%);
-      цвет: #1a1c20;
-      z-индекс: 5;
+      color: #1a1c20;
+      z-index: 5;
     }
     #splash.active { display: flex; flex-direction: column; }
 
     .logo-box {
-      ширина: 122px;
-      высота: 122 пикселя;
+      width: 122px;
+      height: 122px;
       border-radius: 34px 12px 34px 34px;
-      фон: #ffffff;
+      background: #ffffff;
       border: 2px solid rgba(184, 107, 40, 0.28);
       box-shadow: 0 16px 38px rgba(26, 28, 32, 0.12);
       display: flex;
@@ -121,15 +121,15 @@
       justify-content: center;
       padding: 24px 18px;
       background: radial-gradient(circle at 50% 25%, #ffffff 0%, #f5f2eb 60%, #e8e2d5 100%);
-      цвет: #1a1c20;
-      z-индекс: 5;
+      color: #1a1c20;
+      z-index: 5;
     }
     #auth.active { display: flex; flex-direction: column; }
 
     .auth-card {
-      ширина: 100%;
+      width: 100%;
       max-width: 390px;
-      фон: #ffffff;
+      background: #ffffff;
       border: 1.5px solid rgba(184, 107, 40, 0.35);
       border-radius: 28px 10px 28px 28px;
       padding: 32px 22px;
@@ -138,39 +138,39 @@
     }
 
     .btn {
-      граница: отсутствует;
+      border: none;
       border-radius: 15px 6px 15px 15px;
       padding: 12px 16px;
       font-weight: 700;
       font-size: 14.5px;
-      курсор: указатель;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      зазор: 8 пикселей;
-      тактильное действие: манипуляция;
+      gap: 8px;
+      touch-action: manipulation;
     }
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.65; cursor: default; }
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), #b86b28);
-      цвет: #ffffff;
+      color: #ffffff;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .btn-google {
       background: linear-gradient(135deg, #c87b34, #9c591e);
-      цвет: #ffffff;
+      color: #ffffff;
       font-size: 16px;
       padding: 15px 20px;
-      ширина: 100%;
+      width: 100%;
       box-shadow: 0 10px 24px rgba(156, 89, 30, 0.24);
     }
     .g-circle {
-      ширина: 28 пикселей;
-      высота: 28 пикселей;
-      радиус границы: 50%;
-      фон: #ffffff;
-      цвет: #9c591e;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #9c591e;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -178,42 +178,42 @@
     }
     .btn-mint {
       background: rgba(127, 179, 166, 0.16);
-      цвет: var(--accent-2);
+      color: var(--accent-2);
       border: 1px solid rgba(127, 179, 166, 0.35);
     }
     .btn-gold {
       background: rgba(242, 201, 107, 0.18);
-      цвет: var(--gold);
+      color: var(--gold);
       border: 1px solid rgba(242, 201, 107, 0.42);
     }
     body.theme-light .btn-gold {
-      цвет: #9c591e;
+      color: #9c591e;
       background: rgba(184, 107, 40, 0.14);
       border-color: rgba(184, 107, 40, 0.38);
     }
     .btn-ghost {
-      фон: var (--surface-elev);
-      цвет: var(--text);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
     .btn-danger {
       background: rgba(255, 107, 122, 0.16);
-      цвет: var(--danger);
+      color: var(--danger);
       border: 1px solid rgba(255, 107, 122, 0.32);
     }
 
     .topbar {
-      положение: липкое;
-      верх: 0;
-      z-индекс: 25;
-      фон: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background: var(--surface);
       backdrop-filter: blur(10px);
-      border-bottom: 1px Solid var(--border);
+      border-bottom: 1px solid var(--border);
       padding: 11px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      зазор: 6 пикселей;
+      gap: 6px;
     }
     .brand-row { display: flex; align-items: center; gap: 8px; }
     .brand-text { font-weight: 900; font-size: 18px; letter-spacing: 1px; color: var(--accent); }
@@ -223,9 +223,9 @@
     .tab-panel.active { display: block; }
 
     .card {
-      фон: var(--surface);
+      background: var(--surface);
       backdrop-filter: blur(8px);
-      граница: сплошная 1 пиксель var(--border);
+      border: 1px solid var(--border);
       border-top: 2px solid var(--accent);
       border-radius: 24px 8px 24px 24px;
       padding: 16px;
@@ -234,53 +234,53 @@
     }
     .filter-row {
       display: flex;
-      зазор: 6 пикселей;
+      gap: 6px;
       overflow-x: auto;
       padding-bottom: 4px;
       margin-bottom: 12px;
     }
     .chip-btn {
-      граница: сплошная 1 пиксель var(--border);
-      фон: var (--surface-elev);
-      цвет: var(--muted);
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
+      color: var(--muted);
       border-radius: 999px;
       padding: 7px 12px;
       font-size: 12.5px;
       font-weight: 700;
-      курсор: указатель;
-      пробел: nowrap;
+      cursor: pointer;
+      white-space: nowrap;
       flex-shrink: 0;
     }
     .chip-btn.active {
       background: linear-gradient(135deg, var(--accent), #b86b28);
-      цвет: #ffffff;
+      color: #ffffff;
       border-color: transparent;
     }
 
     .pulse-body-text {
       font-size: 15.5px;
-      межстрочный интервал: 1,55;
+      line-height: 1.55;
       margin-top: 8px;
-      пробел: предстрока;
+      white-space: pre-line;
     }
     .pulse-actions-clean {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      зазор: 6 пикселей;
+      gap: 6px;
       margin-top: 12px;
       padding-top: 10px;
-      border-top: 1px Solid var(--border);
+      border-top: 1px solid var(--border);
     }
     .pulse-act-btn {
-      граница: сплошная 1 пиксель var(--border);
-      фон: var (--surface-elev);
-      цвет: var(--text);
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
+      color: var(--text);
       border-radius: 11px;
       padding: 7px 11px;
       font-size: 12.5px;
       font-weight: 700;
-      курсор: указатель;
+      cursor: pointer;
     }
     .pulse-act-btn.gold { color: var(--gold); border-color: rgba(242, 201, 107, 0.35); }
     body.theme-light .pulse-act-btn.gold { color: #9c591e; }
@@ -289,14 +289,14 @@
       margin-top: 12px;
       padding: 14px;
       border-radius: 18px 6px 18px 18px;
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
     }
     .vyruchka-loc {
       margin-top: 7px;
       font-size: 13px;
       font-weight: 700;
-      цвет: var(--accent-2);
+      color: var(--accent-2);
     }
 
     @keyframes satLivingGlow {
@@ -317,35 +317,35 @@
     }
 
     .book-cover-card {
-      положение: относительное;
-      ширина: 100%;
-      высота: 154 пикселя;
+      position: relative;
+      width: 100%;
+      height: 154px;
       border-radius: 18px 6px 18px 18px;
-      переполнение: скрыто;
-      граница: сплошная 1 пиксель var(--border);
+      overflow: hidden;
+      border: 1px solid var(--border);
       margin-bottom: 11px;
-      фон: var (--surface-elev);
-      курсор: указатель;
+      background: var(--surface-elev);
+      cursor: pointer;
     }
     .book-cover-card img {
-      ширина: 100%;
-      высота: 100%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
       display: block;
       pointer-events: none;
     }
     .reader-hero-cover {
-      положение: относительное;
-      ширина: 100%;
+      position: relative;
+      width: 100%;
       max-height: 236px;
       border-radius: 18px 6px 18px 18px;
-      переполнение: скрыто;
-      граница: сплошная 1 пиксель var(--border);
-      фон: var (--surface-elev);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
       margin-bottom: 16px;
     }
     .reader-hero-cover img {
-      ширина: 100%;
+      width: 100%;
       max-height: 236px;
       object-fit: cover;
       display: block;
@@ -357,11 +357,11 @@
     .sat-anim-needle { transform-box: fill-box; transform-origin: center; animation: satLivingPendulum 4.4s ease-in-out infinite; }
 
     .reader-screen {
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 96;
-      фон: var(--bg);
-      цвет: var(--text);
+      position: fixed;
+      inset: 0;
+      z-index: 96;
+      background: var(--bg);
+      color: var(--text);
       display: none;
       flex-direction: column;
     }
@@ -371,17 +371,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      зазор: 8 пикселей;
+      gap: 8px;
       padding: 10px 14px;
-      border-bottom: 1px Solid var(--border);
-      фон: наследовать;
+      border-bottom: 1px solid var(--border);
+      background: inherit;
     }
     .reader-scroll {
       flex: 1;
       overflow-y: auto;
       padding: 20px 18px 48px;
       max-width: 620px;
-      ширина: 100%;
+      width: 100%;
       margin: 0 auto;
     }
     .reader-article-title { margin: 0 0 6px; font-size: 22px; font-weight: 900; line-height: 1.3; }
@@ -391,19 +391,19 @@
       margin-top: 8px;
       padding: 10px 12px;
       border-radius: 12px;
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
       font-size: 12.5px;
-      высота строки: 1.45;
-      цвет: var(--text);
+      line-height: 1.45;
+      color: var(--text);
     }
 
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
     .stat-box {
       padding: 10px 6px;
       border-radius: 14px;
-      фон: var (--surface-elev);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
       text-align: center;
       transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
     }
@@ -420,9 +420,9 @@
 
     .online-dot {
       display: inline-block;
-      ширина: 8 пикселей;
-      высота: 8 пикселей;
-      радиус границы: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: var(--accent-2);
       box-shadow: 0 0 8px rgba(127, 179, 166, 0.8);
       margin-right: 5px;
@@ -432,60 +432,60 @@
     .offline-txt { color: var(--muted); font-size: 12px; }
 
     .input, textarea, select {
-      ширина: 100%;
-      фон: var (--surface-elev);
-      цвет: var(--text);
-      граница: 1 пиксель сплошная var(--border-strong);
+      width: 100%;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
       border-radius: 14px;
       padding: 12px 14px;
       font-size: 15px;
-      план: отсутствует;
+      outline: none;
       margin-top: 6px;
       font-family: inherit;
     }
 
     .profile-top { display: flex; align-items: center; gap: 15px; }
     .ava-ring {
-      ширина: 82px;
-      высота: 82 пикселя;
-      радиус границы: 50%;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
       padding: 3px;
-      фон: var (--border-strong);
+      background: var(--border-strong);
       flex-shrink: 0;
-      положение: относительное;
-      курсор: указатель;
-      тактильное действие: манипуляция;
+      position: relative;
+      cursor: pointer;
+      touch-action: manipulation;
     }
     .ava-ring.has-story {
-      фон: линейный градиент (135 градусов, var (--accent), var (--accent-2), var (--gold));
+      background: linear-gradient(135deg, var(--accent), var(--accent-2), var(--gold));
       padding: 3.5px;
     }
     .ava-circle {
-      ширина: 100%;
-      высота: 100%;
-      радиус границы: 50%;
-      фон: var (--surface-elev);
-      цвет: var(--accent);
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: var(--surface-elev);
+      color: var(--accent);
       font-size: 28px;
       font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
-      переполнение: скрыто;
-      граница: сплошная 2 пикселя var(--border);
-      тактильное действие: манипуляция;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      touch-action: manipulation;
     }
     .ava-circle img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 
     .ava-cam {
-      положение: абсолютное;
-      справа: 0;
-      дно: 0;
-      ширина: 28 пикселей;
-      высота: 28 пикселей;
-      радиус границы: 50%;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       background: var(--accent);
-      цвет: #ffffff;
+      color: #ffffff;
       border: 2px solid var(--surface);
       display: flex;
       align-items: center;
@@ -497,67 +497,67 @@
     .subtabs-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 14px; }
 
     .sub-btn {
-      граница: сплошная 1 пиксель var(--border);
-      фон: var (--surface-elev);
-      цвет: var(--text);
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
+      color: var(--text);
       border-radius: 13px 5px 13px 13px;
       padding: 10px 6px;
       font-size: 13px;
       font-weight: 700;
-      курсор: указатель;
+      cursor: pointer;
       text-align: center;
     }
     .sub-btn.active {
       background: linear-gradient(135deg, var(--accent), #b86b28);
-      цвет: #ffffff;
+      color: #ffffff;
       border-color: transparent;
     }
 
     .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .photo-cell {
-      Соотношение сторон: 1 / 1;
+      aspect-ratio: 1 / 1;
       border-radius: 14px 5px 14px 14px;
-      переполнение: скрыто;
-      граница: сплошная 1 пиксель var(--border);
-      фон: var (--surface-elev);
-      курсор: указатель;
-      положение: относительное;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface-elev);
+      cursor: pointer;
+      position: relative;
     }
     .photo-cell img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
     .photo-del-btn {
-      положение: абсолютное;
+      position: absolute;
       top: 5px;
-      справа: 5 пикселей;
-      ширина: 24 пикселя;
-      высота: 24 пикселя;
-      радиус границы: 50%;
-      граница: отсутствует;
+      right: 5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
       background: rgba(16, 18, 22, 0.82);
-      цвет: #ff8c98;
+      color: #ff8c98;
       font-size: 12px;
       font-weight: 900;
-      курсор: указатель;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      z-индекс: 2;
+      z-index: 2;
     }
 
     .post-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
     .post-user { display: flex; align-items: center; gap: 10px; cursor: pointer; flex: 1; min-width: 0; }
     .mini-ava {
-      ширина: 42 пикселя;
-      высота: 42 пикселя;
-      радиус границы: 50%;
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
-      цвет: var(--accent);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
       font-weight: 800;
       font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      переполнение: скрыто;
+      overflow: hidden;
       flex-shrink: 0;
     }
     .mini-ava img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -566,20 +566,20 @@
     .post-img-wrap {
       margin-top: 10px;
       border-radius: 16px 6px 16px 16px;
-      переполнение: скрыто;
-      граница: сплошная 1 пиксель var(--border);
-      курсор: указатель;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      cursor: pointer;
     }
     .post-img-wrap img { width: 100%; max-height: 380px; object-fit: cover; display: block; pointer-events: none; }
-    .ярлык {
+    .tag {
       font-size: 12px;
       font-weight: 700;
       padding: 5px 11px;
       border-radius: 999px;
       background: rgba(127, 179, 166, 0.16);
-      цвет: var(--accent-2);
+      color: var(--accent-2);
       border: 1px solid rgba(127, 179, 166, 0.35);
-      пробел: nowrap;
+      white-space: nowrap;
     }
     .tag-alert {
       font-size: 12px;
@@ -587,9 +587,9 @@
       padding: 5px 10px;
       border-radius: 999px;
       background: rgba(242, 201, 107, 0.22);
-      цвет: var(--gold);
+      color: var(--gold);
       border: 1px solid rgba(242, 201, 107, 0.45);
-      пробел: nowrap;
+      white-space: nowrap;
     }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 
@@ -597,45 +597,45 @@
     .comment-item {
       padding: 9px 11px;
       border-radius: 13px;
-      фон: var (--surface-elev);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
       margin-bottom: 8px;
     }
     .comment-del-btn {
       border: 1px solid rgba(255, 107, 122, 0.35);
       background: rgba(255, 107, 122, 0.14);
-      цвет: var(--danger);
+      color: var(--danger);
       border-radius: 8px;
       padding: 2px 8px;
       font-size: 11px;
       font-weight: 700;
-      курсор: указатель;
-      пробел: nowrap;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
     .wp-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
     .wp-item {
-      граница: сплошная 1,5 пикселя var(--border);
+      border: 1.5px solid var(--border);
       border-radius: 18px 6px 18px 18px;
       padding: 14px 16px;
-      курсор: указатель;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      зазор: 12 пикселей;
-      тактильное действие: манипуляция;
+      gap: 12px;
+      touch-action: manipulation;
     }
     .wp-item.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(224, 159, 90, 0.25); }
 
     .prayer-edit-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      зазор: 8 пикселей;
+      gap: 8px;
       margin-top: 10px;
       padding: 12px;
       border-radius: 16px;
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
     }
     .prayer-edit-item label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); }
     .prayer-edit-item input { margin-top: 4px; padding: 9px 10px; font-size: 15px; font-weight: 800; text-align: center; }
@@ -643,107 +643,107 @@
     .copyright-footer {
       text-align: center;
       font-size: 12px;
-      цвет: var(--muted);
+      color: var(--muted);
       padding: 6px 12px 14px;
-      межбуквенный интервал: 0,3 пикселя;
-      Прозрачность: 0,85;
+      letter-spacing: 0.3px;
+      opacity: 0.85;
     }
 
     .bottom-nav-single {
-      положение: фиксированное;
-      дно: 0;
-      слева: 0;
-      справа: 0;
-      z-индекс: 30;
-      фон: var(--surface);
-      border-top: 1px Solid var(--border);
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       padding: 6px 12px calc(8px + env(safe-area-inset-bottom));
-      зазор: 8 пикселей;
+      gap: 8px;
     }
     .nav-btn {
       border: 1px solid transparent;
-      фон: прозрачный;
-      цвет: var(--muted);
+      background: transparent;
+      color: var(--muted);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      зазор: 3 пикселя;
+      gap: 3px;
       font-size: 12px;
       font-weight: 700;
       padding: 7px 4px;
       border-radius: 12px;
-      курсор: указатель;
-      пробел: nowrap;
+      cursor: pointer;
+      white-space: nowrap;
     }
     .nav-btn svg {
-      ширина: 21px;
-      высота: 21px;
+      width: 21px;
+      height: 21px;
       stroke: currentColor;
-      Заполнить: нет;
-      ширина хода: 2,1;
+      fill: none;
+      stroke-width: 2.1;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
     .nav-btn.active {
-      цвет: var(--accent);
+      color: var(--accent);
       background: var(--green-soft);
-      цвет границы: var (--border-strong);
+      border-color: var(--border-strong);
     }
     .bottom-nav-profile-right { grid-column: 3; width: 100%; }
 
     .side-menu-backdrop {
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 62;
+      position: fixed;
+      inset: 0;
+      z-index: 62;
       background: rgba(0, 0, 0, 0.35);
       display: none;
     }
     .side-menu-backdrop.open { display: block; }
 
     .left-section-drawer {
-      положение: фиксированное;
+      position: fixed;
       top: 62px;
-      слева: 12 пикселей;
-      ширина: 262 пикселя;
+      left: 12px;
+      width: 262px;
       max-width: calc(100vw - 24px);
       max-height: calc(100vh - 96px);
       overflow-y: auto;
-      z-индекс: 64;
-      фон: var (--surface-elev);
-      цвет: var(--text);
-      граница: 1 пиксель сплошная var(--border-strong);
+      z-index: 64;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
       border-top: 3px solid var(--accent-2);
       border-radius: 6px 22px 22px 22px;
       padding: 14px;
       box-shadow: var(--shadow);
       display: none;
       flex-direction: column;
-      зазор: 8 пикселей;
+      gap: 8px;
     }
     .left-section-drawer.open { display: flex; }
 
     .right-section-drawer {
-      положение: фиксированное;
+      position: fixed;
       top: 62px;
-      справа: 12 пикселей;
-      ширина: 268 пикселей;
+      right: 12px;
+      width: 268px;
       max-width: calc(100vw - 24px);
       max-height: calc(100vh - 96px);
       overflow-y: auto;
-      z-индекс: 64;
-      фон: var (--surface-elev);
-      цвет: var(--text);
-      граница: 1 пиксель сплошная var(--border-strong);
+      z-index: 64;
+      background: var(--surface-elev);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
       border-top: 3px solid var(--accent);
       border-radius: 22px 6px 22px 22px;
       padding: 14px;
       box-shadow: var(--shadow);
       display: none;
       flex-direction: column;
-      зазор: 8 пикселей;
+      gap: 8px;
     }
     .right-section-drawer.open { display: flex; }
 
@@ -754,39 +754,39 @@
       font-weight: 800;
       font-size: 15px;
       padding-bottom: 6px;
-      border-bottom: 1px Solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
 
     .side-drawer-item {
-      ширина: 100%;
+      width: 100%;
       text-align: left;
-      граница: сплошная 1 пиксель var(--border);
-      фон: var(--surface);
-      цвет: var(--text);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
       border-radius: 14px 5px 14px 14px;
       padding: 10px 12px;
       font-size: 13.5px;
       font-weight: 700;
-      курсор: указатель;
+      cursor: pointer;
     }
     .side-drawer-item:hover, .side-drawer-item.selected {
-      цвет границы: var (--border-strong);
+      border-color: var(--border-strong);
       background: var(--green-soft);
-      цвет: var(--accent);
+      color: var(--accent);
     }
 
     .left-sublist-box {
       display: flex;
       flex-direction: column;
-      зазор: 6 пикселей;
+      gap: 6px;
       padding-left: 8px;
       border-left: 2px solid var(--accent-2);
     }
 
     .modal-bg {
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 65;
+      position: fixed;
+      inset: 0;
+      z-index: 65;
       background: rgba(0, 0, 0, 0.35);
       display: none;
       align-items: flex-end;
@@ -794,13 +794,13 @@
     }
     .modal-bg.open { display: flex; }
     .modal-box {
-      ширина: 100%;
+      width: 100%;
       max-width: 600px;
-      максимальная высота: 92vh;
+      max-height: 92vh;
       overflow-y: auto;
-      фон: var(--surface);
+      background: var(--surface);
       backdrop-filter: blur(10px);
-      цвет: var(--text);
+      color: var(--text);
       border-top: 3px solid var(--accent);
       border-radius: 26px 8px 0 0;
       padding: 20px 18px 28px;
@@ -814,16 +814,16 @@
     #deleteAccountModal { z-index: 97; }
 
     .viewer-screen {
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 95;
-      фон: #0d0f13;
-      цвет: #ffffff;
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: #0d0f13;
+      color: #ffffff;
       display: none;
       flex-direction: column;
       justify-content: space-between;
       padding: 18px 16px 24px;
-      сенсорное действие: отсутствует;
+      touch-action: none;
     }
     .viewer-screen.open { display: flex; }
     .viewer-stage {
@@ -831,13 +831,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      переполнение: скрыто;
+      overflow: hidden;
       margin: 10px 0;
-      сенсорное действие: отсутствует;
+      touch-action: none;
     }
     .viewer-screen img {
       max-width: 100%;
-      максимальная высота: 70vh;
+      max-height: 70vh;
       object-fit: contain;
       border-radius: 16px;
       transform-origin: center center;
@@ -846,11 +846,11 @@
 
     #fullCallScreen {
       display: none;
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 98;
+      position: fixed;
+      inset: 0;
+      z-index: 98;
       background: linear-gradient(165deg, #101216 0%, #171a21 55%, #202530 100%);
-      цвет: #f4f1ea;
+      color: #f4f1ea;
       flex-direction: column;
       justify-content: space-between;
       padding: 28px 20px 36px;
@@ -858,50 +858,50 @@
     #fullCallScreen.open { display: flex; }
 
     .chat-screen {
-      положение: фиксированное;
-      вставка: 0;
-      z-индекс: 75;
-      ширина: 100vw;
-      высота: 100dvh;
+      position: fixed;
+      inset: 0;
+      z-index: 75;
+      width: 100vw;
+      height: 100dvh;
       display: none;
       flex-direction: column;
       padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-      фон: var(--bg);
+      background: var(--bg);
       backdrop-filter: blur(12px);
     }
     .chat-screen.open { display: flex; }
     .chat-wrap {
-      ширина: 100%;
+      width: 100%;
       max-width: 640px;
-      высота: 100%;
+      height: 100%;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      минимальная высота: 0;
-      зазор: 7 пикселей;
+      min-height: 0;
+      gap: 7px;
     }
     .chat-topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      зазор: 8 пикселей;
-      фон: var(--surface);
-      граница: сплошная 1 пиксель var(--border);
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-top: 2px solid var(--accent);
       padding: 10px 12px;
       border-radius: 18px 6px 18px 18px;
     }
     .chat-list {
       flex: 1;
-      минимальная высота: 0;
+      min-height: 0;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      зазор: 9 пикселей;
+      gap: 9px;
       padding: 12px;
       border-radius: 18px 6px 18px 18px;
-      фон: var(--surface);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border);
     }
     .msg { padding: 10px 13px; border-radius: 16px; font-size: 14.5px; max-width: 85%; word-break: break-word; }
     .msg.them { background: var(--surface-elev); color: var(--text); align-self: flex-start; border: 1px solid var(--border); }
@@ -915,12 +915,12 @@
     .msg-tool-btn {
       border: 1px solid rgba(255, 255, 255, 0.24);
       background: rgba(16, 18, 22, 0.45);
-      цвет: #ffffff;
+      color: #ffffff;
       border-radius: 10px;
       padding: 4px 10px;
       font-size: 11.5px;
       font-weight: 700;
-      курсор: указатель;
+      cursor: pointer;
     }
     .msg-tool-btn.del { border-color: rgba(255, 130, 145, 0.6); color: #ffd0d5; }
     .msg-photo {
@@ -930,29 +930,29 @@
       max-height: 260px;
       object-fit: cover;
       display: block;
-      курсор: указатель;
+      cursor: pointer;
     }
 
     .voice-player {
       margin-top: 6px;
       display: flex;
       align-items: center;
-      зазор: 8 пикселей;
+      gap: 8px;
       padding: 7px 10px;
       border-radius: 12px;
       background: rgba(16, 18, 22, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.16);
     }
     .voice-play-btn {
-      ширина: 32 пикселя;
-      высота: 32 пикселя;
-      радиус границы: 50%;
-      граница: отсутствует;
-      фон: #ffffff;
-      цвет: #9c591e;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #ffffff;
+      color: #9c591e;
       font-weight: 900;
       font-size: 13px;
-      курсор: указатель;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -960,10 +960,10 @@
     }
     .voice-track {
       flex: 1;
-      высота: 6 пикселей;
+      height: 6px;
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.24);
-      переполнение: скрыто;
+      overflow: hidden;
       min-width: 72px;
     }
     .voice-fill { height: 100%; width: 0%; background: #ffffff; transition: width 0.12s linear; }
@@ -973,46 +973,46 @@
       display: none;
       align-items: center;
       justify-content: space-between;
-      зазор: 8 пикселей;
+      gap: 8px;
       padding: 9px 12px;
       border-radius: 14px;
       background: var(--green-soft);
-      граница: 1 пиксель сплошная var(--border-strong);
+      border: 1px solid var(--border-strong);
       font-size: 13px;
       font-weight: 700;
-      цвет: var(--accent);
+      color: var(--accent);
       flex-wrap: wrap;
     }
     .voice-status-bar.show, .voice-draft-bar.show, .edit-mode-bar.show { display: flex; }
 
     .emoji-bar {
       display: flex;
-      зазор: 6 пикселей;
+      gap: 6px;
       overflow-x: auto;
       padding: 4px 6px;
       border-radius: 14px;
-      фон: var(--surface);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border);
     }
     .emoji-btn {
-      граница: отсутствует;
-      фон: var (--surface-elev);
-      цвет: var(--text);
+      border: none;
+      background: var(--surface-elev);
+      color: var(--text);
       border-radius: 10px;
       padding: 5px 9px;
       font-size: 17px;
       line-height: 1.1;
-      курсор: указатель;
+      cursor: pointer;
       flex-shrink: 0;
     }
     .emoji-btn:active { transform: scale(0.94); }
 
     .chat-composer {
       display: flex;
-      зазор: 6 пикселей;
+      gap: 6px;
       align-items: center;
-      фон: var(--surface);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface);
+      border: 1px solid var(--border);
       padding: 8px;
       border-radius: 18px 6px 18px 18px;
     }
@@ -1021,13 +1021,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      зазор: 10 пикселей;
+      gap: 10px;
       padding: 12px;
       margin-top: 8px;
       border-radius: 16px 6px 16px 16px;
-      фон: var (--surface-elev);
-      граница: сплошная 1 пиксель var(--border);
-      курсор: указатель;
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
+      cursor: pointer;
     }
     .chat-row-card.has-unread { border-color: var(--accent); }
 
@@ -1035,56 +1035,56 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      зазор: 10 пикселей;
+      gap: 10px;
       padding: 12px 0;
-      border-bottom: 1px Solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
     .list-item:last-child { border-bottom: none; padding-bottom: 0; }
 
     .toast {
-      положение: фиксированное;
-      слева: 50%;
-      нижняя часть: 94px;
+      position: fixed;
+      left: 50%;
+      bottom: 94px;
       transform: translateX(-50%) translateY(20px);
-      фон: #9c591e;
-      цвет: #ffffff;
+      background: #9c591e;
+      color: #ffffff;
       padding: 11px 18px;
       border-radius: 999px;
       font-size: 13.5px;
       font-weight: 600;
-      непрозрачность: 0;
+      opacity: 0;
       pointer-events: none;
-      Переход: плавный переход на 0,25 секунды;
-      z-индекс: 110;
-      пробел: nowrap;
+      transition: all 0.25s ease;
+      z-index: 110;
+      white-space: nowrap;
       max-width: 92vw;
-      переполнение: скрыто;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     .osk-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .osk-widget {
-      фон: var (--surface-elev);
-      граница: сплошная 1 пиксель var(--border);
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
       border-radius: 16px 6px 16px 16px;
       padding: 11px 12px;
     }
     .osk-pane { display: none; }
     .osk-pane.active { display: block; }
     .osk-map-box {
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
       border-radius: 18px 6px 18px 18px;
-      переполнение: скрыто;
+      overflow: hidden;
     }
     .osk-map-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      зазор: 8 пикселей;
+      gap: 8px;
       padding: 9px 12px;
-      border-bottom: 1px Solid var(--border);
+      border-bottom: 1px solid var(--border);
     }
     #satOskemenMapSvg { width: 100%; height: 290px; display: block; touch-action: manipulation; }
     .osk-pin-form {
@@ -1092,19 +1092,19 @@
       margin-top: 10px;
       padding: 12px;
       border-radius: 16px;
-      фон: var (--surface-elev);
-      граница: 1 пиксель сплошная var(--border-strong);
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
     }
     .osk-pin-form.open { display: block; }
   </style>
 </head>
-<тело>
+<body>
   <section id="splash" class="screen active">
     <div class="logo-box">
       <div class="logo-dots"><span class="logo-dot"></span><span class="logo-dot"></span></div>
       <div class="logo-letter">Ä</div>
     </div>
-    <h1 class="brand-name">СЭТ</h1>
+    <h1 class="brand-name">SÄT</h1>
     <button type="button" class="btn btn-primary" style="min-width: 210px; padding: 15px 28px; font-size: 17px;" onclick="enterAppFlow()">Войти</button>
     <div id="sessionHint" class="meta" style="margin-top: 14px; color: #625f58; display: none;">Проверяем вход...</div>
   </section>
@@ -1116,7 +1116,7 @@
         <div class="logo-letter" style="font-size: 40px;">Ä</div>
       </div>
       <h2 style="margin: 0 0 8px; font-size: 26px; font-weight: 900; color: #b86b28; letter-spacing: 2px;">SÄT</h2>
-      <p style="margin: 0 0 24px; font-size: 14.5px; color: #625f58;">Быстрый вход в одно касание без анкеты</p>
+      <p style="margin: 0 0 24px; font-size: 14.5px; color: #625f58;">Быстрый вход в одно касание без анкет</p>
       <button type="button" class="btn btn-google" onclick="loginWithGoogle()">
         <span class="g-circle">G</span>
         <span>Продолжить через Google</span>
@@ -1130,16 +1130,16 @@
         <button type="button" id="leftHamburgerBtn" class="btn btn-mint" style="padding: 8px 11px; font-size: 15px; line-height: 1;" onclick="openLeftSectionsMenu()">
           <span>☰</span>
         </button>
-        <div class="brand-text">СЭТ</div>
+        <div class="brand-text">SÄT</div>
       </div>
       <div style="display: flex; gap: 6px; align-items: center;">
         <button type="button" class="btn btn-primary" style="padding: 8px 10px; font-size: 12.5px;" onclick="openUnifiedSearchModal()">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          Поиск</span>
+          <span>Поиск</span>
         </button>
         <button type="button" id="satOskemenTopBtn" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.open()">
           <span id="satOskemenTopTemp">🌤 --°</span>
-          <span>Окемен</span>
+          <span>Оскемен</span>
         </button>
         <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
           <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
@@ -1166,14 +1166,14 @@
         <div class="card">
           <h3 style="margin: 0; font-size: 19px;">Книга</h3>
           <div style="margin-top: 8px; font-size: 14.5px; line-height: 1.5; color: var(--accent); font-weight: 700;">
-            Уважаемые пользователи, скоро мы начнем писать электронные книги.
+            Уважаемые пользователи, скоро мы будем добавлять электронные книги.
           </div>
         </div>
 
         <div id="booksModerationCard" class="card" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
-              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">На фоне у разработчика</h3>
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">На проверке у разработчика</h3>
               <div class="meta">Проверьте отправленные истории и советы перед публикацией</div>
             </div>
             <span class="tag-alert" id="booksPendingBadge">0</span>
@@ -1209,14 +1209,14 @@
         </div>
       </div>
 
-      <div id="tab-выручка" class="tab-panel">
+      <div id="tab-vyruchka" class="tab-panel">
         <div class="card">
           <h3 style="margin: 0; font-size: 19px;">Выручка рядом</h3>
           <p class="pulse-body-text" style="margin-top: 8px; font-size: 14.5px; color: var(--muted);">
             Быстрые ориентиры на месте в Оскемене и ВКО: круглосуточные аптеки, круглосуточные кафе, хостелы и ночлег, а также житейские советы и лайфхаки по городу и быту для тех, кто только осваивается или нуждается в подсказке.
           </p>
           <div class="meta" style="margin-top: 8px;">
-            Общедоступные адреса, справочники и снимки с разрешения учреждений без чужих личных данных. Новые отчеты о проведении проверки, график и наличие мест лучше уточнить на месте.
+            Общедоступные адреса, ориентиры и снимки с разрешения заведений без чужих личных данных. Новые записи проходят проверку, график и наличие мест лучше уточнять на месте.
           </div>
           <div class="actions" style="margin-top: 12px;">
             <button type="button" class="btn btn-primary" style="width: 100%;" onclick="toggleVyruchkaForm()">+ Добавить точку или подсказку</button>
@@ -1231,15 +1231,15 @@
               <option value="tips">Советы и лайфхаки по городу и быту</option>
             </select>
 
-            <label class="meta" style="display:block;margin-top: 10px;">Название или суть подсказки</label>
-            <input id="vyruchkaTitleInput" class="input" maxlength="95" Placeholder="Например: Ночное кафе у перекрёстка или Ориентиры в городе" />
+            <label class="meta" style="display: block; margin-top: 10px;">Название или суть подсказки</label>
+            <input id="vyruchkaTitleInput" class="input" maxlength="95" placeholder="Например: Ночное кафе у перекрёстка или Ориентиры в городе" />
 
-            <label class="meta" style="display:block;margin-top: 10px;">Адрес, район или ориентир</label>
-            <input id="vyruchkaLocationInput" class="input" maxlength="120" Placeholder="Например: пр. Абая / район / ориентир (необязательно для совета)" />
+            <label class="meta" style="display: block; margin-top: 10px;">Адрес, район или ориентир</label>
+            <input id="vyruchkaLocationInput" class="input" maxlength="120" placeholder="Например: пр. Абая / район / ориентир (необязательно для совета)" />
 
             <div style="margin-top: 10px;">
               <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('vyruchka_photo')">
-                <span id="vyruchkaPhotoLabel">Прикрепить фото места с разрешением (необязательно)</span>
+                <span id="vyruchkaPhotoLabel">Прикрепить фото места с разрешения (необязательно)</span>
               </button>
               <div id="vyruchkaPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
                 <img id="vyruchkaPreviewImg" src="" alt="" style="width: 100%; max-height: 190px; object-fit: cover; border-radius: 14px;" />
@@ -1247,8 +1247,8 @@
               </div>
             </div>
 
-            <label class="meta" style="display:block;margin-top: 10px;">Короткая заметка по делу</label>
-            <textarea id="vyruchkaDetailsInput" rows="3" maxlength="360" Placeholder="Режим работы, наличие зарядки/место или практический совет..."></textarea>
+            <label class="meta" style="display: block; margin-top: 10px;">Короткая заметка по делу</label>
+            <textarea id="vyruchkaDetailsInput" rows="3" maxlength="360" placeholder="Режим работы, наличие зарядки/мест или практический совет..."></textarea>
 
             <div class="actions" style="margin-top: 12px;">
               <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="toggleVyruchkaForm(false)">Отмена</button>
@@ -1268,8 +1268,8 @@
         <div id="vyruchkaModerationCard" class="card" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
-              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">На стороне (контроль разработчика)</h3>
-              <div class="meta">Записи от пользователей для публикации в общем списке</div>
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">На проверке (контроль разработчика)</h3>
+              <div class="meta">Записи от пользователей до публикации в общий список</div>
             </div>
             <span class="tag-alert" id="vyruchkaPendingBadge">0</span>
           </div>
@@ -1308,7 +1308,7 @@
           </div>
 
           <div class="actions" style="margin-top: 10px;">
-            <button type="button" class="btn btn-primary" style="flex: 1; размер шрифта: 13,5 пикселей;" onclick="openNewPostModal()">Новая публикация</button>
+            <button type="button" class="btn btn-primary" style="flex: 1; font-size: 13.5px;" onclick="openNewPostModal()">Новая публикация</button>
             <button type="button" class="btn btn-ghost" style="font-size: 13.5px;" onclick="openEditProfileModal()">Изменить</button>
             <button type="button" class="btn btn-danger" style="font-size: 13.5px;" onclick="openDeleteAccountModal()">Удалить страницу</button>
             <button type="button" class="btn btn-ghost" style="font-size: 13.5px;" onclick="logoutUser()">Выйти</button>
@@ -1319,12 +1319,12 @@
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
             <div>
               <h3 style="margin: 0; font-size: 16px;">Анкета</h3>
-              <div id="myQuestionnaireMeta" class="meta">Видна другие пользователи на вашей странице</div>
+              <div id="myQuestionnaireMeta" class="meta">Видна другим пользователям на вашей странице</div>
             </div>
             <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="openEditProfileModal()">Заполнить</button>
           </div>
           <div id="myQuestionnaireText" style="margin-top: 8px; font-size: 14px; line-height: 1.48;">
-            Расскажите коротко о себе или своем деле — другие пользователи увидят это в вашей анкете.
+            Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.
           </div>
         </div>
 
@@ -1338,7 +1338,7 @@
           <div id="myStoryBanner" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <div>
-                <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Ваша сторис (стойки 3 часа)</div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Ваша сторис (действует 3 часа)</div>
                 <div id="myStoryTimerText" class="meta">Активна</div>
               </div>
               <div style="display: flex; gap: 8px;">
@@ -1365,7 +1365,7 @@
         <div id="mySubFriends" style="display: none;">
           <div id="incomingFriendRequestsCard" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">Заявки друзьям</h3>
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">Заявки в друзья</h3>
               <span class="tag-alert" id="incomingFriendCountBadge">0</span>
             </div>
             <div id="incomingFriendRequestsList"></div>
@@ -1428,7 +1428,7 @@
         </div>
 
         <div class="copyright-footer">
-          © СЭТ • Б.Ш.А. Все права защищены.
+          © SÄT • Б.Ш.А. Все права защищены.
         </div>
       </div>
     </main>
@@ -1462,7 +1462,7 @@
   <section id="peerProfileScreen" class="screen">
     <header class="topbar">
       <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
-      <div id="peerHeaderTitle" style="font-weight: 800; размер шрифта: 16px; цвет: var(--accent);">Страница</div>
+      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--accent);">Страница</div>
       <div style="width: 74px;"></div>
     </header>
 
@@ -1480,7 +1480,7 @@
             <div id="peerOnlineStatus" style="margin-top: 3px;"></div>
             <div id="peerAboutLine" class="meta" style="margin-top: 6px; line-height: 1.45;">Участник SÄT</div>
             <div id="peerStoryTag" style="display: none; margin-top: 8px;">
-              <button type="button" class="btn btn-mint" style="padding: 6px 12px; размер шрифта: 12,5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 часов)</button>
+              <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
             </div>
           </div>
         </div>
@@ -1511,7 +1511,7 @@
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('unifiedSearchModal')">✕</button>
       </div>
 
-      <input id="unifiedSearchInput" class="input" style="margin-top: 10px; Margin-bottom: 10px;" Placeholder="Имя, объявление или дело..." oninput="renderUnifiedSearch()" />
+      <input id="unifiedSearchInput" class="input" style="margin-top: 10px; margin-bottom: 10px;" placeholder="Имя, объявление или дело..." oninput="renderUnifiedSearch()" />
 
       <div class="subtabs-3" style="margin-bottom: 10px;">
         <button type="button" id="sTabAll" class="sub-btn active" onclick="setUnifiedSearchTab('all')">Все</button>
@@ -1527,11 +1527,11 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 6px; font-size: 18px;">Выберите тип аккаунта</h3>
       <p class="meta" style="margin: 0 0 14px; line-height: 1.45;">
-        Это можно изменить в любой момент в разделе «Изменить» профиль. Видны только имя, анкета и статус в SÄT.
+        Это можно изменить в любое время в разделе «Изменить» профиля. Видны только имя, анкета и статус в SÄT.
       </p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('user')">
-          фу
+          Пользователь
         </button>
         <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('business')">
           Бизнес-аккаунт
@@ -1575,16 +1575,16 @@
   <div id="addReadingModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 6px; font-size: 18px;">Добавить в «Книгу»</h3>
-      <div class="meta" style="margin-bottom: 10px;">Материал сначала отправляется на проверку, затем становится для всех.</div>
+      <div class="meta" style="margin-bottom: 10px;">Материал сначала отправится на проверку, затем появится для всех.</div>
       <label class="meta">Раздел</label>
       <select id="readingKindSelect">
         <option value="stories">Короткие истории</option>
         <option value="tips">Краткие советы</option>
       </select>
-      <label class="meta" style="display:block;margin-top: 10px;">Заголовок</label>
-      <input id="readingTitleInput" class="input" Placeholder="Название истории или совета" />
-      <label class="meta" style="display:block;margin-top: 10px;">Короткое описание</label>
-      <input id="readingDescInput" class="input" Placeholder="О чем текст..." />
+      <label class="meta" style="display: block; margin-top: 10px;">Заголовок</label>
+      <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
+      <label class="meta" style="display: block; margin-top: 10px;">Короткое описание</label>
+      <input id="readingDescInput" class="input" placeholder="О чём текст..." />
       <div style="margin-top: 10px;">
         <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('reading_cover')">
           <span id="readingPhotoLabel">Прикрепить фото по теме (необязательно)</span>
@@ -1595,7 +1595,7 @@
         </div>
       </div>
       <label class="meta" style="display: block; margin-top: 10px;">Текст</label>
-      <textarea id="readingContentInput" rows="6" Placeholder="Написать текст..."></textarea>
+      <textarea id="readingContentInput" rows="6" placeholder="Напишите текст..."></textarea>
       <div class="actions" style="margin-top: 14px;">
         <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('addReadingModal')">Отмена</button>
         <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveNewReadingItem()">Отправить</button>
@@ -1650,13 +1650,13 @@
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <div onclick="onSupportTitleTripleTap()">
           <h3 id="supportModalTitle" style="margin: 0; font-size: 18px;">Техподдержка SÄT</h3>
-          <div id="supportModalSub" class="meta">Оставьте вопрос или обращение</div>
+          <div id="supportModalSub" class="meta">Опишите вопрос или обращение</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
       </div>
 
       <div id="userSupportForm" style="margin-top: 12px;">
-        <textarea id="supportMsgInput" rows="3" Placeholder="Напишите ваше обращение в техподдержку..."></textarea>
+        <textarea id="supportMsgInput" rows="3" placeholder="Напишите ваше обращение в техподдержку..."></textarea>
         <div class="actions" style="margin-top: 10px;">
           <button type="button" class="btn btn-primary" style="width: 100%;" onclick="sendSupportMessage()">Отправить</button>
         </div>
@@ -1698,8 +1698,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 id="pickerModalTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите фото</h3>
       <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
-        <button type="button" class="btn btn-primary" style="width: 100%; отступ: 14px;" onclick="startCamera()">Сделать фото на камеру</button>
-        <button type="button" class="btn btn-mint" style="width: 100%; отступ: 14px;" onclick="startGallery()">Загрузить из галереи</button>
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="startCamera()">Сделать фото на камеру</button>
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="startGallery()">Загрузить из галереи</button>
         <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="hideModal('photoPickerModal')">Отмена</button>
       </div>
     </div>
@@ -1708,7 +1708,7 @@
   <div id="captionBox" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 id="captionBoxTitle" style="margin: 0 0 10px; font-size: 18px;">Подпись к фото</h3>
-      <input id="captionInput" class="input" maxlength="120" placeholder="Написать подпись..." onkeydown="if(event.key==='Enter') applyCaptionNow()" />
+      <input id="captionInput" class="input" maxlength="120" placeholder="Напишите подпись..." onkeydown="if(event.key==='Enter') applyCaptionNow()" />
       <div class="actions" style="margin-top: 12px;">
         <button type="button" class="btn btn-primary" style="width: 100%;" onclick="applyCaptionNow()">Готово</button>
       </div>
@@ -1739,15 +1739,15 @@
         <option value="cafe">Кафе</option>
       </select>
 
-      <label class="meta" style="display:block;margin-top: 10px;">Подпись или заголовок</label>
-      <input id="postCaptionInput" class="input" Placeholder="Короткий заголовок..." />
+      <label class="meta" style="display: block; margin-top: 10px;">Подпись или заголовок</label>
+      <input id="postCaptionInput" class="input" placeholder="Короткий заголовок..." />
 
-      <label class="meta" style="display:block;margin-top: 10px;">Текст сообщения</label>
-      <textarea id="postTextInput" rows="3" Placeholder="Написать сообщение..."></textarea>
+      <label class="meta" style="display: block; margin-top: 10px;">Текст сообщения</label>
+      <textarea id="postTextInput" rows="3" placeholder="Напишите сообщение..."></textarea>
 
       <div style="margin-top: 12px;">
         <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('post')">
-          <span id="postPhotoLabel">Прикрепить фото (камеру или галерею)</span>
+          <span id="postPhotoLabel">Прикрепить фото (камера или галерея)</span>
         </button>
         <div id="postPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
           <img id="postPreviewImg" src="" alt="" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px;" />
@@ -1762,7 +1762,7 @@
           <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
         </div>
         <div id="postDestExplanation" class="dest-hint-box">
-          <strong>В Пульс:</strong> публикацию видят все пользователи в общем разделе «Пульс», а также она сохраняется на вашей странице.
+          <strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.
         </div>
       </div>
 
@@ -1777,9 +1777,9 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Данные профиля и анкета</h3>
       <label class="meta">Имя</label>
-      <input id="editNameField" class="input" placeholder="Ввести имя" oninput="updateNameStylePreview()" />
+      <input id="editNameField" class="input" placeholder="Введите имя" oninput="updateNameStylePreview()" />
 
-      <label class="meta" style="display:block;margin-top: 10px;">Стиль шрифта имени</label>
+      <label class="meta" style="display: block; margin-top: 10px;">Стиль шрифта имени</label>
       <select id="editNameStyleSelect" onchange="updateNameStylePreview()">
         <option value="normal">Обычный</option>
         <option value="bold">Жирный (𝐀𝐛𝐜)</option>
@@ -1789,30 +1789,30 @@
       </select>
       <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: var(--accent); font-weight: 700;"></div>
 
-      <label class="meta" style="display:block;margin-top: 10px;">Тип аккаунта</label>
+      <label class="meta" style="display: block; margin-top: 10px;">Тип аккаунта</label>
       <select id="editAccountTypeSelect">
         <option value="user">Пользователь</option>
         <option value="business">Бизнес-аккаунт</option>
       </select>
 
-      <label class="meta" style="display:block;margin-top: 10px;">Анкета / О себе (видно других пользователей)</label>
-      <textarea id="editBioField" rows="3" Placeholder="Коротко о себе или о вашем деле..."></textarea>
+      <label class="meta" style="display: block; margin-top: 10px;">Анкета / О себе (видно другим пользователям)</label>
+      <textarea id="editBioField" rows="3" placeholder="Коротко о себе или о вашем деле..."></textarea>
 
-      <label class="meta" style="display:block;margin-top: 10px;">Видимость в общем поиске</label>
+      <label class="meta" style="display: block; margin-top: 10px;">Видимость в общем поиске</label>
       <select id="editHideFromSearchSelect">
-        <option value="0">Показать мою страницу в общем поиске</option>
-        <option value="1">Скрыть общий поиск (видят только те, кому я пишу)</option>
+        <option value="0">Показывать мою страницу в общем поиске</option>
+        <option value="1">Скрыть из общего поиска (видят только те, кому я пишу)</option>
       </select>
 
-      <label class="meta" style="display:block;margin-top: 10px;">Активность статуса</label>
+      <label class="meta" style="display: block; margin-top: 10px;">Статус активности</label>
       <select id="editHideLastSeenSelect">
-        <option value="0">Показывать «в сети» и время посещения</option>
-        <option value="1">Скрывать время визита</option>
+        <option value="0">Показывать «в сети» и время визита</option>
+        <option value="1">Скрывать время последнего визита</option>
       </select>
 
       <div class="actions" style="margin-top: 14px;">
         <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('editProfileModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()"> Сохранить</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()">Сохранить</button>
       </div>
     </div>
   </div>
@@ -1821,9 +1821,9 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Создать группу</h3>
       <label class="meta">Название группы</label>
-      <input id="groupTitleInput" class="input" Placeholder="Название группы" />
-      <label class="meta" style="display:block;margin-top: 10px;">Описание</label>
-      <input id="groupDescInput" class="input" Placeholder="О чём эта группа" />
+      <input id="groupTitleInput" class="input" placeholder="Название группы" />
+      <label class="meta" style="display: block; margin-top: 10px;">Описание</label>
+      <input id="groupDescInput" class="input" placeholder="О чём эта группа" />
       <div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('createGroupModal')">Отмена</button>
         <button type="button" class="btn btn-primary" style="flex: 1;" onclick="createNewGroup()">Создать</button>
@@ -1845,19 +1845,19 @@
     <div id="viewerStage" class="viewer-stage">
       <img id="viewerImage" src="" alt="" draggable="false" />
     </div>
-    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Растяните два пальца • Двигайте влево/вправо</div>
+    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Растяните двумя пальцами • Двигайте влево/вправо</div>
   </div>
 
   <div id="fullCallScreen">
     <div style="text-align: center; margin-top: 24px;">
-      <div class="meta" style="font-size: 13px; межбуквенный интервал: 1px; цвет: var(--accent);">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
-      <h2 id="callPeerName" style="margin: 12px 0 6px; Font-size: 26px; Font-weight: 900;">Собеседник</h2>
-      <div id="callStatusText" class="meta" style="font-size: 15px;"> Соединение...</div>
+      <div class="meta" style="font-size: 13px; letter-spacing: 1px; color: var(--accent);">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
+      <h2 id="callPeerName" style="margin: 12px 0 6px; font-size: 26px; font-weight: 900;">Собеседник</h2>
+      <div id="callStatusText" class="meta" style="font-size: 15px;">Соединение...</div>
       <div id="callTimerText" style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #f2c96b;">00:00</div>
     </div>
 
     <div id="callControlsBox" style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
-      <button type="button" id="callAcceptBtn" class="btn btn-primary" style="display: none; padding: 14px 22px; border-radius: 20px;" onclick="acceptIncomingCall()">Отправить</button>
+      <button type="button" id="callAcceptBtn" class="btn btn-primary" style="display: none; padding: 14px 22px; border-radius: 20px;" onclick="acceptIncomingCall()">Ответить</button>
       <button type="button" id="callMuteBtn" class="btn btn-ghost" style="padding: 14px 18px; border-radius: 20px;" onclick="toggleCallMute()">Микрофон вкл</button>
       <button type="button" class="btn btn-danger" style="padding: 14px 24px; border-radius: 20px;" onclick="hangupCall(); toast('Звонок завершён')">Сбросить</button>
     </div>
@@ -1893,10 +1893,10 @@
       </div>
 
       <div id="editModeBar" class="edit-mode-bar">
-        <span>Редактирование сообщений</span>
+        <span>Редактирование сообщения</span>
         <div style="display: flex; gap: 6px;">
           <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="cancelEditMessage()">Отмена</button>
-          <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()"> Сохранить</button>
+          <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()">Сохранить</button>
         </div>
       </div>
 
@@ -1930,7 +1930,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
         <div>
           <h3 style="margin: 0; font-size: 18px;">Оскемен • Карта и Справочник</h3>
-          <div class="meta">Погода, курсы валют, схемы города, трассы ВКО и службы мониторинга</div>
+          <div class="meta">Погода, курсы валют, схема города, трассы ВКО и службы</div>
         </div>
         <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="window.SAT_OSKEMEN_HUB.close()">✕</button>
       </div>

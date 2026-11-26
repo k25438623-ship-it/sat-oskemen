@@ -8,8 +8,6 @@
   <meta name="copyright" content="© 2026 SÄT • Б.Ш.А. Все права защищены." />
   <title>SÄT</title>
   <meta name="theme-color" content="#101216" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='32' fill='%23161920'/%3E%3Ccircle cx='48' cy='32' r='6' fill='%23e09f5a'/%3E%3Ccircle cx='80' cy='32' r='6' fill='%23e09f5a'/%3E%3Ctext x='64' y='92' text-anchor='middle' font-family='Arial,sans-serif' font-size='68' font-weight='900' fill='%23e09f5a'%3E%C3%84%3C/text%3E%3C/svg%3E" />
@@ -1099,37 +1097,85 @@
     }
     .osk-pin-form.open { display: block; }
 
-    .sat-map-wrap {
+    .calc-card-box {
+      padding: 13px;
       border-radius: 18px 6px 18px 18px;
-      overflow: hidden;
-      border: 1px solid var(--border-strong);
       background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      margin-bottom: 10px;
     }
-    .sat-map-toolbar {
+    .calc-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .calc-result-banner {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px 6px 16px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+    }
+    .calc-big-sum {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+    .azs-preset-row {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      padding: 9px 10px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      margin-top: 8px;
     }
-    .sat-map-search-row {
-      display: flex;
-      gap: 6px;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--border);
+
+    .daylight-explain-box {
+      padding: 12px 13px;
+      border-radius: 16px 6px 16px 16px;
       background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.48;
+      color: var(--text);
     }
-    #satHybridMap {
-      width: 100%;
-      height: 310px;
-      z-index: 1;
+    .daylight-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
     }
-    .leaflet-tile-pane .leaflet-layer:nth-child(2) {
-      filter: invert(100%) hue-rotate(180deg) brightness(1.08) contrast(1.1);
+    .daylight-card {
+      padding: 11px 8px;
+      border-radius: 15px 5px 15px 15px;
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
+      text-align: center;
     }
-    body.theme-light .leaflet-tile-pane .leaflet-layer:nth-child(2) {
-      filter: none;
+    .daylight-val {
+      font-size: 16.5px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-top: 3px;
+    }
+    .daylight-status-box {
+      padding: 11px 13px;
+      border-radius: 16px 6px 16px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .daylight-alert-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 16px 6px 16px 16px;
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -1363,661 +1409,55 @@
           </div>
         </div>
 
-        <div class="subtabs-3">
-          <button type="button" id="subTabPosts" class="sub-btn active" onclick="switchMySubtab('posts')">Публикации</button>
-          <button type="button" id="subTabFriends" class="sub-btn" onclick="switchMySubtab('friends')">Друзья</button>
-          <button type="button" id="subTabGroups" class="sub-btn" onclick="switchMySubtab('groups')">Группы</button>
-        </div>
-
-        <div id="mySubPosts">
-          <div id="myStoryBanner" class="card" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <div>
-                <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Ваша сторис (действует 3 часа)</div>
-                <div id="myStoryTimerText" class="meta">Активна</div>
-              </div>
-              <div style="display: flex; gap: 8px;">
-                <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="viewOwnStory()">Смотреть</button>
-                <button type="button" class="btn btn-danger" style="padding: 8px 10px; font-size: 13px;" onclick="removeOwnStory()">✕</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <h3 style="margin: 0; font-size: 16px;">Мои фотографии</h3>
-              <button type="button" class="btn btn-mint" style="padding: 6px 11px; font-size: 12.5px;" onclick="openPhotoPicker('gallery_add')">+ Фото</button>
-            </div>
-            <div id="myPhotosBox" class="photo-grid"></div>
-          </div>
-
-          <div class="card">
-            <h3 style="margin: 0 0 10px; font-size: 16px;">Мои публикации</h3>
-            <div id="myPostsBox"></div>
-          </div>
-        </div>
-
-        <div id="mySubFriends" style="display: none;">
-          <div id="incomingFriendRequestsCard" class="card" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">Заявки в друзья</h3>
-              <span class="tag-alert" id="incomingFriendCountBadge">0</span>
-            </div>
-            <div id="incomingFriendRequestsList"></div>
-          </div>
-
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <h3 style="margin: 0; font-size: 16px;">Мои друзья</h3>
-              <button type="button" class="btn btn-ghost" style="padding: 6px 11px; font-size: 12.5px;" onclick="refreshFriendsView()">Обновить</button>
-            </div>
-            <div id="myFriendsBox"></div>
-          </div>
-
-          <div class="card">
-            <h3 style="margin: 0 0 8px; font-size: 16px;">Люди в SÄT</h3>
-            <input id="searchPeopleInput" class="input" style="margin-top: 0; margin-bottom: 10px;" placeholder="Поиск по имени..." oninput="renderFriendsTab()" />
-            <div id="otherPeopleBox"></div>
-          </div>
-        </div>
-
-        <div id="mySubGroups" style="display: none;">
-          <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-              <h3 style="margin: 0; font-size: 16px;">Группы</h3>
-              <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="openCreateGroupModal()">+ Создать группу</button>
-            </div>
-            <div id="groupsBox"></div>
-          </div>
-        </div>
-
-        <div id="myChatsCard" class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <div>
-              <h3 style="margin: 0; font-size: 17px;">Чаты</h3>
-              <div id="chatsUnreadSummary" class="meta">Нажмите на чат — откроется на весь экран</div>
-            </div>
-            <span class="tag" id="chatsCountBadge">0</span>
-          </div>
-          <div id="profileChatsList"></div>
-        </div>
-
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <div>
-              <h3 style="margin: 0; font-size: 17px;">Время намаза • Оскемен</h3>
-              <div id="profileNamazPreview" class="meta">Оскемен • Расписание намаза</div>
-            </div>
-            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openNamazQiblaModal()">Открыть</button>
-          </div>
-        </div>
-
-        <div id="profileSupportOrMonitorCard" class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <div>
-              <h3 id="supportOrMonitorTitle" style="margin: 0; font-size: 17px;">Техподдержка</h3>
-              <div id="supportCardSub" class="meta">Написать в техподдержку SÄT</div>
-            </div>
-            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Открыть</button>
-          </div>
-        </div>
-
-        <div class="copyright-footer">
-          © SÄT • Б.Ш.А. Все права защищены.
-        </div>
-      </div>
-    </main>
-
-    <div id="sideMenuBackdrop" class="side-menu-backdrop" onclick="closeAllSideDrawers()"></div>
-
-    <aside id="leftSectionDrawer" class="left-section-drawer" onclick="event.stopPropagation()">
-      <div class="side-drawer-title">
-        <span id="leftDrawerHeading">Разделы</span>
-        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
-      </div>
-      <div id="leftDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
-    </aside>
-
-    <aside id="rightProfileDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
-      <div class="side-drawer-title">
-        <span id="rightDrawerHeading">Профиль</span>
-        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
-      </div>
-      <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
-    </aside>
-
-    <nav class="bottom-nav-single">
-      <button type="button" class="nav-btn active bottom-nav-profile-right" data-tab="profile" onclick="switchMainTab('profile', this)">
-        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span>Профиль</span>
-      </button>
-    </nav>
-  </section>
-
-  <section id="peerProfileScreen" class="screen">
-    <header class="topbar">
-      <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
-      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--accent);">Страница</div>
-      <div style="width: 74px;"></div>
-    </header>
-
-    <div class="container">
-      <div class="card">
-        <div class="profile-top">
-          <div id="peerAvatarRing" class="ava-ring" onclick="onPeerAvatarTap(event)">
-            <div id="peerAvatarCircle" class="ava-circle">Ä</div>
-          </div>
-          <div style="min-width: 0; flex: 1;">
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-              <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
-              <span id="peerAccountRoleBadge"></span>
-            </div>
-            <div id="peerOnlineStatus" style="margin-top: 3px;"></div>
-            <div id="peerAboutLine" class="meta" style="margin-top: 6px; line-height: 1.45;">Участник SÄT</div>
-            <div id="peerStoryTag" style="display: none; margin-top: 8px;">
-              <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
-            </div>
-          </div>
-        </div>
-        <div id="peerActionButtons" class="actions" style="margin-top: 14px;"></div>
-      </div>
-
-      <div class="subtabs-4">
-        <button type="button" id="peerTabPosts" class="sub-btn active" onclick="switchPeerSubtab('posts')">Публикации</button>
-        <button type="button" id="peerTabPhotos" class="sub-btn" onclick="switchPeerSubtab('photos')">Фото</button>
-        <button type="button" id="peerTabFriends" class="sub-btn" onclick="switchPeerSubtab('friends')">Друзья</button>
-        <button type="button" id="peerTabInfo" class="sub-btn" onclick="switchPeerSubtab('info')">Анкета</button>
-      </div>
-
-      <div id="peerPanelPosts" class="card"><div id="peerPostsList"></div></div>
-      <div id="peerPanelPhotos" class="card" style="display: none;"><div id="peerPhotosGrid" class="photo-grid"></div></div>
-      <div id="peerPanelFriends" class="card" style="display: none;"><div id="peerFriendsList"></div></div>
-      <div id="peerPanelInfo" class="card" style="display: none;"><div id="peerInfoBox"></div></div>
-    </div>
-  </section>
-
-  <div id="unifiedSearchModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div>
-          <h3 style="margin: 0; font-size: 18px;">Поиск в SÄT</h3>
-          <div id="searchResultsSummary" class="meta">Живые люди, дела и объявления без шума</div>
-        </div>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('unifiedSearchModal')">✕</button>
-      </div>
-
-      <input id="unifiedSearchInput" class="input" style="margin-top: 10px; margin-bottom: 10px;" placeholder="Имя, объявление или дело..." oninput="renderUnifiedSearch()" />
-
-      <div class="subtabs-3" style="margin-bottom: 10px;">
-        <button type="button" id="sTabAll" class="sub-btn active" onclick="setUnifiedSearchTab('all')">Все</button>
-        <button type="button" id="sTabUsers" class="sub-btn" onclick="setUnifiedSearchTab('users')">Люди</button>
-        <button type="button" id="sTabBusiness" class="sub-btn" onclick="setUnifiedSearchTab('business')">Дела и объявления</button>
-      </div>
-
-      <div id="unifiedSearchList" onclick="onUnifiedSearchListClick(event)"></div>
-    </div>
-  </div>
-
-  <div id="accountRoleModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 6px; font-size: 18px;">Выберите тип аккаунта</h3>
-      <p class="meta" style="margin: 0 0 14px; line-height: 1.45;">
-        Это можно изменить в любое время в разделе «Изменить» профиля. Видны только имя, анкета и статус в SÄT.
-      </p>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('user')">
-          Пользователь
-        </button>
-        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('business')">
-          Бизнес-аккаунт
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="deleteAccountModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 8px; font-size: 18px; color: var(--danger);">Удалить страницу SÄT?</h3>
-      <p class="meta" style="margin: 0 0 14px; line-height: 1.5;">
-        Ваша страница, анкета, фото и публикации в SÄT будут удалены, а вы выйдете из аккаунта приложения. Это действие нельзя отменить.
-      </p>
-      <div class="actions">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('deleteAccountModal')">Отмена</button>
-        <button type="button" id="confirmDeleteAccountBtn" class="btn btn-danger" style="flex: 1;" onclick="deleteMyPageCompletely()">Да, удалить</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="readingViewerModal" class="reader-screen">
-    <div class="reader-topbar">
-      <button type="button" class="btn btn-ghost" style="padding: 7px 12px; font-size: 13px;" onclick="closeReadingViewer()">← Книга</button>
-      <div style="display: flex; gap: 6px; align-items: center;">
-        <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12.5px;" onclick="toggleReaderPaperMode()">Бумага / Ночь</button>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(2)">А+</button>
-      </div>
-    </div>
-    <div class="reader-scroll">
-      <div id="readingModalCoverWrap" class="reader-hero-cover" style="display: none;">
-        <img id="readingModalCoverImg" src="" alt="" />
-      </div>
-      <div id="readingModalMeta" class="meta" style="font-weight: 700; color: var(--accent);">Раздел</div>
-      <h2 id="readingModalTitle" class="reader-article-title">Заголовок</h2>
-      <div id="readingModalBody" class="reader-article-body"></div>
-    </div>
-  </div>
-
-  <div id="addReadingModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 6px; font-size: 18px;">Добавить в «Книгу»</h3>
-      <div class="meta" style="margin-bottom: 10px;">Материал сначала отправится на проверку, затем появится для всех.</div>
-      <label class="meta">Раздел</label>
-      <select id="readingKindSelect">
-        <option value="stories">Короткие истории</option>
-        <option value="tips">Краткие советы</option>
-      </select>
-      <label class="meta" style="display: block; margin-top: 10px;">Заголовок</label>
-      <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
-      <label class="meta" style="display: block; margin-top: 10px;">Короткое описание</label>
-      <input id="readingDescInput" class="input" placeholder="О чём текст..." />
-      <div style="margin-top: 10px;">
-        <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('reading_cover')">
-          <span id="readingPhotoLabel">Прикрепить фото по теме (необязательно)</span>
-        </button>
-        <div id="readingPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
-          <img id="readingPreviewImg" src="" alt="" style="width: 100%; max-height: 170px; object-fit: cover; border-radius: 14px;" />
-          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearReadingAttachment()">Убрать</button>
-        </div>
-      </div>
-      <label class="meta" style="display: block; margin-top: 10px;">Текст</label>
-      <textarea id="readingContentInput" rows="6" placeholder="Напишите текст..."></textarea>
-      <div class="actions" style="margin-top: 14px;">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('addReadingModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveNewReadingItem()">Отправить</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="namazQiblaModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div>
-          <h3 style="margin: 0; font-size: 18px;">Время намаза • Оскемен</h3>
-          <div id="namazLocationLabel" class="meta">Ручное обновление расписания</div>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button type="button" id="togglePrayerEditBtn" class="btn btn-gold" style="padding: 6px 11px; font-size: 12px;" onclick="togglePrayerEditor()">Изменить время</button>
-          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('namazQiblaModal')">✕</button>
-        </div>
-      </div>
-
-      <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px;">
-        <div id="boxFajr" class="stat-box"><div class="meta" style="font-size: 11px;">Фаджр</div><div id="ptFajr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
-        <div id="boxDhuhr" class="stat-box"><div class="meta" style="font-size: 11px;">Зухр</div><div id="ptDhuhr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
-        <div id="boxAsr" class="stat-box"><div class="meta" style="font-size: 11px;">Аср</div><div id="ptAsr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
-        <div id="boxMaghrib" class="stat-box"><div class="meta" style="font-size: 11px;">Магриб</div><div id="ptMaghrib" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
-        <div id="boxIsha" class="stat-box"><div class="meta" style="font-size: 11px;">Иша</div><div id="ptIsha" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
-      </div>
-
-      <div id="namazActiveBanner" style="margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--green-soft); border: 1px solid var(--border-strong); font-size: 13.5px; font-weight: 800; color: var(--accent);">
-        Сейчас: --
-      </div>
-      <div id="namazSourceStatus" class="meta" style="margin-top: 8px; font-size: 12px;">Оскемен • Время обновляется вручную</div>
-
-      <div id="prayerEditPanel" style="display: none;">
-        <div class="prayer-edit-grid">
-          <div class="prayer-edit-item"><label>Фаджр</label><input id="inFajr" class="input" type="time" /></div>
-          <div class="prayer-edit-item"><label>Зухр</label><input id="inDhuhr" class="input" type="time" /></div>
-          <div class="prayer-edit-item"><label>Аср</label><input id="inAsr" class="input" type="time" /></div>
-          <div class="prayer-edit-item"><label>Магриб</label><input id="inMaghrib" class="input" type="time" /></div>
-          <div class="prayer-edit-item" style="grid-column: 1 / -1;"><label>Иша</label><input id="inIsha" class="input" type="time" /></div>
-        </div>
-        <div class="actions" style="margin-top: 10px;">
-          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="togglePrayerEditor(false)">Отмена</button>
-          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveManualOskemenTimes()">Сохранить для всех</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="supportModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-        <div onclick="onSupportTitleTripleTap()">
-          <h3 id="supportModalTitle" style="margin: 0; font-size: 18px;">Техподдержка SÄT</h3>
-          <div id="supportModalSub" class="meta">Опишите вопрос или обращение</div>
-        </div>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
-      </div>
-
-      <div id="userSupportForm" style="margin-top: 12px;">
-        <textarea id="supportMsgInput" rows="3" placeholder="Напишите ваше обращение в техподдержку..."></textarea>
-        <div class="actions" style="margin-top: 10px;">
-          <button type="button" class="btn btn-primary" style="width: 100%;" onclick="sendSupportMessage()">Отправить</button>
-        </div>
-      </div>
-
-      <div id="creatorCodeBox" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
-        <input id="creatorCodeInput" class="input" type="password" placeholder="Код доступа" onkeydown="if(event.key==='Enter') unlockCreatorByCode()" />
-        <div class="actions" style="margin-top: 8px;">
-          <button type="button" class="btn btn-mint" style="width: 100%;" onclick="unlockCreatorByCode()">Войти</button>
-        </div>
-      </div>
-
-      <div id="creatorOnlyPanel" style="display: none; margin-top: 14px;">
-        <div class="subtabs-3">
-          <button type="button" id="cTabTickets" class="sub-btn active" onclick="switchCreatorTab('tickets')">Обращения</button>
-          <button type="button" id="cTabUsers" class="sub-btn" onclick="switchCreatorTab('users')">Люди</button>
-          <button type="button" id="cTabErrors" class="sub-btn" onclick="switchCreatorTab('errors')">Ошибки</button>
-        </div>
-        <div id="cPanelTickets"></div>
-        <div id="cPanelUsers" style="display: none;"></div>
-        <div id="cPanelErrors" style="display: none;"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="avatarChoiceModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 id="avatarChoiceTitle" style="margin: 0 0 6px; font-size: 18px;">Что открыть?</h3>
-      <p id="avatarChoiceSub" class="meta" style="margin: 0 0 14px;">Выберите, что посмотреть</p>
-      <div id="avatarChoiceButtons" style="display: flex; flex-direction: column; gap: 10px;"></div>
-      <button type="button" class="btn btn-ghost" style="width: 100%; margin-top: 10px;" onclick="hideModal('avatarChoiceModal')">Отмена</button>
-    </div>
-  </div>
-
-  <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;" onchange="onImageChosen(event)" />
-  <input type="file" id="galInput" accept="image/*" style="display: none;" onchange="onImageChosen(event)" />
-
-  <div id="photoPickerModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 id="pickerModalTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите фото</h3>
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
-        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="startCamera()">Сделать фото на камеру</button>
-        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="startGallery()">Загрузить из галереи</button>
-        <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="hideModal('photoPickerModal')">Отмена</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="captionBox" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 id="captionBoxTitle" style="margin: 0 0 10px; font-size: 18px;">Подпись к фото</h3>
-      <input id="captionInput" class="input" maxlength="120" placeholder="Напишите подпись..." onkeydown="if(event.key==='Enter') applyCaptionNow()" />
-      <div class="actions" style="margin-top: 12px;">
-        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="applyCaptionNow()">Готово</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="wallpapersModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h3 style="margin: 0; font-size: 18px;">Темы и фоны (5 вариантов)</h3>
-          <div class="meta">Тёмные без «Матрицы» и светлые — нажмите для выбора</div>
-        </div>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
-      </div>
-      <div id="wallpapersList" class="wp-list"></div>
-    </div>
-  </div>
-
-  <div id="newPostModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
-      <label class="meta">Раздел в «Пульсе»</label>
-      <select id="postCategorySelect">
-        <option value="posts">Публикации</option>
-        <option value="news">Новости</option>
-        <option value="walks">Прогулки</option>
-        <option value="cafe">Кафе</option>
-      </select>
-
-      <label class="meta" style="display: block; margin-top: 10px;">Подпись или заголовок</label>
-      <input id="postCaptionInput" class="input" placeholder="Короткий заголовок..." />
-
-      <label class="meta" style="display: block; margin-top: 10px;">Текст сообщения</label>
-      <textarea id="postTextInput" rows="3" placeholder="Напишите сообщение..."></textarea>
-
-      <div style="margin-top: 12px;">
-        <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('post')">
-          <span id="postPhotoLabel">Прикрепить фото (камера или галерея)</span>
-        </button>
-        <div id="postPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
-          <img id="postPreviewImg" src="" alt="" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px;" />
-          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearPostAttachment()">Убрать</button>
-        </div>
-      </div>
-
-      <div style="margin-top: 14px;">
-        <label class="meta">Куда отправить?</label>
-        <div class="grid-2" style="margin-top: 6px;">
-          <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">В Пульс</button>
-          <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
-        </div>
-        <div id="postDestExplanation" class="dest-hint-box">
-          <strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.
-        </div>
-      </div>
-
-      <div class="actions" style="margin-top: 16px;">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('newPostModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="submitNewPost()">Отправить</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="editProfileModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 10px;">Данные профиля и анкета</h3>
-      <label class="meta">Имя</label>
-      <input id="editNameField" class="input" placeholder="Введите имя" oninput="updateNameStylePreview()" />
-
-      <label class="meta" style="display: block; margin-top: 10px;">Стиль шрифта имени</label>
-      <select id="editNameStyleSelect" onchange="updateNameStylePreview()">
-        <option value="normal">Обычный</option>
-        <option value="bold">Жирный (𝐀𝐛𝐜)</option>
-        <option value="italic">Курсив (𝐴𝑏𝑐)</option>
-        <option value="fraktur">Акцентный (𝔄𝔟𝔠)</option>
-        <option value="mono">Печатный (𝙰𝚋𝚌)</option>
-      </select>
-      <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: var(--accent); font-weight: 700;"></div>
-
-      <label class="meta" style="display: block; margin-top: 10px;">Тип аккаунта</label>
-      <select id="editAccountTypeSelect">
-        <option value="user">Пользователь</option>
-        <option value="business">Бизнес-аккаунт</option>
-      </select>
-
-      <label class="meta" style="display: block; margin-top: 10px;">Анкета / О себе (видно другим пользователям)</label>
-      <textarea id="editBioField" rows="3" placeholder="Коротко о себе или о вашем деле..."></textarea>
-
-      <label class="meta" style="display: block; margin-top: 10px;">Видимость в общем поиске</label>
-      <select id="editHideFromSearchSelect">
-        <option value="0">Показывать мою страницу в общем поиске</option>
-        <option value="1">Скрыть из общего поиска (видят только те, кому я пишу)</option>
-      </select>
-
-      <label class="meta" style="display: block; margin-top: 10px;">Статус активности</label>
-      <select id="editHideLastSeenSelect">
-        <option value="0">Показывать «в сети» и время визита</option>
-        <option value="1">Скрывать время последнего визита</option>
-      </select>
-
-      <div class="actions" style="margin-top: 14px;">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('editProfileModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()">Сохранить</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="createGroupModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <h3 style="margin: 0 0 10px;">Создать группу</h3>
-      <label class="meta">Название группы</label>
-      <input id="groupTitleInput" class="input" placeholder="Название группы" />
-      <label class="meta" style="display: block; margin-top: 10px;">Описание</label>
-      <input id="groupDescInput" class="input" placeholder="О чём эта группа" />
-      <div class="actions" style="margin-top: 16px;">
-        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('createGroupModal')">Отмена</button>
-        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="createNewGroup()">Создать</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="fullViewer" class="viewer-screen">
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-      <div>
-        <div id="viewerTitle" style="font-weight: 800; font-size: 16px;">Фото</div>
-        <div id="viewerSub" style="font-size: 12px; opacity: 0.78;"></div>
-      </div>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="downloadCurrentViewerPhoto()">В галерею</button>
-        <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
-      </div>
-    </div>
-    <div id="viewerStage" class="viewer-stage">
-      <img id="viewerImage" src="" alt="" draggable="false" />
-    </div>
-    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Растяните двумя пальцами • Двигайте влево/вправо</div>
-  </div>
-
-  <div id="fullCallScreen">
-    <div style="text-align: center; margin-top: 24px;">
-      <div class="meta" style="font-size: 13px; letter-spacing: 1px; color: var(--accent);">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
-      <h2 id="callPeerName" style="margin: 12px 0 6px; font-size: 26px; font-weight: 900;">Собеседник</h2>
-      <div id="callStatusText" class="meta" style="font-size: 15px;">Соединение...</div>
-      <div id="callTimerText" style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #f2c96b;">00:00</div>
-    </div>
-
-    <div id="callControlsBox" style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
-      <button type="button" id="callAcceptBtn" class="btn btn-primary" style="display: none; padding: 14px 22px; border-radius: 20px;" onclick="acceptIncomingCall()">Ответить</button>
-      <button type="button" id="callMuteBtn" class="btn btn-ghost" style="padding: 14px 18px; border-radius: 20px;" onclick="toggleCallMute()">Микрофон вкл</button>
-      <button type="button" class="btn btn-danger" style="padding: 14px 24px; border-radius: 20px;" onclick="hangupCall(); toast('Звонок завершён')">Сбросить</button>
-    </div>
-  </div>
-
-  <div id="chatScreen" class="chat-screen">
-    <div class="chat-wrap">
-      <div class="chat-topbar">
-        <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13.5px;" onclick="closeChat()">← Чаты</button>
-        <div style="min-width: 0; flex: 1;">
-          <h3 id="chatHeaderTitle" style="margin: 0; font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
-          <div id="chatHeaderSub" class="meta">Сообщения • Голос • Фото</div>
-        </div>
-        <button id="callToggleBtn" type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="toggleAudioCall()">Позвонить</button>
-      </div>
-
-      <div id="chatMessagesBox" class="chat-list"></div>
-
-      <div id="voiceStatusBar" class="voice-status-bar">
-        <span id="voiceStatusText">Пауза перед записью: 2 сек...</span>
-        <button type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Остановить</button>
-      </div>
-
-      <div id="voiceDraftBar" class="voice-draft-bar">
-        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-          <span id="voiceDraftLabel">Голосовое готово</span>
-          <div style="display: flex; gap: 6px;">
-            <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="discardVoiceDraft()">Удалить</button>
-            <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="sendVoiceDraft()">Отправить</button>
-          </div>
-        </div>
-        <audio id="voiceDraftAudio" controls controlsList="nodownload" preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
-      </div>
-
-      <div id="editModeBar" class="edit-mode-bar">
-        <span>Редактирование сообщения</span>
-        <div style="display: flex; gap: 6px;">
-          <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="cancelEditMessage()">Отмена</button>
-          <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()">Сохранить</button>
-        </div>
-      </div>
-
-      <div class="emoji-bar">
-        <button type="button" class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('😂')">😂</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('🙏')">🙏</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('✨')">✨</button>
-        <button type="button" class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
-      </div>
-
-      <div class="chat-composer">
-        <button type="button" class="btn btn-ghost" style="padding: 10px; font-size: 12.5px;" onclick="openPhotoPicker('chat_photo')">
-          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </button>
-        <button type="button" class="btn btn-mint" style="padding: 10px 11px; font-size: 12.5px;" onclick="startVoiceWithPause()">
-          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </button>
-        <input id="chatMsgInput" class="input" style="margin-top: 0; flex: 1; padding: 10px 12px;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMessage()" />
-        <button type="button" class="btn btn-primary" style="padding: 10px 14px; font-size: 13.5px;" onclick="sendMessage()">➤</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Модуль «Оскемен • Карта и Справочник» -->
-  <div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
-        <div>
-          <h3 style="margin: 0; font-size: 18px;">Оскемен • Карта и Справочник</h3>
-          <div class="meta">Погода, курсы валют, схема города, трассы ВКО и службы</div>
-        </div>
-        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="window.SAT_OSKEMEN_HUB.close()">✕</button>
-      </div>
-
-      <div class="osk-widgets">
-        <div class="osk-widget">
-          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Погода • Оскемен</div>
-          <div id="oskWeatherMain" style="font-size: 17px; font-weight: 900; color: var(--accent); margin-top: 4px;">Загрузка...</div>
-          <div id="oskWeatherSub" class="meta" style="font-size: 11.5px; margin-top: 2px;">49.95°N, 82.63°E</div>
-        </div>
-        <div class="osk-widget">
-          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Курсы валют (авто)</div>
-          <div id="oskRatesMain" style="font-size: 13px; font-weight: 800; color: var(--gold); margin-top: 4px; line-height: 1.35;">Загрузка...</div>
-          <div id="oskRatesSub" class="meta" style="font-size: 11.5px; margin-top: 2px;">KZT • автообновление</div>
-        </div>
-      </div>
-
-      <div class="subtabs-3" style="margin-bottom: 12px;">
-        <button type="button" class="sub-btn active" data-osktab="map" onclick="window.SAT_OSKEMEN_HUB.switchTab('map', this)">Карта города</button>
+        <div class="subtabs-3" style="margin-bottom: 12px;">
+        <button type="button" class="sub-btn active" data-osktab="daylight" onclick="window.SAT_OSKEMEN_HUB.switchTab('daylight', this)">Световой день</button>
         <button type="button" class="sub-btn" data-osktab="roads" onclick="window.SAT_OSKEMEN_HUB.switchTab('roads', this)">Трассы ВКО</button>
         <button type="button" class="sub-btn" data-osktab="sos" onclick="window.SAT_OSKEMEN_HUB.switchTab('sos', this)">Номера 112/109</button>
       </div>
 
-      <div id="oskPane-map" class="osk-pane active">
-        <div class="sat-map-wrap">
-          <div class="sat-map-toolbar">
-            <button type="button" class="btn btn-mint" style="padding: 6px 10px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.centerCity()">Оскемен</button>
-            <button type="button" id="oskToggleLabelsBtn" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.toggleLabels()">Улицы и дома</button>
-            <button type="button" id="oskAddPinBtn" class="btn btn-primary" style="padding: 6px 10px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.toggleAddPin()">+ Своя метка</button>
-          </div>
-          <div class="sat-map-search-row">
-            <input id="oskAddressSearchInput" class="input" style="margin-top: 0; flex: 1; padding: 8px 11px; font-size: 13.5px;" placeholder="Адрес или улица в Оскемене / ВКО..." onkeydown="if(event.key==='Enter') window.SAT_OSKEMEN_HUB.searchAddress()" />
-            <button type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.searchAddress()">Найти</button>
-          </div>
-          <div id="satHybridMap"></div>
-        </div>
-
-        <div id="oskPinForm" class="osk-pin-form">
-          <div id="oskPinCoordsHint" class="meta" style="margin-bottom: 6px; font-weight: 700; color: var(--accent);">Точка выбрана</div>
-          <input id="oskPinTitleInput" class="input" style="margin-top: 0;" maxlength="50" placeholder="Название метки (например: Кафе, СТО, Встреча)" />
-          <input id="oskPinDescInput" class="input" maxlength="120" placeholder="Адрес или комментарий" />
-          <div class="actions" style="margin-top: 10px;">
-            <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="window.SAT_OSKEMEN_HUB.cancelPinForm()">Отмена</button>
-            <button type="button" class="btn btn-primary" style="flex: 1;" onclick="window.SAT_OSKEMEN_HUB.savePinForm()">Сохранить</button>
+        
+      <div id="oskPane-daylight" class="osk-pane active">
+        <div class="daylight-explain-box">
+          <div style="font-weight: 800; color: var(--accent);">Как работает «Световой день» • Оскемен (UTC+5)</div>
+          <div style="margin-top: 4px;">
+            Расписание берётся по координатам Оскемена (49.95°N, 82.63°E) и обновляется каждый новый день при наличии сети. Время ориентировочное (без учёта облачности и рельефа). Уведомление на рассвет и закат приходит при открытии приложения (пока приложение ещё не запущено в Google Play).
           </div>
         </div>
 
-        <div id="oskPinCard" class="card" style="margin-top: 10px; margin-bottom: 0; padding: 12px;">
-          <div style="font-weight: 800; color: var(--accent);">🛰 Спутник + улицы и адреса • Оскемен</div>
-          <div class="meta" style="margin-top: 4px;">Введите адрес/улицу для поиска или нажмите «+ Своя метка» и коснитесь спутника.</div>
+        <div class="daylight-grid-3">
+          <div class="daylight-card">
+            <div class="meta" style="font-size: 11.5px;">Рассвет</div>
+            <div id="dlSunriseVal" class="daylight-val">--:--</div>
+          </div>
+          <div class="daylight-card">
+            <div class="meta" style="font-size: 11.5px;">Закат</div>
+            <div id="dlSunsetVal" class="daylight-val">--:--</div>
+          </div>
+          <div class="daylight-card">
+            <div class="meta" style="font-size: 11.5px;">Светло</div>
+            <div id="dlDurationVal" class="daylight-val">-- ч</div>
+          </div>
+        </div>
+
+        <div class="daylight-status-box">
+          <div id="dlNowStatus" style="font-weight: 800; font-size: 14px; color: var(--accent);">Состояние дня: проверка...</div>
+          <div id="dlSyncMeta" class="meta" style="margin-top: 3px; font-size: 12px;">Обновление раз в сутки</div>
+        </div>
+
+        <div class="daylight-alert-row">
+          <div style="min-width: 0; flex: 1;">
+            <div style="font-weight: 800; font-size: 13.5px;">Уведомления о рассвете и закате</div>
+            <div id="dlAlertPermHint" class="meta" style="font-size: 11.5px; margin-top: 2px;">Сигнал и баннер при наступлении времени</div>
+          </div>
+          <button type="button" id="dlNotifyToggleBtn" class="btn btn-mint" style="padding: 7px 11px; font-size: 12px; flex-shrink: 0;" onclick="window.SAT_OSKEMEN_HUB.toggleAlerts()">Вкл</button>
+        </div>
+
+        <div class="actions" style="margin-top: 6px;">
+          <button type="button" class="btn btn-ghost" style="flex: 1; padding: 9px 12px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.refreshDaylight(true)">Обновить за сегодня</button>
+          <button type="button" class="btn btn-mint" style="padding: 9px 12px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.testAlert()">Проверить сигнал</button>
         </div>
       </div>
+
 
       <div id="oskPane-roads" class="osk-pane">
         <div class="list-item"><div><b>Оскемен — Сибинские озёра</b><div class="meta">Через Алгабас (~1 ч 15 мин)</div></div><span class="tag">85 км</span></div>
@@ -2345,25 +1785,11 @@
     })();
 
     (function () {
-      const OSK_CENTER = [49.9483, 82.6285];
-      const PINS_KEY = 'sat_oskemen_sat_pins_v1';
       const WEATHER_KEY = 'sat_oskemen_weather_v3';
       const RATES_KEY = 'sat_oskemen_rates_v3';
-      const BASE_PLACES = [
-        { id: 'p1', lat: 49.9483, lng: 82.6285, title: 'Стрелка / Центр', desc: 'Слияние Иртыша и Ульбы, центр Оскемена', custom: false },
-        { id: 'p2', lat: 49.9325, lng: 82.5870, title: 'КШТ (Левый берег)', desc: 'Жилой массив на левом берегу Иртыша', custom: false },
-        { id: 'p3', lat: 49.9740, lng: 82.6150, title: 'ЖД вокзал Защита', desc: 'Железнодорожный узел в районе Защита', custom: false },
-        { id: 'p4', lat: 49.9340, lng: 82.6460, title: 'Аблакетка', desc: 'Правый берег / южное направление', custom: false }
-      ];
-
-      let mapInstance = null;
-      let satLayer = null;
-      let labelsLayer = null;
-      let labelsVisible = true;
-      let markersLayer = null;
-      let searchMarker = null;
-      let addingPin = false;
-      let draftLatLng = null;
+      const DAYLIGHT_KEY = 'sat_oskemen_daylight_v1';
+      const ALERT_PREF_KEY = 'sat_oskemen_daylight_alerts_v1';
+      const FIRED_KEY = 'sat_oskemen_daylight_fired_v1';
 
       function readObj(k) {
         try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; }
@@ -2371,12 +1797,216 @@
       function writeObj(k, v) {
         try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {}
       }
-      function escText(s) {
-        return String(s || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
+      function getTodayKey() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
       }
-      function getCustomPins() {
-        const arr = readObj(PINS_KEY);
-        return Array.isArray(arr) ? arr : [];
+      function extractHHMM(isoStr) {
+        if (!isoStr || typeof isoStr !== 'string') return '--:--';
+        const m = isoStr.match(/T(\d{2}:\d{2})/);
+        return m ? m[1] : '--:--';
+      }
+      function hmToMins(hm) {
+        if (!/^\d{2}:\d{2}$/.test(hm || '')) return null;
+        const [h, m] = hm.split(':').map(Number);
+        if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+        return h * 60 + m;
+      }
+      function formatDuration(riseHm, setHm) {
+        const rM = hmToMins(riseHm);
+        const sM = hmToMins(setHm);
+        if (rM === null || sM === null || sM <= rM) return '--';
+        const diff = sM - rM;
+        const hrs = Math.floor(diff / 60);
+        const mins = diff % 60;
+        return `${hrs}ч ${String(mins).padStart(2, '0')}м`;
+      }
+
+      function isAlertsEnabled() {
+        const raw = readObj(ALERT_PREF_KEY);
+        return raw === null ? true : Boolean(raw.enabled);
+      }
+      function setAlertsEnabled(val) {
+        writeObj(ALERT_PREF_KEY, { enabled: Boolean(val) });
+        syncAlertUi();
+      }
+      function syncAlertUi() {
+        const enabled = isAlertsEnabled();
+        const btn = document.getElementById('dlNotifyToggleBtn');
+        const hint = document.getElementById('dlAlertPermHint');
+        if (btn) {
+          btn.textContent = enabled ? 'Вкл' : 'Выкл';
+          btn.className = enabled ? 'btn btn-mint' : 'btn btn-ghost';
+        }
+        if (hint) {
+          const perm = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+          if (!enabled) {
+            hint.textContent = 'Уведомления на рассвет и закат отключены';
+          } else if (perm === 'granted') {
+            hint.textContent = 'Системные уведомления разрешены + сигнал в приложении';
+          } else if (perm === 'denied') {
+            hint.textContent = 'Разрешение браузера закрыто — сработает сигнал и баннер в SÄT';
+          } else {
+            hint.textContent = 'Нажмите «Вкл» для разрешения уведомлений в Chrome';
+          }
+        }
+      }
+
+      function playChime() {
+        try {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return;
+          const ctx = new Ctx();
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(660, now);
+          osc.frequency.setValueAtTime(880, now + 0.14);
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.linearRampToValueAtTime(0.09, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+          osc.start(now);
+          osc.stop(now + 0.36);
+        } catch (_) {}
+      }
+
+      function triggerDaylightEvent(kind, hm) {
+        const label = kind === 'sunrise' ? '🌅 Начинает рассветать в Оскемене' : '🌇 Закат в Оскемене';
+        const body = kind === 'sunrise'
+          ? `Время рассвета: ${hm} (UTC+5). Светлое время суток начинается.`
+          : `Время заката: ${hm} (UTC+5). Начинает темнеть.`;
+        playChime();
+        window.toast?.(`${label} (${hm})`);
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          try { new Notification(label, { body }); } catch (_) {}
+        }
+      }
+
+      function paintDaylight(entry) {
+        const riseEl = document.getElementById('dlSunriseVal');
+        const setEl = document.getElementById('dlSunsetVal');
+        const durEl = document.getElementById('dlDurationVal');
+        const stEl = document.getElementById('dlNowStatus');
+        const metaEl = document.getElementById('dlSyncMeta');
+
+        const isToday = Boolean(entry && entry.dateKey === getTodayKey());
+        if (!entry || !isToday || !entry.sunrise || !entry.sunset) {
+          if (riseEl) riseEl.textContent = '--:--';
+          if (setEl) setEl.textContent = '--:--';
+          if (durEl) durEl.textContent = '--';
+          if (stEl) stEl.textContent = entry && entry.dateKey && !isToday
+            ? `Новый день (${getTodayKey()}) • ждёт обновления сети`
+            : 'Состояние дня: ждёт обновления сети';
+          if (metaEl) metaEl.textContent = entry && entry.dateKey && !isToday
+            ? `Прошлый кеш за ${entry.dateKey} скрыт • обновим за сегодня`
+            : 'Данные обновятся автоматически при появлении интернета';
+          return;
+        }
+        if (false) {
+          if (riseEl) riseEl.textContent = '--:--';
+          if (setEl) setEl.textContent = '--:--';
+          if (durEl) durEl.textContent = '--';
+          if (stEl) stEl.textContent = 'Состояние дня: ждёт обновления сети';
+          if (metaEl) metaEl.textContent = 'Данные обновятся автоматически при появлении интернета';
+          return;
+        }
+
+        if (riseEl) riseEl.textContent = entry.sunrise;
+        if (setEl) setEl.textContent = entry.sunset;
+        if (durEl) durEl.textContent = formatDuration(entry.sunrise, entry.sunset);
+
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        const rM = hmToMins(entry.sunrise);
+        const sM = hmToMins(entry.sunset);
+
+        let statusText = 'Состояние дня: светлое время';
+        if (rM !== null && sM !== null) {
+          if (nowMins < rM) {
+            const left = rM - nowMins;
+            statusText = `Темно • Рассвет через ${Math.floor(left / 60)}ч ${left % 60}м`;
+          } else if (nowMins >= rM && nowMins < sM) {
+            const left = sM - nowMins;
+            statusText = `Светло • Закат через ${Math.floor(left / 60)}ч ${left % 60}м`;
+          } else {
+            statusText = `Темно • Закат прошёл в ${entry.sunset}`;
+          }
+        }
+        if (stEl) stEl.textContent = statusText;
+        if (metaEl) {
+          metaEl.textContent = `Актуально на сегодня (${entry.dateKey}) • обновлено в ${entry.updatedAtTime || ''}`;
+        }
+      }
+
+      async function refreshDaylight(force = false) {
+        const todayKey = getTodayKey();
+        const cached = readObj(DAYLIGHT_KEY);
+        const hasTodayCache = Boolean(cached && cached.dateKey === todayKey && cached.sunrise && cached.sunset);
+
+        if (!force && hasTodayCache) {
+          paintDaylight(cached);
+          checkDaylightAlerts(cached);
+          return;
+        }
+
+        if (hasTodayCache) {
+          paintDaylight(cached);
+        } else {
+          paintDaylight(null);
+        }
+
+        try {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=49.9483&longitude=82.6285&daily=sunrise,sunset&timezone=Asia%2FAlmaty&start_date=${todayKey}&end_date=${todayKey}`;
+          const r = await fetch(url);
+          if (!r.ok) throw new Error('daylight');
+          const d = await r.json();
+          const riseRaw = d?.daily?.sunrise?.[0];
+          const setRaw = d?.daily?.sunset?.[0];
+          const sunrise = extractHHMM(riseRaw);
+          const sunset = extractHHMM(setRaw);
+          if (sunrise === '--:--' || sunset === '--:--') throw new Error('bad_hm');
+          const entry = {
+            dateKey: todayKey,
+            sunrise,
+            sunset,
+            updatedAtTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          writeObj(DAYLIGHT_KEY, entry);
+          paintDaylight(entry);
+          checkDaylightAlerts(entry);
+          if (force) window.toast?.('Расписание рассвета и заката обновлено');
+        } catch (_) {
+          if (force) window.toast?.('Не удалось обновить — проверьте сеть');
+        }
+      }
+
+      function checkDaylightAlerts(entry) {
+        if (!isAlertsEnabled() || !entry || entry.dateKey !== getTodayKey()) return;
+        const now = new Date();
+        const nowMins = now.getHours() * 60 + now.getMinutes();
+        const rM = hmToMins(entry.sunrise);
+        const sM = hmToMins(entry.sunset);
+        const fired = readObj(FIRED_KEY) || {};
+        const todayFired = fired[entry.dateKey] || {};
+
+        if (rM !== null && nowMins >= rM && nowMins <= rM + 10 && !todayFired.sunrise) {
+          todayFired.sunrise = true;
+          fired[entry.dateKey] = todayFired;
+          writeObj(FIRED_KEY, fired);
+          triggerDaylightEvent('sunrise', entry.sunrise);
+        }
+        if (sM !== null && nowMins >= sM && nowMins <= sM + 10 && !todayFired.sunset) {
+          todayFired.sunset = true;
+          fired[entry.dateKey] = todayFired;
+          writeObj(FIRED_KEY, fired);
+          triggerDaylightEvent('sunset', entry.sunset);
+        }
       }
 
       function paintWeather(d) {
@@ -2457,84 +2087,16 @@
         }
       }
 
-      function showPinCard(pin) {
-        const card = document.getElementById('oskPinCard');
-        if (!card) return;
-        const delHtml = pin.custom
-          ? `<button type="button" class="btn btn-danger" style="margin-top: 8px; padding: 6px 11px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.deletePin('${escText(pin.id)}')">Удалить метку</button>`
-          : '';
-        const coordsLine = (typeof pin.lat === 'number' && typeof pin.lng === 'number')
-          ? `<div class="meta" style="margin-top: 3px; font-size: 11.5px;">Координаты: ${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}</div>`
-          : '';
-        card.innerHTML = `<div style="font-weight: 800; color: var(--accent);">📍 ${escText(pin.title)}</div><div class="meta" style="margin-top: 4px;">${escText(pin.desc || 'Точка на карте Оскемена')}</div>${coordsLine}${delHtml}`;
-      }
-
-      function renderPinsOnMap() {
-        if (!mapInstance || !window.L) return;
-        if (!markersLayer) markersLayer = L.layerGroup().addTo(mapInstance);
-        markersLayer.clearLayers();
-        BASE_PLACES.concat(getCustomPins()).forEach(pin => {
-          const marker = L.circleMarker([pin.lat, pin.lng], {
-            radius: 7,
-            color: '#ffffff',
-            weight: 2,
-            fillColor: pin.custom ? '#34d399' : '#e09f5a',
-            fillOpacity: 0.95
-          });
-          marker.bindTooltip(pin.title, { permanent: false, direction: 'top' });
-          marker.on('click', (ev) => {
-            L.DomEvent.stopPropagation(ev);
-            showPinCard(pin);
-          });
-          marker.addTo(markersLayer);
-        });
-      }
-
-      function ensureHybridMap() {
-        const container = document.getElementById('satHybridMap');
-        if (!container || !window.L) return;
-        if (!mapInstance) {
-          mapInstance = L.map('satHybridMap', { center: OSK_CENTER, zoom: 12, zoomControl: true, attributionControl: false });
-          satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxZoom: 19,
-            attribution: 'Esri Satellite'
-          });
-          satLayer.addTo(mapInstance);
-
-          labelsLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-            maxZoom: 19,
-            subdomains: 'abcd'
-          });
-          if (labelsVisible) labelsLayer.addTo(mapInstance);
-
-          mapInstance.on('click', (ev) => {
-            if (!addingPin) return;
-            draftLatLng = ev.latlng;
-            const hint = document.getElementById('oskPinCoordsHint');
-            const tInp = document.getElementById('oskPinTitleInput');
-            const dInp = document.getElementById('oskPinDescInput');
-            const form = document.getElementById('oskPinForm');
-            if (hint) hint.textContent = `Точка: ${ev.latlng.lat.toFixed(5)}, ${ev.latlng.lng.toFixed(5)}`;
-            if (tInp) tInp.value = '';
-            if (dInp) dInp.value = '';
-            form.classList.add('open');
-            if (tInp) setTimeout(() => tInp.focus(), 50);
-          });
-        }
-        renderPinsOnMap();
-        setTimeout(() => { try { mapInstance.invalidateSize(); } catch (_) {} }, 120);
-      }
-
       window.SAT_OSKEMEN_HUB = {
         open() {
           window.closeAllSideDrawers?.();
           document.getElementById('satOskemenHubModal')?.classList.add('open');
+          syncAlertUi();
+          refreshDaylight(false);
           refreshWeather();
           refreshRates();
-          setTimeout(() => ensureHybridMap(), 60);
         },
         close() {
-          this.cancelPinForm();
           document.getElementById('satOskemenHubModal')?.classList.remove('open');
         },
         switchTab(name, btn) {
@@ -2542,112 +2104,39 @@
           document.querySelectorAll('.osk-pane').forEach(p => p.classList.remove('active'));
           if (btn) btn.classList.add('active');
           document.getElementById('oskPane-' + name)?.classList.add('active');
-          if (name === 'map') setTimeout(() => ensureHybridMap(), 60);
-        },
-        centerCity() {
-          ensureHybridMap();
-          if (mapInstance) mapInstance.setView(OSK_CENTER, 12);
-        },
-        toggleLabels() {
-          ensureHybridMap();
-          if (!mapInstance || !labelsLayer) return;
-          labelsVisible = !labelsVisible;
-          if (labelsVisible) labelsLayer.addTo(mapInstance);
-          else mapInstance.removeLayer(labelsLayer);
-          const btn = document.getElementById('oskToggleLabelsBtn');
-          if (btn) btn.textContent = labelsVisible ? 'Улицы и дома' : 'Только спутник';
-          window.toast?.(labelsVisible ? 'Слой улиц и адресов включён' : 'Слой улиц скрыт');
-        },
-        toggleAddPin() {
-          ensureHybridMap();
-          addingPin = !addingPin;
-          draftLatLng = null;
-          const btn = document.getElementById('oskAddPinBtn');
-          const form = document.getElementById('oskPinForm');
-          if (btn) btn.textContent = addingPin ? 'Отмена' : '+ Своя метка';
-          if (form && !addingPin) form.classList.remove('open');
-        },
-        cancelPinForm() {
-          draftLatLng = null;
-          addingPin = false;
-          const btn = document.getElementById('oskAddPinBtn');
-          const form = document.getElementById('oskPinForm');
-          if (btn) btn.textContent = '+ Своя метка';
-          if (form) form.classList.remove('open');
-        },
-        savePinForm() {
-          if (!draftLatLng) return;
-          const tInp = document.getElementById('oskPinTitleInput');
-          const dInp = document.getElementById('oskPinDescInput');
-          const title = (tInp ? tInp.value : '').trim();
-          const desc = (dInp ? dInp.value : '').trim();
-          if (!title) { if (tInp) tInp.focus(); return; }
-
-          const list = getCustomPins();
-          const pin = {
-            id: 'p_' + Date.now(),
-            lat: draftLatLng.lat,
-            lng: draftLatLng.lng,
-            title,
-            desc: desc || 'Метка пользователя в Оскемене',
-            custom: true
-          };
-          list.push(pin);
-          writeObj(PINS_KEY, list);
-          this.cancelPinForm();
-          renderPinsOnMap();
-          showPinCard(pin);
-          window.toast?.('Метка сохранена на карте');
-        },
-        deletePin(id) {
-          writeObj(PINS_KEY, getCustomPins().filter(p => p.id !== id));
-          renderPinsOnMap();
-          const card = document.getElementById('oskPinCard');
-          if (card) {
-            card.innerHTML = '<div style="font-weight:800;">Метка удалена</div><div class="meta" style="margin-top:4px;">Выберите точку на спутнике или найдите адрес.</div>';
+          if (name === 'daylight') {
+            syncAlertUi();
+            refreshDaylight(false);
           }
-          window.toast?.('Метка удалена');
         },
-        async searchAddress() {
-          ensureHybridMap();
-          const inp = document.getElementById('oskAddressSearchInput');
-          const rawQ = (inp ? inp.value : '').trim();
-          if (!rawQ) { window.toast?.('Введите адрес или улицу'); return; }
-          const queryText = /оскемен|усть-каменогорск|вко|восточно-казахстан/i.test(rawQ)
-            ? rawQ
-            : `${rawQ}, Усть-Каменогорск, Казахстан`;
-          const card = document.getElementById('oskPinCard');
-          if (card) card.innerHTML = `<div style="font-weight:800; color:var(--accent);">Поиск адреса...</div><div class="meta" style="margin-top:4px;">${escText(queryText)}</div>`;
-          try {
-            const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(queryText)}`, {
-              headers: { 'Accept-Language': 'ru' }
-            });
-            if (!r.ok) throw new Error('geo');
-            const arr = await r.json();
-            if (!Array.isArray(arr) || !arr.length) {
-              if (card) card.innerHTML = `<div style="font-weight:800; color:var(--danger);">Адрес не найден</div><div class="meta" style="margin-top:4px;">Попробуйте уточнить улицу или номер дома в Оскемене.</div>`;
-              return;
-            }
-            const hit = arr[0];
-            const lat = parseFloat(hit.lat);
-            const lng = parseFloat(hit.lon);
-            if (mapInstance && !isNaN(lat) && !isNaN(lng)) {
-              mapInstance.setView([lat, lng], 16);
-              if (searchMarker) { try { mapInstance.removeLayer(searchMarker); } catch (_) {} }
-              searchMarker = L.marker([lat, lng]).addTo(mapInstance);
-              searchMarker.bindPopup(escText(hit.display_name || rawQ)).openPopup();
-            }
-            if (card) {
-              card.innerHTML = `<div style="font-weight:800; color:var(--accent);">📍 ${escText(rawQ)}</div><div class="meta" style="margin-top:4px;">${escText(hit.display_name || '')}</div><div class="meta" style="margin-top:3px; font-size:11.5px;">Координаты: ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>`;
-            }
-          } catch (_) {
-            if (card) card.innerHTML = `<div style="font-weight:800; color:var(--danger);">Ошибка поиска адреса</div><div class="meta" style="margin-top:4px;">Проверьте подключение к интернету и попробуйте снова.</div>`;
+        async toggleAlerts() {
+          const next = !isAlertsEnabled();
+          if (next && typeof Notification !== 'undefined' && Notification.permission === 'default') {
+            try { await Notification.requestPermission(); } catch (_) {}
           }
-        }
+          setAlertsEnabled(next);
+          window.toast?.(next ? 'Уведомления на рассвет и закат включены' : 'Уведомления отключены');
+        },
+        testAlert() {
+          playChime();
+          const cur = readObj(DAYLIGHT_KEY);
+          window.toast?.(`Сигнал проверен • Рассвет ${cur?.sunrise || '--:--'} / Закат ${cur?.sunset || '--:--'}`);
+        },
+        refreshDaylight
       };
 
+      syncAlertUi();
+      refreshDaylight(false);
       refreshWeather();
       refreshRates();
+      setInterval(() => {
+        refreshDaylight(false);
+        const cur = readObj(DAYLIGHT_KEY);
+        if (cur) {
+          paintDaylight(cur);
+          checkDaylightAlerts(cur);
+        }
+      }, 60 * 1000);
       setInterval(() => refreshWeather(), 30 * 60 * 1000);
       setInterval(() => refreshRates(), 6 * 60 * 60 * 1000);
     })();

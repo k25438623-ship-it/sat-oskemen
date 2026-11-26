@@ -1409,13 +1409,615 @@
           </div>
         </div>
 
-        <div class="subtabs-3" style="margin-bottom: 12px;">
+        <div class="subtabs-3">
+          <button type="button" id="subTabPosts" class="sub-btn active" onclick="switchMySubtab('posts')">Публикации</button>
+          <button type="button" id="subTabFriends" class="sub-btn" onclick="switchMySubtab('friends')">Друзья</button>
+          <button type="button" id="subTabGroups" class="sub-btn" onclick="switchMySubtab('groups')">Группы</button>
+        </div>
+
+        <div id="mySubPosts">
+          <div id="myStoryBanner" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <div>
+                <div style="font-weight: 700; font-size: 15px; color: var(--accent);">Ваша сторис (действует 3 часа)</div>
+                <div id="myStoryTimerText" class="meta">Активна</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-mint" style="padding: 8px 12px; font-size: 13px;" onclick="viewOwnStory()">Смотреть</button>
+                <button type="button" class="btn btn-danger" style="padding: 8px 10px; font-size: 13px;" onclick="removeOwnStory()">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <h3 style="margin: 0; font-size: 16px;">Мои фотографии</h3>
+              <button type="button" class="btn btn-mint" style="padding: 6px 11px; font-size: 12.5px;" onclick="openPhotoPicker('gallery_add')">+ Фото</button>
+            </div>
+            <div id="myPhotosBox" class="photo-grid"></div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 16px;">Мои публикации</h3>
+            <div id="myPostsBox"></div>
+          </div>
+        </div>
+
+        <div id="mySubFriends" style="display: none;">
+          <div id="incomingFriendRequestsCard" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 16px; color: var(--gold);">Заявки в друзья</h3>
+              <span class="tag-alert" id="incomingFriendCountBadge">0</span>
+            </div>
+            <div id="incomingFriendRequestsList"></div>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 16px;">Мои друзья</h3>
+              <button type="button" class="btn btn-ghost" style="padding: 6px 11px; font-size: 12.5px;" onclick="refreshFriendsView()">Обновить</button>
+            </div>
+            <div id="myFriendsBox"></div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 16px;">Люди в SÄT</h3>
+            <input id="searchPeopleInput" class="input" style="margin-top: 0; margin-bottom: 10px;" placeholder="Поиск по имени..." oninput="renderFriendsTab()" />
+            <div id="otherPeopleBox"></div>
+          </div>
+        </div>
+
+        <div id="mySubGroups" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <h3 style="margin: 0; font-size: 16px;">Группы</h3>
+              <button type="button" class="btn btn-primary" style="padding: 8px 13px; font-size: 13px;" onclick="openCreateGroupModal()">+ Создать группу</button>
+            </div>
+            <div id="groupsBox"></div>
+          </div>
+        </div>
+
+        <div id="myChatsCard" class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Чаты</h3>
+              <div id="chatsUnreadSummary" class="meta">Нажмите на чат — откроется на весь экран</div>
+            </div>
+            <span class="tag" id="chatsCountBadge">0</span>
+          </div>
+          <div id="profileChatsList"></div>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 style="margin: 0; font-size: 17px;">Время намаза • Оскемен</h3>
+              <div id="profileNamazPreview" class="meta">Оскемен • Расписание намаза</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openNamazQiblaModal()">Открыть</button>
+          </div>
+        </div>
+
+        <div id="profileSupportOrMonitorCard" class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <h3 id="supportOrMonitorTitle" style="margin: 0; font-size: 17px;">Техподдержка</h3>
+              <div id="supportCardSub" class="meta">Написать в техподдержку SÄT</div>
+            </div>
+            <button type="button" class="btn btn-mint" style="padding: 8px 13px; font-size: 13px;" onclick="openSupportModal()">Открыть</button>
+          </div>
+        </div>
+
+        <div class="copyright-footer">
+          © SÄT • Б.Ш.А. Все права защищены.
+        </div>
+      </div>
+    </main>
+
+    <div id="sideMenuBackdrop" class="side-menu-backdrop" onclick="closeAllSideDrawers()"></div>
+
+    <aside id="leftSectionDrawer" class="left-section-drawer" onclick="event.stopPropagation()">
+      <div class="side-drawer-title">
+        <span id="leftDrawerHeading">Разделы</span>
+        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
+      </div>
+      <div id="leftDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
+    </aside>
+
+    <aside id="rightProfileDrawer" class="right-section-drawer" onclick="event.stopPropagation()">
+      <div class="side-drawer-title">
+        <span id="rightDrawerHeading">Профиль</span>
+        <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="closeAllSideDrawers()">✕</button>
+      </div>
+      <div id="rightDrawerItems" style="display: flex; flex-direction: column; gap: 7px;"></div>
+    </aside>
+
+    <nav class="bottom-nav-single">
+      <button type="button" class="nav-btn active bottom-nav-profile-right" data-tab="profile" onclick="switchMainTab('profile', this)">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Профиль</span>
+      </button>
+    </nav>
+  </section>
+
+  <section id="peerProfileScreen" class="screen">
+    <header class="topbar">
+      <button type="button" class="btn btn-ghost" style="padding: 8px 14px; font-size: 14px;" onclick="closePeerScreen()">← Назад</button>
+      <div id="peerHeaderTitle" style="font-weight: 800; font-size: 16px; color: var(--accent);">Страница</div>
+      <div style="width: 74px;"></div>
+    </header>
+
+    <div class="container">
+      <div class="card">
+        <div class="profile-top">
+          <div id="peerAvatarRing" class="ava-ring" onclick="onPeerAvatarTap(event)">
+            <div id="peerAvatarCircle" class="ava-circle">Ä</div>
+          </div>
+          <div style="min-width: 0; flex: 1;">
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+              <h2 id="peerFullName" style="margin: 0; font-size: 20px;">Участник</h2>
+              <span id="peerAccountRoleBadge"></span>
+            </div>
+            <div id="peerOnlineStatus" style="margin-top: 3px;"></div>
+            <div id="peerAboutLine" class="meta" style="margin-top: 6px; line-height: 1.45;">Участник SÄT</div>
+            <div id="peerStoryTag" style="display: none; margin-top: 8px;">
+              <button type="button" class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px;" onclick="openPeerStoryViewer(event)">Смотреть сторис (до 3 ч)</button>
+            </div>
+          </div>
+        </div>
+        <div id="peerActionButtons" class="actions" style="margin-top: 14px;"></div>
+      </div>
+
+      <div class="subtabs-4">
+        <button type="button" id="peerTabPosts" class="sub-btn active" onclick="switchPeerSubtab('posts')">Публикации</button>
+        <button type="button" id="peerTabPhotos" class="sub-btn" onclick="switchPeerSubtab('photos')">Фото</button>
+        <button type="button" id="peerTabFriends" class="sub-btn" onclick="switchPeerSubtab('friends')">Друзья</button>
+        <button type="button" id="peerTabInfo" class="sub-btn" onclick="switchPeerSubtab('info')">Анкета</button>
+      </div>
+
+      <div id="peerPanelPosts" class="card"><div id="peerPostsList"></div></div>
+      <div id="peerPanelPhotos" class="card" style="display: none;"><div id="peerPhotosGrid" class="photo-grid"></div></div>
+      <div id="peerPanelFriends" class="card" style="display: none;"><div id="peerFriendsList"></div></div>
+      <div id="peerPanelInfo" class="card" style="display: none;"><div id="peerInfoBox"></div></div>
+    </div>
+  </section>
+
+  <div id="unifiedSearchModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Поиск в SÄT</h3>
+          <div id="searchResultsSummary" class="meta">Живые люди, дела и объявления без шума</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('unifiedSearchModal')">✕</button>
+      </div>
+
+      <input id="unifiedSearchInput" class="input" style="margin-top: 10px; margin-bottom: 10px;" placeholder="Имя, объявление или дело..." oninput="renderUnifiedSearch()" />
+
+      <div class="subtabs-3" style="margin-bottom: 10px;">
+        <button type="button" id="sTabAll" class="sub-btn active" onclick="setUnifiedSearchTab('all')">Все</button>
+        <button type="button" id="sTabUsers" class="sub-btn" onclick="setUnifiedSearchTab('users')">Люди</button>
+        <button type="button" id="sTabBusiness" class="sub-btn" onclick="setUnifiedSearchTab('business')">Дела и объявления</button>
+      </div>
+
+      <div id="unifiedSearchList" onclick="onUnifiedSearchListClick(event)"></div>
+    </div>
+  </div>
+
+  <div id="accountRoleModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 6px; font-size: 18px;">Выберите тип аккаунта</h3>
+      <p class="meta" style="margin: 0 0 14px; line-height: 1.45;">
+        Это можно изменить в любое время в разделе «Изменить» профиля. Видны только имя, анкета и статус в SÄT.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('user')">
+          Пользователь
+        </button>
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="selectInitialAccountType('business')">
+          Бизнес-аккаунт
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteAccountModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 8px; font-size: 18px; color: var(--danger);">Удалить страницу SÄT?</h3>
+      <p class="meta" style="margin: 0 0 14px; line-height: 1.5;">
+        Ваша страница, анкета, фото и публикации в SÄT будут удалены, а вы выйдете из аккаунта приложения. Это действие нельзя отменить.
+      </p>
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('deleteAccountModal')">Отмена</button>
+        <button type="button" id="confirmDeleteAccountBtn" class="btn btn-danger" style="flex: 1;" onclick="deleteMyPageCompletely()">Да, удалить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="readingViewerModal" class="reader-screen">
+    <div class="reader-topbar">
+      <button type="button" class="btn btn-ghost" style="padding: 7px 12px; font-size: 13px;" onclick="closeReadingViewer()">← Книга</button>
+      <div style="display: flex; gap: 6px; align-items: center;">
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12.5px;" onclick="toggleReaderPaperMode()">Бумага / Ночь</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(-2)">А-</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 10px;" onclick="changeReadingFont(2)">А+</button>
+      </div>
+    </div>
+    <div class="reader-scroll">
+      <div id="readingModalCoverWrap" class="reader-hero-cover" style="display: none;">
+        <img id="readingModalCoverImg" src="" alt="" />
+      </div>
+      <div id="readingModalMeta" class="meta" style="font-weight: 700; color: var(--accent);">Раздел</div>
+      <h2 id="readingModalTitle" class="reader-article-title">Заголовок</h2>
+      <div id="readingModalBody" class="reader-article-body"></div>
+    </div>
+  </div>
+
+  <div id="addReadingModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 6px; font-size: 18px;">Добавить в «Книгу»</h3>
+      <div class="meta" style="margin-bottom: 10px;">Материал сначала отправится на проверку, затем появится для всех.</div>
+      <label class="meta">Раздел</label>
+      <select id="readingKindSelect">
+        <option value="stories">Короткие истории</option>
+        <option value="tips">Краткие советы</option>
+      </select>
+      <label class="meta" style="display: block; margin-top: 10px;">Заголовок</label>
+      <input id="readingTitleInput" class="input" placeholder="Название истории или совета" />
+      <label class="meta" style="display: block; margin-top: 10px;">Короткое описание</label>
+      <input id="readingDescInput" class="input" placeholder="О чём текст..." />
+      <div style="margin-top: 10px;">
+        <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('reading_cover')">
+          <span id="readingPhotoLabel">Прикрепить фото по теме (необязательно)</span>
+        </button>
+        <div id="readingPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
+          <img id="readingPreviewImg" src="" alt="" style="width: 100%; max-height: 170px; object-fit: cover; border-radius: 14px;" />
+          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearReadingAttachment()">Убрать</button>
+        </div>
+      </div>
+      <label class="meta" style="display: block; margin-top: 10px;">Текст</label>
+      <textarea id="readingContentInput" rows="6" placeholder="Напишите текст..."></textarea>
+      <div class="actions" style="margin-top: 14px;">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('addReadingModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveNewReadingItem()">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="namazQiblaModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Время намаза • Оскемен</h3>
+          <div id="namazLocationLabel" class="meta">Ручное обновление расписания</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" id="togglePrayerEditBtn" class="btn btn-gold" style="padding: 6px 11px; font-size: 12px;" onclick="togglePrayerEditor()">Изменить время</button>
+          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('namazQiblaModal')">✕</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px;">
+        <div id="boxFajr" class="stat-box"><div class="meta" style="font-size: 11px;">Фаджр</div><div id="ptFajr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
+        <div id="boxDhuhr" class="stat-box"><div class="meta" style="font-size: 11px;">Зухр</div><div id="ptDhuhr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
+        <div id="boxAsr" class="stat-box"><div class="meta" style="font-size: 11px;">Аср</div><div id="ptAsr" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
+        <div id="boxMaghrib" class="stat-box"><div class="meta" style="font-size: 11px;">Магриб</div><div id="ptMaghrib" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
+        <div id="boxIsha" class="stat-box"><div class="meta" style="font-size: 11px;">Иша</div><div id="ptIsha" class="stat-num" style="font-size: 14.5px; margin-top: 2px;">--:--</div></div>
+      </div>
+
+      <div id="namazActiveBanner" style="margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: var(--green-soft); border: 1px solid var(--border-strong); font-size: 13.5px; font-weight: 800; color: var(--accent);">
+        Сейчас: --
+      </div>
+      <div id="namazSourceStatus" class="meta" style="margin-top: 8px; font-size: 12px;">Оскемен • Время обновляется вручную</div>
+
+      <div id="prayerEditPanel" style="display: none;">
+        <div class="prayer-edit-grid">
+          <div class="prayer-edit-item"><label>Фаджр</label><input id="inFajr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Зухр</label><input id="inDhuhr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Аср</label><input id="inAsr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Магриб</label><input id="inMaghrib" class="input" type="time" /></div>
+          <div class="prayer-edit-item" style="grid-column: 1 / -1;"><label>Иша</label><input id="inIsha" class="input" type="time" /></div>
+        </div>
+        <div class="actions" style="margin-top: 10px;">
+          <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="togglePrayerEditor(false)">Отмена</button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveManualOskemenTimes()">Сохранить для всех</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="supportModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div onclick="onSupportTitleTripleTap()">
+          <h3 id="supportModalTitle" style="margin: 0; font-size: 18px;">Техподдержка SÄT</h3>
+          <div id="supportModalSub" class="meta">Опишите вопрос или обращение</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('supportModal')">✕</button>
+      </div>
+
+      <div id="userSupportForm" style="margin-top: 12px;">
+        <textarea id="supportMsgInput" rows="3" placeholder="Напишите ваше обращение в техподдержку..."></textarea>
+        <div class="actions" style="margin-top: 10px;">
+          <button type="button" class="btn btn-primary" style="width: 100%;" onclick="sendSupportMessage()">Отправить</button>
+        </div>
+      </div>
+
+      <div id="creatorCodeBox" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);">
+        <input id="creatorCodeInput" class="input" type="password" placeholder="Код доступа" onkeydown="if(event.key==='Enter') unlockCreatorByCode()" />
+        <div class="actions" style="margin-top: 8px;">
+          <button type="button" class="btn btn-mint" style="width: 100%;" onclick="unlockCreatorByCode()">Войти</button>
+        </div>
+      </div>
+
+      <div id="creatorOnlyPanel" style="display: none; margin-top: 14px;">
+        <div class="subtabs-3">
+          <button type="button" id="cTabTickets" class="sub-btn active" onclick="switchCreatorTab('tickets')">Обращения</button>
+          <button type="button" id="cTabUsers" class="sub-btn" onclick="switchCreatorTab('users')">Люди</button>
+          <button type="button" id="cTabErrors" class="sub-btn" onclick="switchCreatorTab('errors')">Ошибки</button>
+        </div>
+        <div id="cPanelTickets"></div>
+        <div id="cPanelUsers" style="display: none;"></div>
+        <div id="cPanelErrors" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="avatarChoiceModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="avatarChoiceTitle" style="margin: 0 0 6px; font-size: 18px;">Что открыть?</h3>
+      <p id="avatarChoiceSub" class="meta" style="margin: 0 0 14px;">Выберите, что посмотреть</p>
+      <div id="avatarChoiceButtons" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      <button type="button" class="btn btn-ghost" style="width: 100%; margin-top: 10px;" onclick="hideModal('avatarChoiceModal')">Отмена</button>
+    </div>
+  </div>
+
+  <input type="file" id="camInput" accept="image/*" capture="environment" style="display: none;" onchange="onImageChosen(event)" />
+  <input type="file" id="galInput" accept="image/*" style="display: none;" onchange="onImageChosen(event)" />
+
+  <div id="photoPickerModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="pickerModalTitle" style="margin: 0 0 6px; font-size: 18px;">Выберите фото</h3>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+        <button type="button" class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="startCamera()">Сделать фото на камеру</button>
+        <button type="button" class="btn btn-mint" style="width: 100%; padding: 14px;" onclick="startGallery()">Загрузить из галереи</button>
+        <button type="button" class="btn btn-ghost" style="width: 100%;" onclick="hideModal('photoPickerModal')">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="captionBox" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 id="captionBoxTitle" style="margin: 0 0 10px; font-size: 18px;">Подпись к фото</h3>
+      <input id="captionInput" class="input" maxlength="120" placeholder="Напишите подпись..." onkeydown="if(event.key==='Enter') applyCaptionNow()" />
+      <div class="actions" style="margin-top: 12px;">
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="applyCaptionNow()">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="wallpapersModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Темы и фоны (5 вариантов)</h3>
+          <div class="meta">Тёмные без «Матрицы» и светлые — нажмите для выбора</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('wallpapersModal')">✕</button>
+      </div>
+      <div id="wallpapersList" class="wp-list"></div>
+    </div>
+  </div>
+
+  <div id="newPostModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 10px; font-size: 18px;">Новая публикация</h3>
+      <label class="meta">Раздел в «Пульсе»</label>
+      <select id="postCategorySelect">
+        <option value="posts">Публикации</option>
+        <option value="news">Новости</option>
+        <option value="walks">Прогулки</option>
+        <option value="cafe">Кафе</option>
+      </select>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Подпись или заголовок</label>
+      <input id="postCaptionInput" class="input" placeholder="Короткий заголовок..." />
+
+      <label class="meta" style="display: block; margin-top: 10px;">Текст сообщения</label>
+      <textarea id="postTextInput" rows="3" placeholder="Напишите сообщение..."></textarea>
+
+      <div style="margin-top: 12px;">
+        <button type="button" class="btn btn-mint" style="width: 100%;" onclick="openPhotoPicker('post')">
+          <span id="postPhotoLabel">Прикрепить фото (камера или галерея)</span>
+        </button>
+        <div id="postPreviewWrap" style="display: none; margin-top: 10px; position: relative;">
+          <img id="postPreviewImg" src="" alt="" style="width: 100%; max-height: 210px; object-fit: cover; border-radius: 14px;" />
+          <button type="button" class="btn btn-danger" style="position: absolute; top: 8px; right: 8px; padding: 6px 10px; font-size: 12px;" onclick="clearPostAttachment()">Убрать</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <label class="meta">Куда отправить?</label>
+        <div class="grid-2" style="margin-top: 6px;">
+          <button type="button" id="destBtnPulse" class="sub-btn active" onclick="choosePostDest('pulse')">В Пульс</button>
+          <button type="button" id="destBtnSelf" class="sub-btn" onclick="choosePostDest('self')">Для своей страницы</button>
+        </div>
+        <div id="postDestExplanation" class="dest-hint-box">
+          <strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: 16px;">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('newPostModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="submitNewPost()">Отправить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="editProfileModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 10px;">Данные профиля и анкета</h3>
+      <label class="meta">Имя</label>
+      <input id="editNameField" class="input" placeholder="Введите имя" oninput="updateNameStylePreview()" />
+
+      <label class="meta" style="display: block; margin-top: 10px;">Стиль шрифта имени</label>
+      <select id="editNameStyleSelect" onchange="updateNameStylePreview()">
+        <option value="normal">Обычный</option>
+        <option value="bold">Жирный (𝐀𝐛𝐜)</option>
+        <option value="italic">Курсив (𝐴𝑏𝑐)</option>
+        <option value="fraktur">Акцентный (𝔄𝔟𝔠)</option>
+        <option value="mono">Печатный (𝙰𝚋𝚌)</option>
+      </select>
+      <div id="editNamePreview" class="meta" style="margin-top: 7px; font-size: 15px; color: var(--accent); font-weight: 700;"></div>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Тип аккаунта</label>
+      <select id="editAccountTypeSelect">
+        <option value="user">Пользователь</option>
+        <option value="business">Бизнес-аккаунт</option>
+      </select>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Анкета / О себе (видно другим пользователям)</label>
+      <textarea id="editBioField" rows="3" placeholder="Коротко о себе или о вашем деле..."></textarea>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Видимость в общем поиске</label>
+      <select id="editHideFromSearchSelect">
+        <option value="0">Показывать мою страницу в общем поиске</option>
+        <option value="1">Скрыть из общего поиска (видят только те, кому я пишу)</option>
+      </select>
+
+      <label class="meta" style="display: block; margin-top: 10px;">Статус активности</label>
+      <select id="editHideLastSeenSelect">
+        <option value="0">Показывать «в сети» и время визита</option>
+        <option value="1">Скрывать время последнего визита</option>
+      </select>
+
+      <div class="actions" style="margin-top: 14px;">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('editProfileModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="saveProfileData()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="createGroupModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="margin: 0 0 10px;">Создать группу</h3>
+      <label class="meta">Название группы</label>
+      <input id="groupTitleInput" class="input" placeholder="Название группы" />
+      <label class="meta" style="display: block; margin-top: 10px;">Описание</label>
+      <input id="groupDescInput" class="input" placeholder="О чём эта группа" />
+      <div class="actions" style="margin-top: 16px;">
+        <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('createGroupModal')">Отмена</button>
+        <button type="button" class="btn btn-primary" style="flex: 1;" onclick="createNewGroup()">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="fullViewer" class="viewer-screen">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+      <div>
+        <div id="viewerTitle" style="font-weight: 800; font-size: 16px;">Фото</div>
+        <div id="viewerSub" style="font-size: 12px; opacity: 0.78;"></div>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" class="btn btn-mint" style="padding: 7px 12px; font-size: 12.5px;" onclick="downloadCurrentViewerPhoto()">В галерею</button>
+        <button type="button" class="btn btn-ghost" style="padding: 7px 12px;" onclick="closeFullViewer()">✕</button>
+      </div>
+    </div>
+    <div id="viewerStage" class="viewer-stage">
+      <img id="viewerImage" src="" alt="" draggable="false" />
+    </div>
+    <div id="viewerScaleLabel" style="text-align: center; font-size: 12px; opacity: 0.75;">Растяните двумя пальцами • Двигайте влево/вправо</div>
+  </div>
+
+  <div id="fullCallScreen">
+    <div style="text-align: center; margin-top: 24px;">
+      <div class="meta" style="font-size: 13px; letter-spacing: 1px; color: var(--accent);">HD ЗВОНОК • ШУМОПОДАВЛЕНИЕ</div>
+      <h2 id="callPeerName" style="margin: 12px 0 6px; font-size: 26px; font-weight: 900;">Собеседник</h2>
+      <div id="callStatusText" class="meta" style="font-size: 15px;">Соединение...</div>
+      <div id="callTimerText" style="margin-top: 8px; font-size: 18px; font-weight: 800; color: #f2c96b;">00:00</div>
+    </div>
+
+    <div id="callControlsBox" style="display: flex; justify-content: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap;">
+      <button type="button" id="callAcceptBtn" class="btn btn-primary" style="display: none; padding: 14px 22px; border-radius: 20px;" onclick="acceptIncomingCall()">Ответить</button>
+      <button type="button" id="callMuteBtn" class="btn btn-ghost" style="padding: 14px 18px; border-radius: 20px;" onclick="toggleCallMute()">Микрофон вкл</button>
+      <button type="button" class="btn btn-danger" style="padding: 14px 24px; border-radius: 20px;" onclick="hangupCall(); toast('Звонок завершён')">Сбросить</button>
+    </div>
+  </div>
+
+  <div id="chatScreen" class="chat-screen">
+    <div class="chat-wrap">
+      <div class="chat-topbar">
+        <button type="button" class="btn btn-ghost" style="padding: 8px 12px; font-size: 13.5px;" onclick="closeChat()">← Чаты</button>
+        <div style="min-width: 0; flex: 1;">
+          <h3 id="chatHeaderTitle" style="margin: 0; font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
+          <div id="chatHeaderSub" class="meta">Сообщения • Голос • Фото</div>
+        </div>
+        <button id="callToggleBtn" type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="toggleAudioCall()">Позвонить</button>
+      </div>
+
+      <div id="chatMessagesBox" class="chat-list"></div>
+
+      <div id="voiceStatusBar" class="voice-status-bar">
+        <span id="voiceStatusText">Пауза перед записью: 2 сек...</span>
+        <button type="button" class="btn btn-danger" style="padding: 5px 11px; font-size: 12px;" onclick="stopVoiceRecordingNow()">Остановить</button>
+      </div>
+
+      <div id="voiceDraftBar" class="voice-draft-bar">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <span id="voiceDraftLabel">Голосовое готово</span>
+          <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="discardVoiceDraft()">Удалить</button>
+            <button type="button" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="sendVoiceDraft()">Отправить</button>
+          </div>
+        </div>
+        <audio id="voiceDraftAudio" controls controlsList="nodownload" preload="metadata" style="width: 100%; height: 36px; margin-top: 4px;"></audio>
+      </div>
+
+      <div id="editModeBar" class="edit-mode-bar">
+        <span>Редактирование сообщения</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn btn-ghost" style="padding: 4px 10px; font-size: 12px;" onclick="cancelEditMessage()">Отмена</button>
+          <button type="button" class="btn btn-primary" style="padding: 4px 12px; font-size: 12px;" onclick="saveEditedMessage()">Сохранить</button>
+        </div>
+      </div>
+
+      <div class="emoji-bar">
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😊')">😊</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('😂')">😂</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('❤️')">❤️</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('👍')">👍</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🙏')">🙏</button>
+        <button type="button" class="emoji-btn" onclick="insertEmoji('✨')">✨</button>
+      <div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">Оскемен • Справочник</h3>
+          <div class="meta">Погода, курсы валют, световой день, трассы ВКО и службы</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="window.SAT_OSKEMEN_HUB.close()">✕</button>
+      </div>
+
+      <div class="osk-widgets">
+        <div class="osk-widget">
+          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Погода • Оскемен</div>
+          <div id="oskWeatherMain" style="font-size: 17px; font-weight: 900; color: var(--accent); margin-top: 4px;">Загрузка...</div>
+          <div id="oskWeatherSub" class="meta" style="font-size: 11.5px; margin-top: 2px;">49.95°N, 82.63°E</div>
+        </div>
+        <div class="osk-widget">
+          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Курсы валют (авто)</div>
+          <div id="oskRatesMain" style="font-size: 13px; font-weight: 800; color: var(--gold); margin-top: 5px;">Загрузка...</div>
+          <div id="oskRatesSub" class="meta" style="font-size: 11px; margin-top: 2px;">KZT • автообновление</div>
+        </div>
+      </div>
+
+      <div class="subtabs-3" style="margin-bottom: 12px;">
         <button type="button" class="sub-btn active" data-osktab="daylight" onclick="window.SAT_OSKEMEN_HUB.switchTab('daylight', this)">Световой день</button>
         <button type="button" class="sub-btn" data-osktab="roads" onclick="window.SAT_OSKEMEN_HUB.switchTab('roads', this)">Трассы ВКО</button>
         <button type="button" class="sub-btn" data-osktab="sos" onclick="window.SAT_OSKEMEN_HUB.switchTab('sos', this)">Номера 112/109</button>
       </div>
 
-        
       <div id="oskPane-daylight" class="osk-pane active">
         <div class="daylight-explain-box">
           <div style="font-weight: 800; color: var(--accent);">Как работает «Световой день» • Оскемен (UTC+5)</div>
@@ -1457,7 +2059,6 @@
           <button type="button" class="btn btn-mint" style="padding: 9px 12px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.testAlert()">Проверить сигнал</button>
         </div>
       </div>
-
 
       <div id="oskPane-roads" class="osk-pane">
         <div class="list-item"><div><b>Оскемен — Сибинские озёра</b><div class="meta">Через Алгабас (~1 ч 15 мин)</div></div><span class="tag">85 км</span></div>
@@ -1906,14 +2507,6 @@
           if (metaEl) metaEl.textContent = entry && entry.dateKey && !isToday
             ? `Прошлый кеш за ${entry.dateKey} скрыт • обновим за сегодня`
             : 'Данные обновятся автоматически при появлении интернета';
-          return;
-        }
-        if (false) {
-          if (riseEl) riseEl.textContent = '--:--';
-          if (setEl) setEl.textContent = '--:--';
-          if (durEl) durEl.textContent = '--';
-          if (stEl) stEl.textContent = 'Состояние дня: ждёт обновления сети';
-          if (metaEl) metaEl.textContent = 'Данные обновятся автоматически при появлении интернета';
           return;
         }
 

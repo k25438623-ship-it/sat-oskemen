@@ -1199,9 +1199,7 @@
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
         </button>
-        <button type="button" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="openSatAiModal()">
-          <span>ИИ</span>
-        </button>
+<button type="button" id="satOskemenTopBtn" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.open()"><span id="satOskemenTopTemp">🌤 --°</span><br/><span>Оскемен</span></button>
         <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
           <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
         </button>
@@ -2001,7 +1999,106 @@
     </div>
   </div>
 
-  <div id="satAiModal" class="modal-bg" onclick="closeBackdrop(event)">
+<div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-height: 90vh; display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
+      <div>
+        <h3 style="margin: 0; font-size: 18px;">Оскемен • ВКО Хаб</h3>
+        <div class="meta" style="font-size: 12px;">Погода, курсы, карта, трассы и службы</div>
+      </div>
+      <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="window.SAT_OSKEMEN_HUB.close()">✕</button>
+    </div>
+    <div class="subtabs-4" style="margin-bottom: 10px;">
+      <button type="button" id="oskTabMain" class="sub-btn active" onclick="window.SAT_OSKEMEN_HUB.setTab('main')">Обзор</button>
+      <button type="button" id="oskTabMap" class="sub-btn" onclick="window.SAT_OSKEMEN_HUB.setTab('map')">Карта</button>
+      <button type="button" id="oskTabRoads" class="sub-btn" onclick="window.SAT_OSKEMEN_HUB.setTab('roads')">Трассы</button>
+      <button type="button" id="oskTabSos" class="sub-btn" onclick="window.SAT_OSKEMEN_HUB.setTab('sos')">Службы</button>
+    </div>
+    <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+      <div id="oskPanelMain">
+        <div class="card" style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="margin: 0; font-size: 15px; color: var(--accent);">🌤 Погода • Оскемен</h4>
+            <button type="button" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px;" onclick="window.SAT_OSKEMEN_HUB.fetchWeather(true)">Обновить</button>
+          </div>
+          <div id="oskWeatherBody" style="margin-top: 8px; font-size: 14px;">Загрузка погоды...</div>
+        </div>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="margin: 0; font-size: 15px; color: var(--gold);">💱 Курсы валют (КZT)</h4>
+            <button type="button" class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px;" onclick="window.SAT_OSKEMEN_HUB.fetchRates(true)">Обновить</button>
+          </div>
+          <div id="oskRatesBody" style="margin-top: 8px; font-size: 14px;">Загрузка курсов...</div>
+        </div>
+      </div>
+      <div id="oskPanelMap" style="display: none;">
+        <div class="card" style="margin-bottom: 10px;">
+          <h4 style="margin: 0 0 8px; font-size: 15px;">Схема Оскемена</h4>
+          <div style="width: 100%; height: 220px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-strong); background: var(--surface-elev); position: relative;">
+            <svg viewBox="0 0 500 300" style="width: 100%; height: 100%; fill: none;">
+              <rect width="500" height="300" fill="var(--surface-elev)" />
+              <path d="M 0 160 Q 150 140 250 180 T 500 200 L 500 220 Q 250 200 150 160 T 0 180 Z" fill="#2d4b68" opacity="0.8" />
+              <path d="M 180 0 Q 200 100 250 180" stroke="#2d4b68" stroke-width="12" fill="none" opacity="0.8" />
+              <line x1="210" y1="130" x2="230" y2="155" stroke="var(--accent)" stroke-width="4" />
+              <line x1="290" y1="185" x2="295" y2="205" stroke="var(--accent)" stroke-width="4" />
+              <circle cx="250" cy="180" r="6" fill="var(--gold)" />
+              <text x="255" y="175" fill="var(--text)" font-size="10" font-weight="bold">Стрелка</text>
+              <circle cx="210" cy="110" r="5" fill="var(--accent-2)" />
+              <text x="218" y="113" fill="var(--text)" font-size="10">Центр</text>
+              <circle cx="330" cy="230" r="5" fill="var(--accent-2)" />
+              <text x="338" y="233" fill="var(--text)" font-size="10">КШТ / Левый берег</text>
+              <circle cx="110" cy="80" r="5" fill="var(--accent-2)" />
+              <text x="118" y="83" fill="var(--text)" font-size="10">Защита</text>
+              <circle cx="380" cy="180" r="5" fill="var(--accent-2)" />
+              <text x="388" y="183" fill="var(--text)" font-size="10">Аблакетка</text>
+              <circle cx="150" cy="190" r="5" fill="var(--accent-2)" />
+              <text x="95" y="205" fill="var(--text)" font-size="10">Пристань</text>
+              <circle cx="310" cy="60" r="5" fill="var(--accent-2)" />
+              <text x="318" y="63" fill="var(--text)" font-size="10">Согра</text>
+              <circle cx="210" cy="240" r="5" fill="var(--accent-2)" />
+              <text x="218" y="243" fill="var(--text)" font-size="10">Меновное</text>
+            </svg>
+          </div>
+        </div>
+        <div class="card">
+          <h4 style="margin: 0 0 8px; font-size: 15px;">Мои метки на карте</h4>
+          <div id="oskUserMarkersList" style="margin-bottom: 10px;"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <input id="oskMarkerTitle" class="input" style="margin: 0;" placeholder="Название метки (напр. Любимое кафе)" />
+            <input id="oskMarkerDesc" class="input" style="margin: 0;" placeholder="Ориентир или замечение" />
+            <button type="button" class="btn btn-mint" style="margin-top: 4px;" onclick="window.SAT_OSKEMEN_HUB.addMarker()">+ Добавить метку</button>
+          </div>
+        </div>
+      </div>
+      <div id="oskPanelRoads" style="display: none;">
+        <div class="card">
+          <h4 style="margin: 0 0 10px; font-size: 15px; color: var(--accent);">🛣 Трассы ВКО из Оскемена</h4>
+          <div class="list-item"><span style="font-weight: 700;">Сибинские озёра</span><span class="tag">85 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Голубой Залив</span><span class="tag">100 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Риддер</span><span class="tag">105 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Самарское</span><span class="tag">145 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Алтай (Зыряновск)</span><span class="tag">185 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Семей</span><span class="tag">215 км</span></div>
+          <div class="list-item"><span style="font-weight: 700;">Зайсан</span><span class="tag">470 км</span></div>
+        </div>
+      </div>
+      <div id="oskPanelSos" style="display: none;">
+        <div class="card">
+          <h4 style="margin: 0 0 10px; font-size: 15px; color: var(--danger);">🚨 Экстренные службы</h4>
+          <div class="grid-2" style="margin-top: 0;">
+            <a href="tel:112" class="btn btn-danger" style="text-decoration: none;">📞 112 ЧС</a>
+            <a href="tel:109" class="btn btn-primary" style="text-decoration: none;">📞 109 Акимат</a>
+            <a href="tel:101" class="btn btn-ghost" style="text-decoration: none;">📞 101 Пожарные</a>
+            <a href="tel:102" class="btn btn-ghost" style="text-decoration: none;">📞 102 Полиция</a>
+            <a href="tel:103" class="btn btn-ghost" style="text-decoration: none;">📞 103 Скорая</a>
+            <a href="tel:104" class="btn btn-ghost" style="text-decoration: none;">📞 104 Газ</a>
+            <a href="tel:1403" class="btn btn-mint" style="text-decoration: none; grid-column: 1 / -1;">📞 1403 Казавтожол (Трассы)</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     <div class="modal-box ai-modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
         <div>
@@ -2062,463 +2159,151 @@
           light: false,
           bg: 'linear-gradient(165deg, #111014 0%, #191721 55%, #221f2d 100%)',
           accent: '#e5b567',
-          accent2: '#b89fd9'
-        },
-        {
-          id: 'light_linen',
-          name: 'Светлый лён',
-          desc: 'Светлый режим • тёплый песочный тон',
-          light: true,
-          bg: 'linear-gradient(165deg, #f7f5f0 0%, #efece4 55%, #e5e0d5 100%)',
-          accent: '#b86b28',
-          accent2: '#2f6f62'
-        },
-        {
-          id: 'light_stone',
-          name: 'Светлый камень',
-          desc: 'Светлый режим • чистый серый свет',
-          light: true,
-          bg: 'linear-gradient(165deg, #f4f6f7 0%, #eaeeef 55%, #dfe5e7 100%)',
-          accent: '#9c591e',
-          accent2: '#2f6f62'
-        }
-      ];
-
-      let leftExpandedSection = null;
-
-      function showThemeToast(msg) {
-        try {
-          const t = document.getElementById('toast');
-          if (!t) return;
-          t.textContent = String(msg || '');
-          t.classList.add('show');
-          clearTimeout(window._themeToastT);
-          window._themeToastT = setTimeout(() => t.classList.remove('show'), 2000);
-        } catch (e) {}
-      }
-
-      if (typeof window.toast !== 'function') {
-        window.toast = showThemeToast;
-      }
-
-      function applySatTheme(id) {
-        const th = SAT_THEMES.find((x) => x.id === id) || SAT_THEMES[0];
-        try { localStorage.setItem('sat_theme_v1', th.id); } catch (e) {}
-        document.body.classList.toggle('theme-light', Boolean(th.light));
-        document.documentElement.style.setProperty('--accent', th.accent);
-        document.documentElement.style.setProperty('--accent-2', th.accent2);
-        document.documentElement.style.setProperty('--green', th.accent);
-        document.documentElement.style.background = th.bg;
-        document.body.style.background = th.bg;
-
-        const badge = document.getElementById('wpActiveName');
-        if (badge) badge.textContent = th.name;
-
-        const list = document.getElementById('wallpapersList');
-        if (list) {
-          list.innerHTML = SAT_THEMES.map((item) => {
-            const cur = item.id === th.id;
-            const fg = item.light ? '#1a1c20' : '#f4f1ea';
-            const subFg = item.light ? '#625f58' : '#a6a298';
-            return '<div class="wp-item ' + (cur ? 'active' : '') + '" onclick="selectSatTheme(\'' + item.id + '\')" style="background: ' + item.bg + '; color: ' + fg + ';">' +
-              '<div><div style="font-weight:800;font-size:15px;">' + item.name + '</div><div style="font-size:12px;color:' + subFg + ';margin-top:3px;">' + item.desc + '</div></div>' +
-              '<div style="font-size:12.5px;font-weight:700;color:' + item.accent + ';white-space:nowrap;">' + (cur ? 'Выбран' : 'Применить') + '</div>' +
-            '</div>';
-          }).join('');
-        }
-      }
-
-      window.openWallpapers = function () {
-        let saved = 'amber_dark';
-        try { saved = localStorage.getItem('sat_theme_v1') || 'amber_dark'; } catch (e) {}
-        applySatTheme(saved);
-        document.getElementById('wallpapersModal')?.classList.add('open');
-      };
-
-      window.selectSatTheme = function (id) {
-        applySatTheme(id);
-        const th = SAT_THEMES.find((x) => x.id === id);
-        if (th) {
-          if (typeof window.toast === 'function') window.toast('Тема: ' + th.name);
-          else showThemeToast('Тема: ' + th.name);
-        }
-      };
-
-      window.closeAllSideDrawers = function () {
-        leftExpandedSection = null;
-        document.getElementById('leftSectionDrawer')?.classList.remove('open');
-        document.getElementById('rightProfileDrawer')?.classList.remove('open');
-        document.getElementById('sideMenuBackdrop')?.classList.remove('open');
-      };
-
-      function renderLeftRootList() {
-        const heading = document.getElementById('leftDrawerHeading');
-        const box = document.getElementById('leftDrawerItems');
-        if (!box) return;
-        if (heading) heading.textContent = 'Разделы';
-        box.innerHTML = '';
-
-        const pulsePick = document.createElement('button');
-        pulsePick.type = 'button';
-        pulsePick.className = 'side-drawer-item' + (leftExpandedSection === 'pulse' ? ' selected' : '');
-        pulsePick.textContent = leftExpandedSection === 'pulse' ? '▾ Пульс' : '▸ Пульс';
-        pulsePick.onclick = () => {
-          leftExpandedSection = leftExpandedSection === 'pulse' ? null : 'pulse';
-          renderLeftRootList();
-        };
-        box.appendChild(pulsePick);
-
-        if (leftExpandedSection === 'pulse') {
-          const pSub = document.createElement('div');
-          pSub.className = 'left-sublist-box';
-          const pulseItems = [
-            { label: 'Все темы', fn: () => window.setPulseFilter?.('all') },
-            { label: 'Публикации', fn: () => window.setPulseFilter?.('posts') },
-            { label: 'Новости', fn: () => window.setPulseFilter?.('news') },
-            { label: 'Прогулки', fn: () => window.setPulseFilter?.('walks') },
-            { label: 'Кафе', fn: () => window.setPulseFilter?.('cafe') },
-            { label: '+ Новая публикация', fn: () => window.openNewPostModal?.() }
-          ];
-          pulseItems.forEach((it) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'side-drawer-item';
-            btn.textContent = it.label;
-            btn.onclick = () => {
-              window.closeAllSideDrawers();
-              const pBtn = document.querySelector('.nav-btn[data-tab="pulse"]');
-              if (typeof window.switchMainTab === 'function') window.switchMainTab('pulse', pBtn || null);
-              if (typeof it.fn === 'function') it.fn();
-            };
-            pSub.appendChild(btn);
-          });
-          box.appendChild(pSub);
-        }
-
-        const booksPick = document.createElement('button');
-        booksPick.type = 'button';
-        booksPick.className = 'side-drawer-item' + (leftExpandedSection === 'books' ? ' selected' : '');
-        booksPick.textContent = leftExpandedSection === 'books' ? '▾ Книга' : '▸ Книга';
-        booksPick.onclick = () => {
-          leftExpandedSection = leftExpandedSection === 'books' ? null : 'books';
-          renderLeftRootList();
-        };
-        box.appendChild(booksPick);
-
-        if (leftExpandedSection === 'books') {
-          const bSub = document.createElement('div');
-          bSub.className = 'left-sublist-box';
-          const bookItems = [
-            { label: 'Открыть Книгу', fn: () => {} },
-            { label: '+ Добавить короткую историю', fn: () => window.openAddReadingForKind?.('stories') },
-            { label: '+ Добавить краткий совет', fn: () => window.openAddReadingForKind?.('tips') }
-          ];
-          bookItems.forEach((it) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'side-drawer-item';
-            btn.textContent = it.label;
-            btn.onclick = () => {
-              window.closeAllSideDrawers();
-              const bBtn = document.querySelector('.nav-btn[data-tab="books"]');
-              if (typeof window.switchMainTab === 'function') window.switchMainTab('books', bBtn || null);
-              if (typeof it.fn === 'function') it.fn();
-            };
-            bSub.appendChild(btn);
-          });
-          box.appendChild(bSub);
-        }
-
-        const vyruchkaPick = document.createElement('button');
-        vyruchkaPick.type = 'button';
-        vyruchkaPick.className = 'side-drawer-item' + (leftExpandedSection === 'vyruchka' ? ' selected' : '');
-        vyruchkaPick.textContent = leftExpandedSection === 'vyruchka' ? '▾ Выручка рядом' : '▸ Выручка рядом';
-        vyruchkaPick.onclick = () => {
-          leftExpandedSection = leftExpandedSection === 'vyruchka' ? null : 'vyruchka';
-          renderLeftRootList();
-        };
-        box.appendChild(vyruchkaPick);
-
-        if (leftExpandedSection === 'vyruchka') {
-          const vSub = document.createElement('div');
-          vSub.className = 'left-sublist-box';
-          const vyruchkaItems = [
-            { label: 'Все точки и советы', fn: () => window.setVyruchkaFilter?.('all') },
-            { label: 'Аптеки 24/7', fn: () => window.setVyruchkaFilter?.('pharmacy24') },
-            { label: 'Кафе 24/7', fn: () => window.setVyruchkaFilter?.('cafe24') },
-            { label: 'Ночлег / Хостелы', fn: () => window.setVyruchkaFilter?.('stay') },
-            { label: 'Советы и лайфхаки', fn: () => window.setVyruchkaFilter?.('tips') },
-            { label: '+ Добавить запись', fn: () => window.toggleVyruchkaForm?.(true) }
-          ];
-          vyruchkaItems.forEach((it) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'side-drawer-item';
-            btn.textContent = it.label;
-            btn.onclick = () => {
-              window.closeAllSideDrawers();
-              const vBtn = document.querySelector('.nav-btn[data-tab="vyruchka"]');
-              if (typeof window.switchMainTab === 'function') window.switchMainTab('vyruchka', vBtn || null);
-              if (typeof it.fn === 'function') it.fn();
-            };
-            vSub.appendChild(btn);
-          });
-          box.appendChild(vSub);
-        }
-      }
-
-      window.openLeftSectionsMenu = function () {
-        document.getElementById('rightProfileDrawer')?.classList.remove('open');
-        const isOpen = document.getElementById('leftSectionDrawer')?.classList.contains('open');
-        if (isOpen) {
-          window.closeAllSideDrawers();
-          return;
-        }
-        if (!leftExpandedSection) {
-          const activePanel = document.querySelector('.tab-panel.active');
-          const curTab = activePanel ? activePanel.id.replace('tab-', '') : '';
-          if (curTab === 'books') leftExpandedSection = 'books';
-          else if (curTab === 'pulse') leftExpandedSection = 'pulse';
-          else if (curTab === 'vyruchka') leftExpandedSection = 'vyruchka';
-          else leftExpandedSection = null;
-        }
-        renderLeftRootList();
-        document.getElementById('sideMenuBackdrop')?.classList.add('open');
-        document.getElementById('leftSectionDrawer')?.classList.add('open');
-      };
-
-      window.openProfileRightDrawer = function () {
-        const activePanel = document.querySelector('.tab-panel.active');
-        const currentTab = activePanel ? activePanel.id.replace('tab-', '') : 'profile';
-        if (currentTab !== 'profile' && typeof window.switchMainTab === 'function') {
-          const pBtn = document.querySelector('.nav-btn[data-tab="profile"]');
-          window.switchMainTab('profile', pBtn || null);
-        }
-
         const heading = document.getElementById('rightDrawerHeading');
-        const box = document.getElementById('rightDrawerItems');
-        if (!box) return;
-        if (heading) heading.textContent = 'Профиль — меню';
-
-        const items = [
-          { label: 'Публикации и фото', fn: () => window.switchMySubtab?.('posts') },
-          { label: 'Друзья и заявки', fn: () => window.switchMySubtab?.('friends') },
-          { label: 'Группы', fn: () => window.switchMySubtab?.('groups') },
-          { label: 'Анкета и имя', fn: () => window.openEditProfileModal?.() },
-          { label: 'Время намаза • Оскемен', fn: () => window.openNamazQiblaModal?.() },
-          { label: 'Техподдержка', fn: () => window.openSupportModal?.() },
-          { label: 'Удалить страницу', fn: () => window.openDeleteAccountModal?.() }
-        ];
-
-        box.innerHTML = '';
-        items.forEach((it) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'side-drawer-item';
-          btn.textContent = it.label;
-          btn.onclick = () => {
-            window.closeAllSideDrawers();
-            if (typeof it.fn === 'function') it.fn();
-          };
-          box.appendChild(btn);
-        });
-
-        leftExpandedSection = null;
-        document.getElementById('leftSectionDrawer')?.classList.remove('open');
-        document.getElementById('sideMenuBackdrop')?.classList.add('open');
-        document.getElementById('rightProfileDrawer')?.classList.add('open');
-      };
-
-      let initial = 'amber_dark';
-      try { initial = localStorage.getItem('sat_theme_v1') || 'amber_dark'; } catch (e) {}
-      applySatTheme(initial);
-    })();
-
-    (function () {
-      const AI_WORKER_URL = 'https://sat-ai.bakytzhanazat.workers.dev';
-      const AI_HISTORY_KEY = 'sat_ai_chat_history_v1';
-      let aiHistory = [];
-      let aiBusy = false;
-
+(function() {
+  const W_KEY = 'sat_osk_w_cache';
+  const R_KEY = 'sat_osk_r_cache';
+  const M_KEY = 'sat_osk_m_list';
+  window.SAT_OSKEMEN_HUB = {
+    open() {
+      document.getElementById('satOskemenHubModal')?.classList.add('open');
+      this.fetchWeather();
+      this.fetchRates();
+      this.renderMarkers();
+    },
+    close() {
+      document.getElementById('satOskemenHubModal')?.classList.remove('open');
+    },
+    setTab(t) {
+      ['Main', 'Map', 'Roads', 'Sos'].forEach(k => {
+        const btn = document.getElementById('oskTab' + k);
+        const pnl = document.getElementById('oskPanel' + k);
+        if (btn) btn.classList.toggle('active', k.toLowerCase() === t.toLowerCase());
+        if (pnl) pnl.style.display = (k.toLowerCase() === t.toLowerCase()) ? 'block' : 'none';
+      });
+    },
+    async fetchWeather(force = false) {
       try {
-        const saved = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || '[]');
-        if (Array.isArray(saved)) aiHistory = saved.slice(-16);
-      } catch (e) {}
-
-      function persistAiHistory() {
-        try {
-          localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory.slice(-16)));
-        } catch (e) {}
-      }
-
-      function appendAiBubble(role, text) {
-        const box = document.getElementById('satAiMessagesBox');
-        if (!box) return null;
-        const div = document.createElement('div');
-        div.className = 'ai-msg ' + (role === 'user' ? 'user' : 'bot');
-        div.textContent = String(text || '');
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-        return div;
-      }
-
-      function renderAiHistory() {
-        const box = document.getElementById('satAiMessagesBox');
-        if (!box) return;
-        box.innerHTML = '';
-        if (!aiHistory.length) {
-          appendAiBubble('bot', 'Привет! Я ИИ-помощник SÄT. Спрашивай про Оскемен и ВКО, дела, идеи для постов или любые вопросы по делу.');
+        const now = Date.now();
+        let cached = null;
+        try { cached = JSON.parse(localStorage.getItem(W_KEY)); } catch(e){}
+        if (!force && cached && (now - cached.ts < 1800000)) {
+          this.renderWeather(cached.data);
           return;
         }
-        aiHistory.forEach((m) => appendAiBubble(m.role === 'user' ? 'user' : 'bot', m.content));
-      }
-
-      function extractAiReplyText(data) {
-        if (!data) return '';
-        if (typeof data === 'string') return data.trim();
-        if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
-        if (typeof data.response === 'string' && data.response.trim()) return data.response.trim();
-        if (typeof data.answer === 'string' && data.answer.trim()) return data.answer.trim();
-        if (typeof data.text === 'string' && data.text.trim()) return data.text.trim();
-        if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-          return String(data.choices[0].message.content).trim();
-        }
-        if (data.data && typeof data.data.reply === 'string') return data.data.reply.trim();
-        return '';
-      }
-
-      function extractAnyTextDeep(parsed, rawText) {
-        const direct = extractAiReplyText(parsed);
-        if (direct) return direct;
-        if (parsed && typeof parsed === 'object') {
-          if (typeof parsed.error === 'string' && parsed.error.trim()) {
-            return 'Воркер вернул ошибку: ' + parsed.error.trim();
-          }
-          if (parsed.error && typeof parsed.error === 'object' && parsed.error.message) {
-            return 'Воркер вернул ошибку: ' + String(parsed.error.message);
-          }
-          if (Array.isArray(parsed.content) && parsed.content[0] && parsed.content[0].text) {
-            return String(parsed.content[0].text).trim();
-          }
-          if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] && parsed.candidates[0].content.parts[0].text) {
-            return String(parsed.candidates[0].content.parts[0].text).trim();
-          }
-          const compact = JSON.stringify(parsed);
-          if (compact && compact !== '{}') return 'Ответ сервера (JSON): ' + compact.slice(0, 600);
-        }
-        if (rawText && String(rawText).trim()) return String(rawText).trim().slice(0, 600);
-        return '';
-      }
-
-      async function requestSatAi(promptText) {
-        const payload = {
-          prompt: promptText,
-          message: promptText,
-          text: promptText,
-          question: promptText,
-          query: promptText,
-          region: 'Оскемен / ВКО',
-          app: 'SÄT',
-          history: aiHistory.slice(-10)
+        const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.9483&longitude=82.6285&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const wData = {
+          temp: Math.round(data.current.temperature_2m),
+          feels: Math.round(data.current.apparent_temperature),
+          hum: data.current.relative_humidity_2m,
+          wind: Math.round(data.current.wind_speed_10m),
+          time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
         };
-
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timer = controller ? setTimeout(() => controller.abort(), 25000) : null;
-
-        try {
-          const res = await fetch(AI_WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller ? controller.signal : undefined
-          });
-          const rawText = await res.text();
-          let parsed = null;
-          try {
-            parsed = rawText ? JSON.parse(rawText) : null;
-          } catch (e) {
-            parsed = rawText;
-          }
-
-          if (!res.ok) {
-            const detail = parsed && typeof parsed === 'object' && parsed.error
-              ? (typeof parsed.error === 'string' ? parsed.error : (parsed.error.message || JSON.stringify(parsed.error)))
-              : (rawText ? String(rawText).slice(0, 240) : '');
-            return 'Ошибка сервера ИИ (HTTP ' + res.status + ')' + (detail ? ': ' + detail : '');
-          }
-
-          const reply = extractAnyTextDeep(parsed, rawText);
-          if (!reply) return 'Сервер ИИ вернул пустой ответ.';
-          return reply;
-        } catch (err) {
-          const errName = err && err.name ? err.name : 'Error';
-          const errMsg = err && err.message ? err.message : String(err || 'unknown');
-          if (errName === 'AbortError') {
-            return 'Сервер ИИ не ответил за 25 сек (таймаут). Попробуйте ещё раз.';
-          }
-          return 'Запрос в браузере заблокирован или нет сети (' + errName + ': ' + errMsg + '). Проверьте CORS в воркере sat-ai.bakytzhanazat.workers.dev.';
-        } finally {
-          if (timer) clearTimeout(timer);
-        }
+        localStorage.setItem(W_KEY, JSON.stringify({ ts: now, data: wData }));
+        this.renderWeather(wData);
+      } catch(e) {
+        const b = document.getElementById('oskWeatherBody');
+        if (b) b.textContent = 'Ошибка загрузки погоды';
       }
-
-      window.openSatAiModal = function () {
-        window.closeAllSideDrawers?.();
-        renderAiHistory();
-        const modal = document.getElementById('satAiModal');
-        if (modal) modal.classList.add('open');
-        const inp = document.getElementById('satAiInput');
-        if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 60);
-      };
-
-      window.clearSatAiChat = function () {
-        aiHistory = [];
-        persistAiHistory();
-        renderAiHistory();
-        window.toast?.('История ИИ очищена');
-      };
-
-      window.sendSatAiQuick = function (text) {
-        const inp = document.getElementById('satAiInput');
-        if (inp) inp.value = text;
-        window.sendSatAiMessage();
-      };
-
-      window.sendSatAiMessage = async function () {
-        if (aiBusy) return;
-        const inp = document.getElementById('satAiInput');
-        const btn = document.getElementById('satAiSendBtn');
-        const text = (inp ? inp.value : '').trim();
-        if (!text) return;
-
-        aiBusy = true;
-        if (inp) inp.value = '';
-        if (btn) btn.disabled = true;
-
-        aiHistory.push({ role: 'user', content: text });
-        persistAiHistory();
-        appendAiBubble('user', text);
-
-        const typingEl = appendAiBubble('bot', 'Думаю...');
-
-        try {
-          const reply = await requestSatAi(text);
-          if (typingEl) typingEl.textContent = reply;
-          aiHistory.push({ role: 'assistant', content: reply });
-          persistAiHistory();
-        } catch (err) {
-          const fallback = 'Сбой клиента ИИ: ' + String(err && err.message ? err.message : err);
-          if (typingEl) typingEl.textContent = fallback;
-          aiHistory.pop();
-          persistAiHistory();
-          window.toast?.('Ошибка связи с ИИ');
-        } finally {
-          aiBusy = false;
-          if (btn) btn.disabled = false;
+    },
+    renderWeather(d) {
+      const btnT = document.getElementById('satOskemenTopTemp');
+      if (btnT) btnT.textContent = `🌤 ${d.temp > 0 ? '+' : ''}${d.temp}°`;
+      const b = document.getElementById('oskWeatherBody');
+      if (b) {
+        b.innerHTML = `
+          <div style="font-size:22px; font-weight:900; color:var(--text);">${d.temp > 0 ? '+' : ''}${d.temp}°C</div>
+          <div style="margin-top:4px;">Ощущается как ${d.feels > 0 ? '+' : ''}${d.feels}°C • Влажность: ${d.hum}%</div>
+          <div style="margin-top:2px;">Ветер: ${d.wind} км/ч</div>
+          <div class="meta" style="margin-top:6px; font-size:11px;">Обновлено в ${d.time}</div>
+        `;
+      }
+    },
+    async fetchRates(force = false) {
+      try {
+        const now = Date.now();
+        let cached = null;
+        try { cached = JSON.parse(localStorage.getItem(R_KEY)); } catch(e){}
+        if (!force && cached && (now - cached.ts < 21600000)) {
+          this.renderRates(cached.data);
+          return;
         }
-      };
-    })();
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        const kzt = data.rates.KZT;
+        const rData = {
+          usd: kzt ? kzt.toFixed(2) : '--',
+          rub: (kzt && data.rates.RUB) ? (kzt / data.rates.RUB).toFixed(2) : '--',
+          cny: (kzt && data.rates.CNY) ? (kzt / data.rates.CNY).toFixed(2) : '--',
+          time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+        };
+        localStorage.setItem(R_KEY, JSON.stringify({ ts: now, data: rData }));
+        this.renderRates(rData);
+      } catch(e) {
+        const b = document.getElementById('oskRatesBody');
+        if (b) b.textContent = 'Ошибка загрузки курсов';
+      }
+    },
+    renderRates(d) {
+      const b = document.getElementById('oskRatesBody');
+      if (b) {
+        b.innerHTML = `
+          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);"><span>🇺🇸 1 USD</span><span style="font-weight:800;">${d.usd} ₸</span></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid var(--border);"><span>🇷🇺 1 RUB</span><span style="font-weight:800;">${d.rub} ₸</span></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>🇨🇳 1 CNY</span><span style="font-weight:800;">${d.cny} ₸</span></div>
+          <div class="meta" style="margin-top:6px; font-size:11px;">Обновлено в ${d.time}</div>
+        `;
+      }
+    },
+    getMarkers() {
+      try { return JSON.parse(localStorage.getItem(M_KEY)) || []; } catch(e) { return []; }
+    },
+    addMarker() {
+      const tIn = document.getElementById('oskMarkerTitle');
+      const dIn = document.getElementById('oskMarkerDesc');
+      const title = (tIn?.value || '').trim();
+      const desc = (dIn?.value || '').trim();
+      if (!title) { if (typeof window.toast === 'function') window.toast('Введите название метки'); return; }
+      const list = this.getMarkers();
+      list.push({ id: Date.now(), title, desc });
+      localStorage.setItem(M_KEY, JSON.stringify(list));
+      if (tIn) tIn.value = '';
+      if (dIn) dIn.value = '';
+      this.renderMarkers();
+      if (typeof window.toast === 'function') window.toast('Метка добавлена');
+    },
+    deleteMarker(id) {
+      const list = this.getMarkers().filter(m => m.id !== id);
+      localStorage.setItem(M_KEY, JSON.stringify(list));
+      this.renderMarkers();
+    },
+    renderMarkers() {
+      const box = document.getElementById('oskUserMarkersList');
+      if (!box) return;
+      const list = this.getMarkers();
+      if (!list.length) {
+        box.innerHTML = '<div class="meta" style="font-size:12px;">Нет сохранённых меток</div>';
+        return;
+      }
+      box.innerHTML = list.map(m => `
+        <div class="comment-item" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:700; font-size:13px;">📍 ${m.title}</div>
+            ${m.desc ? `<div class="meta" style="font-size:11px;">${m.desc}</div>` : ''}
+          </div>
+          <button type="button" class="comment-del-btn" onclick="window.SAT_OSKEMEN_HUB.deleteMarker(${m.id})">✕</button>
+        </div>
+      `).join('');
+    }
+  };
+  window.SAT_OSKEMEN_HUB.fetchWeather();
+  window.SAT_OSKEMEN_HUB.fetchRates();
+  setInterval(() => window.SAT_OSKEMEN_HUB.fetchWeather(), 1800000);
+  setInterval(() => window.SAT_OSKEMEN_HUB.fetchRates(), 21600000);
+})();
   </script>
 
   <script type="module">
@@ -7037,3 +6822,6 @@
   </script>
 </body>
 </html>
+
+
+

@@ -2494,7 +2494,7 @@
         const container = document.getElementById('satHybridMap');
         if (!container || !window.L) return;
         if (!mapInstance) {
-          mapInstance = L.map('satHybridMap', { center: OSK_CENTER, zoom: 12, zoomControl: true });
+          mapInstance = L.map('satHybridMap', { center: OSK_CENTER, zoom: 12, zoomControl: true, attributionControl: false });
           satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             maxZoom: 19,
             attribution: 'Esri Satellite'

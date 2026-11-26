@@ -2279,6 +2279,7 @@
       getFirestore,
       collection,
       addDoc,
+      getDoc,
       setDoc,
       deleteDoc,
       doc,
@@ -2309,6 +2310,7 @@
     const STORE_KEY = 'sat_clean_state_v45';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
     const MEDIA_VAULT_KEY = 'sat_media_vault_v1';
+    const CLOUD_GALLERY_MAX = 12;
 
     // Базовый фильтр мата и грубости для сохранения спокойного тона в SÄT
     const SAT_PROFANITY_ROOTS = [
@@ -2734,6 +2736,17 @@
       }).filter(Boolean);
     }
 
+    function mergePhotoLists(primaryList, secondaryList) {
+      const seen = new Set();
+      const out = [];
+      [...normalizePhotos(primaryList), ...normalizePhotos(secondaryList)].forEach((item) => {
+        if (!item || !item.src || seen.has(item.src)) return;
+        seen.add(item.src);
+        out.push(item);
+      });
+      return out.slice(0, 30);
+    }
+
     function storyAlive(data, endMs) {
       return Boolean(data && endMs && Date.now() < Number(endMs));
     }
@@ -2781,7 +2794,9 @@
           if (!best) best = { ...p };
           else {
             if (!best.avatar && p.avatar) best.avatar = p.avatar;
-            if ((!best.photos || !best.photos.length) && Array.isArray(p.photos) && p.photos.length) best.photos = p.photos;
+            if (Array.isArray(p.photos) && p.photos.length) {
+              best.photos = mergePhotoLists(best.photos, p.photos);
+            }
             if ((!best.story || !storyAlive(best.story, best.storyEnd)) && p.story && storyAlive(p.story, p.storyEnd)) {
               best.story = p.story;
               best.storyStart = p.storyStart;
@@ -3093,8 +3108,8 @@
           const p = JSON.parse(raw);
           if (!p || typeof p !== 'object') continue;
           if (!vault.avatar && p.avatar) vault.avatar = String(p.avatar);
-          if ((!vault.photos || !vault.photos.length) && Array.isArray(p.photos) && p.photos.length) {
-            vault.photos = normalizePhotos(p.photos);
+          if (Array.isArray(p.photos) && p.photos.length) {
+            vault.photos = mergePhotoLists(vault.photos, p.photos);
           }
           if (!vault.story && p.story && storyAlive(p.story, p.storyEnd)) {
             vault.story = String(p.story);
@@ -3437,15 +3452,81 @@
       }, () => {});
     }
 
-    async function syncProfileCloud(user) {
-      if (!user) return;
-      silentHealMediaAndPosts();
-      state.lastUid = user.uid;
-      if (!state.avatar && recovered?.avatar) state.avatar = recovered.avatar;
-      if ((!state.photos || !state.photos.length) && recovered?.photos?.length) {
-        state.photos = normalizePhotos(recovered.photos);
+    // Безопасное слияние облачного профиля и локального состояния:
+    // пустые локальные поля НИКОГДА не затирают уже сохранённые фото, сторис и анкету в облаке
+    function mergeCloudAndLocalProfile(cloudData, allowOverwriteMedia = false) {
+      if (!cloudData || typeof cloudData !== 'object') return;
+      checkOwnStoryExpiry();
+
+      if (!allowOverwriteMedia) {
+        if (!state.avatar && cloudData.photoData) {
+          state.avatar = String(cloudData.photoData);
+        }
+        if (Array.isArray(cloudData.savedPhotos) && cloudData.savedPhotos.length) {
+          state.photos = mergePhotoLists(state.photos, cloudData.savedPhotos);
+        }
+        if ((!state.story || !storyAlive(state.story, state.storyEnd)) && cloudData.storyData && storyAlive(cloudData.storyData, cloudData.storyExpiresAt)) {
+          state.story = String(cloudData.storyData);
+          state.storyStart = Number(cloudData.storyCreatedAt || 0);
+          state.storyEnd = Number(cloudData.storyExpiresAt || 0);
+          state.storyLabel = String(cloudData.storyTimeLabel || '');
+        }
       }
+
+      if (!state.bio && cloudData.bio && cloudData.bio !== 'Мой профиль SÄT') {
+        state.bio = String(cloudData.bio);
+      }
+      if (!state.namePlain && cloudData.namePlain) {
+        state.namePlain = String(cloudData.namePlain);
+      }
+      if (!state.name && cloudData.fullName) {
+        state.name = String(cloudData.fullName);
+      }
+      if (cloudData.accountType && !state.hasChosenAccountType) {
+        state.accountType = normalizeAccountType(cloudData.accountType);
+        state.hasChosenAccountType = true;
+      }
+      if (typeof cloudData.hideFromSearch === 'boolean') {
+        state.hideFromSearch = cloudData.hideFromSearch;
+      }
+      if (typeof cloudData.hideLastSeen === 'boolean') {
+        state.hideLastSeen = cloudData.hideLastSeen;
+      }
+    }
+
+    async function loadCloudProfileFirst(user) {
+      if (!user) return null;
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          const data = snap.data() || {};
+          mergeCloudAndLocalProfile(data, false);
+          persist();
+          return data;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    async function syncProfileCloud(user, opts = {}) {
+      if (!user) return;
+      const explicitMediaChange = Boolean(opts.explicitMediaChange);
+      if (!explicitMediaChange) {
+        silentHealMediaAndPosts();
+      }
+      state.lastUid = user.uid;
+      if (!explicitMediaChange) {
+        if (!state.avatar && recovered?.avatar) state.avatar = recovered.avatar;
+        if ((!state.photos || !state.photos.length) && recovered?.photos?.length) {
+          state.photos = normalizePhotos(recovered.photos);
+        }
+      }
+
       const nowMs = Date.now();
+      const hasActiveStory = storyAlive(state.story, state.storyEnd);
+      const compactSavedPhotos = normalizePhotos(state.photos).slice(0, CLOUD_GALLERY_MAX);
+      const resolvedAvatar = myAvatarUrl();
+
       const payload = {
         uid: user.uid,
         fullName: myDisplayName(),
@@ -3455,15 +3536,24 @@
         hideFromSearch: Boolean(state.hideFromSearch),
         hideLastSeen: Boolean(state.hideLastSeen),
         bio: state.bio || 'Мой профиль SÄT',
-        photoData: myAvatarUrl(),
-        savedPhotos: normalizePhotos(state.photos).slice(0, 30),
-        storyData: storyAlive(state.story, state.storyEnd) ? state.story : '',
-        storyCreatedAt: storyAlive(state.story, state.storyEnd) ? (state.storyStart || 0) : 0,
-        storyExpiresAt: storyAlive(state.story, state.storyEnd) ? (state.storyEnd || 0) : 0,
-        storyTimeLabel: storyAlive(state.story, state.storyEnd) ? (state.storyLabel || '') : '',
         lastSeenMs: nowMs,
         updatedAt: serverTimestamp()
       };
+
+      // Передаём медиа-поля только если они непустые ИЛИ пользователь явно их удалил/изменил
+      if (resolvedAvatar || explicitMediaChange) {
+        payload.photoData = resolvedAvatar || '';
+      }
+      if (compactSavedPhotos.length || explicitMediaChange) {
+        payload.savedPhotos = compactSavedPhotos;
+      }
+      if (hasActiveStory || explicitMediaChange) {
+        payload.storyData = hasActiveStory ? state.story : '';
+        payload.storyCreatedAt = hasActiveStory ? (state.storyStart || 0) : 0;
+        payload.storyExpiresAt = hasActiveStory ? (state.storyEnd || 0) : 0;
+        payload.storyTimeLabel = hasActiveStory ? (state.storyLabel || '') : '';
+      }
+
       persist();
       try {
         await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
@@ -3512,13 +3602,15 @@
       const hint = document.getElementById('sessionHint');
       if (hint) hint.style.display = 'none';
       if (user) {
-        silentHealMediaAndPosts();
         state.lastUid = user.uid;
+        // Сначала считываем облачный профиль, чтобы не затереть уже сохранённые фото/сторис/анкету
+        await loadCloudProfileFirst(user);
+        silentHealMediaAndPosts();
         if (!state.namePlain && user.displayName) state.namePlain = user.displayName;
         if (!state.name && user.displayName) state.name = user.displayName;
         persist();
         subscribeIncomingCallsForUser(user.uid);
-        await syncProfileCloud(user);
+        await syncProfileCloud(user, { explicitMediaChange: false });
         goToProfileStart();
       } else {
         if (incomingCallsUnsub) { incomingCallsUnsub(); incomingCallsUnsub = null; }
@@ -3602,27 +3694,7 @@
         const myUid = getMyUid();
         const meCloud = myUid ? fresh.find((u) => u.uid === myUid) : null;
         if (meCloud) {
-          if (!state.avatar && meCloud.photoData) state.avatar = meCloud.photoData;
-          if ((!state.photos || !state.photos.length) && Array.isArray(meCloud.savedPhotos) && meCloud.savedPhotos.length) {
-            state.photos = normalizePhotos(meCloud.savedPhotos);
-          }
-          if ((!state.story || !storyAlive(state.story, state.storyEnd)) && meCloud.storyData && storyAlive(meCloud.storyData, meCloud.storyExpiresAt)) {
-            state.story = meCloud.storyData;
-            state.storyStart = Number(meCloud.storyCreatedAt || 0);
-            state.storyEnd = Number(meCloud.storyExpiresAt || 0);
-            state.storyLabel = String(meCloud.storyTimeLabel || '');
-          }
-          if (!state.bio && meCloud.bio) state.bio = meCloud.bio;
-          if (meCloud.accountType) {
-            state.accountType = normalizeAccountType(meCloud.accountType);
-            state.hasChosenAccountType = true;
-          }
-          if (typeof meCloud.hideFromSearch === 'boolean') {
-            state.hideFromSearch = meCloud.hideFromSearch;
-          }
-          if (typeof meCloud.hideLastSeen === 'boolean') {
-            state.hideLastSeen = meCloud.hideLastSeen;
-          }
+          mergeCloudAndLocalProfile(meCloud, false);
         }
         silentHealMediaAndPosts();
         persist();
@@ -4720,11 +4792,19 @@
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
       const list = normalizePhotos(state.photos);
       if (idx < 0 || idx >= list.length) return;
+      const removed = list[idx];
       list.splice(idx, 1);
       state.photos = list;
+      try {
+        const v = loadMediaVault();
+        if (removed && removed.src && Array.isArray(v.photos)) {
+          v.photos = v.photos.filter((p) => p && p.src !== removed.src);
+          localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v));
+        }
+      } catch (e) {}
       persist();
       renderMyProfile();
-      await syncProfileCloud(currentUser);
+      await syncProfileCloud(currentUser, { explicitMediaChange: true });
       toast('Фото удалено');
     }
 
@@ -4778,18 +4858,20 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          const maxD = pickTarget === 'avatar' ? 420 : 900;
+          // Компактное сжатие, чтобы документ пользователя в Firestore никогда не переполнялся
+          const maxD = pickTarget === 'avatar' ? 360 : 760;
+          const quality = pickTarget === 'avatar' ? 0.74 : 0.72;
           const sc = Math.min(1, maxD / Math.max(img.width || 1, img.height || 1));
           canvas.width = Math.max(1, Math.round((img.width || 600) * sc));
           canvas.height = Math.max(1, Math.round((img.height || 600) * sc));
           canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.78);
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
 
           if (pickTarget === 'avatar') {
             state.avatar = dataUrl;
             addSavedPhoto(dataUrl);
             renderMyProfile();
-            await syncProfileCloud(currentUser);
+            await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Фото профиля сохранено');
           } else if (pickTarget === 'story') {
             const cap = await askPhotoCaption('Подпись к сторис');
@@ -4800,13 +4882,13 @@
             state.storyLabel = cap ? `${formatTime(now)} • ${cap}` : formatTime(now);
             persist();
             renderMyProfile();
-            await syncProfileCloud(currentUser);
+            await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Сторис опубликована на 3 часа');
           } else if (pickTarget === 'gallery_add') {
             const cap = await askPhotoCaption('Подпись к фото');
             addSavedPhoto(dataUrl, cap);
             renderMyProfile();
-            await syncProfileCloud(currentUser);
+            await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Фото добавлено в альбом');
           } else if (pickTarget === 'post') {
             draftPostPhoto = dataUrl;
@@ -4873,9 +4955,14 @@
 
     async function removeOwnStory() {
       state.story = ''; state.storyStart = 0; state.storyEnd = 0; state.storyLabel = '';
+      try {
+        const v = loadMediaVault();
+        v.story = ''; v.storyStart = 0; v.storyEnd = 0; v.storyLabel = '';
+        localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v));
+      } catch (e) {}
       persist();
       renderMyProfile();
-      await syncProfileCloud(currentUser);
+      await syncProfileCloud(currentUser, { explicitMediaChange: true });
       toast('Сторис удалена');
     }
 
@@ -5212,7 +5299,6 @@
       const myUid = getMyUid();
       const canDelete = isCreatorAccount() || (target && (
         String(target.id).startsWith('tmp_cmt_') ||
-        String(target.id).startsWith('cmt_') && myUid && target.authorUid === myUid ||
         (myUid && target.authorUid === myUid)
       ));
 
@@ -5917,7 +6003,7 @@
       if (!m?.photoData) return;
       addSavedPhoto(m.photoData, `Из чата: ${m.senderName || 'Чат'}`);
       renderMyProfile();
-      await syncProfileCloud(currentUser);
+      await syncProfileCloud(currentUser, { explicitMediaChange: true });
       toast('Фото сохранено в альбом SÄT');
     }
 
@@ -6563,7 +6649,7 @@
         state.hideLastSeen = hideSeen;
 
         persist();
-        await syncProfileCloud(currentUser);
+        await syncProfileCloud(currentUser, { explicitMediaChange: false });
         renderMyProfile();
         renderFriendsTab();
         renderUnifiedSearch();

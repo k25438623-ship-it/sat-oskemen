@@ -1118,6 +1118,46 @@
       text-overflow: ellipsis;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .ai-modal-box { display: flex; flex-direction: column; max-height: 88vh; }
+    .ai-quick-row { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 6px; }
+    .ai-messages-box {
+      flex: 1;
+      min-height: 180px;
+      max-height: 46vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      margin: 6px 0 10px;
+      border-radius: 16px 6px 16px 16px;
+      background: var(--surface-elev);
+      border: 1px solid var(--border);
+    }
+    .ai-msg {
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 88%;
+      white-space: pre-wrap;
+      word-break: break-word;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .ai-msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--accent), #b86b28);
+      color: #ffffff;
+    }
+    .ai-msg.bot {
+      align-self: flex-start;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+    .ai-composer-row { display: flex; gap: 8px; align-items: center; }
   </style>
 </head>
 <body>
@@ -1158,6 +1198,9 @@
         <button type="button" class="btn btn-primary" style="padding: 8px 10px; font-size: 12.5px;" onclick="openUnifiedSearchModal()">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
+        </button>
+        <button type="button" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="openSatAiModal()">
+          <span>ИИ</span>
         </button>
         <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
           <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
@@ -1958,6 +2001,36 @@
     </div>
   </div>
 
+  <div id="satAiModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box ai-modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px;">ИИ-помощник SÄT</h3>
+          <div class="meta">Оскемен и ВКО • Подсказки по городу, делам и вопросам</div>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="clearSatAiChat()">Очистить</button>
+          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('satAiModal')">✕</button>
+        </div>
+      </div>
+
+      <div class="ai-quick-row">
+        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Подскажи полезные ориентиры и советы по Оскемену')">Оскемен</button>
+        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Какие есть идеи для прогулок и отдыха в ВКО?')">Прогулки в ВКО</button>
+        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Помоги составить короткое объявление или пост для SÄT')">Пост для SÄT</button>
+      </div>
+
+      <div id="satAiMessagesBox" class="ai-messages-box">
+        <div class="ai-msg bot">Привет! Я ИИ-помощник SÄT. Спрашивай про Оскемен и ВКО, маршруты, дела, идеи для публикаций или любые вопросы по делу.</div>
+      </div>
+
+      <div class="ai-composer-row">
+        <input id="satAiInput" class="input" style="margin-top: 0; flex: 1; padding: 10px 12px;" placeholder="Напишите вопрос ИИ..." onkeydown="if(event.key==='Enter') sendSatAiMessage()" />
+        <button type="button" id="satAiSendBtn" class="btn btn-primary" style="padding: 10px 14px; font-size: 13.5px;" onclick="sendSatAiMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
   <audio id="remoteAudioEl" autoplay playsinline style="display: none;"></audio>
   <div id="toast" class="toast"></div>
 
@@ -2259,6 +2332,152 @@
       let initial = 'amber_dark';
       try { initial = localStorage.getItem('sat_theme_v1') || 'amber_dark'; } catch (e) {}
       applySatTheme(initial);
+    })();
+
+    (function () {
+      const AI_WORKER_URL = 'https://sat-ai.bakytzhanazat.workers.dev';
+      const AI_HISTORY_KEY = 'sat_ai_chat_history_v1';
+      let aiHistory = [];
+      let aiBusy = false;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || '[]');
+        if (Array.isArray(saved)) aiHistory = saved.slice(-16);
+      } catch (e) {}
+
+      function persistAiHistory() {
+        try {
+          localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory.slice(-16)));
+        } catch (e) {}
+      }
+
+      function appendAiBubble(role, text) {
+        const box = document.getElementById('satAiMessagesBox');
+        if (!box) return null;
+        const div = document.createElement('div');
+        div.className = 'ai-msg ' + (role === 'user' ? 'user' : 'bot');
+        div.textContent = String(text || '');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+        return div;
+      }
+
+      function renderAiHistory() {
+        const box = document.getElementById('satAiMessagesBox');
+        if (!box) return;
+        box.innerHTML = '';
+        if (!aiHistory.length) {
+          appendAiBubble('bot', 'Привет! Я ИИ-помощник SÄT. Спрашивай про Оскемен и ВКО, дела, идеи для постов или любые вопросы по делу.');
+          return;
+        }
+        aiHistory.forEach((m) => appendAiBubble(m.role === 'user' ? 'user' : 'bot', m.content));
+      }
+
+      function extractAiReplyText(data) {
+        if (!data) return '';
+        if (typeof data === 'string') return data.trim();
+        if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
+        if (typeof data.response === 'string' && data.response.trim()) return data.response.trim();
+        if (typeof data.answer === 'string' && data.answer.trim()) return data.answer.trim();
+        if (typeof data.text === 'string' && data.text.trim()) return data.text.trim();
+        if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
+        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+          return String(data.choices[0].message.content).trim();
+        }
+        if (data.data && typeof data.data.reply === 'string') return data.data.reply.trim();
+        return '';
+      }
+
+      async function requestSatAi(promptText) {
+        const payload = {
+          prompt: promptText,
+          message: promptText,
+          region: 'Оскемен / ВКО',
+          app: 'SÄT',
+          history: aiHistory.slice(-10)
+        };
+
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = controller ? setTimeout(() => controller.abort(), 25000) : null;
+
+        try {
+          const res = await fetch(AI_WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller ? controller.signal : undefined
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          const rawText = await res.text();
+          let parsed = null;
+          try {
+            parsed = JSON.parse(rawText);
+          } catch (e) {
+            parsed = rawText;
+          }
+          const reply = extractAiReplyText(parsed);
+          if (!reply) throw new Error('Empty AI response');
+          return reply;
+        } finally {
+          if (timer) clearTimeout(timer);
+        }
+      }
+
+      window.openSatAiModal = function () {
+        window.closeAllSideDrawers?.();
+        renderAiHistory();
+        const modal = document.getElementById('satAiModal');
+        if (modal) modal.classList.add('open');
+        const inp = document.getElementById('satAiInput');
+        if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 60);
+      };
+
+      window.clearSatAiChat = function () {
+        aiHistory = [];
+        persistAiHistory();
+        renderAiHistory();
+        window.toast?.('История ИИ очищена');
+      };
+
+      window.sendSatAiQuick = function (text) {
+        const inp = document.getElementById('satAiInput');
+        if (inp) inp.value = text;
+        window.sendSatAiMessage();
+      };
+
+      window.sendSatAiMessage = async function () {
+        if (aiBusy) return;
+        const inp = document.getElementById('satAiInput');
+        const btn = document.getElementById('satAiSendBtn');
+        const text = (inp ? inp.value : '').trim();
+        if (!text) return;
+
+        aiBusy = true;
+        if (inp) inp.value = '';
+        if (btn) btn.disabled = true;
+
+        aiHistory.push({ role: 'user', content: text });
+        persistAiHistory();
+        appendAiBubble('user', text);
+
+        const typingEl = appendAiBubble('bot', 'Думаю...');
+
+        try {
+          const reply = await requestSatAi(text);
+          if (typingEl) typingEl.textContent = reply;
+          aiHistory.push({ role: 'assistant', content: reply });
+          persistAiHistory();
+        } catch (err) {
+          const fallback = 'Сейчас не удалось получить ответ от сервера ИИ. Проверьте соединение или попробуйте ещё раз чуть позже.';
+          if (typingEl) typingEl.textContent = fallback;
+          aiHistory.pop();
+          persistAiHistory();
+          window.toast?.('Ошибка связи с ИИ');
+        } finally {
+          aiBusy = false;
+          if (btn) btn.disabled = false;
+        }
+      };
     })();
   </script>
 
@@ -6778,3 +6997,4 @@
   </script>
 </body>
 </html>
+

@@ -299,7 +299,6 @@
       color: var(--accent-2);
     }
 
-    /* Анимации «живых картин» в разделе «Книга» */
     @keyframes satLivingGlow {
       0%, 100% { opacity: 0.58; transform: scale(1); }
       50% { opacity: 1; transform: scale(1.07); }
@@ -352,26 +351,10 @@
       display: block;
     }
 
-    .sat-anim-glow {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: satLivingGlow 3.8s ease-in-out infinite;
-    }
-    .sat-anim-fog {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: satLivingDriftSlow 7s ease-in-out infinite;
-    }
-    .sat-anim-wave {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: satLivingRipple 5s ease-in-out infinite;
-    }
-    .sat-anim-needle {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: satLivingPendulum 4.4s ease-in-out infinite;
-    }
+    .sat-anim-glow { transform-box: fill-box; transform-origin: center; animation: satLivingGlow 3.8s ease-in-out infinite; }
+    .sat-anim-fog { transform-box: fill-box; transform-origin: center; animation: satLivingDriftSlow 7s ease-in-out infinite; }
+    .sat-anim-wave { transform-box: fill-box; transform-origin: center; animation: satLivingRipple 5s ease-in-out infinite; }
+    .sat-anim-needle { transform-box: fill-box; transform-origin: center; animation: satLivingPendulum 4.4s ease-in-out infinite; }
 
     .reader-screen {
       position: fixed;
@@ -383,10 +366,7 @@
       flex-direction: column;
     }
     .reader-screen.open { display: flex; }
-    .reader-screen.paper-mode {
-      background: #f5efe2;
-      color: #1f1b16;
-    }
+    .reader-screen.paper-mode { background: #f5efe2; color: #1f1b16; }
     .reader-topbar {
       display: flex;
       align-items: center;
@@ -404,18 +384,8 @@
       width: 100%;
       margin: 0 auto;
     }
-    .reader-article-title {
-      margin: 0 0 6px;
-      font-size: 22px;
-      font-weight: 900;
-      line-height: 1.3;
-    }
-    .reader-article-body {
-      margin-top: 16px;
-      font-size: 17px;
-      line-height: 1.75;
-      white-space: pre-line;
-    }
+    .reader-article-title { margin: 0 0 6px; font-size: 22px; font-weight: 900; line-height: 1.3; }
+    .reader-article-body { margin-top: 16px; font-size: 17px; line-height: 1.75; white-space: pre-line; }
 
     .dest-hint-box {
       margin-top: 8px;
@@ -428,12 +398,7 @@
       color: var(--text);
     }
 
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
     .stat-box {
       padding: 10px 6px;
       border-radius: 14px;
@@ -548,12 +513,7 @@
       border-color: transparent;
     }
 
-    .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 8px;
-    }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
     .photo-cell {
       aspect-ratio: 1 / 1;
       border-radius: 14px 5px 14px 14px;
@@ -677,19 +637,8 @@
       background: var(--surface-elev);
       border: 1px solid var(--border-strong);
     }
-    .prayer-edit-item label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-    .prayer-edit-item input {
-      margin-top: 4px;
-      padding: 9px 10px;
-      font-size: 15px;
-      font-weight: 800;
-      text-align: center;
-    }
+    .prayer-edit-item label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); }
+    .prayer-edit-item input { margin-top: 4px; padding: 9px 10px; font-size: 15px; font-weight: 800; text-align: center; }
 
     .copyright-footer {
       text-align: center;
@@ -743,10 +692,7 @@
       background: var(--green-soft);
       border-color: var(--border-strong);
     }
-    .bottom-nav-profile-right {
-      grid-column: 3;
-      width: 100%;
-    }
+    .bottom-nav-profile-right { grid-column: 3; width: 100%; }
 
     .side-menu-backdrop {
       position: fixed;
@@ -1083,9 +1029,7 @@
       border: 1px solid var(--border);
       cursor: pointer;
     }
-    .chat-row-card.has-unread {
-      border-color: var(--accent);
-    }
+    .chat-row-card.has-unread { border-color: var(--accent); }
 
     .list-item {
       display: flex;
@@ -1119,45 +1063,39 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .ai-modal-box { display: flex; flex-direction: column; max-height: 88vh; }
-    .ai-quick-row { display: flex; gap: 6px; overflow-x: auto; padding: 8px 0 6px; }
-    .ai-messages-box {
-      flex: 1;
-      min-height: 180px;
-      max-height: 46vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 10px;
-      margin: 6px 0 10px;
-      border-radius: 16px 6px 16px 16px;
+    .osk-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .osk-widget {
       background: var(--surface-elev);
       border: 1px solid var(--border);
+      border-radius: 16px 6px 16px 16px;
+      padding: 11px 12px;
     }
-    .ai-msg {
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-size: 14px;
-      line-height: 1.5;
-      max-width: 88%;
-      white-space: pre-wrap;
-      word-break: break-word;
-      user-select: text;
-      -webkit-user-select: text;
+    .osk-pane { display: none; }
+    .osk-pane.active { display: block; }
+    .osk-map-box {
+      background: var(--surface-elev);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px 6px 18px 18px;
+      overflow: hidden;
     }
-    .ai-msg.user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, var(--accent), #b86b28);
-      color: #ffffff;
+    .osk-map-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
     }
-    .ai-msg.bot {
-      align-self: flex-start;
-      background: var(--surface);
-      color: var(--text);
+    #satOskemenMapSvg { width: 100%; height: 290px; display: block; touch-action: manipulation; }
+    .osk-pin-form {
+      display: none;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: var(--surface-elev);
       border: 1px solid var(--border-strong);
     }
-    .ai-composer-row { display: flex; gap: 8px; align-items: center; }
+    .osk-pin-form.open { display: block; }
   </style>
 </head>
 <body>
@@ -1199,8 +1137,9 @@
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
         </button>
-        <button type="button" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="openSatAiModal()">
-          <span>ИИ</span>
+        <button type="button" id="satOskemenTopBtn" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.open()">
+          <span id="satOskemenTopTemp">🌤 --°</span>
+          <span>Оскемен</span>
         </button>
         <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
           <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
@@ -1692,26 +1631,11 @@
 
       <div id="prayerEditPanel" style="display: none;">
         <div class="prayer-edit-grid">
-          <div class="prayer-edit-item">
-            <label>Фаджр</label>
-            <input id="inFajr" class="input" type="time" />
-          </div>
-          <div class="prayer-edit-item">
-            <label>Зухр</label>
-            <input id="inDhuhr" class="input" type="time" />
-          </div>
-          <div class="prayer-edit-item">
-            <label>Аср</label>
-            <input id="inAsr" class="input" type="time" />
-          </div>
-          <div class="prayer-edit-item">
-            <label>Магриб</label>
-            <input id="inMaghrib" class="input" type="time" />
-          </div>
-          <div class="prayer-edit-item" style="grid-column: 1 / -1;">
-            <label>Иша</label>
-            <input id="inIsha" class="input" type="time" />
-          </div>
+          <div class="prayer-edit-item"><label>Фаджр</label><input id="inFajr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Зухр</label><input id="inDhuhr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Аср</label><input id="inAsr" class="input" type="time" /></div>
+          <div class="prayer-edit-item"><label>Магриб</label><input id="inMaghrib" class="input" type="time" /></div>
+          <div class="prayer-edit-item" style="grid-column: 1 / -1;"><label>Иша</label><input id="inIsha" class="input" type="time" /></div>
         </div>
         <div class="actions" style="margin-top: 10px;">
           <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="togglePrayerEditor(false)">Отмена</button>
@@ -1751,7 +1675,6 @@
           <button type="button" id="cTabUsers" class="sub-btn" onclick="switchCreatorTab('users')">Люди</button>
           <button type="button" id="cTabErrors" class="sub-btn" onclick="switchCreatorTab('errors')">Ошибки</button>
         </div>
-
         <div id="cPanelTickets"></div>
         <div id="cPanelUsers" style="display: none;"></div>
         <div id="cPanelErrors" style="display: none;"></div>
@@ -2001,32 +1924,96 @@
     </div>
   </div>
 
-  <div id="satAiModal" class="modal-bg" onclick="closeBackdrop(event)">
-    <div class="modal-box ai-modal-box" onclick="event.stopPropagation()">
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+  <!-- Модуль «Оскемен • Карта и Справочник» -->
+  <div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
         <div>
-          <h3 style="margin: 0; font-size: 18px;">ИИ-помощник SÄT</h3>
-          <div class="meta">Оскемен и ВКО • Подсказки по городу, делам и вопросам</div>
+          <h3 style="margin: 0; font-size: 18px;">Оскемен • Карта и Справочник</h3>
+          <div class="meta">Погода, курсы валют, схема города, трассы ВКО и службы</div>
         </div>
-        <div style="display: flex; gap: 6px;">
-          <button type="button" class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="clearSatAiChat()">Очистить</button>
-          <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('satAiModal')">✕</button>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="window.SAT_OSKEMEN_HUB.close()">✕</button>
+      </div>
+
+      <div class="osk-widgets">
+        <div class="osk-widget">
+          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Погода • Оскемен</div>
+          <div id="oskWeatherMain" style="font-size: 17px; font-weight: 900; color: var(--accent); margin-top: 4px;">Загрузка...</div>
+          <div id="oskWeatherSub" class="meta" style="font-size: 11.5px; margin-top: 2px;">49.95°N, 82.63°E</div>
+        </div>
+        <div class="osk-widget">
+          <div class="meta" style="font-size: 11.5px; font-weight: 700;">Курсы валют (авто)</div>
+          <div id="oskRatesMain" style="font-size: 13px; font-weight: 800; color: var(--gold); margin-top: 4px; line-height: 1.35;">Загрузка...</div>
+          <div id="oskRatesSub" class="meta" style="font-size: 11.5px; margin-top: 2px;">KZT • автообновление</div>
         </div>
       </div>
 
-      <div class="ai-quick-row">
-        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Подскажи полезные ориентиры и советы по Оскемену')">Оскемен</button>
-        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Какие есть идеи для прогулок и отдыха в ВКО?')">Прогулки в ВКО</button>
-        <button type="button" class="chip-btn" onclick="sendSatAiQuick('Помоги составить короткое объявление или пост для SÄT')">Пост для SÄT</button>
+      <div class="subtabs-3" style="margin-bottom: 12px;">
+        <button type="button" class="sub-btn active" data-osktab="map" onclick="window.SAT_OSKEMEN_HUB.switchTab('map', this)">Карта города</button>
+        <button type="button" class="sub-btn" data-osktab="roads" onclick="window.SAT_OSKEMEN_HUB.switchTab('roads', this)">Трассы ВКО</button>
+        <button type="button" class="sub-btn" data-osktab="sos" onclick="window.SAT_OSKEMEN_HUB.switchTab('sos', this)">Номера 112/109</button>
       </div>
 
-      <div id="satAiMessagesBox" class="ai-messages-box">
-        <div class="ai-msg bot">Привет! Я ИИ-помощник SÄT. Спрашивай про Оскемен и ВКО, маршруты, дела, идеи для публикаций или любые вопросы по делу.</div>
+      <div id="oskPane-map" class="osk-pane active">
+        <div class="osk-map-box">
+          <div class="osk-map-bar">
+            <span id="oskMapHint" class="meta">Нажмите на точку или добавьте свою</span>
+            <button type="button" id="oskAddPinBtn" class="btn btn-mint" style="padding: 6px 11px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.toggleAddPin()">+ Метка</button>
+          </div>
+          <svg id="satOskemenMapSvg" viewBox="0 0 400 290" onclick="window.SAT_OSKEMEN_HUB.onMapClick(event)">
+            <rect x="0" y="0" width="400" height="290" fill="var(--bg)" />
+            <circle cx="178" cy="148" r="24" fill="var(--accent-2)" opacity="0.22" />
+            <text x="178" y="151" font-size="8.5" text-anchor="middle" fill="var(--accent-2)" font-weight="bold">Стрелка</text>
+            <path d="M 35 290 C 85 230, 135 190, 175 145 C 215 100, 260 60, 325 0" fill="none" stroke="#4a90b8" stroke-width="17" stroke-linecap="round" opacity="0.75" />
+            <path d="M 175 145 C 235 140, 305 125, 400 105" fill="none" stroke="#5aa5cf" stroke-width="11" stroke-linecap="round" opacity="0.75" />
+            <line x1="145" y1="165" x2="175" y2="185" stroke="var(--accent)" stroke-width="5" />
+            <text x="112" y="194" font-size="8.5" fill="var(--accent)" font-weight="bold">Иртышский мост</text>
+            <line x1="222" y1="128" x2="228" y2="152" stroke="var(--accent)" stroke-width="5" />
+            <text x="234" y="152" font-size="8.5" fill="var(--accent)" font-weight="bold">Ульбинский мост</text>
+            <text x="236" y="94" font-size="11" font-weight="800" fill="var(--text)">ЦЕНТР</text>
+            <text x="64" y="232" font-size="11" font-weight="800" fill="var(--text)">КШТ (Левый берег)</text>
+            <text x="276" y="58" font-size="10" font-weight="700" fill="var(--muted)">ЗАЩИТА</text>
+            <text x="312" y="168" font-size="10" font-weight="700" fill="var(--muted)">АБЛАКЕТКА</text>
+            <text x="160" y="45" font-size="10" font-weight="700" fill="var(--muted)">ПРИСТАНЬ</text>
+            <text x="322" y="28" font-size="10" font-weight="700" fill="var(--muted)">СОГРА</text>
+            <text x="54" y="126" font-size="10" font-weight="700" fill="var(--muted)">МЕНОВНОЕ</text>
+            <g id="oskPinsLayer"></g>
+          </svg>
+        </div>
+
+        <div id="oskPinForm" class="osk-pin-form">
+          <input id="oskPinTitleInput" class="input" style="margin-top: 0;" maxlength="50" placeholder="Название точки в Оскемене" />
+          <input id="oskPinDescInput" class="input" maxlength="120" placeholder="Короткий ориентир или описание" />
+          <div class="actions" style="margin-top: 10px;">
+            <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="window.SAT_OSKEMEN_HUB.cancelPinForm()">Отмена</button>
+            <button type="button" class="btn btn-primary" style="flex: 1;" onclick="window.SAT_OSKEMEN_HUB.savePinForm()">Сохранить метку</button>
+          </div>
+        </div>
+
+        <div id="oskPinCard" class="card" style="margin-top: 10px; margin-bottom: 0; padding: 12px;">
+          <div style="font-weight: 800; color: var(--accent);">📍 Стрелка (слияние Иртыша и Ульбы)</div>
+          <div class="meta" style="margin-top: 4px;">Центральный ориентир города. Нажмите «+ Метка», чтобы поставить свою точку на схеме.</div>
+        </div>
       </div>
 
-      <div class="ai-composer-row">
-        <input id="satAiInput" class="input" style="margin-top: 0; flex: 1; padding: 10px 12px;" placeholder="Напишите вопрос ИИ..." onkeydown="if(event.key==='Enter') sendSatAiMessage()" />
-        <button type="button" id="satAiSendBtn" class="btn btn-primary" style="padding: 10px 14px; font-size: 13.5px;" onclick="sendSatAiMessage()">➤</button>
+      <div id="oskPane-roads" class="osk-pane">
+        <div class="list-item"><div><b>Оскемен — Сибинские озёра</b><div class="meta">Через Алгабас (~1 ч 15 мин)</div></div><span class="tag">85 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Голубой Залив</b><div class="meta">Бухтарминское вдхр. (~1,5 ч)</div></div><span class="tag">100 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Риддер</b><div class="meta">Трасса Р-150 / А-9 (~1,5 ч)</div></div><span class="tag">105 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Самарское</b><div class="meta">Через переправу / объезд (~2–2,5 ч)</div></div><span class="tag">145 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Алтай (Зыряновск)</b><div class="meta">Через Осиновский перевал (~2,5–3 ч)</div></div><span class="tag">185 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Семей (обл. Абай)</b><div class="meta">Трасса А-3 (~2,5–3 ч)</div></div><span class="tag">215 км</span></div>
+        <div class="list-item"><div><b>Оскемен — Зайсан</b><div class="meta">Калбатау — Кокпекты — Акжар (~6–6,5 ч)</div></div><span class="tag">470 км</span></div>
+      </div>
+
+      <div id="oskPane-sos" class="osk-pane">
+        <div class="list-item"><div><b>Единая служба спасения (ЧС / трассы)</b><div class="meta">Круглосуточно по всей ВКО</div></div><a class="btn btn-danger" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:112">112</a></div>
+        <div class="list-item"><div><b>iKomek — Контакт-центр акимата</b><div class="meta">Свет, вода, тепло, ЖКХ Оскемена</div></div><a class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:109">109</a></div>
+        <div class="list-item"><div><b>КазАвтоЖол (состояние трасс)</b><div class="meta">Закрытие республиканских дорог</div></div><a class="btn btn-mint" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:1403">1403</a></div>
+        <div class="list-item"><div><b>Пожарная служба</b></div><a class="btn btn-ghost" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:101">101</a></div>
+        <div class="list-item"><div><b>Полиция</b></div><a class="btn btn-ghost" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:102">102</a></div>
+        <div class="list-item"><div><b>Скорая медицинская помощь</b></div><a class="btn btn-ghost" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:103">103</a></div>
+        <div class="list-item"><div><b>Аварийная газовая служба</b></div><a class="btn btn-ghost" style="padding: 6px 12px; font-size: 12.5px; text-decoration: none;" href="tel:104">104</a></div>
       </div>
     </div>
   </div>
@@ -2335,189 +2322,255 @@
     })();
 
     (function () {
-      const AI_WORKER_URL = 'https://sat-ai.bakytzhanazat.workers.dev';
-      const AI_HISTORY_KEY = 'sat_ai_chat_history_v1';
-      let aiHistory = [];
-      let aiBusy = false;
+      const BASE_PINS = [
+        { id: 'b1', x: 178, y: 145, title: 'Стрелка (Центр)', desc: 'Слияние Иртыша и Ульбы, набережная и парк.', custom: false },
+        { id: 'b2', x: 102, y: 215, title: 'КШТ (Левый берег)', desc: 'Жилой массив на левом берегу Иртыша.', custom: false },
+        { id: 'b3', x: 255, y: 88, title: 'Площадь Республики', desc: 'Центр города, ул. Казахстан / пр. Назарбаева.', custom: false },
+        { id: 'b4', x: 285, y: 50, title: 'ЖД вокзал Защита', desc: 'Главный железнодорожный узел Оскемена.', custom: false }
+      ];
+      const PINS_KEY = 'sat_oskemen_pins_v3';
+      const WEATHER_KEY = 'sat_oskemen_weather_v3';
+      const RATES_KEY = 'sat_oskemen_rates_v3';
 
-      try {
-        const saved = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || '[]');
-        if (Array.isArray(saved)) aiHistory = saved.slice(-16);
-      } catch (e) {}
+      let addingPin = false;
+      let draftCoords = null;
 
-      function persistAiHistory() {
-        try {
-          localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(aiHistory.slice(-16)));
-        } catch (e) {}
+      function readObj(k) {
+        try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; }
+      }
+      function writeObj(k, v) {
+        try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {}
+      }
+      function escText(s) {
+        return String(s || '').replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]);
+      }
+      function getCustomPins() {
+        const arr = readObj(PINS_KEY);
+        return Array.isArray(arr) ? arr : [];
       }
 
-      function appendAiBubble(role, text) {
-        const box = document.getElementById('satAiMessagesBox');
-        if (!box) return null;
-        const div = document.createElement('div');
-        div.className = 'ai-msg ' + (role === 'user' ? 'user' : 'bot');
-        div.textContent = String(text || '');
-        box.appendChild(div);
-        box.scrollTop = box.scrollHeight;
-        return div;
+      function renderPins() {
+        const layer = document.getElementById('oskPinsLayer');
+        if (!layer) return;
+        layer.innerHTML = '';
+        BASE_PINS.concat(getCustomPins()).forEach(pin => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.style.cursor = 'pointer';
+
+          const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          c.setAttribute('cx', String(pin.x));
+          c.setAttribute('cy', String(pin.y));
+          c.setAttribute('r', '7.5');
+          c.setAttribute('fill', pin.custom ? 'var(--accent-2)' : 'var(--accent)');
+          c.setAttribute('stroke', '#ffffff');
+          c.setAttribute('stroke-width', '2');
+
+          const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          t.setAttribute('x', String(pin.x));
+          t.setAttribute('y', String(pin.y - 11));
+          t.setAttribute('font-size', '9');
+          t.setAttribute('font-weight', '700');
+          t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('fill', 'var(--text)');
+          t.textContent = pin.title;
+
+          g.appendChild(c);
+          g.appendChild(t);
+          g.addEventListener('click', ev => {
+            ev.stopPropagation();
+            showPinCard(pin);
+          });
+          layer.appendChild(g);
+        });
       }
 
-      function renderAiHistory() {
-        const box = document.getElementById('satAiMessagesBox');
-        if (!box) return;
-        box.innerHTML = '';
-        if (!aiHistory.length) {
-          appendAiBubble('bot', 'Привет! Я ИИ-помощник SÄT. Спрашивай про Оскемен и ВКО, дела, идеи для постов или любые вопросы по делу.');
+      function showPinCard(pin) {
+        const card = document.getElementById('oskPinCard');
+        if (!card) return;
+        const delHtml = pin.custom
+          ? `<button type="button" class="btn btn-danger" style="margin-top: 8px; padding: 6px 11px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.deletePin('${escText(pin.id)}')">Удалить метку</button>`
+          : '';
+        card.innerHTML = `
+          <div style="font-weight: 800; color: var(--accent);">📍 ${escText(pin.title)}</div>
+          <div class="meta" style="margin-top: 4px;">${escText(pin.desc || 'Точка на схеме Оскемена')}</div>
+          ${delHtml}
+        `;
+      }
+
+      function paintWeather(d) {
+        const sign = d.temp > 0 ? '+' : '';
+        const topEl = document.getElementById('satOskemenTopTemp');
+        const mainEl = document.getElementById('oskWeatherMain');
+        const subEl = document.getElementById('oskWeatherSub');
+        if (topEl) topEl.textContent = `🌤 ${sign}${d.temp}°`;
+        if (mainEl) mainEl.textContent = `${sign}${d.temp}°C • Ветер ${d.wind} км/ч`;
+        if (subEl) subEl.textContent = `Ощущается ${d.feels > 0 ? '+' : ''}${d.feels}° • Влажность ${d.hum}% • ${d.time || ''}`;
+      }
+
+      async function refreshWeather(force = false) {
+        const now = Date.now();
+        const cached = readObj(WEATHER_KEY);
+        if (!force && cached && cached.data && (now - cached.ts < 30 * 60 * 1000)) {
+          paintWeather(cached.data);
           return;
         }
-        aiHistory.forEach((m) => appendAiBubble(m.role === 'user' ? 'user' : 'bot', m.content));
-      }
-
-      function extractAiReplyText(data) {
-        if (!data) return '';
-        if (typeof data === 'string') return data.trim();
-        if (typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim();
-        if (typeof data.response === 'string' && data.response.trim()) return data.response.trim();
-        if (typeof data.answer === 'string' && data.answer.trim()) return data.answer.trim();
-        if (typeof data.text === 'string' && data.text.trim()) return data.text.trim();
-        if (typeof data.message === 'string' && data.message.trim()) return data.message.trim();
-        if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-          return String(data.choices[0].message.content).trim();
-        }
-        if (data.data && typeof data.data.reply === 'string') return data.data.reply.trim();
-        return '';
-      }
-
-      function extractAnyTextDeep(parsed, rawText) {
-        const direct = extractAiReplyText(parsed);
-        if (direct) return direct;
-        if (parsed && typeof parsed === 'object') {
-          if (typeof parsed.error === 'string' && parsed.error.trim()) {
-            return 'Воркер вернул ошибку: ' + parsed.error.trim();
-          }
-          if (parsed.error && typeof parsed.error === 'object' && parsed.error.message) {
-            return 'Воркер вернул ошибку: ' + String(parsed.error.message);
-          }
-          if (Array.isArray(parsed.content) && parsed.content[0] && parsed.content[0].text) {
-            return String(parsed.content[0].text).trim();
-          }
-          if (parsed.candidates && parsed.candidates[0] && parsed.candidates[0].content && parsed.candidates[0].content.parts && parsed.candidates[0].content.parts[0] && parsed.candidates[0].content.parts[0].text) {
-            return String(parsed.candidates[0].content.parts[0].text).trim();
-          }
-          const compact = JSON.stringify(parsed);
-          if (compact && compact !== '{}') return 'Ответ сервера (JSON): ' + compact.slice(0, 600);
-        }
-        if (rawText && String(rawText).trim()) return String(rawText).trim().slice(0, 600);
-        return '';
-      }
-
-      async function requestSatAi(promptText) {
-        const payload = {
-          prompt: promptText,
-          message: promptText,
-          text: promptText,
-          question: promptText,
-          query: promptText,
-          region: 'Оскемен / ВКО',
-          app: 'SÄT',
-          history: aiHistory.slice(-10)
-        };
-
-        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        const timer = controller ? setTimeout(() => controller.abort(), 25000) : null;
-
         try {
-          const res = await fetch(AI_WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: controller ? controller.signal : undefined
-          });
-          const rawText = await res.text();
-          let parsed = null;
-          try {
-            parsed = rawText ? JSON.parse(rawText) : null;
-          } catch (e) {
-            parsed = rawText;
+          const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=49.9483&longitude=82.6285&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=Asia%2FAlmaty');
+          if (!r.ok) throw new Error('weather');
+          const d = await r.json();
+          const wData = {
+            temp: Math.round(d.current.temperature_2m),
+            feels: Math.round(d.current.apparent_temperature),
+            hum: Math.round(d.current.relative_humidity_2m),
+            wind: Math.round(d.current.wind_speed_10m),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          writeObj(WEATHER_KEY, { ts: now, data: wData });
+          paintWeather(wData);
+        } catch (_) {
+          if (cached && cached.data) paintWeather(cached.data);
+          else {
+            const mainEl = document.getElementById('oskWeatherMain');
+            if (mainEl) mainEl.textContent = 'Нет сети';
           }
-
-          if (!res.ok) {
-            const detail = parsed && typeof parsed === 'object' && parsed.error
-              ? (typeof parsed.error === 'string' ? parsed.error : (parsed.error.message || JSON.stringify(parsed.error)))
-              : (rawText ? String(rawText).slice(0, 240) : '');
-            return 'Ошибка сервера ИИ (HTTP ' + res.status + ')' + (detail ? ': ' + detail : '');
-          }
-
-          const reply = extractAnyTextDeep(parsed, rawText);
-          if (!reply) return 'Сервер ИИ вернул пустой ответ.';
-          return reply;
-        } catch (err) {
-          const errName = err && err.name ? err.name : 'Error';
-          const errMsg = err && err.message ? err.message : String(err || 'unknown');
-          if (errName === 'AbortError') {
-            return 'Сервер ИИ не ответил за 25 сек (таймаут). Попробуйте ещё раз.';
-          }
-          return 'Запрос в браузере заблокирован или нет сети (' + errName + ': ' + errMsg + '). Проверьте CORS в воркере sat-ai.bakytzhanazat.workers.dev.';
-        } finally {
-          if (timer) clearTimeout(timer);
         }
       }
 
-      window.openSatAiModal = function () {
-        window.closeAllSideDrawers?.();
-        renderAiHistory();
-        const modal = document.getElementById('satAiModal');
-        if (modal) modal.classList.add('open');
-        const inp = document.getElementById('satAiInput');
-        if (inp) setTimeout(() => { try { inp.focus(); } catch (e) {} }, 60);
-      };
+      function paintRates(d) {
+        const mainEl = document.getElementById('oskRatesMain');
+        const subEl = document.getElementById('oskRatesSub');
+        if (mainEl) mainEl.textContent = `$ ${d.usd}₸ • ₽ ${d.rub}₸ • ¥ ${d.cny}₸`;
+        if (subEl) subEl.textContent = d.time ? `KZT • Обновлено в ${d.time}` : 'KZT • автообновление';
+      }
 
-      window.clearSatAiChat = function () {
-        aiHistory = [];
-        persistAiHistory();
-        renderAiHistory();
-        window.toast?.('История ИИ очищена');
-      };
-
-      window.sendSatAiQuick = function (text) {
-        const inp = document.getElementById('satAiInput');
-        if (inp) inp.value = text;
-        window.sendSatAiMessage();
-      };
-
-      window.sendSatAiMessage = async function () {
-        if (aiBusy) return;
-        const inp = document.getElementById('satAiInput');
-        const btn = document.getElementById('satAiSendBtn');
-        const text = (inp ? inp.value : '').trim();
-        if (!text) return;
-
-        aiBusy = true;
-        if (inp) inp.value = '';
-        if (btn) btn.disabled = true;
-
-        aiHistory.push({ role: 'user', content: text });
-        persistAiHistory();
-        appendAiBubble('user', text);
-
-        const typingEl = appendAiBubble('bot', 'Думаю...');
-
+      async function refreshRates(force = false) {
+        const now = Date.now();
+        const cached = readObj(RATES_KEY);
+        if (!force && cached && cached.data && (now - cached.ts < 6 * 60 * 60 * 1000)) {
+          paintRates(cached.data);
+          return;
+        }
         try {
-          const reply = await requestSatAi(text);
-          if (typingEl) typingEl.textContent = reply;
-          aiHistory.push({ role: 'assistant', content: reply });
-          persistAiHistory();
-        } catch (err) {
-          const fallback = 'Сбой клиента ИИ: ' + String(err && err.message ? err.message : err);
-          if (typingEl) typingEl.textContent = fallback;
-          aiHistory.pop();
-          persistAiHistory();
-          window.toast?.('Ошибка связи с ИИ');
-        } finally {
-          aiBusy = false;
-          if (btn) btn.disabled = false;
+          const r = await fetch('https://open.er-api.com/v6/latest/USD');
+          if (!r.ok) throw new Error('rates');
+          const d = await r.json();
+          const kzt = d && d.rates && d.rates.KZT;
+          const rub = d && d.rates && d.rates.RUB;
+          const cny = d && d.rates && d.rates.CNY;
+          if (!kzt || !rub || !cny) throw new Error('empty');
+          const rData = {
+            usd: kzt.toFixed(1),
+            rub: (kzt / rub).toFixed(2),
+            cny: (kzt / cny).toFixed(1),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+          writeObj(RATES_KEY, { ts: now, data: rData });
+          paintRates(rData);
+        } catch (_) {
+          if (cached && cached.data) paintRates(cached.data);
+          else {
+            const mainEl = document.getElementById('oskRatesMain');
+            if (mainEl) mainEl.textContent = 'Обновится при сети';
+          }
+        }
+      }
+
+      window.SAT_OSKEMEN_HUB = {
+        open() {
+          window.closeAllSideDrawers?.();
+          document.getElementById('satOskemenHubModal')?.classList.add('open');
+          renderPins();
+          refreshWeather();
+          refreshRates();
+        },
+        close() {
+          this.cancelPinForm();
+          document.getElementById('satOskemenHubModal')?.classList.remove('open');
+        },
+        switchTab(name, btn) {
+          document.querySelectorAll('[data-osktab]').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.osk-pane').forEach(p => p.classList.remove('active'));
+          if (btn) btn.classList.add('active');
+          document.getElementById('oskPane-' + name)?.classList.add('active');
+        },
+        toggleAddPin() {
+          addingPin = !addingPin;
+          draftCoords = null;
+          const btn = document.getElementById('oskAddPinBtn');
+          const hint = document.getElementById('oskMapHint');
+          const form = document.getElementById('oskPinForm');
+          if (btn) btn.textContent = addingPin ? 'Отмена' : '+ Метка';
+          if (hint) hint.textContent = addingPin ? 'Коснитесь нужного места на схеме...' : 'Нажмите на точку или добавьте свою';
+          if (form && !addingPin) form.classList.remove('open');
+        },
+        onMapClick(ev) {
+          if (!addingPin) return;
+          const svg = document.getElementById('satOskemenMapSvg');
+          const form = document.getElementById('oskPinForm');
+          const tInp = document.getElementById('oskPinTitleInput');
+          const dInp = document.getElementById('oskPinDescInput');
+          if (!svg || !form) return;
+
+          const rect = svg.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+          draftCoords = {
+            x: Math.max(12, Math.min(388, Math.round(((ev.clientX - rect.left) / rect.width) * 400))),
+            y: Math.max(18, Math.min(278, Math.round(((ev.clientY - rect.top) / rect.height) * 290)))
+          };
+          if (tInp) tInp.value = '';
+          if (dInp) dInp.value = '';
+          form.classList.add('open');
+          if (tInp) setTimeout(() => tInp.focus(), 50);
+        },
+        cancelPinForm() {
+          draftCoords = null;
+          addingPin = false;
+          const btn = document.getElementById('oskAddPinBtn');
+          const hint = document.getElementById('oskMapHint');
+          const form = document.getElementById('oskPinForm');
+          if (btn) btn.textContent = '+ Метка';
+          if (hint) hint.textContent = 'Нажмите на точку или добавьте свою';
+          if (form) form.classList.remove('open');
+        },
+        savePinForm() {
+          if (!draftCoords) return;
+          const tInp = document.getElementById('oskPinTitleInput');
+          const dInp = document.getElementById('oskPinDescInput');
+          const title = (tInp ? tInp.value : '').trim();
+          const desc = (dInp ? dInp.value : '').trim();
+          if (!title) { if (tInp) tInp.focus(); return; }
+
+          const list = getCustomPins();
+          const pin = {
+            id: 'p_' + Date.now(),
+            x: draftCoords.x,
+            y: draftCoords.y,
+            title,
+            desc: desc || 'Метка добавлена в SÄT',
+            custom: true
+          };
+          list.push(pin);
+          writeObj(PINS_KEY, list);
+          this.cancelPinForm();
+          renderPins();
+          showPinCard(pin);
+          window.toast?.('Метка сохранена на схеме');
+        },
+        deletePin(id) {
+          writeObj(PINS_KEY, getCustomPins().filter(p => p.id !== id));
+          renderPins();
+          const card = document.getElementById('oskPinCard');
+          if (card) {
+            card.innerHTML = '<div style="font-weight:800;">Метка удалена</div><div class="meta" style="margin-top:4px;">Выберите любую точку на схеме Оскемена.</div>';
+          }
+          window.toast?.('Метка удалена');
         }
       };
+
+      refreshWeather();
+      refreshRates();
+      setInterval(() => refreshWeather(), 30 * 60 * 1000);
+      setInterval(() => refreshRates(), 6 * 60 * 60 * 1000);
     })();
   </script>
 
@@ -2571,7 +2624,6 @@
     const MEDIA_VAULT_KEY = 'sat_media_vault_v1';
     const CLOUD_GALLERY_MAX = 12;
 
-    // Базовый фильтр мата и грубости для сохранения спокойного тона в SÄT
     const SAT_PROFANITY_ROOTS = [
       'бля', 'бляд', 'блят',
       'еба', 'ебл', 'ебан', 'ебат', 'ебуч', 'заеб', 'наеб', 'отъеб', 'поеб', 'съеб', 'уеб', 'долбоеб', 'долбоёб',
@@ -3093,9 +3145,7 @@
       };
     }
 
-    function normalizeAccountType(val) {
-      return val === 'business' ? 'business' : 'user';
-    }
+    function normalizeAccountType(val) { return val === 'business' ? 'business' : 'user'; }
 
     function renderAccountBadgeHtml(accountType) {
       if (normalizeAccountType(accountType) === 'business') {
@@ -3141,10 +3191,7 @@
         content: String(d.content || d.summary || ''),
         photoData
       };
-      return {
-        ...base,
-        coverSrc: getReadingCoverSrc(base)
-      };
+      return { ...base, coverSrc: getReadingCoverSrc(base) };
     }
 
     function normalizeVyruchkaDoc(raw, id) {
@@ -3313,20 +3360,8 @@
       } catch (e) {}
     }
 
-    function startRingingLoop(mode) {
-      stopRingingLoop();
-      playTone(mode);
-      ringInterval = setInterval(() => {
-        playTone(mode);
-      }, 2400);
-    }
-
-    function stopRingingLoop() {
-      if (ringInterval) {
-        clearInterval(ringInterval);
-        ringInterval = null;
-      }
-    }
+    function startRingingLoop(mode) { stopRingingLoop(); playTone(mode); ringInterval = setInterval(() => playTone(mode), 2400); }
+    function stopRingingLoop() { if (ringInterval) { clearInterval(ringInterval); ringInterval = null; } }
 
     function formatTime(ms) {
       const d = ms ? new Date(ms) : new Date();
@@ -3337,29 +3372,15 @@
 
     function formatPresenceHtml(lastSeenMs, hideLastSeen = false) {
       const ts = Number(lastSeenMs || 0);
-      if (ts && (Date.now() - ts) <= ONLINE_WINDOW_MS) {
-        return '<span class="online-dot"></span><span class="online-txt">в сети</span>';
-      }
-      if (hideLastSeen) {
-        return '<span class="offline-txt">активность скрыта</span>';
-      }
-      if (ts > 0) {
-        return `<span class="offline-txt">был(а) в сети ${esc(formatTime(ts))}</span>`;
-      }
+      if (ts && (Date.now() - ts) <= ONLINE_WINDOW_MS) return '<span class="online-dot"></span><span class="online-txt">в сети</span>';
+      if (hideLastSeen) return '<span class="offline-txt">активность скрыта</span>';
+      if (ts > 0) return `<span class="offline-txt">был(а) в сети ${esc(formatTime(ts))}</span>`;
       return '<span class="offline-txt">не в сети</span>';
     }
 
     function loadMediaVault() {
       const keys = [MEDIA_VAULT_KEY, VAULT_BACKUP_KEY, STORE_KEY];
-      let vault = {
-        avatar: '',
-        photos: [],
-        story: '',
-        storyStart: 0,
-        storyEnd: 0,
-        storyLabel: '',
-        postsById: {}
-      };
+      let vault = { avatar: '', photos: [], story: '', storyStart: 0, storyEnd: 0, storyLabel: '', postsById: {} };
       for (const k of keys) {
         try {
           const raw = localStorage.getItem(k);
@@ -3367,18 +3388,14 @@
           const p = JSON.parse(raw);
           if (!p || typeof p !== 'object') continue;
           if (!vault.avatar && p.avatar) vault.avatar = String(p.avatar);
-          if (Array.isArray(p.photos) && p.photos.length) {
-            vault.photos = mergePhotoLists(vault.photos, p.photos);
-          }
+          if (Array.isArray(p.photos) && p.photos.length) vault.photos = mergePhotoLists(vault.photos, p.photos);
           if (!vault.story && p.story && storyAlive(p.story, p.storyEnd)) {
             vault.story = String(p.story);
             vault.storyStart = Number(p.storyStart || 0);
             vault.storyEnd = Number(p.storyEnd || 0);
             vault.storyLabel = String(p.storyLabel || '');
           }
-          if (p.postsById && typeof p.postsById === 'object') {
-            vault.postsById = { ...p.postsById, ...vault.postsById };
-          }
+          if (p.postsById && typeof p.postsById === 'object') vault.postsById = { ...p.postsById, ...vault.postsById };
         } catch (e) {}
       }
       return vault;
@@ -3425,16 +3442,9 @@
         checkOwnStoryExpiry();
         const vault = loadMediaVault();
         let changed = false;
-
-        if (!state.avatar && vault.avatar) {
-          state.avatar = vault.avatar;
-          changed = true;
-        }
+        if (!state.avatar && vault.avatar) { state.avatar = vault.avatar; changed = true; }
         const curPhotos = normalizePhotos(state.photos);
-        if (!curPhotos.length && Array.isArray(vault.photos) && vault.photos.length) {
-          state.photos = normalizePhotos(vault.photos);
-          changed = true;
-        }
+        if (!curPhotos.length && Array.isArray(vault.photos) && vault.photos.length) { state.photos = normalizePhotos(vault.photos); changed = true; }
         if ((!state.story || !storyAlive(state.story, state.storyEnd)) && vault.story && storyAlive(vault.story, vault.storyEnd)) {
           state.story = vault.story;
           state.storyStart = vault.storyStart;
@@ -3442,7 +3452,6 @@
           state.storyLabel = vault.storyLabel;
           changed = true;
         }
-
         const vaultPostsArr = Object.values(vault.postsById || {}).filter((x) => x && (x.id || x.clientPostId));
         if (vaultPostsArr.length) {
           const existingKeys = new Set(posts.map((p) => String(p.clientPostId || p.id)));
@@ -3454,19 +3463,10 @@
             const k = String(p.clientPostId || p.id);
             const vp = vault.postsById[k];
             if (!vp) return p;
-            return {
-              ...vp,
-              ...p,
-              photoData: p.photoData || vp.photoData || '',
-              body: p.body || vp.body || '',
-              caption: p.caption || vp.caption || ''
-            };
+            return { ...vp, ...p, photoData: p.photoData || vp.photoData || '', body: p.body || vp.body || '', caption: p.caption || vp.caption || '' };
           });
         }
-
-        if (changed) {
-          persist(false);
-        }
+        if (changed) persist(false);
         saveMediaVault(posts);
       } catch (e) {}
     }
@@ -3484,50 +3484,30 @@
 
     silentHealMediaAndPosts();
 
-    function queueCloudRetry(fn) {
-      retryQueue.push({ fn, tries: 0 });
-    }
+    function queueCloudRetry(fn) { retryQueue.push({ fn, tries: 0 }); }
 
     setInterval(async () => {
       if (!retryQueue.length) return;
       const item = retryQueue[0];
       item.tries += 1;
-      try {
-        await item.fn();
-        retryQueue.shift();
-      } catch (e) {
-        if (item.tries >= 8) retryQueue.shift();
-      }
+      try { await item.fn(); retryQueue.shift(); } catch (e) { if (item.tries >= 8) retryQueue.shift(); }
     }, 4500);
 
-    function getMyUid() {
-      return currentUser?.uid || state.lastUid || '';
-    }
-
+    function getMyUid() { return currentUser?.uid || state.lastUid || ''; }
     function getMyPlainName() {
       const raw = (state.namePlain || state.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Участник').trim();
       return raw || 'Участник';
     }
-
     function myDisplayName() {
       const base = getMyPlainName();
       const styleKey = state.nameStyle || 'normal';
-      if (styleKey !== 'normal') {
-        return formatStyledName(base, styleKey);
-      }
+      if (styleKey !== 'normal') return formatStyledName(base, styleKey);
       return (state.name || base).trim() || 'Участник';
     }
-
-    function myAvatarUrl() {
-      return state.avatar || currentUser?.photoURL || '';
-    }
+    function myAvatarUrl() { return state.avatar || currentUser?.photoURL || ''; }
 
     function isCreatorAccount() {
-      try {
-        return localStorage.getItem(CREATOR_UNLOCK_KEY) === '1';
-      } catch (e) {
-        return false;
-      }
+      try { return localStorage.getItem(CREATOR_UNLOCK_KEY) === '1'; } catch (e) { return false; }
     }
 
     function onSupportTitleTripleTap() {
@@ -3544,10 +3524,7 @@
     function unlockCreatorByCode() {
       const inp = document.getElementById('creatorCodeInput');
       const val = (inp ? inp.value : '').trim();
-      if (!val || val !== CREATOR_UNLOCK_CODE) {
-        toast('Неверный код');
-        return;
-      }
+      if (!val || val !== CREATOR_UNLOCK_CODE) { toast('Неверный код'); return; }
       try { localStorage.setItem(CREATOR_UNLOCK_KEY, '1'); } catch (e) {}
       if (inp) inp.value = '';
       document.getElementById('creatorCodeBox').style.display = 'none';
@@ -3614,11 +3591,7 @@
 
     window.addEventListener('error', (ev) => {
       const m = ev?.message || 'error';
-      state.lastSilentError = {
-        time: Date.now(),
-        msg: m,
-        line: ev?.lineno || 0
-      };
+      state.lastSilentError = { time: Date.now(), msg: m, line: ev?.lineno || 0 };
       persist();
       reportSilentErrorToCloud(m);
       syncSupportAndMonitorCard();
@@ -3627,10 +3600,7 @@
 
     window.addEventListener('unhandledrejection', (ev) => {
       const m = String(ev?.reason?.message || ev?.reason || 'promise_error');
-      state.lastSilentError = {
-        time: Date.now(),
-        msg: m
-      };
+      state.lastSilentError = { time: Date.now(), msg: m };
       persist();
       reportSilentErrorToCloud(m);
       syncSupportAndMonitorCard();
@@ -3639,10 +3609,7 @@
 
     function checkOwnStoryExpiry() {
       if (state.story && !storyAlive(state.story, state.storyEnd)) {
-        state.story = '';
-        state.storyStart = 0;
-        state.storyEnd = 0;
-        state.storyLabel = '';
+        state.story = ''; state.storyStart = 0; state.storyEnd = 0; state.storyLabel = '';
         persist(false);
       }
     }
@@ -3681,16 +3648,11 @@
         renderUnifiedSearch();
         await syncProfileCloud(currentUser);
         toast(chosen === 'business' ? 'Выбран бизнес-аккаунт' : 'Выбран аккаунт пользователя');
-      } catch (e) {
-        hideModal('accountRoleModal');
-      }
+      } catch (e) { hideModal('accountRoleModal'); }
     }
 
     function subscribeIncomingCallsForUser(uid) {
-      if (incomingCallsUnsub) {
-        incomingCallsUnsub();
-        incomingCallsUnsub = null;
-      }
+      if (incomingCallsUnsub) { incomingCallsUnsub(); incomingCallsUnsub = null; }
       if (!uid) return;
       incomingCallsUnsub = onSnapshot(query(collection(db, 'calls'), where('toUid', '==', uid)), (snap) => {
         snap.docChanges().forEach((ch) => {
@@ -3711,19 +3673,12 @@
       }, () => {});
     }
 
-    // Безопасное слияние облачного профиля и локального состояния:
-    // пустые локальные поля НИКОГДА не затирают уже сохранённые фото, сторис и анкету в облаке
     function mergeCloudAndLocalProfile(cloudData, allowOverwriteMedia = false) {
       if (!cloudData || typeof cloudData !== 'object') return;
       checkOwnStoryExpiry();
-
       if (!allowOverwriteMedia) {
-        if (!state.avatar && cloudData.photoData) {
-          state.avatar = String(cloudData.photoData);
-        }
-        if (Array.isArray(cloudData.savedPhotos) && cloudData.savedPhotos.length) {
-          state.photos = mergePhotoLists(state.photos, cloudData.savedPhotos);
-        }
+        if (!state.avatar && cloudData.photoData) state.avatar = String(cloudData.photoData);
+        if (Array.isArray(cloudData.savedPhotos) && cloudData.savedPhotos.length) state.photos = mergePhotoLists(state.photos, cloudData.savedPhotos);
         if ((!state.story || !storyAlive(state.story, state.storyEnd)) && cloudData.storyData && storyAlive(cloudData.storyData, cloudData.storyExpiresAt)) {
           state.story = String(cloudData.storyData);
           state.storyStart = Number(cloudData.storyCreatedAt || 0);
@@ -3731,26 +3686,15 @@
           state.storyLabel = String(cloudData.storyTimeLabel || '');
         }
       }
-
-      if (!state.bio && cloudData.bio && cloudData.bio !== 'Мой профиль SÄT') {
-        state.bio = String(cloudData.bio);
-      }
-      if (!state.namePlain && cloudData.namePlain) {
-        state.namePlain = String(cloudData.namePlain);
-      }
-      if (!state.name && cloudData.fullName) {
-        state.name = String(cloudData.fullName);
-      }
+      if (!state.bio && cloudData.bio && cloudData.bio !== 'Мой профиль SÄT') state.bio = String(cloudData.bio);
+      if (!state.namePlain && cloudData.namePlain) state.namePlain = String(cloudData.namePlain);
+      if (!state.name && cloudData.fullName) state.name = String(cloudData.fullName);
       if (cloudData.accountType && !state.hasChosenAccountType) {
         state.accountType = normalizeAccountType(cloudData.accountType);
         state.hasChosenAccountType = true;
       }
-      if (typeof cloudData.hideFromSearch === 'boolean') {
-        state.hideFromSearch = cloudData.hideFromSearch;
-      }
-      if (typeof cloudData.hideLastSeen === 'boolean') {
-        state.hideLastSeen = cloudData.hideLastSeen;
-      }
+      if (typeof cloudData.hideFromSearch === 'boolean') state.hideFromSearch = cloudData.hideFromSearch;
+      if (typeof cloudData.hideLastSeen === 'boolean') state.hideLastSeen = cloudData.hideLastSeen;
     }
 
     async function loadCloudProfileFirst(user) {
@@ -3770,17 +3714,12 @@
     async function syncProfileCloud(user, opts = {}) {
       if (!user) return;
       const explicitMediaChange = Boolean(opts.explicitMediaChange);
-      if (!explicitMediaChange) {
-        silentHealMediaAndPosts();
-      }
+      if (!explicitMediaChange) silentHealMediaAndPosts();
       state.lastUid = user.uid;
       if (!explicitMediaChange) {
         if (!state.avatar && recovered?.avatar) state.avatar = recovered.avatar;
-        if ((!state.photos || !state.photos.length) && recovered?.photos?.length) {
-          state.photos = normalizePhotos(recovered.photos);
-        }
+        if ((!state.photos || !state.photos.length) && recovered?.photos?.length) state.photos = normalizePhotos(recovered.photos);
       }
-
       const nowMs = Date.now();
       const hasActiveStory = storyAlive(state.story, state.storyEnd);
       const compactSavedPhotos = normalizePhotos(state.photos).slice(0, CLOUD_GALLERY_MAX);
@@ -3798,40 +3737,25 @@
         lastSeenMs: nowMs,
         updatedAt: serverTimestamp()
       };
-
-      // Передаём медиа-поля только если они непустые ИЛИ пользователь явно их удалил/изменил
-      if (resolvedAvatar || explicitMediaChange) {
-        payload.photoData = resolvedAvatar || '';
-      }
-      if (compactSavedPhotos.length || explicitMediaChange) {
-        payload.savedPhotos = compactSavedPhotos;
-      }
+      if (resolvedAvatar || explicitMediaChange) payload.photoData = resolvedAvatar || '';
+      if (compactSavedPhotos.length || explicitMediaChange) payload.savedPhotos = compactSavedPhotos;
       if (hasActiveStory || explicitMediaChange) {
         payload.storyData = hasActiveStory ? state.story : '';
         payload.storyCreatedAt = hasActiveStory ? (state.storyStart || 0) : 0;
         payload.storyExpiresAt = hasActiveStory ? (state.storyEnd || 0) : 0;
         payload.storyTimeLabel = hasActiveStory ? (state.storyLabel || '') : '';
       }
-
       persist();
       try {
         await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
       } catch (e) {
-        queueCloudRetry(() => setDoc(doc(db, 'users', user.uid), {
-          ...payload,
-          lastSeenMs: Date.now(),
-          updatedAt: serverTimestamp()
-        }, { merge: true }));
+        queueCloudRetry(() => setDoc(doc(db, 'users', user.uid), { ...payload, lastSeenMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true }));
       }
     }
 
     async function pingOnlinePresence() {
       if (!currentUser) return;
-      try {
-        await setDoc(doc(db, 'users', currentUser.uid), {
-          lastSeenMs: Date.now()
-        }, { merge: true });
-      } catch (e) {}
+      try { await setDoc(doc(db, 'users', currentUser.uid), { lastSeenMs: Date.now() }, { merge: true }); } catch (e) {}
     }
 
     document.addEventListener('visibilitychange', () => {
@@ -3862,7 +3786,6 @@
       if (hint) hint.style.display = 'none';
       if (user) {
         state.lastUid = user.uid;
-        // Сначала считываем облачный профиль, чтобы не затереть уже сохранённые фото/сторис/анкету
         await loadCloudProfileFirst(user);
         silentHealMediaAndPosts();
         if (!state.namePlain && user.displayName) state.namePlain = user.displayName;
@@ -3883,20 +3806,11 @@
         goToProfileStart();
         toast('Вход выполнен');
       } catch (e) {
-        try {
-          await signInWithRedirect(auth, googleProvider);
-        } catch (err) {
-          toast('Не удалось войти через Google');
-        }
+        try { await signInWithRedirect(auth, googleProvider); } catch (err) { toast('Не удалось войти через Google'); }
       }
     }
 
-    async function logoutUser() {
-      hangupCall();
-      await signOut(auth);
-      showScreen('splash');
-      toast('Вы вышли');
-    }
+    async function logoutUser() { hangupCall(); await signOut(auth); showScreen('splash'); toast('Вы вышли'); }
 
     onSnapshot(query(collection(db, 'posts'), orderBy('createdAt', 'desc')), (snap) => {
       const cloudPosts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -3923,23 +3837,12 @@
       renderVyruchkaTab();
     }, () => {});
 
-    function rebuildReadingIndex(list) {
-      readingByIdMap.clear();
-      list.forEach((item) => {
-        readingByIdMap.set(item.id, item);
-      });
-    }
+    function rebuildReadingIndex(list) { readingByIdMap.clear(); list.forEach((item) => readingByIdMap.set(item.id, item)); }
 
     onSnapshot(collection(db, 'books'), (snap) => {
       const merged = new Map();
-      INITIAL_READING_ITEMS.forEach((item) => {
-        const norm = normalizeReadingDoc(item, item.id);
-        merged.set(norm.id, norm);
-      });
-      snap.docs.forEach((d) => {
-        const norm = normalizeReadingDoc(d.data(), d.id);
-        merged.set(norm.id, norm);
-      });
+      INITIAL_READING_ITEMS.forEach((item) => merged.set(item.id, normalizeReadingDoc(item, item.id)));
+      snap.docs.forEach((d) => merged.set(d.id, normalizeReadingDoc(d.data(), d.id)));
       readingItems = Array.from(merged.values());
       rebuildReadingIndex(readingItems);
       renderBooksTab();
@@ -3952,9 +3855,7 @@
         state.cachedUsers = fresh.slice(0, 100);
         const myUid = getMyUid();
         const meCloud = myUid ? fresh.find((u) => u.uid === myUid) : null;
-        if (meCloud) {
-          mergeCloudAndLocalProfile(meCloud, false);
-        }
+        if (meCloud) mergeCloudAndLocalProfile(meCloud, false);
         silentHealMediaAndPosts();
         persist();
       }
@@ -3982,12 +3883,7 @@
 
     onSnapshot(collection(db, 'chats'), (snap) => {
       const myUid = getMyUid();
-      const sorted = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => {
-        const ta = a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0;
-        const tb = b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0;
-        return tb - ta;
-      });
-
+      const sorted = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.updatedAt?.toMillis ? b.updatedAt.toMillis() : 0) - (a.updatedAt?.toMillis ? a.updatedAt.toMillis() : 0));
       if (initialChatsLoaded && myUid) {
         sorted.forEach((c) => {
           const isMember = Array.isArray(c.members) ? c.members.includes(myUid) : true;
@@ -3998,19 +3894,13 @@
             notifiedChatLastMsg.set(c.id, sig);
             const senderTitle = getChatDisplayTitle(c);
             playTone('incoming');
-            if (activeChatId !== c.id) {
-              toast(`Новое от ${senderTitle}: ${c.lastMessage || 'сообщение'}`);
-            }
+            if (activeChatId !== c.id) toast(`Новое от ${senderTitle}: ${c.lastMessage || 'сообщение'}`);
           }
         });
       } else {
-        sorted.forEach((c) => {
-          const updMs = c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0;
-          notifiedChatLastMsg.set(c.id, `${c.lastMessage || ''}_${updMs}`);
-        });
+        sorted.forEach((c) => notifiedChatLastMsg.set(c.id, `${c.lastMessage || ''}_${c.updatedAt?.toMillis ? c.updatedAt.toMillis() : 0}`));
         initialChatsLoaded = true;
       }
-
       chats = sorted;
       renderGroupsTab();
       renderProfileChatsList();
@@ -4092,9 +3982,7 @@
       box.style.display = nextOpen ? 'block' : 'none';
       if (nextOpen) {
         const catSel = document.getElementById('vyruchkaCatSelect');
-        if (catSel && vyruchkaFilter !== 'all' && VYRUCKA_CATEGORIES[vyruchkaFilter]) {
-          catSel.value = vyruchkaFilter;
-        }
+        if (catSel && vyruchkaFilter !== 'all' && VYRUCKA_CATEGORIES[vyruchkaFilter]) catSel.value = vyruchkaFilter;
       } else {
         clearVyruchkaAttachment();
       }
@@ -4102,16 +3990,8 @@
 
     function setVyruchkaFilter(cat) {
       vyruchkaFilter = ['all', 'pharmacy24', 'cafe24', 'stay', 'tips'].includes(cat) ? cat : 'all';
-      const map = {
-        all: 'vFilterAll',
-        pharmacy24: 'vFilterPharmacy24',
-        cafe24: 'vFilterCafe24',
-        stay: 'vFilterStay',
-        tips: 'vFilterTips'
-      };
-      Object.entries(map).forEach(([k, id]) => {
-        document.getElementById(id)?.classList.toggle('active', k === vyruchkaFilter);
-      });
+      const map = { all: 'vFilterAll', pharmacy24: 'vFilterPharmacy24', cafe24: 'vFilterCafe24', stay: 'vFilterStay', tips: 'vFilterTips' };
+      Object.entries(map).forEach(([k, id]) => document.getElementById(id)?.classList.toggle('active', k === vyruchkaFilter));
       renderVyruchkaTab();
     }
 
@@ -4121,12 +4001,7 @@
       const title = (document.getElementById('vyruchkaTitleInput')?.value || '').trim();
       const location = (document.getElementById('vyruchkaLocationInput')?.value || '').trim();
       const details = (document.getElementById('vyruchkaDetailsInput')?.value || '').trim();
-
-      if (!title || !details) {
-        toast('Укажите название или суть и заметку');
-        return;
-      }
-
+      if (!title || !details) { toast('Укажите название или суть и заметку'); return; }
       if (!checkTextBeforeSubmit(`${title} ${location} ${details}`)) return;
 
       const creator = isCreatorAccount();
@@ -4173,10 +4048,8 @@
         createdAtMs: item.createdAtMs,
         createdAt: serverTimestamp()
       };
-
       const writeOp = () => setDoc(doc(db, 'vyruchka', item.id), cloudPayload, { merge: true });
       writeOp().catch(() => queueCloudRetry(writeOp));
-
       toast(creator ? 'Добавлено (автор скрыт)' : 'Отправлено на проверку');
     }
 
@@ -4186,10 +4059,7 @@
       vyruchkaItems = vyruchkaItems.map((x) => (x.id === targetId ? { ...x, status: 'approved' } : x));
       persist(false);
       renderVyruchkaTab();
-      const op = () => updateDoc(doc(db, 'vyruchka', targetId), {
-        status: 'approved',
-        reviewedAt: serverTimestamp()
-      });
+      const op = () => updateDoc(doc(db, 'vyruchka', targetId), { status: 'approved', reviewedAt: serverTimestamp() });
       op().catch(() => queueCloudRetry(op));
       toast('Запись опубликована');
     }
@@ -4211,7 +4081,6 @@
       const modList = document.getElementById('vyruchkaPendingList');
       const modBadge = document.getElementById('vyruchkaPendingBadge');
       if (!listEl) return;
-
       const creator = isCreatorAccount();
       const safeItems = vyruchkaItems.map((x) => normalizeVyruchkaDoc(x, x.id));
 
@@ -4223,13 +4092,7 @@
           modList.innerHTML = pending.length
             ? pending.map((item) => {
                 const pKey = `vr_pending_${item.id}`;
-                if (item.photoData) {
-                  photoViewerRegistry.set(pKey, {
-                    src: item.photoData,
-                    title: item.title,
-                    sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом')
-                  });
-                }
+                if (item.photoData) photoViewerRegistry.set(pKey, { src: item.photoData, title: item.title, sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом') });
                 return `
                   <div class="comment-item">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -4251,10 +4114,7 @@
         }
       }
 
-      const approvedFiltered = safeItems
-        .filter((x) => x.status === 'approved')
-        .filter((x) => vyruchkaFilter === 'all' || x.category === vyruchkaFilter);
-
+      const approvedFiltered = safeItems.filter((x) => x.status === 'approved').filter((x) => vyruchkaFilter === 'all' || x.category === vyruchkaFilter);
       if (!approvedFiltered.length) {
         listEl.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">Записей пока нет</div><div class="meta">Нажмите «+ Добавить точку или подсказку», чтобы внести первую запись.</div></div>';
         return;
@@ -4262,17 +4122,9 @@
 
       listEl.innerHTML = approvedFiltered.map((item) => {
         const showAuthor = !item.hideAuthor && !item.isDeveloperEntry;
-        const delBtn = creator
-          ? `<button type="button" class="pulse-act-btn" style="color:var(--danger);" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>`
-          : '';
+        const delBtn = creator ? `<button type="button" class="pulse-act-btn" style="color:var(--danger);" onclick="deleteVyruchkaItem('${esc(item.id)}')">Удалить</button>` : '';
         const photoKey = `vr_photo_${item.id}`;
-        if (item.photoData) {
-          photoViewerRegistry.set(photoKey, {
-            src: item.photoData,
-            title: item.title,
-            sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом')
-          });
-        }
+        if (item.photoData) photoViewerRegistry.set(photoKey, { src: item.photoData, title: item.title, sub: item.location || (VYRUCKA_CATEGORIES[item.category] || 'Выручка рядом') });
         return `
           <article class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -4294,23 +4146,13 @@
 
     function openUnifiedSearchModal() {
       try {
-        if (!getMyUid()) {
-          toast('Войдите в аккаунт, чтобы искать людей и бизнес');
-          return;
-        }
+        if (!getMyUid()) { toast('Войдите в аккаунт, чтобы искать людей и бизнес'); return; }
         pingOnlinePresence();
         const inp = document.getElementById('unifiedSearchInput');
-        if (inp) {
-          inp.value = '';
-          setTimeout(() => {
-            try { inp.focus(); } catch (e) {}
-          }, 60);
-        }
+        if (inp) { inp.value = ''; setTimeout(() => { try { inp.focus(); } catch (e) {} }, 60); }
         setUnifiedSearchTab(unifiedSearchTab || 'all');
         document.getElementById('unifiedSearchModal')?.classList.add('open');
-      } catch (e) {
-        toast('Не удалось открыть поиск');
-      }
+      } catch (e) { toast('Не удалось открыть поиск'); }
     }
 
     function setUnifiedSearchTab(tab) {
@@ -4330,45 +4172,29 @@
         if (!found) return '';
         const raw = String(found.caption || found.body || '').trim();
         return raw.length > 76 ? raw.slice(0, 76) + '...' : raw;
-      } catch (e) {
-        return '';
-      }
+      } catch (e) { return ''; }
     }
 
-    function isUserOnlineNow(u) {
-      const ts = Number(u?.lastSeenMs || 0);
-      return Boolean(ts && (Date.now() - ts) <= ONLINE_WINDOW_MS);
-    }
+    function isUserOnlineNow(u) { const ts = Number(u?.lastSeenMs || 0); return Boolean(ts && (Date.now() - ts) <= ONLINE_WINDOW_MS); }
 
     function findSearchUserByUid(uid) {
       if (!uid) return null;
       const strUid = String(uid);
-      if (Array.isArray(users)) {
-        const hit = users.find((u) => u && String(u.uid || '') === strUid);
-        if (hit) return hit;
-      }
-      if (Array.isArray(state.cachedUsers)) {
-        const cachedHit = state.cachedUsers.find((u) => u && String(u.uid || '') === strUid);
-        if (cachedHit) return cachedHit;
-      }
+      if (Array.isArray(users)) { const hit = users.find((u) => u && String(u.uid || '') === strUid); if (hit) return hit; }
+      if (Array.isArray(state.cachedUsers)) { const cachedHit = state.cachedUsers.find((u) => u && String(u.uid || '') === strUid); if (cachedHit) return cachedHit; }
       return null;
     }
 
     function getRegisteredSearchPool() {
       const poolMap = new Map();
-      const allSources = [
-        ...(Array.isArray(state.cachedUsers) ? state.cachedUsers : []),
-        ...(Array.isArray(users) ? users : [])
-      ];
+      const allSources = [...(Array.isArray(state.cachedUsers) ? state.cachedUsers : []), ...(Array.isArray(users) ? users : [])];
       allSources.forEach((u) => {
         if (!u || !u.uid) return;
         const uidStr = String(u.uid).trim();
         if (!uidStr || uidStr.startsWith('by_name:')) return;
         const prev = poolMap.get(uidStr) || {};
         poolMap.set(uidStr, {
-          ...prev,
-          ...u,
-          uid: uidStr,
+          ...prev, ...u, uid: uidStr,
           fullName: String(u.fullName || prev.fullName || 'Участник').trim() || 'Участник',
           accountType: normalizeAccountType(u.accountType || prev.accountType),
           hideFromSearch: typeof u.hideFromSearch === 'boolean' ? u.hideFromSearch : Boolean(prev.hideFromSearch),
@@ -4384,33 +4210,21 @@
       try {
         const target = ev && ev.target ? ev.target.closest('[data-search-action]') : null;
         if (!target) return;
-        ev.preventDefault();
-        ev.stopPropagation();
-
+        ev.preventDefault(); ev.stopPropagation();
         const action = String(target.getAttribute('data-search-action') || '');
         const uid = String(target.getAttribute('data-uid') || '').trim();
         if (!uid) return;
-
         const userObj = findSearchUserByUid(uid);
         const safeName = String(userObj?.fullName || 'Участник');
-
-        if (action === 'open_profile') {
-          hideModal('unifiedSearchModal');
-          if (typeof openPersonPage === 'function') openPersonPage(uid, safeName);
-        } else if (action === 'open_chat') {
-          hideModal('unifiedSearchModal');
-          if (typeof openDirectChat === 'function') await openDirectChat(uid, safeName);
-        } else if (action === 'add_friend') {
-          if (typeof addFriend === 'function') await addFriend(uid, safeName);
-          renderUnifiedSearch();
-        } else if (action === 'accept_friend') {
+        if (action === 'open_profile') { hideModal('unifiedSearchModal'); if (typeof openPersonPage === 'function') openPersonPage(uid, safeName); }
+        else if (action === 'open_chat') { hideModal('unifiedSearchModal'); if (typeof openDirectChat === 'function') await openDirectChat(uid, safeName); }
+        else if (action === 'add_friend') { if (typeof addFriend === 'function') await addFriend(uid, safeName); renderUnifiedSearch(); }
+        else if (action === 'accept_friend') {
           const reqId = String(target.getAttribute('data-req-id') || '').trim();
           if (typeof acceptFriendReq === 'function') await acceptFriendReq(reqId, uid, safeName);
           renderUnifiedSearch();
         }
-      } catch (e) {
-        toast('Не удалось выполнить действие');
-      }
+      } catch (e) { toast('Не удалось выполнить действие'); }
     }
 
     function renderUnifiedSearch() {
@@ -4418,7 +4232,6 @@
         const box = document.getElementById('unifiedSearchList');
         const sumEl = document.getElementById('searchResultsSummary');
         if (!box) return;
-
         const myUid = String(getMyUid() || '');
         const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
         const visiblePool = getRegisteredSearchPool().filter((u) => {
@@ -4433,7 +4246,6 @@
             const isBiz = normalizeAccountType(u.accountType) === 'business';
             if (unifiedSearchTab === 'users' && isBiz) return false;
             if (unifiedSearchTab === 'business' && !isBiz) return false;
-
             if (!q) return true;
             const nameDisp = String(u.fullName || '').toLowerCase();
             const namePlain = String(u.namePlain || '').toLowerCase();
@@ -4451,14 +4263,8 @@
             return Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0);
           });
 
-        if (sumEl) {
-          sumEl.textContent = `В поиске SÄT: ${visiblePool.length} • Найдено: ${matched.length}`;
-        }
-
-        if (!matched.length) {
-          box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Проверьте написание имени или выберите вкладку «Все».</div>';
-          return;
-        }
+        if (sumEl) sumEl.textContent = `В поиске SÄT: ${visiblePool.length} • Найдено: ${matched.length}`;
+        if (!matched.length) { box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Проверьте написание имени или выберите вкладку «Все».</div>'; return; }
 
         box.innerHTML = matched.map((u) => {
           const uidStr = String(u.uid);
@@ -4468,9 +4274,7 @@
           const badge = isBiz ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Бизнес</span>' : '';
           const meBadge = isMe ? '<span class="tag" style="margin-left: 6px; padding: 2px 8px; font-size: 11px;">Вы</span>' : '';
           const adLine = getLatestPostTextForUid(uidStr);
-          const subDesc = adLine
-            ? `Публикация: ${adLine}`
-            : String(u.bio || (isBiz ? 'Зарегистрированный бизнес в SÄT' : 'Зарегистрированный участник SÄT'));
+          const subDesc = adLine ? `Публикация: ${adLine}` : String(u.bio || (isBiz ? 'Зарегистрированный бизнес в SÄT' : 'Зарегистрированный участник SÄT'));
 
           let actionRight = '';
           if (!isMe) {
@@ -4488,10 +4292,7 @@
             `;
           }
 
-          const avaHtml = u.photoData
-            ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />`
-            : esc((name[0] || 'S').toUpperCase());
-
+          const avaHtml = u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((name[0] || 'S').toUpperCase());
           return `
             <div class="list-item">
               <div class="post-user" data-search-action="open_profile" data-uid="${esc(uidStr)}">
@@ -4531,19 +4332,14 @@
       const myUid = getMyUid();
       const badgeText = kind === 'tips' ? 'Краткий совет' : 'Короткая история';
       const emptyText = kind === 'tips' ? 'Кратких советов пока нет.' : 'Коротких историй пока нет.';
-
-      if (!items.length) {
-        return `<div class="meta" style="padding: 6px 0;">${esc(emptyText)}</div>`;
-      }
+      if (!items.length) return `<div class="meta" style="padding: 6px 0;">${esc(emptyText)}</div>`;
 
       return items.map((item) => {
         const canDelete = creator || (myUid && item.authorUid && item.authorUid === myUid);
         const cover = getReadingCoverSrc(item);
         return `
           <div style="padding: 12px 0; border-top: 1px solid var(--border);">
-            <div class="book-cover-card" onclick="openReadingItem('${esc(item.id)}')">
-              <img src="${esc(cover)}" alt="" draggable="false" />
-            </div>
+            <div class="book-cover-card" onclick="openReadingItem('${esc(item.id)}')"><img src="${esc(cover)}" alt="" draggable="false" /></div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
               <div style="min-width: 0; flex: 1;">
                 <div class="user-name">${esc(item.title)}</div>
@@ -4573,8 +4369,8 @@
       const creator = isCreatorAccount();
       const myUid = getMyUid();
       const safeItems = readingItems.map((item) => normalizeReadingDoc(item, item.id));
-
       const pendingItems = safeItems.filter((item) => item.status === 'pending');
+
       if (modCard && modList && modBadge) {
         modCard.style.display = creator ? 'block' : 'none';
         modBadge.textContent = String(pendingItems.length);
@@ -4599,16 +4395,11 @@
         }
       }
 
-      const approvedStories = safeItems.filter((item) => item.status === 'approved' && item.kind === 'stories');
-      const approvedTips = safeItems.filter((item) => item.status === 'approved' && item.kind === 'tips');
-
-      storiesBox.innerHTML = renderReadingCardList(approvedStories, 'stories');
-      tipsBox.innerHTML = renderReadingCardList(approvedTips, 'tips');
+      storiesBox.innerHTML = renderReadingCardList(safeItems.filter((item) => item.status === 'approved' && item.kind === 'stories'), 'stories');
+      tipsBox.innerHTML = renderReadingCardList(safeItems.filter((item) => item.status === 'approved' && item.kind === 'tips'), 'tips');
 
       if (mySubCard && mySubList) {
-        const myPending = myUid
-          ? safeItems.filter((item) => item.authorUid === myUid && item.status === 'pending')
-          : [];
+        const myPending = myUid ? safeItems.filter((item) => item.authorUid === myUid && item.status === 'pending') : [];
         mySubCard.style.display = myPending.length ? 'block' : 'none';
         mySubList.innerHTML = myPending.map((item) => `
           <div class="list-item">
@@ -4624,77 +4415,43 @@
 
     function openReadingItem(id) {
       const item = readingByIdMap.get(String(id || ''));
-      if (!item) {
-        toast('Текст не найден');
-        return;
-      }
+      if (!item) { toast('Текст не найден'); return; }
       const coverWrap = document.getElementById('readingModalCoverWrap');
       const coverImg = document.getElementById('readingModalCoverImg');
       const coverSrc = getReadingCoverSrc(item);
-      if (coverWrap && coverImg && coverSrc) {
-        coverImg.src = coverSrc;
-        coverWrap.style.display = 'block';
-      } else if (coverWrap) {
-        coverWrap.style.display = 'none';
-      }
+      if (coverWrap && coverImg && coverSrc) { coverImg.src = coverSrc; coverWrap.style.display = 'block'; }
+      else if (coverWrap) { coverWrap.style.display = 'none'; }
       document.getElementById('readingModalTitle').textContent = item.title || 'Текст';
       document.getElementById('readingModalMeta').textContent = item.audience || (item.kind === 'tips' ? 'Краткий совет' : 'Короткая история');
       const bodyEl = document.getElementById('readingModalBody');
-      if (bodyEl) {
-        bodyEl.textContent = item.content || item.summary || '';
-        bodyEl.style.fontSize = `${readingFontSize}px`;
-      }
+      if (bodyEl) { bodyEl.textContent = item.content || item.summary || ''; bodyEl.style.fontSize = `${readingFontSize}px`; }
       const scr = document.getElementById('readingViewerModal');
-      if (scr) {
-        scr.classList.add('open');
-        const scrollBox = scr.querySelector('.reader-scroll');
-        if (scrollBox) scrollBox.scrollTop = 0;
-      }
+      if (scr) { scr.classList.add('open'); const scrollBox = scr.querySelector('.reader-scroll'); if (scrollBox) scrollBox.scrollTop = 0; }
     }
 
-    function closeReadingViewer() {
-      document.getElementById('readingViewerModal')?.classList.remove('open');
-    }
-
-    function toggleReaderPaperMode() {
-      document.getElementById('readingViewerModal')?.classList.toggle('paper-mode');
-    }
-
+    function closeReadingViewer() { document.getElementById('readingViewerModal')?.classList.remove('open'); }
+    function toggleReaderPaperMode() { document.getElementById('readingViewerModal')?.classList.toggle('paper-mode'); }
     function changeReadingFont(delta) {
       readingFontSize = Math.min(24, Math.max(13, readingFontSize + delta));
       const bodyEl = document.getElementById('readingModalBody');
       if (bodyEl) bodyEl.style.fontSize = `${readingFontSize}px`;
     }
 
-    function openAddReadingModal() {
-      clearReadingAttachment();
-      document.getElementById('addReadingModal')?.classList.add('open');
-    }
+    function openAddReadingModal() { clearReadingAttachment(); document.getElementById('addReadingModal')?.classList.add('open'); }
 
     async function saveNewReadingItem() {
       const kind = document.getElementById('readingKindSelect')?.value === 'tips' ? 'tips' : 'stories';
       const title = (document.getElementById('readingTitleInput')?.value || '').trim();
       const summary = (document.getElementById('readingDescInput')?.value || '').trim();
       const content = (document.getElementById('readingContentInput')?.value || '').trim();
-      if (!title || !content) {
-        toast('Укажите заголовок и текст');
-        return;
-      }
+      if (!title || !content) { toast('Укажите заголовок и текст'); return; }
       if (!checkTextBeforeSubmit(`${title} ${summary} ${content}`)) return;
 
       const myUid = getMyUid();
       const newItem = normalizeReadingDoc({
-        kind,
-        status: 'pending',
-        authorUid: myUid || 'guest',
-        authorName: myDisplayName(),
-        audience: kind === 'tips' ? 'Краткий совет' : 'Короткая история',
-        title,
-        summary,
-        content,
-        photoData: draftReadingPhoto || ''
+        kind, status: 'pending', authorUid: myUid || 'guest', authorName: myDisplayName(),
+        audience: kind === 'tips' ? 'Краткий совет' : 'Короткая история', title, summary, content, photoData: draftReadingPhoto || ''
       });
-
       document.getElementById('readingTitleInput').value = '';
       document.getElementById('readingDescInput').value = '';
       document.getElementById('readingContentInput').value = '';
@@ -4703,16 +4460,8 @@
 
       try {
         const ref = await addDoc(collection(db, 'books'), {
-          kind: newItem.kind,
-          status: 'pending',
-          authorUid: newItem.authorUid,
-          authorName: newItem.authorName,
-          audience: newItem.audience,
-          title: newItem.title,
-          summary: newItem.summary,
-          content: newItem.content,
-          photoData: newItem.photoData,
-          createdAt: serverTimestamp()
+          kind: newItem.kind, status: 'pending', authorUid: newItem.authorUid, authorName: newItem.authorName,
+          audience: newItem.audience, title: newItem.title, summary: newItem.summary, content: newItem.content, photoData: newItem.photoData, createdAt: serverTimestamp()
         });
         const saved = normalizeReadingDoc({ ...newItem, id: ref.id }, ref.id);
         readingByIdMap.set(saved.id, saved);
@@ -4724,16 +4473,8 @@
         readingItems = [newItem, ...readingItems.filter((x) => x.id !== newItem.id)];
         renderBooksTab();
         queueCloudRetry(() => addDoc(collection(db, 'books'), {
-          kind: newItem.kind,
-          status: 'pending',
-          authorUid: newItem.authorUid,
-          authorName: newItem.authorName,
-          audience: newItem.audience,
-          title: newItem.title,
-          summary: newItem.summary,
-          content: newItem.content,
-          photoData: newItem.photoData,
-          createdAt: serverTimestamp()
+          kind: newItem.kind, status: 'pending', authorUid: newItem.authorUid, authorName: newItem.authorName,
+          audience: newItem.audience, title: newItem.title, summary: newItem.summary, content: newItem.content, photoData: newItem.photoData, createdAt: serverTimestamp()
         }));
         toast('Сохраним и отправим при связи');
       }
@@ -4747,19 +4488,8 @@
       readingByIdMap.set(updated.id, updated);
       readingItems = readingItems.map((x) => (x.id === updated.id ? updated : x));
       renderBooksTab();
-      try {
-        await updateDoc(doc(db, 'books', updated.id), {
-          status: 'approved',
-          reviewedAt: serverTimestamp()
-        });
-        toast('Одобрено и опубликовано');
-      } catch (e) {
-        queueCloudRetry(() => updateDoc(doc(db, 'books', updated.id), {
-          status: 'approved',
-          reviewedAt: serverTimestamp()
-        }));
-        toast('Одобрено, синхронизируем при связи');
-      }
+      try { await updateDoc(doc(db, 'books', updated.id), { status: 'approved', reviewedAt: serverTimestamp() }); toast('Одобрено и опубликовано'); }
+      catch (e) { queueCloudRetry(() => updateDoc(doc(db, 'books', updated.id), { status: 'approved', reviewedAt: serverTimestamp() })); toast('Одобрено, синхронизируем при связи'); }
     }
 
     async function deleteReadingItem(id) {
@@ -4768,20 +4498,12 @@
       const item = readingByIdMap.get(targetId);
       const myUid = getMyUid();
       const canDelete = isCreatorAccount() || (myUid && item && item.authorUid === myUid);
-      if (!canDelete) {
-        toast('Удалять можно только свои записи');
-        return;
-      }
+      if (!canDelete) { toast('Удалять можно только свои записи'); return; }
       readingByIdMap.delete(targetId);
       readingItems = readingItems.filter((x) => x.id !== targetId);
       renderBooksTab();
-      try {
-        await deleteDoc(doc(db, 'books', targetId));
-        toast('Удалено');
-      } catch (e) {
-        queueCloudRetry(() => deleteDoc(doc(db, 'books', targetId)));
-        toast('Удалим при восстановлении связи');
-      }
+      try { await deleteDoc(doc(db, 'books', targetId)); toast('Удалено'); }
+      catch (e) { queueCloudRetry(() => deleteDoc(doc(db, 'books', targetId))); toast('Удалим при восстановлении связи'); }
     }
 
     function switchCreatorTab(tab) {
@@ -4797,7 +4519,6 @@
     function renderCreatorDashboard() {
       if (!isCreatorAccount()) return;
       syncSupportAndMonitorCard();
-
       const tBox = document.getElementById('cPanelTickets');
       if (tBox) {
         tBox.innerHTML = supportTickets.length
@@ -4873,35 +4594,16 @@
     async function sendSupportMessage() {
       const inp = document.getElementById('supportMsgInput');
       const text = (inp ? inp.value : '').trim();
-      if (!text) {
-        toast('Напишите сообщение');
-        return;
-      }
+      if (!text) { toast('Напишите сообщение'); return; }
       if (!checkTextBeforeSubmit(text)) return;
-
       inp.value = '';
       hideModal('supportModal');
-
-      const payload = {
-        senderUid: getMyUid() || 'guest',
-        senderName: myDisplayName(),
-        text,
-        time: formatTime(Date.now()),
-        createdAt: serverTimestamp()
-      };
-
-      try {
-        await addDoc(collection(db, 'support_tickets'), payload);
-        toast('Сообщение отправлено в техподдержку');
-      } catch (e) {
-        queueCloudRetry(() => addDoc(collection(db, 'support_tickets'), payload));
-        toast('Отправим при восстановлении связи');
-      }
+      const payload = { senderUid: getMyUid() || 'guest', senderName: myDisplayName(), text, time: formatTime(Date.now()), createdAt: serverTimestamp() };
+      try { await addDoc(collection(db, 'support_tickets'), payload); toast('Сообщение отправлено в техподдержку'); }
+      catch (e) { queueCloudRetry(() => addDoc(collection(db, 'support_tickets'), payload)); toast('Отправим при восстановлении связи'); }
     }
 
-    async function deleteSupportTicket(id) {
-      try { await deleteDoc(doc(db, 'support_tickets', id)); } catch (e) {}
-    }
+    async function deleteSupportTicket(id) { try { await deleteDoc(doc(db, 'support_tickets', id)); } catch (e) {} }
 
     function switchMainTab(tab, btn) {
       window.closeAllSideDrawers?.();
@@ -4916,16 +4618,8 @@
 
     function setPulseFilter(f) {
       pulseFilter = ['all', 'posts', 'news', 'walks', 'cafe'].includes(f) ? f : 'all';
-      const map = {
-        all: 'pFilterAll',
-        posts: 'pFilterPosts',
-        news: 'pFilterNews',
-        walks: 'pFilterWalks',
-        cafe: 'pFilterCafe'
-      };
-      Object.entries(map).forEach(([k, id]) => {
-        document.getElementById(id)?.classList.toggle('active', k === pulseFilter);
-      });
+      const map = { all: 'pFilterAll', posts: 'pFilterPosts', news: 'pFilterNews', walks: 'pFilterWalks', cafe: 'pFilterCafe' };
+      Object.entries(map).forEach(([k, id]) => document.getElementById(id)?.classList.toggle('active', k === pulseFilter));
       renderPulse();
     }
 
@@ -4959,11 +4653,7 @@
       if (!target) return;
       const key = target.getAttribute('data-view-photo');
       const item = photoViewerRegistry.get(key);
-      if (item && item.src) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        openImageViewer(item.src, item.title || 'Фото', item.sub || '');
-      }
+      if (item && item.src) { ev.preventDefault(); ev.stopPropagation(); openImageViewer(item.src, item.title || 'Фото', item.sub || ''); }
     });
 
     function renderMyProfile() {
@@ -4974,23 +4664,15 @@
       document.getElementById('myNameText').textContent = name;
       const roleBadge = document.getElementById('myAccountRoleBadge');
       if (roleBadge) roleBadge.innerHTML = renderAccountBadgeHtml(state.accountType);
-
-      const bioText = state.bio || (isBiz ? 'Бизнес-аккаунт SÄT' : 'Мой профиль SÄT');
-      document.getElementById('myBioText').textContent = bioText;
+      document.getElementById('myBioText').textContent = state.bio || (isBiz ? 'Бизнес-аккаунт SÄT' : 'Мой профиль SÄT');
 
       const qMeta = document.getElementById('myQuestionnaireMeta');
       if (qMeta) {
         const searchHint = state.hideFromSearch ? ' • Скрыта из общего поиска' : '';
-        qMeta.textContent = (isBiz
-          ? 'Анкета бизнес-аккаунта • Видна при переходе на страницу'
-          : 'Анкета пользователя • Видна при переходе на страницу') + searchHint;
+        qMeta.textContent = (isBiz ? 'Анкета бизнес-аккаунта • Видна при переходе на страницу' : 'Анкета пользователя • Видна при переходе на страницу') + searchHint;
       }
       const qBody = document.getElementById('myQuestionnaireText');
-      if (qBody) {
-        qBody.textContent = state.bio
-          ? state.bio
-          : 'Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.';
-      }
+      if (qBody) qBody.textContent = state.bio ? state.bio : 'Расскажите коротко о себе или своём деле — другие пользователи увидят это в вашей анкете.';
 
       const myOnlineBadge = document.getElementById('myOnlineBadge');
       if (myOnlineBadge) {
@@ -5024,11 +4706,7 @@
       } else {
         pGrid.innerHTML = galleryList.map((item, i) => {
           const key = `my_gal_${i}`;
-          photoViewerRegistry.set(key, {
-            src: item.src,
-            title: name,
-            sub: item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}`
-          });
+          photoViewerRegistry.set(key, { src: item.src, title: name, sub: item.caption ? `Фото #${i + 1} • ${item.caption}` : `Фото #${i + 1}` });
           return `
             <div class="photo-cell" data-view-photo="${key}">
               <button type="button" class="photo-del-btn" onclick="deleteGalleryPhoto(${i}, event)">✕</button>
@@ -5083,31 +4761,12 @@
       const val = (document.getElementById('captionInput')?.value || '').trim().slice(0, 120);
       if (val && !checkTextBeforeSubmit(val)) return;
       hideModal('captionBox');
-      if (_capResolver) {
-        const fn = _capResolver;
-        _capResolver = null;
-        fn(val);
-      }
+      if (_capResolver) { const fn = _capResolver; _capResolver = null; fn(val); }
     }
 
-    function openPhotoPicker(target) {
-      pickTarget = target;
-      document.getElementById('photoPickerModal')?.classList.add('open');
-    }
-
-    function startCamera() {
-      hideModal('photoPickerModal');
-      const el = document.getElementById('camInput');
-      el.value = '';
-      el.click();
-    }
-
-    function startGallery() {
-      hideModal('photoPickerModal');
-      const el = document.getElementById('galInput');
-      el.value = '';
-      el.click();
-    }
+    function openPhotoPicker(target) { pickTarget = target; document.getElementById('photoPickerModal')?.classList.add('open'); }
+    function startCamera() { hideModal('photoPickerModal'); const el = document.getElementById('camInput'); el.value = ''; el.click(); }
+    function startGallery() { hideModal('photoPickerModal'); const el = document.getElementById('galInput'); el.value = ''; el.click(); }
 
     function onImageChosen(e) {
       const file = e.target.files?.[0];
@@ -5117,7 +4776,6 @@
         const img = new Image();
         img.onload = async () => {
           const canvas = document.createElement('canvas');
-          // Компактное сжатие, чтобы документ пользователя в Firestore никогда не переполнялся
           const maxD = pickTarget === 'avatar' ? 360 : 760;
           const quality = pickTarget === 'avatar' ? 0.74 : 0.72;
           const sc = Math.min(1, maxD / Math.max(img.width || 1, img.height || 1));
@@ -5127,26 +4785,20 @@
           const dataUrl = canvas.toDataURL('image/jpeg', quality);
 
           if (pickTarget === 'avatar') {
-            state.avatar = dataUrl;
-            addSavedPhoto(dataUrl);
-            renderMyProfile();
+            state.avatar = dataUrl; addSavedPhoto(dataUrl); renderMyProfile();
             await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Фото профиля сохранено');
           } else if (pickTarget === 'story') {
             const cap = await askPhotoCaption('Подпись к сторис');
             const now = Date.now();
-            state.story = dataUrl;
-            state.storyStart = now;
-            state.storyEnd = now + STORY_TTL;
+            state.story = dataUrl; state.storyStart = now; state.storyEnd = now + STORY_TTL;
             state.storyLabel = cap ? `${formatTime(now)} • ${cap}` : formatTime(now);
-            persist();
-            renderMyProfile();
+            persist(); renderMyProfile();
             await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Сторис опубликована на 3 часа');
           } else if (pickTarget === 'gallery_add') {
             const cap = await askPhotoCaption('Подпись к фото');
-            addSavedPhoto(dataUrl, cap);
-            renderMyProfile();
+            addSavedPhoto(dataUrl, cap); renderMyProfile();
             await syncProfileCloud(currentUser, { explicitMediaChange: true });
             toast('Фото добавлено в альбом');
           } else if (pickTarget === 'post') {
@@ -5185,10 +4837,7 @@
       document.getElementById('avatarChoiceModal')?.classList.add('open');
     }
 
-    function pickChoiceAndOpen(src, title, sub) {
-      hideModal('avatarChoiceModal');
-      openImageViewer(src, title, sub);
-    }
+    function pickChoiceAndOpen(src, title, sub) { hideModal('avatarChoiceModal'); openImageViewer(src, title, sub); }
 
     function onMyAvatarTap() {
       checkOwnStoryExpiry();
@@ -5198,29 +4847,17 @@
       showAvatarChoiceModal({
         title: myDisplayName(),
         sub: hasStory && ava ? 'Выберите, что посмотреть' : (hasStory ? 'Активна сторис (до 3 ч)' : 'Фото профиля'),
-        avatarSrc: ava,
-        avatarTitle: myDisplayName(),
-        avatarSub: 'Фото профиля',
-        storySrc: hasStory ? state.story : '',
-        storyTitle: myDisplayName(),
-        storySub: `Сторис • ${state.storyLabel}`
+        avatarSrc: ava, avatarTitle: myDisplayName(), avatarSub: 'Фото профиля',
+        storySrc: hasStory ? state.story : '', storyTitle: myDisplayName(), storySub: `Сторис • ${state.storyLabel}`
       });
     }
 
-    function viewOwnStory() {
-      checkOwnStoryExpiry();
-      if (state.story) openImageViewer(state.story, myDisplayName(), `Сторис • ${state.storyLabel}`);
-    }
+    function viewOwnStory() { checkOwnStoryExpiry(); if (state.story) openImageViewer(state.story, myDisplayName(), `Сторис • ${state.storyLabel}`); }
 
     async function removeOwnStory() {
       state.story = ''; state.storyStart = 0; state.storyEnd = 0; state.storyLabel = '';
-      try {
-        const v = loadMediaVault();
-        v.story = ''; v.storyStart = 0; v.storyEnd = 0; v.storyLabel = '';
-        localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v));
-      } catch (e) {}
-      persist();
-      renderMyProfile();
+      try { const v = loadMediaVault(); v.story = ''; v.storyStart = 0; v.storyEnd = 0; v.storyLabel = ''; localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v)); } catch (e) {}
+      persist(); renderMyProfile();
       await syncProfileCloud(currentUser, { explicitMediaChange: true });
       toast('Сторис удалена');
     }
@@ -5236,15 +4873,11 @@
       }
       const img = document.getElementById('viewerImage');
       const lbl = document.getElementById('viewerScaleLabel');
-      if (img) {
-        img.style.transition = vMode === 'none' ? 'transform 0.14s ease' : 'none';
-        img.style.transform = `translate3d(${Math.round(vPanX)}px, ${Math.round(vPanY)}px, 0) scale(${vScale})`;
-      }
+      if (img) { img.style.transition = vMode === 'none' ? 'transform 0.14s ease' : 'none'; img.style.transform = `translate3d(${Math.round(vPanX)}px, ${Math.round(vPanY)}px, 0) scale(${vScale})`; }
       if (lbl) lbl.textContent = vScale > 1 ? `Масштаб: ${Math.round(vScale * 100)}% • Двигайте пальцем` : 'Растяните двумя пальцами • Двигайте влево/вправо';
     }
 
     function resetViewerTransform() { vMode = 'none'; vScale = 1; vPanX = 0; vPanY = 0; applyViewerTransform(); }
-
     function openImageViewer(src, title, sub) {
       if (!src) return;
       document.getElementById('viewerTitle').textContent = title || 'Фото';
@@ -5253,11 +4886,7 @@
       resetViewerTransform();
       document.getElementById('fullViewer')?.classList.add('open');
     }
-
-    function closeFullViewer() {
-      resetViewerTransform();
-      document.getElementById('fullViewer')?.classList.remove('open');
-    }
+    function closeFullViewer() { resetViewerTransform(); document.getElementById('fullViewer')?.classList.remove('open'); }
 
     function dataUrlToFile(dataUrl, fileName = 'sat-photo.jpg') {
       const parts = String(dataUrl || '').split(',');
@@ -5267,18 +4896,12 @@
       const byteString = atob(parts[1]);
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      const blob = new Blob([ab], { type: mime });
-      return new File([blob], fileName, { type: mime });
+      for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+      return new File([new Blob([ab], { type: mime })], fileName, { type: mime });
     }
 
     async function savePhotoDirectToGallery(src, prefix = 'sat-photo') {
-      if (!src) {
-        toast('Нет фото для сохранения');
-        return;
-      }
+      if (!src) { toast('Нет фото для сохранения'); return; }
       const fileName = `${prefix}-${Date.now()}.jpg`;
       try {
         if (src.startsWith('data:') && navigator.share && typeof File !== 'undefined') {
@@ -5289,41 +4912,19 @@
             return;
           }
         }
-      } catch (e) {
-        if (e && e.name === 'AbortError') return;
-      }
-
+      } catch (e) { if (e && e.name === 'AbortError') return; }
       try {
+        const a = document.createElement('a');
         if (src.startsWith('data:')) {
-          const file = dataUrlToFile(src, fileName);
-          const url = URL.createObjectURL(file);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+          const url = URL.createObjectURL(dataUrlToFile(src, fileName));
+          a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a);
           setTimeout(() => URL.revokeObjectURL(url), 4000);
-        } else {
-          const a = document.createElement('a');
-          a.href = src;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
+        } else { a.href = src; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
         toast('Фото сохранено в галерею / загрузки');
-      } catch (err) {
-        toast('Удерживайте фото для сохранения в галерею');
-      }
+      } catch (err) { toast('Удерживайте фото для сохранения в галерею'); }
     }
 
-    function downloadCurrentViewerPhoto() {
-      const img = document.getElementById('viewerImage');
-      const src = img ? img.getAttribute('src') : '';
-      savePhotoDirectToGallery(src, 'sat-post');
-    }
-
+    function downloadCurrentViewerPhoto() { const img = document.getElementById('viewerImage'); savePhotoDirectToGallery(img ? img.getAttribute('src') : '', 'sat-post'); }
     function getTouchDist(t1, t2) { return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY); }
 
     (function bindViewerTouchGestures() {
@@ -5332,22 +4933,13 @@
       stage.addEventListener('touchstart', (e) => {
         if (!document.getElementById('fullViewer')?.classList.contains('open')) return;
         if (e.touches.length === 2) {
-          e.preventDefault();
-          vMode = 'pinch';
-          vStartDist = Math.max(10, getTouchDist(e.touches[0], e.touches[1]));
-          vStartScale = vScale;
-          vStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          vStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          e.preventDefault(); vMode = 'pinch';
+          vStartDist = Math.max(10, getTouchDist(e.touches[0], e.touches[1])); vStartScale = vScale;
+          vStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2; vStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
           vPanOriginX = vPanX; vPanOriginY = vPanY;
         } else if (e.touches.length === 1) {
-          const t = e.touches[0];
-          const now = Date.now();
-          if (now - vLastTap < 300) {
-            e.preventDefault(); vMode = 'none';
-            vScale = vScale > 1.05 ? 1 : 2.2;
-            if (vScale === 1) { vPanX = 0; vPanY = 0; }
-            applyViewerTransform(); vLastTap = 0; return;
-          }
+          const t = e.touches[0]; const now = Date.now();
+          if (now - vLastTap < 300) { e.preventDefault(); vMode = 'none'; vScale = vScale > 1.05 ? 1 : 2.2; if (vScale === 1) { vPanX = 0; vPanY = 0; } applyViewerTransform(); vLastTap = 0; return; }
           vLastTap = now; vStartX = t.clientX; vStartY = t.clientY; vPanOriginX = vPanX; vPanOriginY = vPanY; vMode = 'pan';
         }
       }, { passive: false });
@@ -5356,19 +4948,13 @@
         if (!document.getElementById('fullViewer')?.classList.contains('open')) return;
         if (vMode === 'pinch' && e.touches.length === 2) {
           e.preventDefault();
-          const dist = Math.max(10, getTouchDist(e.touches[0], e.touches[1]));
-          vScale = vStartScale * (dist / vStartDist);
-          const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-          vPanX = vPanOriginX + (cx - vStartX); vPanY = vPanOriginY + (cy - vStartY);
-          applyViewerTransform();
+          vScale = vStartScale * (Math.max(10, getTouchDist(e.touches[0], e.touches[1])) / vStartDist);
+          const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2; const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          vPanX = vPanOriginX + (cx - vStartX); vPanY = vPanOriginY + (cy - vStartY); applyViewerTransform();
         } else if (vMode === 'pan' && e.touches.length === 1) {
           e.preventDefault();
-          const t = e.touches[0];
-          const dx = t.clientX - vStartX; const dy = t.clientY - vStartY;
-          vPanX = vPanOriginX + (vScale > 1 ? dx : dx * 0.65);
-          vPanY = vPanOriginY + (vScale > 1 ? dy : dy * 0.45);
-          applyViewerTransform();
+          const t = e.touches[0]; const dx = t.clientX - vStartX; const dy = t.clientY - vStartY;
+          vPanX = vPanOriginX + (vScale > 1 ? dx : dx * 0.65); vPanY = vPanOriginY + (vScale > 1 ? dy : dy * 0.45); applyViewerTransform();
         }
       }, { passive: false });
 
@@ -5385,11 +4971,9 @@
     function updatePostDestExplanation(d) {
       const box = document.getElementById('postDestExplanation');
       if (!box) return;
-      if (d === 'self') {
-        box.innerHTML = '<strong>Для своей страницы:</strong> публикацию увидят только те, кто зайдёт на вашу страницу (в общий «Пульс» она не попадёт).';
-      } else {
-        box.innerHTML = '<strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.';
-      }
+      box.innerHTML = d === 'self'
+        ? '<strong>Для своей страницы:</strong> публикацию увидят только те, кто зайдёт на вашу страницу (в общий «Пульс» она не попадёт).'
+        : '<strong>В Пульс:</strong> публикацию увидят все пользователи в общем разделе «Пульс», а также она останется на вашей странице.';
     }
 
     function openNewPostModal() {
@@ -5424,9 +5008,7 @@
     }
 
     function resolvePostAuthorUid(p) {
-      if (p && p.authorUid && p.authorUid !== 'null' && p.authorUid !== 'undefined') {
-        return String(p.authorUid);
-      }
+      if (p && p.authorUid && p.authorUid !== 'null' && p.authorUid !== 'undefined') return String(p.authorUid);
       if (p && p.author) {
         const found = users.find((u) => (u.fullName || '').trim().toLowerCase() === String(p.author).trim().toLowerCase());
         if (found?.uid) return String(found.uid);
@@ -5440,11 +5022,7 @@
       const cat = normalizePostCategory(document.getElementById('postCategorySelect').value);
       const caption = document.getElementById('postCaptionInput').value.trim();
       const text = document.getElementById('postTextInput').value.trim();
-      if (!caption && !text && !draftPostPhoto) {
-        toast('Добавьте текст или фото');
-        return;
-      }
-
+      if (!caption && !text && !draftPostPhoto) { toast('Добавьте текст или фото'); return; }
       if (!checkTextBeforeSubmit(`${caption} ${text}`)) return;
 
       isSubmittingPost = true;
@@ -5456,28 +5034,15 @@
         const clientPostId = `post_${now}_${Math.random().toString(36).slice(2, 7)}`;
 
         const payload = {
-          clientPostId,
-          author: myDisplayName(),
-          authorUid: uidForPost,
-          authorPhoto: myAvatarUrl(),
-          category: cat,
-          categoryLabel: getCategoryDisplayLabel({ category: cat }),
-          caption,
-          body: text,
-          photoData: draftPostPhoto || '',
-          visibility: vis,
-          sentAtMs: now,
-          time: timeStr,
-          karma: 0,
-          karmaGivenBy: {}
+          clientPostId, author: myDisplayName(), authorUid: uidForPost, authorPhoto: myAvatarUrl(),
+          category: cat, categoryLabel: getCategoryDisplayLabel({ category: cat }), caption, body: text,
+          photoData: draftPostPhoto || '', visibility: vis, sentAtMs: now, time: timeStr, karma: 0, karmaGivenBy: {}
         };
 
         const item = { id: clientPostId, ...payload };
         posts = [item, ...posts.filter((p) => (p.clientPostId || p.id) !== clientPostId)];
         saveMediaVault(posts);
-        renderPulse();
-        renderMyPosts();
-        renderUnifiedSearch();
+        renderPulse(); renderMyPosts(); renderUnifiedSearch();
 
         const writePost = () => setDoc(doc(db, 'posts', clientPostId), { ...payload, createdAt: serverTimestamp() });
         writePost().catch(() => queueCloudRetry(writePost));
@@ -5487,9 +5052,7 @@
         clearPostAttachment();
         hideModal('newPostModal');
         toast(vis === 'pulse' ? 'Опубликовано в Пульсе' : 'Сохранено на вашей странице');
-      } finally {
-        setTimeout(() => { isSubmittingPost = false; }, 400);
-      }
+      } finally { setTimeout(() => { isSubmittingPost = false; }, 400); }
     }
 
     function getPostTime(p) {
@@ -5528,53 +5091,23 @@
       commentsByPostId.set(postId, [...(commentsByPostId.get(postId) || []), cmtObj]);
       openCommentsPostIds.add(postId);
       renderPulse();
-      try {
-        await setDoc(doc(db, 'posts', postId, 'comments', cmtId), {
-          authorUid,
-          authorName: cmtObj.authorName,
-          text: cmtObj.text,
-          time: cmtObj.time,
-          createdAt: serverTimestamp()
-        });
-        toast('Комментарий добавлен');
-      } catch (e) {
-        queueCloudRetry(() => setDoc(doc(db, 'posts', postId, 'comments', cmtId), {
-          authorUid,
-          authorName: cmtObj.authorName,
-          text: cmtObj.text,
-          time: cmtObj.time,
-          createdAt: serverTimestamp()
-        }));
-      }
+      try { await setDoc(doc(db, 'posts', postId, 'comments', cmtId), { authorUid, authorName: cmtObj.authorName, text: cmtObj.text, time: cmtObj.time, createdAt: serverTimestamp() }); toast('Комментарий добавлен'); }
+      catch (e) { queueCloudRetry(() => setDoc(doc(db, 'posts', postId, 'comments', cmtId), { authorUid, authorName: cmtObj.authorName, text: cmtObj.text, time: cmtObj.time, createdAt: serverTimestamp() })); }
     }
 
     async function deletePostComment(postId, commentId) {
-      const pid = String(postId || '');
-      const cid = String(commentId || '');
+      const pid = String(postId || ''); const cid = String(commentId || '');
       if (!pid || !cid) return;
-
       const curList = commentsByPostId.get(pid) || [];
       const target = curList.find((x) => String(x.id) === cid);
       const myUid = getMyUid();
-      const canDelete = isCreatorAccount() || (target && (
-        String(target.id).startsWith('tmp_cmt_') ||
-        (myUid && target.authorUid === myUid)
-      ));
-
-      if (!canDelete) {
-        toast('Удалять можно свой комментарий или в режиме разработчика');
-        return;
-      }
-
+      const canDelete = isCreatorAccount() || (target && (String(target.id).startsWith('tmp_cmt_') || (myUid && target.authorUid === myUid)));
+      if (!canDelete) { toast('Удалять можно свой комментарий или в режиме разработчика'); return; }
       commentsByPostId.set(pid, curList.filter((x) => String(x.id) !== cid));
       renderPulse();
-
       if (!cid.startsWith('tmp_cmt_') && !pid.startsWith('post_')) {
-        try {
-          await deleteDoc(doc(db, 'posts', pid, 'comments', cid));
-        } catch (e) {
-          queueCloudRetry(() => deleteDoc(doc(db, 'posts', pid, 'comments', cid)));
-        }
+        try { await deleteDoc(doc(db, 'posts', pid, 'comments', cid)); }
+        catch (e) { queueCloudRetry(() => deleteDoc(doc(db, 'posts', pid, 'comments', cid))); }
       }
       toast('Комментарий удалён');
     }
@@ -5582,24 +5115,16 @@
     function getMyKarmaCountForPost(p) {
       const myUid = getMyUid() || 'anon';
       const cloudMap = p && p.karmaGivenBy && typeof p.karmaGivenBy === 'object' ? p.karmaGivenBy : {};
-      const cloudCount = Number(cloudMap[myUid] || 0);
-      const localCount = Number(state.karmaClicksByPost?.[p?.id] || 0);
-      return Math.max(cloudCount, localCount);
+      return Math.max(Number(cloudMap[myUid] || 0), Number(state.karmaClicksByPost?.[p?.id] || 0));
     }
 
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       if (!box) return;
-      const myUid = getMyUid();
-      const creator = isCreatorAccount();
-      const list = posts.filter((p) => {
-        if ((p.visibility || 'pulse') !== 'pulse') return false;
-        return pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter;
-      });
-      if (!list.length) {
-        box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">Здесь пока пусто</div><div class="meta">Добавьте публикацию в Профиле.</div></div>';
-        return;
-      }
+      const myUid = getMyUid(); const creator = isCreatorAccount();
+      const list = posts.filter((p) => (p.visibility || 'pulse') === 'pulse' && (pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter));
+      if (!list.length) { box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">Здесь пока пусто</div><div class="meta">Добавьте публикацию в Профиле.</div></div>'; return; }
+
       box.innerHTML = list.map((p) => {
         ensureCommentsListener(p.id);
         const resolvedUid = resolvePostAuthorUid(p);
@@ -5613,18 +5138,9 @@
         const reached = usedKarma >= MAX_KARMA_PER_POST;
         const cmtList = commentsByPostId.get(p.id) || [];
         const isCmtOpen = openCommentsPostIds.has(p.id);
-        const safeId = esc(p.id);
-        const safeAuthorUid = esc(resolvedUid);
-        const safeAuthorName = esc(p.author || 'Участник');
+        const safeId = esc(p.id); const safeAuthorUid = esc(resolvedUid); const safeAuthorName = esc(p.author || 'Участник');
         const photoKey = `post_photo_${p.id}`;
-
-        if (p.photoData) {
-          photoViewerRegistry.set(photoKey, {
-            src: p.photoData,
-            title: p.author || 'Фото',
-            sub: t
-          });
-        }
+        if (p.photoData) photoViewerRegistry.set(photoKey, { src: p.photoData, title: p.author || 'Фото', sub: t });
 
         const commentsHtml = isCmtOpen ? `
           <div class="comments-box">
@@ -5650,13 +5166,8 @@
           </div>
         ` : '';
 
-        const karmaBtnHtml = !isSelf
-          ? `<button type="button" class="pulse-act-btn gold" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">★ ${karmaVal}</button>`
-          : `<span class="meta" style="font-weight:700;">★ ${karmaVal}</span>`;
-
-        const peerButtonsHtml = (!isSelf && resolvedUid && !resolvedUid.startsWith('by_name:'))
-          ? `<button type="button" class="pulse-act-btn" onclick="openDirectChat('${safeAuthorUid}', '${safeAuthorName}')">Написать</button>`
-          : '';
+        const karmaBtnHtml = !isSelf ? `<button type="button" class="pulse-act-btn gold" ${reached ? 'disabled' : ''} onclick="giveKarma('${safeId}')">★ ${karmaVal}</button>` : `<span class="meta" style="font-weight:700;">★ ${karmaVal}</span>`;
+        const peerButtonsHtml = (!isSelf && resolvedUid && !resolvedUid.startsWith('by_name:')) ? `<button type="button" class="pulse-act-btn" onclick="openDirectChat('${safeAuthorUid}', '${safeAuthorName}')">Написать</button>` : '';
 
         return `
           <article class="card">
@@ -5692,24 +5203,13 @@
     function renderMyPosts() {
       const box = document.getElementById('myPostsBox');
       if (!box) return;
-      const myUid = getMyUid();
-      const myName = myDisplayName().toLowerCase();
-      const mine = posts.filter((p) => {
-        if (myUid && p.authorUid === myUid) return true;
-        if (String(p.id).startsWith('post_')) return true;
-        if ((!p.authorUid || p.authorUid === 'guest') && (p.author || '').toLowerCase() === myName) return true;
-        return false;
-      });
+      const myUid = getMyUid(); const myName = myDisplayName().toLowerCase();
+      const mine = posts.filter((p) => (myUid && p.authorUid === myUid) || String(p.id).startsWith('post_') || ((!p.authorUid || p.authorUid === 'guest') && (p.author || '').toLowerCase() === myName));
       if (!mine.length) { box.innerHTML = '<div class="meta">Публикаций пока нет.</div>'; return; }
+
       box.innerHTML = mine.map((p, idx) => {
         const photoKey = `my_post_photo_${p.id || idx}`;
-        if (p.photoData) {
-          photoViewerRegistry.set(photoKey, {
-            src: p.photoData,
-            title: myDisplayName(),
-            sub: getPostTime(p)
-          });
-        }
+        if (p.photoData) photoViewerRegistry.set(photoKey, { src: p.photoData, title: myDisplayName(), sub: getPostTime(p) });
         return `
           <div style="padding:12px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:8px;">
             <div>
@@ -5725,49 +5225,21 @@
     }
 
     async function giveKarma(id) {
-      const targetPost = posts.find((p) => p.id === id);
-      const myUid = getMyUid();
-      if (targetPost && myUid && targetPost.authorUid === myUid) {
-        toast('Карму нельзя ставить себе');
-        return;
-      }
+      const targetPost = posts.find((p) => p.id === id); const myUid = getMyUid();
+      if (targetPost && myUid && targetPost.authorUid === myUid) { toast('Карму нельзя ставить себе'); return; }
       const used = targetPost ? getMyKarmaCountForPost(targetPost) : Number(state.karmaClicksByPost?.[id] || 0);
-      if (used >= MAX_KARMA_PER_POST) {
-        toast('На этот пост уже поставлено максимум 3 раза');
-        return;
-      }
-      const nextUsed = used + 1;
-      const voterKey = myUid || 'anon';
-      state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: nextUsed };
-      persist();
-      posts = posts.map((p) => {
-        if (p.id !== id) return p;
-        const prevGiven = p.karmaGivenBy && typeof p.karmaGivenBy === 'object' ? p.karmaGivenBy : {};
-        return {
-          ...p,
-          karma: Number(p.karma ?? 0) + 1,
-          karmaGivenBy: { ...prevGiven, [voterKey]: nextUsed }
-        };
-      });
+      if (used >= MAX_KARMA_PER_POST) { toast('На этот пост уже поставлено максимум 3 раза'); return; }
+      const nextUsed = used + 1; const voterKey = myUid || 'anon';
+      state.karmaClicksByPost = { ...state.karmaClicksByPost, [id]: nextUsed }; persist();
+      posts = posts.map((p) => p.id !== id ? p : { ...p, karma: Number(p.karma ?? 0) + 1, karmaGivenBy: { ...(p.karmaGivenBy || {}), [voterKey]: nextUsed } });
       renderPulse(); renderMyPosts();
-      try {
-        await updateDoc(doc(db, 'posts', id), {
-          karma: increment(1),
-          [`karmaGivenBy.${voterKey}`]: nextUsed
-        });
-      } catch (e) {}
+      try { await updateDoc(doc(db, 'posts', id), { karma: increment(1), [`karmaGivenBy.${voterKey}`]: nextUsed }); } catch (e) {}
       toast(`+1 к карме (${nextUsed}/${MAX_KARMA_PER_POST} навсегда)`);
     }
 
     async function removePost(id) {
       posts = posts.filter((p) => p.id !== id);
-      try {
-        const v = loadMediaVault();
-        if (v.postsById && v.postsById[id]) {
-          delete v.postsById[id];
-          localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v));
-        }
-      } catch (e) {}
+      try { const v = loadMediaVault(); if (v.postsById && v.postsById[id]) { delete v.postsById[id]; localStorage.setItem(MEDIA_VAULT_KEY, JSON.stringify(v)); } } catch (e) {}
       renderPulse(); renderMyPosts(); renderUnifiedSearch();
       try { await deleteDoc(doc(db, 'posts', id)); } catch (e) {}
       toast('Удалено');
@@ -5778,24 +5250,14 @@
       if (!uid || uid === 'unknown') return;
       if (myUid && uid === myUid) { goToProfileStart(); return; }
       if (String(uid).startsWith('by_name:')) {
-        const rawName = decodeURIComponent(String(uid).slice('by_name:'.length));
-        openPeerUid = uid;
-        openPeerName = rawName || fallbackName || 'Участник';
-        switchPeerSubtab('posts');
-        renderPeerPageContent();
-        showScreen('peerProfileScreen');
-        window.scrollTo(0, 0);
-        return;
+        openPeerUid = uid; openPeerName = decodeURIComponent(String(uid).slice('by_name:'.length)) || fallbackName || 'Участник';
+        switchPeerSubtab('posts'); renderPeerPageContent(); showScreen('peerProfileScreen'); window.scrollTo(0, 0); return;
       }
       openPeerUid = uid; openPeerName = fallbackName || 'Участник';
-      switchPeerSubtab('posts');
-      renderPeerPageContent();
-      showScreen('peerProfileScreen');
-      window.scrollTo(0, 0);
+      switchPeerSubtab('posts'); renderPeerPageContent(); showScreen('peerProfileScreen'); window.scrollTo(0, 0);
     }
 
     function closePeerScreen() { openPeerUid = null; openPeerName = ''; showScreen('app'); }
-
     function switchPeerSubtab(sub) {
       ['posts', 'photos', 'friends', 'info'].forEach((k) => {
         document.getElementById('peerTab' + k[0].toUpperCase() + k.slice(1))?.classList.toggle('active', k === sub);
@@ -5818,7 +5280,6 @@
       document.getElementById('peerFullName').textContent = name;
       const pBadge = document.getElementById('peerAccountRoleBadge');
       if (pBadge) pBadge.innerHTML = renderAccountBadgeHtml(u.accountType);
-
       const pOnline = document.getElementById('peerOnlineStatus');
       if (pOnline) pOnline.innerHTML = isByName ? '<span class="offline-txt">Автор публикации</span>' : formatPresenceHtml(u.lastSeenMs, u.hideLastSeen);
       document.getElementById('peerAboutLine').textContent = bio;
@@ -5836,10 +5297,7 @@
         if (rel.status === 'accepted') fBtn = `<span class="tag" style="padding:10px 14px;">В друзьях</span>`;
         else if (rel.status === 'outgoing') fBtn = `<span class="meta" style="padding:10px;">Заявка отправлена</span>`;
         else if (rel.status === 'incoming') fBtn = `<button type="button" class="btn btn-mint" style="flex:1;" onclick="acceptFriendReq('${rel.id}', '${esc(uid)}', '${esc(name)}')">Принять</button>`;
-        actionHtml = `
-          <button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать</button>
-          ${fBtn}
-        `;
+        actionHtml = `<button type="button" class="btn btn-primary" style="flex:1;" onclick="openDirectChat('${esc(uid)}', '${esc(name)}')">Написать</button>${fBtn}`;
       }
       document.getElementById('peerActionButtons').innerHTML = actionHtml;
 
@@ -5850,20 +5308,11 @@
 
       const uPhotos = normalizePhotos(u.savedPhotos);
       document.getElementById('peerPhotosGrid').innerHTML = uPhotos.length
-        ? uPhotos.map((ph, idx) => {
-            const key = `peer_gal_${uid}_${idx}`;
-            photoViewerRegistry.set(key, { src: ph.src, title: name, sub: ph.caption || '' });
-            return `<div class="photo-cell" data-view-photo="${esc(key)}"><img src="${ph.src}" alt="" draggable="false" /></div>`;
-          }).join('')
+        ? uPhotos.map((ph, idx) => { const key = `peer_gal_${uid}_${idx}`; photoViewerRegistry.set(key, { src: ph.src, title: name, sub: ph.caption || '' }); return `<div class="photo-cell" data-view-photo="${esc(key)}"><img src="${ph.src}" alt="" draggable="false" /></div>`; }).join('')
         : '<div class="meta" style="grid-column:1/-1;">Фотографий нет.</div>';
 
       const fSet = new Set();
-      friendsDocs.forEach((r) => {
-        if (r.status === 'accepted') {
-          if (r.fromUid === uid) fSet.add(r.toUid);
-          if (r.toUid === uid) fSet.add(r.fromUid);
-        }
-      });
+      friendsDocs.forEach((r) => { if (r.status === 'accepted') { if (r.fromUid === uid) fSet.add(r.toUid); if (r.toUid === uid) fSet.add(r.fromUid); } });
       fSet.delete(myUid);
       const pFriends = Array.from(fSet).map((fid) => users.find((x) => x.uid === fid) || { uid: fid, fullName: 'Участник' });
       document.getElementById('peerFriendsList').innerHTML = pFriends.length
@@ -5881,23 +5330,14 @@
 
     function onPeerAvatarTap(ev) {
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      const u = users.find((x) => x.uid === openPeerUid) || {};
-      const name = u.fullName || openPeerName || 'Участник';
-      showAvatarChoiceModal({
-        title: name, sub: 'Выберите, что посмотреть',
-        avatarSrc: u.photoData || '', avatarTitle: name, avatarSub: 'Фото профиля',
-        storySrc: openPeerStoryData?.src || '', storyTitle: name, storySub: `Сторис • ${openPeerStoryData?.time || ''}`
-      });
+      const u = users.find((x) => x.uid === openPeerUid) || {}; const name = u.fullName || openPeerName || 'Участник';
+      showAvatarChoiceModal({ title: name, sub: 'Выберите, что посмотреть', avatarSrc: u.photoData || '', avatarTitle: name, avatarSub: 'Фото профиля', storySrc: openPeerStoryData?.src || '', storyTitle: name, storySub: `Сторис • ${openPeerStoryData?.time || ''}` });
     }
 
-    function openPeerStoryViewer(ev) {
-      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      if (openPeerStoryData) openImageViewer(openPeerStoryData.src, openPeerStoryData.author, `Сторис • ${openPeerStoryData.time}`);
-    }
+    function openPeerStoryViewer(ev) { if (ev) { ev.preventDefault(); ev.stopPropagation(); } if (openPeerStoryData) openImageViewer(openPeerStoryData.src, openPeerStoryData.author, `Сторис • ${openPeerStoryData.time}`); }
 
     function getFriendRel(otherUid) {
-      const myUid = String(getMyUid() || '');
-      const targetUid = String(otherUid || '');
+      const myUid = String(getMyUid() || ''); const targetUid = String(otherUid || '');
       if (!myUid || !targetUid || targetUid === myUid) return { status: 'none' };
       const r = friendsDocs.find((x) => x && ((x.fromUid === myUid && x.toUid === targetUid) || (x.toUid === myUid && x.fromUid === targetUid)));
       if (!r) return { status: 'none' };
@@ -5909,44 +5349,18 @@
     function refreshFriendsView() { pingOnlinePresence(); renderFriendsTab(); toast('Обновлено'); }
 
     function renderFriendsTab() {
-      const incCard = document.getElementById('incomingFriendRequestsCard');
-      const incList = document.getElementById('incomingFriendRequestsList');
-      const incBadge = document.getElementById('incomingFriendCountBadge');
-      const myBox = document.getElementById('myFriendsBox');
-      const otherBox = document.getElementById('otherPeopleBox');
+      const incCard = document.getElementById('incomingFriendRequestsCard'); const incList = document.getElementById('incomingFriendRequestsList'); const incBadge = document.getElementById('incomingFriendCountBadge');
+      const myBox = document.getElementById('myFriendsBox'); const otherBox = document.getElementById('otherPeopleBox');
       if (!myBox || !otherBox) return;
       const myUid = String(getMyUid() || '');
 
-      const incomingReqs = myUid
-        ? friendsDocs.filter((r) => r && r.toUid === myUid && r.status === 'pending' && r.fromUid && r.fromUid !== myUid)
-        : [];
-
+      const incomingReqs = myUid ? friendsDocs.filter((r) => r && r.toUid === myUid && r.status === 'pending' && r.fromUid && r.fromUid !== myUid) : [];
       if (incCard && incList && incBadge) {
-        incCard.style.display = incomingReqs.length ? 'block' : 'none';
-        incBadge.textContent = String(incomingReqs.length);
+        incCard.style.display = incomingReqs.length ? 'block' : 'none'; incBadge.textContent = String(incomingReqs.length);
         incList.innerHTML = incomingReqs.map((req) => {
-          const senderUid = String(req.fromUid || '');
-          const prof = users.find((u) => u && u.uid === senderUid) || {};
-          const senderName = String(prof.fullName || req.fromName || 'Участник');
-          const avaHtml = prof.photoData
-            ? `<img src="${esc(prof.photoData)}" alt="" draggable="false" />`
-            : esc((senderName[0] || 'S').toUpperCase());
-
-          return `
-            <div class="list-item">
-              <div class="post-user" onclick="openPersonPage('${esc(senderUid)}', '${esc(senderName)}')">
-                <div class="mini-ava">${avaHtml}</div>
-                <div style="min-width: 0; flex: 1;">
-                  <div class="user-name">${esc(senderName)}${renderAccountBadgeHtml(prof.accountType)}</div>
-                  <div class="meta">Заявка в друзья</div>
-                </div>
-              </div>
-              <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" onclick="acceptFriendReq('${esc(req.id)}', '${esc(senderUid)}', '${esc(senderName)}')">Принять</button>
-                <button type="button" class="btn btn-danger" style="padding: 7px 11px; font-size: 12px;" onclick="declineFriendReq('${esc(req.id)}', '${esc(senderUid)}')">Отклонить</button>
-              </div>
-            </div>
-          `;
+          const senderUid = String(req.fromUid || ''); const prof = users.find((u) => u && u.uid === senderUid) || {}; const senderName = String(prof.fullName || req.fromName || 'Участник');
+          const avaHtml = prof.photoData ? `<img src="${esc(prof.photoData)}" alt="" draggable="false" />` : esc((senderName[0] || 'S').toUpperCase());
+          return `<div class="list-item"><div class="post-user" onclick="openPersonPage('${esc(senderUid)}', '${esc(senderName)}')"><div class="mini-ava">${avaHtml}</div><div style="min-width: 0; flex: 1;"><div class="user-name">${esc(senderName)}${renderAccountBadgeHtml(prof.accountType)}</div><div class="meta">Заявка в друзья</div></div></div><div style="display: flex; gap: 6px; flex-shrink: 0;"><button type="button" class="btn btn-primary" style="padding: 7px 11px; font-size: 12px;" onclick="acceptFriendReq('${esc(req.id)}', '${esc(senderUid)}', '${esc(senderName)}')">Принять</button><button type="button" class="btn btn-danger" style="padding: 7px 11px; font-size: 12px;" onclick="declineFriendReq('${esc(req.id)}', '${esc(senderUid)}')">Отклонить</button></div></div>`;
         }).join('');
       }
 
@@ -5956,157 +5370,72 @@
         const otherUid = (myUid && r.fromUid === myUid) ? r.toUid : ((myUid && r.toUid === myUid) ? r.fromUid : '');
         if (otherUid && otherUid !== myUid) {
           const prof = users.find((u) => u.uid === otherUid) || {};
-          acceptedMap.set(otherUid, {
-            uid: otherUid,
-            fullName: prof.fullName || r.toName || r.fromName || 'Участник',
-            accountType: prof.accountType || 'user',
-            hideLastSeen: Boolean(prof.hideLastSeen),
-            photoData: prof.photoData || '',
-            lastSeenMs: prof.lastSeenMs || 0
-          });
+          acceptedMap.set(otherUid, { uid: otherUid, fullName: prof.fullName || r.toName || r.fromName || 'Участник', accountType: prof.accountType || 'user', hideLastSeen: Boolean(prof.hideLastSeen), photoData: prof.photoData || '', lastSeenMs: prof.lastSeenMs || 0 });
         }
       });
 
       const listToShow = Array.from(acceptedMap.values()).filter((f) => f.uid && f.uid !== myUid);
       myBox.innerHTML = listToShow.length
-        ? listToShow.map((u) => `
-            <div class="list-item">
-              <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName)}')">
-                <div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div>
-                <div style="min-width:0; flex:1;">
-                  <div class="user-name">${esc(u.fullName)}${renderAccountBadgeHtml(u.accountType)}</div>
-                  <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
-                </div>
-              </div>
-              <button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openDirectChat('${esc(u.uid)}', '${esc(u.fullName)}')">Чат</button>
-            </div>
-          `).join('')
+        ? listToShow.map((u) => `<div class="list-item"><div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(u.fullName)}')"><div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((u.fullName[0] || 'S').toUpperCase())}</div><div style="min-width:0; flex:1;"><div class="user-name">${esc(u.fullName)}${renderAccountBadgeHtml(u.accountType)}</div><div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div></div></div><button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openDirectChat('${esc(u.uid)}', '${esc(u.fullName)}')">Чат</button></div>`).join('')
         : '<div class="meta">Друзей пока нет.</div>';
 
       const q = (document.getElementById('searchPeopleInput')?.value || '').trim().toLowerCase();
       const candidates = users.filter((u) => {
         if (!u || !u.uid || u.uid === myUid || acceptedMap.has(u.uid) || u.hideFromSearch) return false;
         if (!q) return true;
-        const nDisp = String(u.fullName || '').toLowerCase();
-        const nPlain = String(u.namePlain || '').toLowerCase();
-        const bio = String(u.bio || '').toLowerCase();
-        return nDisp.includes(q) || nPlain.includes(q) || bio.includes(q);
+        return String(u.fullName || '').toLowerCase().includes(q) || String(u.namePlain || '').toLowerCase().includes(q) || String(u.bio || '').toLowerCase().includes(q);
       });
       otherBox.innerHTML = candidates.length
         ? candidates.map((u) => {
-            const rel = getFriendRel(u.uid);
-            const uName = u.fullName || 'Участник';
+            const rel = getFriendRel(u.uid); const uName = u.fullName || 'Участник';
             let btn = `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="addFriend('${esc(u.uid)}', '${esc(uName)}')">Добавить</button>`;
             if (rel.status === 'outgoing') btn = '<span class="meta">Отправлена</span>';
             else if (rel.status === 'incoming') btn = `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="acceptFriendReq('${rel.id}', '${esc(u.uid)}', '${esc(uName)}')">Принять</button>`;
-            return `
-              <div class="list-item">
-                <div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(uName)}')">
-                  <div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((uName[0] || 'S').toUpperCase())}</div>
-                  <div style="min-width:0; flex:1;">
-                    <div class="user-name">${esc(uName)}${renderAccountBadgeHtml(u.accountType)}</div>
-                    <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
-                  </div>
-                </div>
-                ${btn}
-              </div>
-            `;
+            return `<div class="list-item"><div class="post-user" onclick="openPersonPage('${esc(u.uid)}', '${esc(uName)}')"><div class="mini-ava">${u.photoData ? `<img src="${esc(u.photoData)}" alt="" draggable="false" />` : esc((uName[0] || 'S').toUpperCase())}</div><div style="min-width:0; flex:1;"><div class="user-name">${esc(uName)}${renderAccountBadgeHtml(u.accountType)}</div><div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div></div></div>${btn}</div>`;
           }).join('')
         : '<div class="meta">Новых людей пока нет.</div>';
     }
 
     async function addFriend(toUid, toName) {
       try {
-        const myUid = String(getMyUid() || '');
-        const safeToUid = String(toUid || '').trim();
-        if (!myUid) {
-          toast('Сначала войдите в аккаунт');
-          return;
-        }
-        if (!safeToUid || safeToUid === myUid || safeToUid.startsWith('by_name:')) {
-          toast('Выберите зарегистрированного участника');
-          return;
-        }
-
+        const myUid = String(getMyUid() || ''); const safeToUid = String(toUid || '').trim();
+        if (!myUid) { toast('Сначала войдите в аккаунт'); return; }
+        if (!safeToUid || safeToUid === myUid || safeToUid.startsWith('by_name:')) { toast('Выберите зарегистрированного участника'); return; }
         const existingRel = getFriendRel(safeToUid);
-        if (existingRel.status === 'accepted') {
-          toast('Уже в друзьях');
-          return;
-        }
-        if (existingRel.status === 'outgoing') {
-          toast('Заявка уже отправлена');
-          return;
-        }
+        if (existingRel.status === 'accepted') { toast('Уже в друзьях'); return; }
+        if (existingRel.status === 'outgoing') { toast('Заявка уже отправлена'); return; }
 
         const docId = 'req_' + [myUid, safeToUid].sort().join('_');
         const targetUser = findSearchUserByUid(safeToUid);
-        const resolvedToName = String(toName || targetUser?.fullName || 'Участник');
-
-        const payload = {
-          fromUid: myUid,
-          fromName: myDisplayName(),
-          toUid: safeToUid,
-          toName: resolvedToName,
-          status: 'pending',
-          createdAt: serverTimestamp()
-        };
-
+        const payload = { fromUid: myUid, fromName: myDisplayName(), toUid: safeToUid, toName: String(toName || targetUser?.fullName || 'Участник'), status: 'pending', createdAt: serverTimestamp() };
         const existingIdx = friendsDocs.findIndex((x) => x && x.id === docId);
         if (existingIdx >= 0) friendsDocs[existingIdx] = { ...friendsDocs[existingIdx], ...payload, id: docId };
         else friendsDocs = [{ id: docId, ...payload }, ...friendsDocs];
-        state.cachedRequests = friendsDocs.slice(0, 200);
-        persist();
-
-        renderFriendsTab();
-        renderUnifiedSearch();
-        if (openPeerUid) renderPeerPageContent();
+        state.cachedRequests = friendsDocs.slice(0, 200); persist();
+        renderFriendsTab(); renderUnifiedSearch(); if (openPeerUid) renderPeerPageContent();
 
         const op = () => setDoc(doc(db, 'friendRequests', docId), payload, { merge: true });
-        await op().catch(() => {
-          queueCloudRetry(op);
-        });
+        await op().catch(() => queueCloudRetry(op));
         toast('Заявка в друзья отправлена');
-      } catch (e) {
-        toast('Не удалось отправить заявку');
-      }
+      } catch (e) { toast('Не удалось отправить заявку'); }
     }
 
     async function acceptFriendReq(reqId, fromUid, fromName) {
       try {
         const myUid = String(getMyUid() || '');
-        if (!myUid) {
-          toast('Сначала войдите в аккаунт');
-          return;
-        }
+        if (!myUid) { toast('Сначала войдите в аккаунт'); return; }
         const safeFromUid = String(fromUid || '').trim();
         const safeId = String(reqId || '').trim() || (safeFromUid ? ('req_' + [myUid, safeFromUid].sort().join('_')) : '');
         if (!safeId || safeId === 'req_') return;
 
-        friendsDocs = friendsDocs.map((r) => (
-          r && (r.id === safeId || (safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid))
-            ? { ...r, id: safeId, status: 'accepted' }
-            : r
-        ));
-        state.cachedRequests = friendsDocs.slice(0, 200);
-        persist();
+        friendsDocs = friendsDocs.map((r) => (r && (r.id === safeId || (safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid)) ? { ...r, id: safeId, status: 'accepted' } : r));
+        state.cachedRequests = friendsDocs.slice(0, 200); persist();
+        renderFriendsTab(); renderUnifiedSearch(); if (openPeerUid) renderPeerPageContent();
 
-        renderFriendsTab();
-        renderUnifiedSearch();
-        if (openPeerUid) renderPeerPageContent();
-
-        const op = () => setDoc(doc(db, 'friendRequests', safeId), {
-          fromUid: safeFromUid || undefined,
-          toUid: myUid,
-          status: 'accepted',
-          acceptedAt: serverTimestamp()
-        }, { merge: true });
-        await op().catch(() => {
-          queueCloudRetry(op);
-        });
+        const op = () => setDoc(doc(db, 'friendRequests', safeId), { fromUid: safeFromUid || undefined, toUid: myUid, status: 'accepted', acceptedAt: serverTimestamp() }, { merge: true });
+        await op().catch(() => queueCloudRetry(op));
         toast(`Вы добавили ${String(fromName || 'участника')} в друзья`);
-      } catch (e) {
-        toast('Не удалось принять заявку');
-      }
+      } catch (e) { toast('Не удалось принять заявку'); }
     }
 
     async function declineFriendReq(reqId, fromUid) {
@@ -6117,31 +5446,19 @@
         const safeId = String(reqId || '').trim() || (safeFromUid ? ('req_' + [myUid, safeFromUid].sort().join('_')) : '');
         if (!safeId || safeId === 'req_') return;
 
-        friendsDocs = friendsDocs.filter((r) => (
-          r && r.id !== safeId && !(safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid && r.status === 'pending')
-        ));
-        state.cachedRequests = friendsDocs.slice(0, 200);
-        persist();
-
-        renderFriendsTab();
-        renderUnifiedSearch();
-        if (openPeerUid) renderPeerPageContent();
+        friendsDocs = friendsDocs.filter((r) => !(r && (r.id === safeId || (safeFromUid && r.fromUid === safeFromUid && r.toUid === myUid && r.status === 'pending'))));
+        state.cachedRequests = friendsDocs.slice(0, 200); persist();
+        renderFriendsTab(); renderUnifiedSearch(); if (openPeerUid) renderPeerPageContent();
 
         const op = () => deleteDoc(doc(db, 'friendRequests', safeId));
-        await op().catch(() => {
-          queueCloudRetry(op);
-        });
+        await op().catch(() => queueCloudRetry(op));
         toast('Заявка отклонена');
-      } catch (e) {
-        toast('Не удалось отклонить заявку');
-      }
+      } catch (e) { toast('Не удалось отклонить заявку'); }
     }
 
     function renderGroupsTab() {
-      const box = document.getElementById('groupsBox');
-      if (!box) return;
-      const myUid = getMyUid();
-      const groups = chats.filter((c) => c.type === 'group');
+      const box = document.getElementById('groupsBox'); if (!box) return;
+      const myUid = getMyUid(); const groups = chats.filter((c) => c.type === 'group');
       box.innerHTML = groups.length
         ? groups.map((g) => {
             const inG = Array.isArray(g.members) && g.members.includes(myUid);
@@ -6163,17 +5480,13 @@
         type: 'group', title, description: desc || 'Группа SÄT', creatorUid: myUid, members: [myUid],
         lastMessage: 'Группа создана', lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp()
       }).catch(() => null);
-      document.getElementById('groupTitleInput').value = '';
-      document.getElementById('groupDescInput').value = '';
-      hideModal('createGroupModal');
-      if (ref) openChatRoom(ref.id, title);
+      document.getElementById('groupTitleInput').value = ''; document.getElementById('groupDescInput').value = '';
+      hideModal('createGroupModal'); if (ref) openChatRoom(ref.id, title);
     }
 
     async function joinChatGroup(id, title) {
-      const myUid = getMyUid();
-      if (!myUid) return;
-      await updateDoc(doc(db, 'chats', id), { members: arrayUnion(myUid) }).catch(() => {});
-      openChatRoom(id, title);
+      const myUid = getMyUid(); if (!myUid) return;
+      await updateDoc(doc(db, 'chats', id), { members: arrayUnion(myUid) }).catch(() => {}); openChatRoom(id, title);
     }
 
     function getChatDisplayTitle(c) {
@@ -6184,8 +5497,7 @@
     }
 
     function renderProfileChatsList() {
-      const box = document.getElementById('profileChatsList');
-      const badge = document.getElementById('chatsCountBadge');
+      const box = document.getElementById('profileChatsList'); const badge = document.getElementById('chatsCountBadge');
       if (!box) return;
       const myUid = getMyUid();
       const myChats = chats.filter((c) => Array.isArray(c.members) ? (!myUid || c.members.includes(myUid)) : true);
@@ -6200,93 +5512,62 @@
     }
 
     async function openDirectChat(otherUid, otherName) {
-      const myUid = getMyUid();
-      if (!myUid || !otherUid || otherUid === myUid) return;
+      const myUid = getMyUid(); if (!myUid || !otherUid || otherUid === myUid) return;
       const id = 'dm_' + [myUid, otherUid].sort().join('_');
-      await setDoc(doc(db, 'chats', id), {
-        type: 'direct', members: [myUid, otherUid], memberNames: { [myUid]: myDisplayName(), [otherUid]: otherName || 'Участник' }, updatedAt: serverTimestamp()
-      }, { merge: true }).catch(() => {});
+      await setDoc(doc(db, 'chats', id), { type: 'direct', members: [myUid, otherUid], memberNames: { [myUid]: myDisplayName(), [otherUid]: otherName || 'Участник' }, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
       openChatRoom(id, otherName);
     }
 
     function openChatRoom(id, title) {
-      activeChatId = id;
-      cancelEditMessage(); discardVoiceDraft();
-      const c = chats.find((x) => x.id === id);
-      const myUid = getMyUid();
+      activeChatId = id; cancelEditMessage(); discardVoiceDraft();
+      const c = chats.find((x) => x.id === id); const myUid = getMyUid();
       document.getElementById('chatHeaderTitle').textContent = c ? getChatDisplayTitle(c) : (title || 'Чат');
       const subEl = document.getElementById('chatHeaderSub');
       if (subEl && c?.type !== 'group' && Array.isArray(c?.members)) {
-        const peerId = c.members.find((u) => u && u !== myUid);
-        const peerObj = users.find((u) => u.uid === peerId);
+        const peerId = c.members.find((u) => u && u !== myUid); const peerObj = users.find((u) => u.uid === peerId);
         subEl.innerHTML = peerObj ? formatPresenceHtml(peerObj.lastSeenMs, peerObj.hideLastSeen) : 'Сообщения • Голос • Фото';
       }
       document.getElementById('callToggleBtn').style.display = c?.type === 'group' ? 'none' : 'inline-flex';
       if (chatUnsub) chatUnsub();
       chatUnsub = onSnapshot(query(collection(db, 'chats', id, 'messages'), orderBy('createdAt', 'asc')), async (snap) => {
-        const curUid = getMyUid();
-        const prevCount = chatMsgs.length;
+        const curUid = getMyUid(); const prevCount = chatMsgs.length;
         const loaded = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         if (loaded.length > prevCount && prevCount > 0) {
           const newest = loaded[loaded.length - 1];
-          if (newest && curUid && newest.senderUid && newest.senderUid !== curUid) {
-            playTone('incoming');
-          }
+          if (newest && curUid && newest.senderUid && newest.senderUid !== curUid) playTone('incoming');
         }
-        chatMsgs = loaded;
-        renderChatBox();
+        chatMsgs = loaded; renderChatBox();
         if (curUid) {
           await updateDoc(doc(db, 'chats', id), { readByUsers: arrayUnion(curUid) }).catch(() => {});
           for (const d of snap.docs) {
-            const md = d.data();
-            const seenList = Array.isArray(md.seenBy) ? md.seenBy : (md.senderUid ? [md.senderUid] : []);
-            if (md.senderUid && md.senderUid !== curUid && !seenList.includes(curUid)) {
-              updateDoc(doc(db, 'chats', id, 'messages', d.id), { seenBy: arrayUnion(curUid) }).catch(() => {});
-            }
+            const md = d.data(); const seenList = Array.isArray(md.seenBy) ? md.seenBy : (md.senderUid ? [md.senderUid] : []);
+            if (md.senderUid && md.senderUid !== curUid && !seenList.includes(curUid)) updateDoc(doc(db, 'chats', id, 'messages', d.id), { seenBy: arrayUnion(curUid) }).catch(() => {});
           }
         }
       }, () => {});
       document.getElementById('chatScreen')?.classList.add('open');
     }
 
-    function closeChat() {
-      cancelVoiceState(); discardVoiceDraft(); cancelEditMessage();
-      if (chatUnsub) { chatUnsub(); chatUnsub = null; }
-      activeChatId = null;
-      document.getElementById('chatScreen')?.classList.remove('open');
-    }
+    function closeChat() { cancelVoiceState(); discardVoiceDraft(); cancelEditMessage(); if (chatUnsub) { chatUnsub(); chatUnsub = null; } activeChatId = null; document.getElementById('chatScreen')?.classList.remove('open'); }
 
     async function saveChatPhotoToGallery(msgId, ev) {
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      const m = chatMsgs.find((x) => x.id === msgId);
-      if (!m?.photoData) return;
-      addSavedPhoto(m.photoData, `Из чата: ${m.senderName || 'Чат'}`);
-      renderMyProfile();
-      await syncProfileCloud(currentUser, { explicitMediaChange: true });
-      toast('Фото сохранено в альбом SÄT');
+      const m = chatMsgs.find((x) => x.id === msgId); if (!m?.photoData) return;
+      addSavedPhoto(m.photoData, `Из чата: ${m.senderName || 'Чат'}`); renderMyProfile();
+      await syncProfileCloud(currentUser, { explicitMediaChange: true }); toast('Фото сохранено в альбом SÄT');
     }
 
-    function downloadChatPhoto(msgId, ev) {
-      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-      const m = chatMsgs.find((x) => x.id === msgId);
-      if (!m?.photoData) return;
-      savePhotoDirectToGallery(m.photoData, 'sat-chat');
-    }
+    function downloadChatPhoto(msgId, ev) { if (ev) { ev.preventDefault(); ev.stopPropagation(); } const m = chatMsgs.find((x) => x.id === msgId); if (m?.photoData) savePhotoDirectToGallery(m.photoData, 'sat-chat'); }
 
     function renderTicksHtml(m, mine, myUid) {
       if (!mine) return '';
       const seenArr = Array.isArray(m.seenBy) ? m.seenBy : [];
-      const readByOther = seenArr.some((uid) => uid && uid !== myUid);
-      return readByOther
-        ? '<span class="tick-read" title="Прочитано">✓✓</span>'
-        : '<span class="tick-sent" title="Отправлено">✓</span>';
+      return seenArr.some((uid) => uid && uid !== myUid) ? '<span class="tick-read" title="Прочитано">✓✓</span>' : '<span class="tick-sent" title="Отправлено">✓</span>';
     }
 
     function renderChatBox() {
-      const box = document.getElementById('chatMessagesBox');
-      if (!box) return;
-      const myUid = getMyUid();
-      const cur = chats.find((x) => x.id === activeChatId);
+      const box = document.getElementById('chatMessagesBox'); if (!box) return;
+      const myUid = getMyUid(); const cur = chats.find((x) => x.id === activeChatId);
       const isDirect = cur?.type === 'direct' || String(cur?.id || '').startsWith('dm_');
       box.innerHTML = chatMsgs.length
         ? chatMsgs.map((m) => {
@@ -6301,8 +5582,7 @@
               return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<img class="msg-photo" src="${m.photoData}" alt="" onclick="openImageViewer('${m.photoData}', '${esc(m.senderName || 'Фото')}', '${esc(formatTime(ms))}')" /><div class="msg-tools">${dlBtn}${albumBtn}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${ticks}</div>${tools}</div>`;
             }
             if (m.kind === 'voice' && m.audioData) {
-              const dur = Number(m.durationSec || 1);
-              const sid = esc(m.id);
+              const dur = Number(m.durationSec || 1); const sid = esc(m.id);
               return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div class="voice-player"><button type="button" id="vpBtn_${sid}" class="voice-play-btn" onclick="toggleVoicePlay('${sid}', '${m.audioData}')">▶</button><div class="voice-track"><div id="vpFill_${sid}" class="voice-fill"></div></div><span class="voice-dur">${dur} сек</span></div><div class="msg-meta-row"><span>${esc(tm)}</span>${ticks}</div>${tools}</div>`;
             }
             return `<div class="msg ${mine ? 'me' : 'them'}">${!mine && m.senderName ? `<div class="msg-who">${esc(m.senderName)}</div>` : ''}<div>${esc(m.text || '')}</div><div class="msg-meta-row"><span>${esc(tm)}</span>${m.edited ? '<span class="msg-edited">изм.</span>' : ''}${ticks}</div>${tools}</div>`;
@@ -6311,143 +5591,76 @@
       box.scrollTop = box.scrollHeight;
     }
 
-    function insertEmoji(em) {
-      const inp = document.getElementById('chatMsgInput');
-      if (!inp) return;
-      inp.value += em;
-      inp.focus();
-    }
-
-    function beginEditMessage(id) {
-      const t = chatMsgs.find((x) => x.id === id);
-      if (!t) return;
-      editingMsgId = id;
-      const inp = document.getElementById('chatMsgInput');
-      inp.value = t.text || ''; inp.focus();
-      document.getElementById('editModeBar')?.classList.add('show');
-    }
-
-    function cancelEditMessage() {
-      if (editingMsgId) document.getElementById('chatMsgInput').value = '';
-      editingMsgId = null;
-      document.getElementById('editModeBar')?.classList.remove('show');
-    }
+    function insertEmoji(em) { const inp = document.getElementById('chatMsgInput'); if (inp) { inp.value += em; inp.focus(); } }
+    function beginEditMessage(id) { const t = chatMsgs.find((x) => x.id === id); if (!t) return; editingMsgId = id; const inp = document.getElementById('chatMsgInput'); inp.value = t.text || ''; inp.focus(); document.getElementById('editModeBar')?.classList.add('show'); }
+    function cancelEditMessage() { if (editingMsgId) document.getElementById('chatMsgInput').value = ''; editingMsgId = null; document.getElementById('editModeBar')?.classList.remove('show'); }
 
     async function saveEditedMessage() {
-      const inp = document.getElementById('chatMsgInput');
-      const nextText = inp.value.trim();
+      const inp = document.getElementById('chatMsgInput'); const nextText = inp.value.trim();
       if (!editingMsgId || !activeChatId || !nextText) return;
-      const id = editingMsgId; const cid = activeChatId;
-      inp.value = ''; cancelEditMessage();
-      chatMsgs = chatMsgs.map((m) => m.id === id ? { ...m, text: nextText, edited: true } : m);
-      renderChatBox();
-      if (!String(id).startsWith('tmp_')) {
-        await updateDoc(doc(db, 'chats', cid, 'messages', id), { text: nextText, edited: true, updatedAt: serverTimestamp() }).catch(() => {});
-      }
+      const id = editingMsgId; const cid = activeChatId; inp.value = ''; cancelEditMessage();
+      chatMsgs = chatMsgs.map((m) => m.id === id ? { ...m, text: nextText, edited: true } : m); renderChatBox();
+      if (!String(id).startsWith('tmp_')) await updateDoc(doc(db, 'chats', cid, 'messages', id), { text: nextText, edited: true, updatedAt: serverTimestamp() }).catch(() => {});
     }
 
     async function deleteChatMessage(id) {
-      if (!id || !activeChatId) return;
-      const cid = activeChatId;
-      if (editingMsgId === id) cancelEditMessage();
-      chatMsgs = chatMsgs.filter((m) => m.id !== id);
-      renderChatBox();
-      if (!String(id).startsWith('tmp_')) {
-        await deleteDoc(doc(db, 'chats', cid, 'messages', id)).catch(() => {});
-      }
+      if (!id || !activeChatId) return; const cid = activeChatId; if (editingMsgId === id) cancelEditMessage();
+      chatMsgs = chatMsgs.filter((m) => m.id !== id); renderChatBox();
+      if (!String(id).startsWith('tmp_')) await deleteDoc(doc(db, 'chats', cid, 'messages', id)).catch(() => {});
     }
 
     async function sendMessage() {
       if (editingMsgId) { await saveEditedMessage(); return; }
-      const inp = document.getElementById('chatMsgInput');
-      const text = inp.value.trim();
-      const myUid = getMyUid();
+      const inp = document.getElementById('chatMsgInput'); const text = inp.value.trim(); const myUid = getMyUid();
       if (!text || !activeChatId || !myUid) return;
-      const cid = activeChatId; inp.value = '';
-      const now = Date.now();
+      const cid = activeChatId; inp.value = ''; const now = Date.now();
       chatMsgs = [...chatMsgs, { id: 'tmp_' + now, senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, seenBy: [myUid] }];
-      renderChatBox();
-      playTone('sent');
+      renderChatBox(); playTone('sent');
       try {
-        await addDoc(collection(db, 'chats', cid, 'messages'), {
-          senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, seenBy: [myUid], createdAt: serverTimestamp()
-        });
+        await addDoc(collection(db, 'chats', cid, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'text', text, sentAtMs: now, seenBy: [myUid], createdAt: serverTimestamp() });
         await updateDoc(doc(db, 'chats', cid), { lastMessage: text, lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() });
       } catch (e) {}
     }
 
     async function sendPhotoToChat(dataUrl) {
-      const myUid = getMyUid();
-      if (!activeChatId || !myUid || !dataUrl) return;
-      playTone('sent');
-      await addDoc(collection(db, 'chats', activeChatId, 'messages'), {
-        senderUid: myUid, senderName: myDisplayName(), kind: 'photo', text: '', photoData: dataUrl, seenBy: [myUid], createdAt: serverTimestamp()
-      }).catch(() => {});
+      const myUid = getMyUid(); if (!activeChatId || !myUid || !dataUrl) return; playTone('sent');
+      await addDoc(collection(db, 'chats', activeChatId, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'photo', text: '', photoData: dataUrl, seenBy: [myUid], createdAt: serverTimestamp() }).catch(() => {});
       await updateDoc(doc(db, 'chats', activeChatId), { lastMessage: 'Фотография', lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() }).catch(() => {});
       toast('Фото отправлено');
     }
 
-    function getHdAudioConstraints() {
-      return {
-        audio: {
-          echoCancellation: { ideal: true },
-          noiseSuppression: { ideal: true },
-          autoGainControl: { ideal: true },
-          channelCount: { ideal: 1 },
-          sampleRate: { ideal: 48000 },
-          sampleSize: { ideal: 16 }
-        }
-      };
-    }
+    function getHdAudioConstraints() { return { audio: { echoCancellation: { ideal: true }, noiseSuppression: { ideal: true }, autoGainControl: { ideal: true }, channelCount: { ideal: 1 }, sampleRate: { ideal: 48000 }, sampleSize: { ideal: 16 } } }; }
 
     function cancelVoiceState() {
       clearTimeout(voicePauseTimer); voicePauseTimer = null;
       if (voiceRecorder && voiceRecorder.state !== 'inactive') { try { voiceRecorder.stop(); } catch (e) {} }
-      voiceRecorder = null;
-      if (voiceStream) { voiceStream.getTracks().forEach((tr) => tr.stop()); voiceStream = null; }
+      voiceRecorder = null; if (voiceStream) { voiceStream.getTracks().forEach((tr) => tr.stop()); voiceStream = null; }
       document.getElementById('voiceStatusBar')?.classList.remove('show');
     }
 
-    function discardVoiceDraft() {
-      pendingVoiceDraft = null;
-      const el = document.getElementById('voiceDraftAudio');
-      if (el) { el.pause(); el.removeAttribute('src'); }
-      document.getElementById('voiceDraftBar')?.classList.remove('show');
-    }
+    function discardVoiceDraft() { pendingVoiceDraft = null; const el = document.getElementById('voiceDraftAudio'); if (el) { el.pause(); el.removeAttribute('src'); } document.getElementById('voiceDraftBar')?.classList.remove('show'); }
 
     async function startVoiceWithPause() {
-      const myUid = getMyUid();
-      if (!activeChatId || !myUid) return;
+      const myUid = getMyUid(); if (!activeChatId || !myUid) return;
       if (voicePauseTimer || (voiceRecorder && voiceRecorder.state === 'recording')) { stopVoiceRecordingNow(); return; }
       discardVoiceDraft();
-      const bar = document.getElementById('voiceStatusBar');
-      const st = document.getElementById('voiceStatusText');
+      const bar = document.getElementById('voiceStatusBar'); const st = document.getElementById('voiceStatusText');
       bar.classList.add('show'); st.textContent = 'Пауза перед записью: 2 сек...';
-      try {
-        voiceStream = await navigator.mediaDevices.getUserMedia(getHdAudioConstraints());
-      } catch (e) { bar.classList.remove('show'); toast('Нет доступа к микрофону'); return; }
+      try { voiceStream = await navigator.mediaDevices.getUserMedia(getHdAudioConstraints()); } catch (e) { bar.classList.remove('show'); toast('Нет доступа к микрофону'); return; }
       voicePauseTimer = setTimeout(() => {
         voicePauseTimer = null;
         if (!voiceStream || !activeChatId) { cancelVoiceState(); return; }
-        const mime = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
-          ? 'audio/webm;codecs=opus'
-          : '';
-        voiceRecorder = mime
-          ? new MediaRecorder(voiceStream, { mimeType: mime, audioBitsPerSecond: 128000 })
-          : new MediaRecorder(voiceStream);
+        const mime = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) ? 'audio/webm;codecs=opus' : '';
+        voiceRecorder = mime ? new MediaRecorder(voiceStream, { mimeType: mime, audioBitsPerSecond: 128000 }) : new MediaRecorder(voiceStream);
         voiceChunks = []; voiceStartMs = Date.now();
         voiceRecorder.ondataavailable = (ev) => { if (ev.data?.size) voiceChunks.push(ev.data); };
         voiceRecorder.onstop = () => {
           const dur = Math.max(1, Math.round((Date.now() - voiceStartMs) / 1000));
           if (voiceStream) { voiceStream.getTracks().forEach((tr) => tr.stop()); voiceStream = null; }
           bar.classList.remove('show');
-          const blob = new Blob(voiceChunks, { type: voiceRecorder?.mimeType || 'audio/webm' });
-          voiceChunks = [];
+          const blob = new Blob(voiceChunks, { type: voiceRecorder?.mimeType || 'audio/webm' }); voiceChunks = [];
           if (!blob.size) return;
-          if (blob.size > 750000) {
-            toast('Запись слишком длинная — запишите покороче');
-            return;
-          }
+          if (blob.size > 750000) { toast('Запись слишком длинная — запишите покороче'); return; }
           const r = new FileReader();
           r.onload = () => {
             pendingVoiceDraft = { audioData: String(r.result || ''), durSec: dur };
@@ -6457,26 +5670,16 @@
           };
           r.readAsDataURL(blob);
         };
-        voiceRecorder.start();
-        st.textContent = 'Идёт чистая HD запись... Нажмите «Остановить»';
+        voiceRecorder.start(); st.textContent = 'Идёт чистая HD запись... Нажмите «Остановить»';
       }, 2000);
     }
 
-    function stopVoiceRecordingNow() {
-      if (voicePauseTimer) { clearTimeout(voicePauseTimer); voicePauseTimer = null; }
-      if (voiceRecorder?.state === 'recording') voiceRecorder.stop();
-      else cancelVoiceState();
-    }
+    function stopVoiceRecordingNow() { if (voicePauseTimer) { clearTimeout(voicePauseTimer); voicePauseTimer = null; } if (voiceRecorder?.state === 'recording') voiceRecorder.stop(); else cancelVoiceState(); }
 
     async function sendVoiceDraft() {
-      const myUid = getMyUid();
-      if (!pendingVoiceDraft || !activeChatId || !myUid) return;
-      const { audioData, durSec } = pendingVoiceDraft; const cid = activeChatId;
-      discardVoiceDraft();
-      playTone('sent');
-      await addDoc(collection(db, 'chats', cid, 'messages'), {
-        senderUid: myUid, senderName: myDisplayName(), kind: 'voice', audioData, durationSec: durSec, seenBy: [myUid], createdAt: serverTimestamp()
-      }).catch(() => {});
+      const myUid = getMyUid(); if (!pendingVoiceDraft || !activeChatId || !myUid) return;
+      const { audioData, durSec } = pendingVoiceDraft; const cid = activeChatId; discardVoiceDraft(); playTone('sent');
+      await addDoc(collection(db, 'chats', cid, 'messages'), { senderUid: myUid, senderName: myDisplayName(), kind: 'voice', audioData, durationSec: durSec, seenBy: [myUid], createdAt: serverTimestamp() }).catch(() => {});
       await updateDoc(doc(db, 'chats', cid), { lastMessage: `Голосовое (${durSec} сек)`, lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp() }).catch(() => {});
       toast('Голосовое отправлено');
     }
@@ -6490,320 +5693,170 @@
       }
       if (!el.paused) { el.pause(); playingVoiceMsgId = null; document.getElementById('vpBtn_' + msgId).textContent = '▶'; return; }
       el.play().then(() => {
-        playingVoiceMsgId = msgId;
-        document.getElementById('vpBtn_' + msgId).textContent = '❚❚';
-        clearInterval(voiceProgressTimer);
+        playingVoiceMsgId = msgId; document.getElementById('vpBtn_' + msgId).textContent = '❚❚'; clearInterval(voiceProgressTimer);
         voiceProgressTimer = setInterval(() => {
-          const cur = voiceAudioMap.get(playingVoiceMsgId);
-          const fill = document.getElementById('vpFill_' + playingVoiceMsgId);
+          const cur = voiceAudioMap.get(playingVoiceMsgId); const fill = document.getElementById('vpFill_' + playingVoiceMsgId);
           if (cur && fill && cur.duration) fill.style.width = Math.min(100, (cur.currentTime / cur.duration) * 100) + '%';
         }, 120);
       }).catch(() => {});
     }
 
     function openFullCallUi(peerName, statusText, opts = {}) {
-      callSeconds = 0;
-      callMuted = false;
-      const nameEl = document.getElementById('callPeerName');
-      const stEl = document.getElementById('callStatusText');
-      const tmEl = document.getElementById('callTimerText');
-      const muteBtn = document.getElementById('callMuteBtn');
-      const acceptBtn = document.getElementById('callAcceptBtn');
-      if (nameEl) nameEl.textContent = peerName || 'Собеседник';
-      if (stEl) stEl.textContent = statusText || 'Вызов...';
-      if (tmEl) tmEl.textContent = '00:00';
-      if (muteBtn) muteBtn.textContent = 'Микрофон вкл';
-      if (acceptBtn) acceptBtn.style.display = opts.isIncoming ? 'inline-flex' : 'none';
-      document.getElementById('fullCallScreen')?.classList.add('open');
-
-      clearInterval(callTimerInterval);
+      callSeconds = 0; callMuted = false;
+      const nameEl = document.getElementById('callPeerName'); const stEl = document.getElementById('callStatusText');
+      const tmEl = document.getElementById('callTimerText'); const muteBtn = document.getElementById('callMuteBtn'); const acceptBtn = document.getElementById('callAcceptBtn');
+      if (nameEl) nameEl.textContent = peerName || 'Собеседник'; if (stEl) stEl.textContent = statusText || 'Вызов...';
+      if (tmEl) tmEl.textContent = '00:00'; if (muteBtn) muteBtn.textContent = 'Микрофон вкл'; if (acceptBtn) acceptBtn.style.display = opts.isIncoming ? 'inline-flex' : 'none';
+      document.getElementById('fullCallScreen')?.classList.add('open'); clearInterval(callTimerInterval);
       if (!opts.isIncoming) {
         callTimerInterval = setInterval(() => {
           callSeconds += 1;
-          const mm = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-          const ss = String(callSeconds % 60).padStart(2, '0');
-          if (tmEl) tmEl.textContent = `${mm}:${ss}`;
+          if (tmEl) tmEl.textContent = `${String(Math.floor(callSeconds / 60)).padStart(2, '0')}:${String(callSeconds % 60).padStart(2, '0')}`;
         }, 1000);
       }
     }
 
     function startActiveCallTimer() {
-      const tmEl = document.getElementById('callTimerText');
-      clearInterval(callTimerInterval);
+      const tmEl = document.getElementById('callTimerText'); clearInterval(callTimerInterval);
       callTimerInterval = setInterval(() => {
         callSeconds += 1;
-        const mm = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-        const ss = String(callSeconds % 60).padStart(2, '0');
-        if (tmEl) tmEl.textContent = `${mm}:${ss}`;
+        if (tmEl) tmEl.textContent = `${String(Math.floor(callSeconds / 60)).padStart(2, '0')}:${String(callSeconds % 60).padStart(2, '0')}`;
       }, 1000);
     }
 
     function closeFullCallUi() {
-      stopRingingLoop();
-      clearInterval(callTimerInterval);
-      callTimerInterval = null;
-      callSeconds = 0;
-      callMuted = false;
-      const acceptBtn = document.getElementById('callAcceptBtn');
-      if (acceptBtn) acceptBtn.style.display = 'none';
+      stopRingingLoop(); clearInterval(callTimerInterval); callTimerInterval = null; callSeconds = 0; callMuted = false;
+      const acceptBtn = document.getElementById('callAcceptBtn'); if (acceptBtn) acceptBtn.style.display = 'none';
       document.getElementById('fullCallScreen')?.classList.remove('open');
     }
 
     function toggleCallMute() {
-      if (!localCallStream) return;
-      callMuted = !callMuted;
-      localCallStream.getAudioTracks().forEach((tr) => { tr.enabled = !callMuted; });
-      const muteBtn = document.getElementById('callMuteBtn');
-      if (muteBtn) muteBtn.textContent = callMuted ? 'Микрофон выкл' : 'Микрофон вкл';
+      if (!localCallStream) return; callMuted = !callMuted; localCallStream.getAudioTracks().forEach((tr) => { tr.enabled = !callMuted; });
+      const muteBtn = document.getElementById('callMuteBtn'); if (muteBtn) muteBtn.textContent = callMuted ? 'Микрофон выкл' : 'Микрофон вкл';
       toast(callMuted ? 'Микрофон выключен' : 'Микрофон включён');
     }
 
     async function flushRemoteIceQueue(targetPeerConnection, queue) {
       if (!targetPeerConnection || !targetPeerConnection.remoteDescription || !Array.isArray(queue)) return;
-      while (queue.length) {
-        const cand = queue.shift();
-        try {
-          await targetPeerConnection.addIceCandidate(new RTCIceCandidate(cand));
-        } catch (e) {}
-      }
+      while (queue.length) { const cand = queue.shift(); try { await targetPeerConnection.addIceCandidate(new RTCIceCandidate(cand)); } catch (e) {} }
     }
 
     function attachIceExchange(peerConn, callId, role) {
-      const myRole = role === 'caller' ? 'callerCandidates' : 'calleeCandidates';
-      const remoteRole = role === 'caller' ? 'calleeCandidates' : 'callerCandidates';
+      const myRole = role === 'caller' ? 'callerCandidates' : 'calleeCandidates'; const remoteRole = role === 'caller' ? 'calleeCandidates' : 'callerCandidates';
       const remoteIceQueue = [];
-
       peerConn.onicecandidate = (ev) => {
         if (!ev.candidate || !callId) return;
-        const candObj = ev.candidate.toJSON ? ev.candidate.toJSON() : {
-          candidate: ev.candidate.candidate,
-          sdpMid: ev.candidate.sdpMid,
-          sdpMLineIndex: ev.candidate.sdpMLineIndex
-        };
-        addDoc(collection(db, 'calls', callId, myRole), candObj).catch(() => {});
+        addDoc(collection(db, 'calls', callId, myRole), ev.candidate.toJSON ? ev.candidate.toJSON() : { candidate: ev.candidate.candidate, sdpMid: ev.candidate.sdpMid, sdpMLineIndex: ev.candidate.sdpMLineIndex }).catch(() => {});
       };
-
       peerConn.onconnectionstatechange = () => {
         const stEl = document.getElementById('callStatusText');
         if (!stEl) return;
-        if (peerConn.connectionState === 'connected') {
-          stEl.textContent = 'HD связь активна';
-        } else if (peerConn.connectionState === 'failed' || peerConn.connectionState === 'disconnected') {
-          stEl.textContent = 'Связь прервалась';
-        }
+        if (peerConn.connectionState === 'connected') stEl.textContent = 'HD связь активна';
+        else if (peerConn.connectionState === 'failed' || peerConn.connectionState === 'disconnected') stEl.textContent = 'Связь прервалась';
       };
-
       const iceUnsub = onSnapshot(collection(db, 'calls', callId, remoteRole), async (snap) => {
-        snap.docChanges().forEach((ch) => {
-          if (ch.type === 'added') {
-            remoteIceQueue.push(ch.doc.data());
-          }
-        });
+        snap.docChanges().forEach((ch) => { if (ch.type === 'added') remoteIceQueue.push(ch.doc.data()); });
         await flushRemoteIceQueue(peerConn, remoteIceQueue);
       }, () => {});
-
       return { iceUnsub, remoteIceQueue };
     }
 
     async function acceptIncomingCall() {
       if (!incomingCallData || !incomingCallData.offer) return;
-      const callObj = incomingCallData;
-      incomingCallData = null;
-      stopRingingLoop();
-      const acceptBtn = document.getElementById('callAcceptBtn');
-      if (acceptBtn) acceptBtn.style.display = 'none';
-      const stEl = document.getElementById('callStatusText');
-      if (stEl) stEl.textContent = 'HD связь активна';
-
+      const callObj = incomingCallData; incomingCallData = null; stopRingingLoop();
+      const acceptBtn = document.getElementById('callAcceptBtn'); if (acceptBtn) acceptBtn.style.display = 'none';
+      const stEl = document.getElementById('callStatusText'); if (stEl) stEl.textContent = 'HD связь активна';
       try {
         localCallStream = await navigator.mediaDevices.getUserMedia(getHdAudioConstraints());
         pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
         localCallStream.getTracks().forEach((tr) => pc.addTrack(tr, localCallStream));
-        pc.ontrack = (ev) => {
-          const a = document.getElementById('remoteAudioEl');
-          if (a && ev.streams?.[0]) {
-            a.srcObject = ev.streams[0];
-            a.play().catch(() => {});
-          }
-        };
-        callDocId = callObj.id;
-        const iceCtx = attachIceExchange(pc, callObj.id, 'callee');
-        callUnsub = iceCtx.iceUnsub;
-        await pc.setRemoteDescription(new RTCSessionDescription(callObj.offer));
-        await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-        await updateDoc(doc(db, 'calls', callObj.id), {
-          status: 'answered',
-          answer: { type: answer.type, sdp: answer.sdp }
-        }).catch(() => {});
-        startActiveCallTimer();
-        toast('Звонок принят');
-      } catch (e) {
-        hangupCall();
-        toast('Нет доступа к микрофону');
-      }
+        pc.ontrack = (ev) => { const a = document.getElementById('remoteAudioEl'); if (a && ev.streams?.[0]) { a.srcObject = ev.streams[0]; a.play().catch(() => {}); } };
+        callDocId = callObj.id; const iceCtx = attachIceExchange(pc, callObj.id, 'callee'); callUnsub = iceCtx.iceUnsub;
+        await pc.setRemoteDescription(new RTCSessionDescription(callObj.offer)); await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
+        const answer = await pc.createAnswer(); await pc.setLocalDescription(answer);
+        await updateDoc(doc(db, 'calls', callObj.id), { status: 'answered', answer: { type: answer.type, sdp: answer.sdp } }).catch(() => {});
+        startActiveCallTimer(); toast('Звонок принят');
+      } catch (e) { hangupCall(); toast('Нет доступа к микрофону'); }
     }
 
     async function toggleAudioCall() {
-      if (callDocId || incomingCallData) {
-        hangupCall();
-        toast('Звонок завершён');
-        return;
-      }
-      const myUid = getMyUid();
-      const chat = chats.find((x) => x.id === activeChatId);
-      const peerUid = chat?.members?.find((u) => u && u !== myUid);
-      const peerName = document.getElementById('chatHeaderTitle')?.textContent || 'Собеседник';
+      if (callDocId || incomingCallData) { hangupCall(); toast('Звонок завершён'); return; }
+      const myUid = getMyUid(); const chat = chats.find((x) => x.id === activeChatId);
+      const peerUid = chat?.members?.find((u) => u && u !== myUid); const peerName = document.getElementById('chatHeaderTitle')?.textContent || 'Собеседник';
       if (!myUid || !peerUid) { toast('Выберите собеседника'); return; }
       try {
         localCallStream = await navigator.mediaDevices.getUserMedia(getHdAudioConstraints());
         pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
         localCallStream.getTracks().forEach((tr) => pc.addTrack(tr, localCallStream));
-        pc.ontrack = (ev) => {
-          const a = document.getElementById('remoteAudioEl');
-          if (a && ev.streams?.[0]) {
-            a.srcObject = ev.streams[0];
-            a.play().catch(() => {});
-          }
-        };
-        const newId = 'call_' + Date.now();
-        callDocId = newId;
-        openFullCallUi(peerName, 'Идут гудки... • Шумоподавление');
-        startRingingLoop('ringback');
-        const iceCtx = attachIceExchange(pc, newId, 'caller');
-        callUnsub = iceCtx.iceUnsub;
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        await setDoc(doc(db, 'calls', newId), {
-          fromUid: myUid,
-          fromName: myDisplayName(),
-          toUid: peerUid,
-          status: 'ringing',
-          offer: { type: offer.type, sdp: offer.sdp },
-          createdAt: serverTimestamp()
-        });
+        pc.ontrack = (ev) => { const a = document.getElementById('remoteAudioEl'); if (a && ev.streams?.[0]) { a.srcObject = ev.streams[0]; a.play().catch(() => {}); } };
+        const newId = 'call_' + Date.now(); callDocId = newId;
+        openFullCallUi(peerName, 'Идут гудки... • Шумоподавление'); startRingingLoop('ringback');
+        const iceCtx = attachIceExchange(pc, newId, 'caller'); callUnsub = iceCtx.iceUnsub;
+        const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+        await setDoc(doc(db, 'calls', newId), { fromUid: myUid, fromName: myDisplayName(), toUid: peerUid, status: 'ringing', offer: { type: offer.type, sdp: offer.sdp }, createdAt: serverTimestamp() });
         if (outgoingCallUnsub) outgoingCallUnsub();
         outgoingCallUnsub = onSnapshot(doc(db, 'calls', newId), async (snap) => {
-          const d = snap.data();
-          if (!d) return;
+          const d = snap.data(); if (!d) return;
           if (d.status === 'answered' && d.answer && pc && !pc.currentRemoteDescription) {
-            stopRingingLoop();
-            const stEl = document.getElementById('callStatusText');
-            if (stEl) stEl.textContent = 'HD связь активна';
-            await pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(() => {});
-            await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
-          } else if (d.status === 'ended' || d.status === 'declined') {
-            hangupCall(false);
-            toast('Звонок завершён');
-          }
+            stopRingingLoop(); const stEl = document.getElementById('callStatusText'); if (stEl) stEl.textContent = 'HD связь активна';
+            await pc.setRemoteDescription(new RTCSessionDescription(d.answer)).catch(() => {}); await flushRemoteIceQueue(pc, iceCtx.remoteIceQueue);
+          } else if (d.status === 'ended' || d.status === 'declined') { hangupCall(false); toast('Звонок завершён'); }
         }, () => {});
-        const btn = document.getElementById('callToggleBtn');
-        if (btn) btn.textContent = 'Сбросить';
-      } catch (e) {
-        closeFullCallUi();
-        toast('Нет доступа к микрофону');
-      }
+        const btn = document.getElementById('callToggleBtn'); if (btn) btn.textContent = 'Сбросить';
+      } catch (e) { closeFullCallUi(); toast('Нет доступа к микрофону'); }
     }
 
     function hangupCall(notifyPeer = true) {
       const targetCallId = callDocId || incomingCallData?.id;
-      if (notifyPeer && targetCallId) {
-        updateDoc(doc(db, 'calls', targetCallId), { status: 'ended' }).catch(() => {});
-      }
-      callDocId = null;
-      incomingCallData = null;
-      closeFullCallUi();
+      if (notifyPeer && targetCallId) updateDoc(doc(db, 'calls', targetCallId), { status: 'ended' }).catch(() => {});
+      callDocId = null; incomingCallData = null; closeFullCallUi();
       if (outgoingCallUnsub) { outgoingCallUnsub(); outgoingCallUnsub = null; }
       if (callUnsub) { callUnsub(); callUnsub = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
       if (localCallStream) { localCallStream.getTracks().forEach((tr) => tr.stop()); localCallStream = null; }
-      const btn = document.getElementById('callToggleBtn');
-      if (btn) btn.textContent = 'Позвонить';
+      const btn = document.getElementById('callToggleBtn'); if (btn) btn.textContent = 'Позвонить';
     }
 
     function cleanHHMM(raw) {
-      const m = String(raw || '').match(/(\d{1,2}:\d{2})/);
-      if (!m) return '--:--';
-      const [h, min] = m[1].split(':');
-      return `${String(Number(h)).padStart(2, '0')}:${String(Number(min)).padStart(2, '0')}`;
+      const m = String(raw || '').match(/(\d{1,2}:\d{2})/); if (!m) return '--:--';
+      const [h, min] = m[1].split(':'); return `${String(Number(h)).padStart(2, '0')}:${String(Number(min)).padStart(2, '0')}`;
     }
 
     function hhmmToMins(hm) {
-      if (!/^\d{2}:\d{2}$/.test(hm)) return null;
-      const [h, m] = hm.split(':').map(Number);
-      if (h < 0 || h > 23 || m < 0 || m > 59) return null;
-      return h * 60 + m;
+      if (!/^\d{2}:\d{2}$/.test(hm)) return null; const [h, m] = hm.split(':').map(Number);
+      if (h < 0 || h > 23 || m < 0 || m > 59) return null; return h * 60 + m;
     }
 
     function highlightCurrentPrayer(t) {
-      const keys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-      const labels = { Fajr: 'Фаджр', Dhuhr: 'Зухр', Asr: 'Аср', Maghrib: 'Магриб', Isha: 'Иша' };
-
-      keys.forEach((k) => {
-        document.getElementById('box' + k)?.classList.remove('current-prayer');
-      });
-
+      const keys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']; const labels = { Fajr: 'Фаджр', Dhuhr: 'Зухр', Asr: 'Аср', Maghrib: 'Магриб', Isha: 'Иша' };
+      keys.forEach((k) => document.getElementById('box' + k)?.classList.remove('current-prayer'));
       const banner = document.getElementById('namazActiveBanner');
-      const entries = keys
-        .map((k) => ({ key: k, label: labels[k], hm: cleanHHMM(t[k]), mins: hhmmToMins(cleanHHMM(t[k])) }))
-        .filter((x) => x.mins !== null);
+      const entries = keys.map((k) => ({ key: k, label: labels[k], hm: cleanHHMM(t[k]), mins: hhmmToMins(cleanHHMM(t[k])) })).filter((x) => x.mins !== null);
+      if (entries.length < 5) { if (banner) banner.textContent = 'Задайте все 5 времён для подсветки текущего намаза'; return null; }
 
-      if (entries.length < 5) {
-        if (banner) banner.textContent = 'Задайте все 5 времён для подсветки текущего намаза';
-        return null;
-      }
-
-      const now = new Date();
-      const nowMins = now.getHours() * 60 + now.getMinutes();
-
+      const now = new Date(); const nowMins = now.getHours() * 60 + now.getMinutes();
       let activeIdx = entries.length - 1;
-      for (let i = 0; i < entries.length; i++) {
-        if (nowMins < entries[i].mins) {
-          activeIdx = i === 0 ? entries.length - 1 : i - 1;
-          break;
-        }
-      }
+      for (let i = 0; i < entries.length; i++) { if (nowMins < entries[i].mins) { activeIdx = i === 0 ? entries.length - 1 : i - 1; break; } }
 
-      const activeItem = entries[activeIdx];
-      const nextItem = entries[(activeIdx + 1) % entries.length];
-
+      const activeItem = entries[activeIdx]; const nextItem = entries[(activeIdx + 1) % entries.length];
       document.getElementById('box' + activeItem.key)?.classList.add('current-prayer');
-
-      if (banner) {
-        banner.textContent = `Сейчас идёт: ${activeItem.label} (${activeItem.hm}) • Далее: ${nextItem.label} в ${nextItem.hm}`;
-      }
+      if (banner) banner.textContent = `Сейчас идёт: ${activeItem.label} (${activeItem.hm}) • Далее: ${nextItem.label} в ${nextItem.hm}`;
       return activeItem;
     }
 
     function renderOskemenPrayerUI() {
       const t = state.manualPrayerTimes || {};
-      ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((k) => {
-        const el = document.getElementById('pt' + k);
-        if (el) el.textContent = cleanHHMM(t[k]);
-      });
-
+      ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'].forEach((k) => { const el = document.getElementById('pt' + k); if (el) el.textContent = cleanHHMM(t[k]); });
       const activeItem = highlightCurrentPrayer(t);
-
       const stEl = document.getElementById('namazSourceStatus');
-      if (stEl) {
-        stEl.textContent = t.updatedDateLabel
-          ? `Оскемен • Обновлено: ${t.updatedDateLabel}`
-          : 'Оскемен • Нажмите «Изменить время», чтобы задать расписание на день';
-      }
-
+      if (stEl) stEl.textContent = t.updatedDateLabel ? `Оскемен • Обновлено: ${t.updatedDateLabel}` : 'Оскемен • Нажмите «Изменить время», чтобы задать расписание на день';
       const prev = document.getElementById('profileNamazPreview');
-      if (prev) {
-        prev.textContent = activeItem
-          ? `Оскемен • Сейчас: ${activeItem.label} (${activeItem.hm})`
-          : `Оскемен • Фаджр ${cleanHHMM(t.Fajr)} • Магриб ${cleanHHMM(t.Maghrib)}`;
-      }
+      if (prev) prev.textContent = activeItem ? `Оскемен • Сейчас: ${activeItem.label} (${activeItem.hm})` : `Оскемен • Фаджр ${cleanHHMM(t.Fajr)} • Магриб ${cleanHHMM(t.Maghrib)}`;
     }
 
     function togglePrayerEditor(forceState) {
       prayerEditOpen = typeof forceState === 'boolean' ? forceState : !prayerEditOpen;
-      const panel = document.getElementById('prayerEditPanel');
-      if (!panel) return;
+      const panel = document.getElementById('prayerEditPanel'); if (!panel) return;
       panel.style.display = prayerEditOpen ? 'block' : 'none';
       if (prayerEditOpen) {
         const t = state.manualPrayerTimes || {};
@@ -6816,179 +5869,72 @@
     }
 
     async function saveManualOskemenTimes() {
-      const f = cleanHHMM(document.getElementById('inFajr')?.value);
-      const d = cleanHHMM(document.getElementById('inDhuhr')?.value);
-      const a = cleanHHMM(document.getElementById('inAsr')?.value);
-      const m = cleanHHMM(document.getElementById('inMaghrib')?.value);
-      const i = cleanHHMM(document.getElementById('inIsha')?.value);
-      if ([f, d, a, m, i].includes('--:--')) {
-        toast('Заполните все 5 времён намаза');
-        return;
-      }
+      const f = cleanHHMM(document.getElementById('inFajr')?.value); const d = cleanHHMM(document.getElementById('inDhuhr')?.value);
+      const a = cleanHHMM(document.getElementById('inAsr')?.value); const m = cleanHHMM(document.getElementById('inMaghrib')?.value); const i = cleanHHMM(document.getElementById('inIsha')?.value);
+      if ([f, d, a, m, i].includes('--:--')) { toast('Заполните все 5 времён намаза'); return; }
 
       const now = new Date();
       const label = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
-      state.manualPrayerTimes = {
-        Fajr: f,
-        Dhuhr: d,
-        Asr: a,
-        Maghrib: m,
-        Isha: i,
-        updatedDateLabel: label
-      };
-      persist();
-      renderOskemenPrayerUI();
-      togglePrayerEditor(false);
+      state.manualPrayerTimes = { Fajr: f, Dhuhr: d, Asr: a, Maghrib: m, Isha: i, updatedDateLabel: label };
+      persist(); renderOskemenPrayerUI(); togglePrayerEditor(false);
 
-      const prayerPayload = {
-        Fajr: f,
-        Dhuhr: d,
-        Asr: a,
-        Maghrib: m,
-        Isha: i,
-        updatedDateLabel: label,
-        updatedBy: myDisplayName(),
-        updatedAt: serverTimestamp()
-      };
-      setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true }).catch(() => {
-        queueCloudRetry(() => setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true }));
-      });
-
+      const prayerPayload = { Fajr: f, Dhuhr: d, Asr: a, Maghrib: m, Isha: i, updatedDateLabel: label, updatedBy: myDisplayName(), updatedAt: serverTimestamp() };
+      setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true }).catch(() => queueCloudRetry(() => setDoc(doc(db, 'settings', 'oskemen_prayer'), prayerPayload, { merge: true })));
       toast('Время намаза по Оскемену сохранено');
     }
 
-    function openNamazQiblaModal() {
-      togglePrayerEditor(false);
-      renderOskemenPrayerUI();
-      document.getElementById('namazQiblaModal')?.classList.add('open');
-    }
-
-    setInterval(() => {
-      if (document.getElementById('namazQiblaModal')?.classList.contains('open')) {
-        renderOskemenPrayerUI();
-      }
-    }, 30000);
+    function openNamazQiblaModal() { togglePrayerEditor(false); renderOskemenPrayerUI(); document.getElementById('namazQiblaModal')?.classList.add('open'); }
+    setInterval(() => { if (document.getElementById('namazQiblaModal')?.classList.contains('open')) renderOskemenPrayerUI(); }, 30000);
 
     function openEditProfileModal() {
       try {
-        const plain = getMyPlainName();
-        const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(state.nameStyle) ? state.nameStyle : 'normal';
-        document.getElementById('editNameField').value = plain;
-        document.getElementById('editNameStyleSelect').value = styleKey;
-        document.getElementById('editAccountTypeSelect').value = normalizeAccountType(state.accountType);
-        document.getElementById('editBioField').value = state.bio || '';
-        document.getElementById('editHideFromSearchSelect').value = state.hideFromSearch ? '1' : '0';
-        document.getElementById('editHideLastSeenSelect').value = state.hideLastSeen ? '1' : '0';
-        updateNameStylePreview();
-        document.getElementById('editProfileModal')?.classList.add('open');
+        const plain = getMyPlainName(); const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(state.nameStyle) ? state.nameStyle : 'normal';
+        document.getElementById('editNameField').value = plain; document.getElementById('editNameStyleSelect').value = styleKey;
+        document.getElementById('editAccountTypeSelect').value = normalizeAccountType(state.accountType); document.getElementById('editBioField').value = state.bio || '';
+        document.getElementById('editHideFromSearchSelect').value = state.hideFromSearch ? '1' : '0'; document.getElementById('editHideLastSeenSelect').value = state.hideLastSeen ? '1' : '0';
+        updateNameStylePreview(); document.getElementById('editProfileModal')?.classList.add('open');
       } catch (e) {}
     }
 
     async function saveProfileData() {
       try {
         const rawName = (document.getElementById('editNameField')?.value || '').trim();
-        const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(document.getElementById('editNameStyleSelect')?.value)
-          ? document.getElementById('editNameStyleSelect').value
-          : 'normal';
+        const styleKey = ['normal', 'bold', 'italic', 'fraktur', 'mono'].includes(document.getElementById('editNameStyleSelect')?.value) ? document.getElementById('editNameStyleSelect').value : 'normal';
         const accType = normalizeAccountType(document.getElementById('editAccountTypeSelect')?.value);
         const bioVal = (document.getElementById('editBioField')?.value || '').trim();
         const hideSearch = document.getElementById('editHideFromSearchSelect')?.value === '1';
         const hideSeen = document.getElementById('editHideLastSeenSelect')?.value === '1';
-
         if (!checkTextBeforeSubmit(`${rawName} ${bioVal}`)) return;
 
         const basePlain = rawName || getMyPlainName();
-        state.namePlain = basePlain;
-        state.nameStyle = styleKey;
-        state.name = formatStyledName(basePlain, styleKey);
-        state.accountType = accType;
-        state.hasChosenAccountType = true;
-        state.bio = bioVal;
-        state.hideFromSearch = hideSearch;
-        state.hideLastSeen = hideSeen;
+        state.namePlain = basePlain; state.nameStyle = styleKey; state.name = formatStyledName(basePlain, styleKey);
+        state.accountType = accType; state.hasChosenAccountType = true; state.bio = bioVal; state.hideFromSearch = hideSearch; state.hideLastSeen = hideSeen;
 
-        persist();
-        await syncProfileCloud(currentUser, { explicitMediaChange: false });
-        renderMyProfile();
-        renderFriendsTab();
-        renderUnifiedSearch();
-        hideModal('editProfileModal');
-        toast('Сохранено');
-      } catch (e) {
-        toast('Не удалось сохранить профиль');
-      }
+        persist(); await syncProfileCloud(currentUser, { explicitMediaChange: false });
+        renderMyProfile(); renderFriendsTab(); renderUnifiedSearch(); hideModal('editProfileModal'); toast('Сохранено');
+      } catch (e) { toast('Не удалось сохранить профиль'); }
     }
 
-    function openDeleteAccountModal() {
-      document.getElementById('deleteAccountModal')?.classList.add('open');
-    }
+    function openDeleteAccountModal() { document.getElementById('deleteAccountModal')?.classList.add('open'); }
 
     async function deleteMyPageCompletely() {
-      const btn = document.getElementById('confirmDeleteAccountBtn');
-      if (btn) btn.disabled = true;
-      const uid = getMyUid();
-
+      const btn = document.getElementById('confirmDeleteAccountBtn'); if (btn) btn.disabled = true; const uid = getMyUid();
       try {
-        try { hangupCall(false); } catch (e) {}
-        try { cancelVoiceState(); discardVoiceDraft(); } catch (e) {}
-
+        try { hangupCall(false); } catch (e) {} try { cancelVoiceState(); discardVoiceDraft(); } catch (e) {}
         if (uid) {
           try { await deleteDoc(doc(db, 'users', uid)); } catch (e) {}
-
-          const myCloudPosts = posts.filter((p) => p && p.authorUid === uid && !String(p.id).startsWith('post_'));
-          for (const p of myCloudPosts) {
-            try { await deleteDoc(doc(db, 'posts', p.id)); } catch (e) {}
-          }
-
-          const relatedReqs = friendsDocs.filter((r) => r && (r.fromUid === uid || r.toUid === uid));
-          for (const r of relatedReqs) {
-            try { await deleteDoc(doc(db, 'friendRequests', r.id)); } catch (e) {}
-          }
+          for (const p of posts.filter((p) => p && p.authorUid === uid && !String(p.id).startsWith('post_'))) { try { await deleteDoc(doc(db, 'posts', p.id)); } catch (e) {} }
+          for (const r of friendsDocs.filter((r) => r && (r.fromUid === uid || r.toUid === uid))) { try { await deleteDoc(doc(db, 'friendRequests', r.id)); } catch (e) {} }
         }
-
         state = {
-          name: '',
-          namePlain: '',
-          nameStyle: 'normal',
-          accountType: 'user',
-          hasChosenAccountType: false,
-          hideFromSearch: false,
-          hideLastSeen: false,
-          bio: '',
-          avatar: '',
-          photos: [],
-          story: '',
-          storyStart: 0,
-          storyEnd: 0,
-          storyLabel: '',
-          karmaClicksByPost: {},
-          manualPrayerTimes: state.manualPrayerTimes,
-          cachedFriends: [],
-          cachedUsers: [],
-          cachedRequests: [],
-          cachedVyruchka: [],
-          lastUid: '',
-          lastSilentError: null
+          name: '', namePlain: '', nameStyle: 'normal', accountType: 'user', hasChosenAccountType: false, hideFromSearch: false, hideLastSeen: false,
+          bio: '', avatar: '', photos: [], story: '', storyStart: 0, storyEnd: 0, storyLabel: '', karmaClicksByPost: {},
+          manualPrayerTimes: state.manualPrayerTimes, cachedFriends: [], cachedUsers: [], cachedRequests: [], cachedVyruchka: [], lastUid: '', lastSilentError: null
         };
-        posts = posts.filter((p) => p.authorUid !== uid);
-        users = users.filter((u) => u.uid !== uid);
-        friendsDocs = friendsDocs.filter((r) => r.fromUid !== uid && r.toUid !== uid);
-
-        try { localStorage.removeItem(STORE_KEY); } catch (e) {}
-        try { localStorage.removeItem(VAULT_BACKUP_KEY); } catch (e) {}
-        try { localStorage.removeItem(MEDIA_VAULT_KEY); } catch (e) {}
-
-        hideModal('deleteAccountModal');
-        try { await signOut(auth); } catch (e) {}
-        showScreen('splash');
-        toast('Ваша страница удалена');
-      } catch (err) {
-        hideModal('deleteAccountModal');
-        showScreen('splash');
-        toast('Страница очищена');
-      } finally {
-        if (btn) btn.disabled = false;
-      }
+        posts = posts.filter((p) => p.authorUid !== uid); users = users.filter((u) => u.uid !== uid); friendsDocs = friendsDocs.filter((r) => r.fromUid !== uid && r.toUid !== uid);
+        try { localStorage.removeItem(STORE_KEY); localStorage.removeItem(VAULT_BACKUP_KEY); localStorage.removeItem(MEDIA_VAULT_KEY); } catch (e) {}
+        hideModal('deleteAccountModal'); try { await signOut(auth); } catch (e) {} showScreen('splash'); toast('Ваша страница удалена');
+      } catch (err) { hideModal('deleteAccountModal'); showScreen('splash'); toast('Страница очищена'); } finally { if (btn) btn.disabled = false; }
     }
 
     function hideModal(id) { document.getElementById(id)?.classList.remove('open'); }
@@ -7002,29 +5948,20 @@
       switchMainTab, switchMySubtab, setPulseFilter,
       clearVyruchkaAttachment, toggleVyruchkaForm, setVyruchkaFilter, submitVyruchkaEntry, approveVyruchkaItem, deleteVyruchkaItem, renderVyruchkaTab,
       clearReadingAttachment, openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
-      changeReadingFont, openAddReadingModal,
-      saveNewReadingItem, approveReadingItem, deleteReadingItem,
+      changeReadingFont, openAddReadingModal, saveNewReadingItem, approveReadingItem, deleteReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
-      onSupportTitleTripleTap, unlockCreatorByCode,
-      openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket,
-      openPhotoPicker, startCamera, startGallery, onImageChosen,
-      deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
-      onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory,
-      openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
-      openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost,
-      giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,
-      openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer,
-      refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
-      openCreateGroupModal, createNewGroup, joinChatGroup,
-      openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
+      onSupportTitleTripleTap, unlockCreatorByCode, openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket,
+      openPhotoPicker, startCamera, startGallery, onImageChosen, deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
+      onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory, openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
+      openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost, giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,
+      openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer, refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
+      openCreateGroupModal, createNewGroup, joinChatGroup, openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
       startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft, toggleVoicePlay,
       toggleAudioCall, acceptIncomingCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop
     });
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {}));
-    }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {})); }
 
     silentHealMediaAndPosts();
     renderBooksTab();
@@ -7037,3 +5974,4 @@
   </script>
 </body>
 </html>
+

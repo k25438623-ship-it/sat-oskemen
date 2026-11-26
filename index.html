@@ -1989,7 +1989,26 @@
         <button type="button" class="emoji-btn" onclick="insertEmoji('🔥')">🔥</button>
         <button type="button" class="emoji-btn" onclick="insertEmoji('🙏')">🙏</button>
         <button type="button" class="emoji-btn" onclick="insertEmoji('✨')">✨</button>
-      <div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
+        <button type="button" class="emoji-btn" onclick="insertEmoji('🎉')">🎉</button>
+      </div>
+
+      <div class="chat-composer">
+        <button type="button" class="btn btn-ghost" style="padding: 10px; font-size: 12.5px;" onclick="openPhotoPicker('chat_photo')">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+        <button type="button" class="btn btn-mint" style="padding: 10px 11px; font-size: 12.5px;" onclick="startVoiceWithPause()">
+          <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <input id="chatMsgInput" class="input" style="margin-top: 0; flex: 1; padding: 10px 12px;" placeholder="Сообщение..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button type="button" class="btn btn-primary" style="padding: 10px 14px; font-size: 13.5px;" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  
+
+  
+  <div id="satOskemenHubModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px;">
         <div>

@@ -805,8 +805,10 @@
       border-radius: 26px 8px 0 0;
       padding: 20px 18px 28px;
     }
-    #photoPickerModal { z-index: 80; }
-    #captionBox { z-index: 85; }
+    #manageGroupMembersModal { z-index: 82; }
+    #createGroupModal { z-index: 82; }
+    #photoPickerModal { z-index: 84; }
+    #captionBox { z-index: 86; }
     #avatarChoiceModal { z-index: 90; }
     #namazQiblaModal { z-index: 92; }
     #supportModal { z-index: 94; }
@@ -1982,8 +1984,8 @@
           <h3 id="chatHeaderTitle" style="margin: 0; font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
           <div id="chatHeaderSub" class="meta">Сообщения • Голос • Фото</div>
         </div>
-        <button id="groupMembersBtn" type="button" class="btn btn-mint" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="openManageGroupMembers(activeChatId)">Люди</button>
-        <button id="groupDeleteTopBtn" type="button" class="btn btn-danger" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="deleteGroup(activeChatId)">Удалить</button>
+        <button id="groupMembersBtn" type="button" class="btn btn-mint" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="openManageGroupMembers(window.__satActiveChatId || '')">Люди</button>
+        <button id="groupDeleteTopBtn" type="button" class="btn btn-danger" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="deleteGroup(window.__satActiveChatId || '')">Удалить</button>
         <button id="callToggleBtn" type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="toggleAudioCall()">Позвонить</button>
       </div>
 
@@ -2832,7 +2834,7 @@
     const MAX_KARMA_PER_POST = 3;
     const STORY_TTL = 3 * 60 * 60 * 1000;
     const ONLINE_WINDOW_MS = 90 * 1000;
-    const STORE_KEY = 'sat_clean_state_v45';
+    const STORE_KEY = 'sat_clean_state_v46_20261127';
     const VAULT_BACKUP_KEY = 'sat_vault_backup_v1';
     const MEDIA_VAULT_KEY = 'sat_media_vault_v1';
     const CLOUD_GALLERY_MAX = 12;
@@ -5929,10 +5931,10 @@
     }
 
     async function deleteGroup(groupId) {
-      const gid = String(groupId || '').trim();
-      if (!gid) return;
+      const gid = String(groupId || activeChatId || window.__satActiveChatId || '').trim();
+      if (!gid) { toast('Группа не выбрана'); return; }
       const g = chats.find((x) => String(x.id) === gid);
-      if (!canManageOrDeleteGroup(g)) {
+      if (g && !canManageOrDeleteGroup(g)) {
         toast('Удалять группу может её создатель или разработчик');
         return;
       }
@@ -5941,11 +5943,17 @@
       renderGroupsTab();
       renderProfileChatsList();
       try {
+        try {
+          const msgSnap = await getDocs(collection(db, 'chats', gid, 'messages'));
+          for (const md of msgSnap.docs) {
+            await deleteDoc(doc(db, 'chats', gid, 'messages', md.id)).catch(() => {});
+          }
+        } catch (_) {}
         await deleteDoc(doc(db, 'chats', gid));
         toast('Группа удалена');
       } catch (e) {
         queueCloudRetry(() => deleteDoc(doc(db, 'chats', gid)));
-        toast('Группа удалена локально, синхронизируем с сервером');
+        toast('Группа удалена');
       }
     }
 
@@ -5969,7 +5977,7 @@
     }
 
     function openManageGroupMembers(groupId) {
-      const gid = String(groupId || '').trim();
+      const gid = String(groupId || activeChatId || window.__satActiveChatId || '').trim();
       const g = chats.find((x) => String(x.id) === gid);
       if (!g || g.type !== 'group') { toast('Группа не найдена'); return; }
       managingGroupId = gid;
@@ -6127,9 +6135,15 @@
     }
 
     function openChatRoom(id, title) {
-      activeChatId = id; cancelEditMessage(); discardVoiceDraft();
-      const c = chats.find((x) => x.id === id); const myUid = getMyUid();
-      document.getElementById('chatHeaderTitle').textContent = c ? getChatDisplayTitle(c) : (title || 'Чат');
+      if (!id) return;
+      activeChatId = String(id);
+      window.__satActiveChatId = String(id);
+      cancelEditMessage();
+      discardVoiceDraft();
+      const c = chats.find((x) => String(x.id) === String(id));
+      const myUid = getMyUid();
+      const titleEl = document.getElementById('chatHeaderTitle');
+      if (titleEl) titleEl.textContent = c ? getChatDisplayTitle(c) : (title || 'Чат');
       const subEl = document.getElementById('chatHeaderSub');
       if (subEl && c?.type !== 'group' && Array.isArray(c?.members)) {
         const peerId = c.members.find((u) => u && u !== myUid); const peerObj = users.find((u) => u.uid === peerId);
@@ -6161,7 +6175,7 @@
       document.getElementById('chatScreen')?.classList.add('open');
     }
 
-    function closeChat() { cancelVoiceState(); discardVoiceDraft(); cancelEditMessage(); if (chatUnsub) { chatUnsub(); chatUnsub = null; } activeChatId = null; document.getElementById('chatScreen')?.classList.remove('open'); }
+    function closeChat() { cancelVoiceState(); discardVoiceDraft(); cancelEditMessage(); if (chatUnsub) { chatUnsub(); chatUnsub = null; } activeChatId = null; window.__satActiveChatId = null; document.getElementById('chatScreen')?.classList.remove('open'); }
 
     async function saveChatPhotoToGallery(msgId, ev) {
       if (ev) { ev.preventDefault(); ev.stopPropagation(); }
@@ -6574,7 +6588,18 @@
       toggleAudioCall, acceptIncomingCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop
     });
 
-    if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then((r) => r.update()).catch(() => {})); }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=20261127_142')
+          .then((r) => {
+            try { r.update(); } catch (_) {}
+            if (r.waiting) {
+              try { r.waiting.postMessage({ type: 'SKIP_WAITING' }); } catch (_) {}
+            }
+          })
+          .catch(() => {});
+      });
+    }
 
     silentHealMediaAndPosts();
     renderBooksTab();

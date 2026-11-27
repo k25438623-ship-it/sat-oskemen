@@ -6088,6 +6088,37 @@
         : '<div class="meta">Групп пока нет.</div>';
     }
 
+    async function joinChatGroup(id, title) {
+      const myUid = getMyUid();
+      if (!myUid) return;
+      await updateDoc(doc(db, 'chats', id), { members: arrayUnion(myUid) }).catch(() => {});
+      openChatRoom(id, title);
+    }
+
+    function getChatDisplayTitle(c) {
+      if (!c) return 'Чат';
+      if (c.type === 'group') return c.title || 'Группа';
+      const myUid = getMyUid();
+      const entry = Object.entries(c.memberNames || {}).find(([uid]) => uid && uid !== myUid);
+      return (entry && entry[1]) || c.title || 'Чат';
+    }
+
+    function renderProfileChatsList() {
+      const box = document.getElementById('profileChatsList');
+      const badge = document.getElementById('chatsCountBadge');
+      if (!box) return;
+      const myUid = getMyUid();
+      const myChats = chats.filter((c) => Array.isArray(c.members) ? (!myUid || c.members.includes(myUid)) : true);
+      if (badge) badge.textContent = String(myChats.length);
+      box.innerHTML = myChats.length
+        ? myChats.map((c) => {
+            const title = getChatDisplayTitle(c);
+            const unread = Boolean(myUid && c.lastSenderUid && c.lastSenderUid !== myUid && !(Array.isArray(c.readByUsers) && c.readByUsers.includes(myUid)));
+            return `<div class="chat-row-card ${unread ? 'has-unread' : ''}" onclick="openChatRoom('${esc(c.id)}', '${esc(title)}')"><div style="min-width:0; flex:1;"><div style="font-weight:800;">${esc(title)}</div><div class="meta">${esc(c.lastMessage || 'Открыть чат')}</div></div>${unread ? '<span class="tag-alert">Новое</span>' : '<span class="tag">Открыть</span>'}</div>`;
+          }).join('')
+        : '<div class="meta" style="margin-top:8px;">Чатов пока нет.</div>';
+    }
+
     async function openDirectChat(otherUid, otherName) {
       const myUid = getMyUid(); if (!myUid || !otherUid || otherUid === myUid) return;
       const id = 'dm_' + [myUid, otherUid].sort().join('_');

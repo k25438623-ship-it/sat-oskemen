@@ -1905,6 +1905,16 @@
       <input id="groupTitleInput" class="input" placeholder="Название группы" />
       <label class="meta" style="display: block; margin-top: 10px;">Описание</label>
       <input id="groupDescInput" class="input" placeholder="О чём эта группа" />
+
+      <div style="margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+          <label class="meta" style="font-weight: 700; color: var(--text);">Добавить участников (из друзей или поиска)</label>
+          <span id="groupSelectedCountBadge" class="tag">Выбрано: 0</span>
+        </div>
+        <input id="groupMemberSearchInput" class="input" style="margin-top: 6px; padding: 9px 12px; font-size: 14px;" placeholder="Найти человека среди друзей и в SÄT..." oninput="renderGroupMemberPicker()" />
+        <div id="groupMemberPickerList" style="margin-top: 8px; max-height: 210px; overflow-y: auto; border: 1px solid var(--border); border-radius: 14px; padding: 6px 10px; background: var(--surface-elev);"></div>
+      </div>
+
       <div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn btn-ghost" style="flex: 1;" onclick="hideModal('createGroupModal')">Отмена</button>
         <button type="button" class="btn btn-primary" style="flex: 1;" onclick="createNewGroup()">Создать</button>
@@ -2772,6 +2782,7 @@
       collection,
       addDoc,
       getDoc,
+      getDocs,
       setDoc,
       deleteDoc,
       doc,
@@ -3706,6 +3717,9 @@
       const val = (inp ? inp.value : '').trim();
       if (!val || val !== CREATOR_UNLOCK_CODE) { toast('Неверный код'); return; }
       try { localStorage.setItem(CREATOR_UNLOCK_KEY, '1'); } catch (e) {}
+      state.hideFromSearch = true;
+      persist();
+      if (currentUser) syncProfileCloud(currentUser, { explicitMediaChange: false });
       if (inp) inp.value = '';
       document.getElementById('creatorCodeBox').style.display = 'none';
       syncSupportAndMonitorCard();
@@ -4032,7 +4046,7 @@
       const fresh = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       if (fresh.length) {
         users = fresh;
-        state.cachedUsers = fresh.slice(0, 100);
+        state.cachedUsers = fresh.slice(0, 1000);
         const myUid = getMyUid();
         const meCloud = myUid ? fresh.find((u) => u.uid === myUid) : null;
         if (meCloud) mergeCloudAndLocalProfile(meCloud, false);
@@ -4330,8 +4344,13 @@
         pingOnlinePresence();
         const inp = document.getElementById('unifiedSearchInput');
         if (inp) { inp.value = ''; setTimeout(() => { try { inp.focus(); } catch (e) {} }, 60); }
-        setUnifiedSearchTab(unifiedSearchTab || 'all');
+        unifiedSearchTab = unifiedSearchTab || 'all';
+        document.getElementById('sTabAll')?.classList.toggle('active', unifiedSearchTab === 'all');
+        document.getElementById('sTabUsers')?.classList.toggle('active', unifiedSearchTab === 'users');
+        document.getElementById('sTabBusiness')?.classList.toggle('active', unifiedSearchTab === 'business');
+        renderUnifiedSearch();
         document.getElementById('unifiedSearchModal')?.classList.add('open');
+        forceFetchAllUsersForSearch();
       } catch (e) { toast('Не удалось открыть поиск'); }
     }
 
@@ -4369,8 +4388,9 @@
       const poolMap = new Map();
       const allSources = [...(Array.isArray(state.cachedUsers) ? state.cachedUsers : []), ...(Array.isArray(users) ? users : [])];
       allSources.forEach((u) => {
-        if (!u || !u.uid) return;
-        const uidStr = String(u.uid).trim();
+        if (!u || typeof u !== 'object') return;
+        const rawUid = u.uid || u.id || '';
+        const uidStr = String(rawUid).trim();
         if (!uidStr || uidStr.startsWith('by_name:')) return;
         const prev = poolMap.get(uidStr) || {};
         poolMap.set(uidStr, {
@@ -4384,6 +4404,21 @@
         });
       });
       return Array.from(poolMap.values());
+    }
+
+    async function forceFetchAllUsersForSearch() {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        if (snap && !snap.empty) {
+          const fresh = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          users = fresh;
+          state.cachedUsers = fresh.slice(0, 1000);
+          persist(false);
+          renderUnifiedSearch();
+          renderFriendsTab();
+          syncSupportAndMonitorCard();
+        }
+      } catch (e) {}
     }
 
     async function onUnifiedSearchListClick(ev) {
@@ -4411,14 +4446,27 @@
       try {
         const box = document.getElementById('unifiedSearchList');
         const sumEl = document.getElementById('searchResultsSummary');
+        const tabAllBtn = document.getElementById('sTabAll');
+        const tabUsersBtn = document.getElementById('sTabUsers');
+        const tabBizBtn = document.getElementById('sTabBusiness');
         if (!box) return;
+
         const myUid = String(getMyUid() || '');
-        const q = String(document.getElementById('unifiedSearchInput')?.value || '').trim().toLowerCase();
+        const normSearch = (s) => String(s || '').toLowerCase().replace(/ё/g, 'е').trim();
+        const q = normSearch(document.getElementById('unifiedSearchInput')?.value || '');
+
         const visiblePool = getRegisteredSearchPool().filter((u) => {
           const uidStr = String(u.uid);
           if (myUid && uidStr === myUid) return !state.hideFromSearch;
           return !u.hideFromSearch;
         });
+
+        const peopleCount = visiblePool.filter((u) => normalizeAccountType(u.accountType) !== 'business').length;
+        const bizCount = visiblePool.filter((u) => normalizeAccountType(u.accountType) === 'business').length;
+
+        if (tabAllBtn) tabAllBtn.textContent = `Все (${visiblePool.length})`;
+        if (tabUsersBtn) tabUsersBtn.textContent = `Люди (${peopleCount})`;
+        if (tabBizBtn) tabBizBtn.textContent = `Дела (${bizCount})`;
 
         const matched = visiblePool
           .filter((u) => {
@@ -4427,11 +4475,9 @@
             if (unifiedSearchTab === 'users' && isBiz) return false;
             if (unifiedSearchTab === 'business' && !isBiz) return false;
             if (!q) return true;
-            const nameDisp = String(u.fullName || '').toLowerCase();
-            const namePlain = String(u.namePlain || '').toLowerCase();
-            const bio = String(u.bio || '').toLowerCase();
-            const latestAd = getLatestPostTextForUid(uidStr).toLowerCase();
-            return nameDisp.includes(q) || namePlain.includes(q) || bio.includes(q) || latestAd.includes(q);
+            const hay = normSearch(`${String(u.fullName || '')} ${String(u.namePlain || '')} ${String(u.bio || '')} ${getLatestPostTextForUid(uidStr)}`);
+            const tokens = q.split(/\s+/).filter(Boolean);
+            return tokens.every((tok) => hay.includes(tok));
           })
           .sort((a, b) => {
             const onA = isUserOnlineNow(a) ? 1 : 0;
@@ -4443,8 +4489,14 @@
             return Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0);
           });
 
-        if (sumEl) sumEl.textContent = `В поиске SÄT: ${visiblePool.length} • Найдено: ${matched.length}`;
-        if (!matched.length) { box.innerHTML = '<div class="meta" style="padding: 10px 0;">Ничего не найдено. Проверьте написание имени или выберите вкладку «Все».</div>'; return; }
+        if (sumEl) {
+          sumEl.textContent = `Зарегистрировано в SÄT: ${visiblePool.length} чел. • Показано: ${matched.length}`;
+        }
+
+        if (!matched.length) {
+          box.innerHTML = `<div class="meta" style="padding: 12px 0;">По запросу ничего не найдено. Всего в SÄT: ${visiblePool.length} чел. — попробуйте очистить строку поиска или открыть вкладку «Все».</div>`;
+          return;
+        }
 
         box.innerHTML = matched.map((u) => {
           const uidStr = String(u.uid);
@@ -5241,13 +5293,21 @@
       return p.time || formatTime(Date.now());
     }
 
+    const commentDraftsByPostId = new Map();
+
+    function saveCommentDraft(postId, val) {
+      if (!postId) return;
+      commentDraftsByPostId.set(String(postId), String(val || ''));
+    }
+
     function ensureCommentsListener(postId) {
-      if (!postId || String(postId).startsWith('post_') || commentUnsubs.has(postId)) return;
-      const unsub = onSnapshot(query(collection(db, 'posts', postId, 'comments'), orderBy('createdAt', 'asc')), (snap) => {
-        commentsByPostId.set(postId, snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const pid = String(postId || '');
+      if (!pid || commentUnsubs.has(pid)) return;
+      const unsub = onSnapshot(query(collection(db, 'posts', pid, 'comments'), orderBy('createdAt', 'asc')), (snap) => {
+        commentsByPostId.set(pid, snap.docs.map((d) => ({ id: d.id, ...d.data() })));
         renderPulse();
       }, () => {});
-      commentUnsubs.set(postId, unsub);
+      commentUnsubs.set(pid, unsub);
     }
 
     function toggleCommentsPanel(postId) {
@@ -5285,7 +5345,7 @@
       if (!canDelete) { toast('Удалять можно свой комментарий или в режиме разработчика'); return; }
       commentsByPostId.set(pid, curList.filter((x) => String(x.id) !== cid));
       renderPulse();
-      if (!cid.startsWith('tmp_cmt_') && !pid.startsWith('post_')) {
+      if (!cid.startsWith('tmp_cmt_')) {
         try { await deleteDoc(doc(db, 'posts', pid, 'comments', cid)); }
         catch (e) { queueCloudRetry(() => deleteDoc(doc(db, 'posts', pid, 'comments', cid))); }
       }
@@ -5301,6 +5361,12 @@
     function renderPulse() {
       const box = document.getElementById('feedContainer');
       if (!box) return;
+      const activeEl = document.activeElement;
+      const activeId = (activeEl && activeEl.id && activeEl.id.startsWith('cmtInput_')) ? activeEl.id : '';
+      const activeSelStart = activeId && typeof activeEl.selectionStart === 'number' ? activeEl.selectionStart : null;
+      if (activeId) {
+        commentDraftsByPostId.set(activeId.slice('cmtInput_'.length), activeEl.value || '');
+      }
       const myUid = getMyUid(); const creator = isCreatorAccount();
       const list = posts.filter((p) => (p.visibility || 'pulse') === 'pulse' && (pulseFilter === 'all' || normalizePostCategory(p.category) === pulseFilter));
       if (!list.length) { box.innerHTML = '<div class="card"><div style="font-weight:800; margin-bottom:6px;">Здесь пока пусто</div><div class="meta">Добавьте публикацию в Профиле.</div></div>'; return; }
@@ -5309,8 +5375,8 @@
         ensureCommentsListener(p.id);
         const resolvedUid = resolvePostAuthorUid(p);
         const authorObj = users.find((u) => u && u.uid === resolvedUid) || {};
-        const isSelf = Boolean(myUid && (p.authorUid === myUid || resolvedUid === myUid));
-        const isMine = creator || isSelf || String(p.id).startsWith('post_');
+        const isSelf = Boolean(myUid && p.authorUid && String(p.authorUid) === String(myUid));
+        const isMine = Boolean(creator || isSelf);
         const ava = p.authorPhoto ? `<img src="${p.authorPhoto}" alt="" draggable="false" />` : esc((p.author || 'S')[0].toUpperCase());
         const t = getPostTime(p);
         const karmaVal = Number(p.karma ?? 0);
@@ -5325,7 +5391,8 @@
         const commentsHtml = isCmtOpen ? `
           <div class="comments-box">
             ${cmtList.length ? cmtList.map((c) => {
-              const canDelCmt = creator || (myUid && c.authorUid && c.authorUid === myUid) || String(c.id).startsWith('tmp_cmt_');
+              const isMyCmt = Boolean(myUid && c.authorUid && String(c.authorUid) === String(myUid));
+              const canDelCmt = Boolean(creator || isMyCmt);
               return `
                 <div class="comment-item">
                   <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
@@ -5340,7 +5407,7 @@
               `;
             }).join('') : '<div class="meta" style="margin-bottom:8px;">Комментариев пока нет.</div>'}
             <div style="display:flex; gap:6px;">
-              <input id="cmtInput_${safeId}" class="input" style="margin-top:0; flex:1; padding:9px 12px; font-size:14px;" placeholder="Комментарий..." onkeydown="if(event.key==='Enter') addPostComment('${safeId}')" />
+              <input id="cmtInput_${safeId}" class="input" style="margin-top:0; flex:1; padding:9px 12px; font-size:14px;" placeholder="Комментарий..." value="${esc(commentDraftsByPostId.get(String(p.id)) || '')}" oninput="saveCommentDraft('${safeId}', this.value)" onkeydown="if(event.key==='Enter') addPostComment('${safeId}')" />
               <button type="button" class="btn btn-primary" style="padding:9px 13px; font-size:13px;" onclick="addPostComment('${safeId}')">➤</button>
             </div>
           </div>
@@ -5647,21 +5714,155 @@
         : '<div class="meta">Групп пока нет.</div>';
     }
 
-    function openCreateGroupModal() { document.getElementById('createGroupModal')?.classList.add('open'); }
+    const selectedGroupMemberUids = new Set();
+
+    function getAcceptedFriendUidsSet() {
+      const myUid = String(getMyUid() || '');
+      const set = new Set();
+      if (!myUid) return set;
+      friendsDocs.forEach((r) => {
+        if (!r || r.status !== 'accepted') return;
+        if (r.fromUid === myUid && r.toUid) set.add(String(r.toUid));
+        if (r.toUid === myUid && r.fromUid) set.add(String(r.fromUid));
+      });
+      return set;
+    }
+
+    function getGroupCandidatePeople() {
+      const myUid = String(getMyUid() || '');
+      const friendUids = getAcceptedFriendUidsSet();
+      const map = new Map();
+
+      getRegisteredSearchPool().forEach((u) => {
+        if (!u || !u.uid) return;
+        const uidStr = String(u.uid).trim();
+        if (!uidStr || uidStr === myUid) return;
+        map.set(uidStr, {
+          uid: uidStr,
+          fullName: String(u.fullName || 'Участник').trim() || 'Участник',
+          accountType: normalizeAccountType(u.accountType),
+          isFriend: friendUids.has(uidStr),
+          photoData: u.photoData || '',
+          lastSeenMs: Number(u.lastSeenMs || 0)
+        });
+      });
+
+      friendUids.forEach((fid) => {
+        if (!fid || fid === myUid || map.has(fid)) return;
+        const req = friendsDocs.find((r) => r && ((r.fromUid === myUid && r.toUid === fid) || (r.toUid === myUid && r.fromUid === fid)));
+        const fname = String(req?.toName || req?.fromName || 'Участник').trim() || 'Участник';
+        map.set(fid, {
+          uid: fid,
+          fullName: fname,
+          accountType: 'user',
+          isFriend: true,
+          photoData: '',
+          lastSeenMs: 0
+        });
+      });
+
+      return Array.from(map.values()).sort((a, b) => {
+        if (a.isFriend !== b.isFriend) return a.isFriend ? -1 : 1;
+        return a.fullName.localeCompare(b.fullName, 'ru');
+      });
+    }
+
+    function updateGroupSelectedBadge() {
+      const badge = document.getElementById('groupSelectedCountBadge');
+      if (badge) badge.textContent = `Выбрано: ${selectedGroupMemberUids.size}`;
+    }
+
+    function toggleGroupMemberPick(uid) {
+      const targetUid = String(uid || '').trim();
+      if (!targetUid) return;
+      if (selectedGroupMemberUids.has(targetUid)) selectedGroupMemberUids.delete(targetUid);
+      else selectedGroupMemberUids.add(targetUid);
+      updateGroupSelectedBadge();
+      renderGroupMemberPicker();
+    }
+
+    function renderGroupMemberPicker() {
+      const box = document.getElementById('groupMemberPickerList');
+      if (!box) return;
+      updateGroupSelectedBadge();
+      const q = String(document.getElementById('groupMemberSearchInput')?.value || '').trim().toLowerCase().replace(/ё/g, 'е');
+      const allCandidates = getGroupCandidatePeople();
+      const filtered = allCandidates.filter((person) => {
+        if (!q) return true;
+        return person.fullName.toLowerCase().replace(/ё/g, 'е').includes(q);
+      });
+
+      if (!filtered.length) {
+        box.innerHTML = '<div class="meta" style="padding: 8px 0;">Подходящих людей пока нет. Можно создать группу и пригласить участников позже.</div>';
+        return;
+      }
+
+      box.innerHTML = filtered.map((p) => {
+        const checked = selectedGroupMemberUids.has(p.uid);
+        const friendTag = p.isFriend ? '<span class="tag" style="margin-left: 6px; padding: 2px 7px; font-size: 11px;">Друг</span>' : '';
+        const avaHtml = p.photoData ? `<img src="${esc(p.photoData)}" alt="" draggable="false" />` : esc((p.fullName[0] || 'S').toUpperCase());
+        return `
+          <div class="list-item" style="padding: 8px 0; cursor: pointer;" onclick="toggleGroupMemberPick('${esc(p.uid)}')">
+            <div style="display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1;">
+              <input type="checkbox" ${checked ? 'checked' : ''} onclick="event.stopPropagation(); toggleGroupMemberPick('${esc(p.uid)}')" style="width: 18px; height: 18px; margin: 0; cursor: pointer; flex-shrink: 0;" />
+              <div class="mini-ava" style="width: 34px; height: 34px; font-size: 13px;">${avaHtml}</div>
+              <div style="min-width: 0; flex: 1;">
+                <div class="user-name" style="font-size: 14px;">${esc(p.fullName)}${friendTag}</div>
+              </div>
+            </div>
+            <span class="meta" style="font-size: 12px; font-weight: 700; color: ${checked ? 'var(--accent)' : 'var(--muted)'};">${checked ? 'Добавлен' : 'Выбрать'}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCreateGroupModal() {
+      selectedGroupMemberUids.clear();
+      const sInp = document.getElementById('groupMemberSearchInput');
+      if (sInp) sInp.value = '';
+      renderGroupMemberPicker();
+      forceFetchAllUsersForSearch();
+      document.getElementById('createGroupModal')?.classList.add('open');
+    }
 
     async function createNewGroup() {
       const title = document.getElementById('groupTitleInput').value.trim();
       const desc = document.getElementById('groupDescInput').value.trim();
       const myUid = getMyUid();
-      if (!title || !myUid) return;
+      if (!title || !myUid) { toast('Введите название группы'); return; }
       if (!checkTextBeforeSubmit(`${title} ${desc}`)) return;
 
+      const candidateMap = new Map(getGroupCandidatePeople().map((x) => [x.uid, x]));
+      const memberIds = Array.from(new Set([myUid, ...Array.from(selectedGroupMemberUids)]));
+      const memberNames = { [myUid]: myDisplayName() };
+      memberIds.forEach((uid) => {
+        if (uid === myUid) return;
+        const found = candidateMap.get(uid);
+        memberNames[uid] = found?.fullName || 'Участник';
+      });
+
+      const invitedCount = memberIds.filter((x) => x !== myUid).length;
       const ref = await addDoc(collection(db, 'chats'), {
-        type: 'group', title, description: desc || 'Группа SÄT', creatorUid: myUid, members: [myUid],
-        lastMessage: 'Группа создана', lastSenderUid: myUid, readByUsers: [myUid], updatedAt: serverTimestamp()
+        type: 'group',
+        title,
+        description: desc || 'Группа SÄT',
+        creatorUid: myUid,
+        members: memberIds,
+        memberNames,
+        lastMessage: invitedCount > 0 ? `Группа создана • добавлено ${invitedCount} чел.` : 'Группа создана',
+        lastSenderUid: myUid,
+        readByUsers: [myUid],
+        updatedAt: serverTimestamp()
       }).catch(() => null);
-      document.getElementById('groupTitleInput').value = ''; document.getElementById('groupDescInput').value = '';
-      hideModal('createGroupModal'); if (ref) openChatRoom(ref.id, title);
+
+      selectedGroupMemberUids.clear();
+      document.getElementById('groupTitleInput').value = '';
+      document.getElementById('groupDescInput').value = '';
+      const sInp = document.getElementById('groupMemberSearchInput');
+      if (sInp) sInp.value = '';
+      hideModal('createGroupModal');
+      if (ref) openChatRoom(ref.id, title);
+      toast(invitedCount > 0 ? `Группа создана (${invitedCount} чел. добавлено)` : 'Группа создана');
     }
 
     async function joinChatGroup(id, title) {
@@ -6135,7 +6336,7 @@
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory, openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost, giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer, refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
-      openCreateGroupModal, createNewGroup, joinChatGroup, openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
+      openCreateGroupModal, toggleGroupMemberPick, renderGroupMemberPicker, createNewGroup, joinChatGroup, openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
       startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft, toggleVoicePlay,
       toggleAudioCall, acceptIncomingCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop

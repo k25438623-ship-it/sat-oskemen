@@ -1213,19 +1213,19 @@
         </button>
         <div class="brand-text">SÄT</div>
       </div>
-      <div style="display: flex; gap: 6px; align-items: center;">
-        <button type="button" class="btn btn-primary" style="padding: 8px 10px; font-size: 12.5px;" onclick="openUnifiedSearchModal()">
+      <div style="display: flex; gap: 5px; align-items: center; flex-wrap: nowrap;">
+        <button type="button" class="btn btn-primary" style="padding: 7px 8px; font-size: 12px;" onclick="openUnifiedSearchModal()">
           <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Поиск</span>
         </button>
-        <button type="button" id="satOskemenTopBtn" class="btn btn-mint" style="padding: 8px 10px; font-size: 12.5px;" onclick="window.SAT_OSKEMEN_HUB.open()">
+        <button type="button" id="satOskemenTopBtn" class="btn btn-mint" style="padding: 7px 8px; font-size: 12px;" onclick="window.SAT_OSKEMEN_HUB.open()">
           <span id="satOskemenTopTemp">🌤 --°</span>
           <span>Оскемен</span>
         </button>
-        <button type="button" class="btn btn-ghost" style="padding: 8px 10px; font-size: 12.5px;" onclick="openWallpapers()">
-          <span id="wpActiveName" style="max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
+        <button type="button" class="btn btn-ghost" style="padding: 7px 8px; font-size: 12px;" onclick="openWallpapers()">
+          <span id="wpActiveName" style="max-width: 52px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Тема</span>
         </button>
-        <button type="button" id="rightProfileDrawerBtn" class="btn btn-gold" style="padding: 8px 10px; font-size: 12.5px;" onclick="openProfileRightDrawer()">
+        <button type="button" id="rightProfileDrawerBtn" class="btn btn-gold" style="padding: 7px 9px; font-size: 12px; flex-shrink: 0;" onclick="openProfileRightDrawer()">
           <span>Профиль →</span>
         </button>
       </div>
@@ -3794,21 +3794,31 @@
       }
     }
 
+    let lastReportedErrorSig = '';
+    let lastReportedErrorAt = 0;
+
     function reportSilentErrorToCloud(msg) {
       if (!currentUser || !msg) return;
+      const cleanMsg = String(msg).slice(0, 300).trim();
+      if (!cleanMsg || cleanMsg === 'Script error.') return;
+      const now = Date.now();
+      if (cleanMsg === lastReportedErrorSig && (now - lastReportedErrorAt) < 15000) return;
+      lastReportedErrorSig = cleanMsg;
+      lastReportedErrorAt = now;
       addDoc(collection(db, 'app_errors'), {
         userUid: currentUser.uid,
         userName: myDisplayName(),
-        message: String(msg).slice(0, 300),
-        time: formatTime(Date.now()),
+        message: cleanMsg,
+        time: formatTime(now),
         createdAt: serverTimestamp()
       }).catch(() => {});
     }
 
     window.addEventListener('error', (ev) => {
       const m = ev?.message || 'error';
+      if (String(m) === 'Script error.') return true;
       state.lastSilentError = { time: Date.now(), msg: m, line: ev?.lineno || 0 };
-      persist();
+      persist(false);
       reportSilentErrorToCloud(m);
       syncSupportAndMonitorCard();
       return true;
@@ -3817,7 +3827,7 @@
     window.addEventListener('unhandledrejection', (ev) => {
       const m = String(ev?.reason?.message || ev?.reason || 'promise_error');
       state.lastSilentError = { time: Date.now(), msg: m };
-      persist();
+      persist(false);
       reportSilentErrorToCloud(m);
       syncSupportAndMonitorCard();
       if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
@@ -4770,77 +4780,110 @@
       renderCreatorDashboard();
     }
 
+    async function clearAllAppErrors() {
+      if (!isCreatorAccount()) return;
+      const toDelete = [...appErrorLogs];
+      appErrorLogs = [];
+      state.lastSilentError = null;
+      lastReportedErrorSig = '';
+      lastReportedErrorAt = 0;
+      persist(false);
+      syncSupportAndMonitorCard();
+      renderCreatorDashboard();
+      for (const er of toDelete) {
+        if (er?.id) {
+          deleteDoc(doc(db, 'app_errors', er.id)).catch(() => {});
+        }
+      }
+      toast('Логи ошибок очищены');
+    }
+
     function renderCreatorDashboard() {
       if (!isCreatorAccount()) return;
-      syncSupportAndMonitorCard();
-      const tBox = document.getElementById('cPanelTickets');
-      if (tBox) {
-        tBox.innerHTML = supportTickets.length
-          ? supportTickets.map((t) => `
-              <div class="comment-item">
-                <div style="display:flex; justify-content:space-between; gap:8px;">
-                  <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(t.senderName || 'Пользователь')}</span>
-                  <span class="meta" style="font-size:11px;">${esc(t.time || '')}</span>
+      try {
+        syncSupportAndMonitorCard();
+        const tBox = document.getElementById('cPanelTickets');
+        if (tBox) {
+          tBox.innerHTML = supportTickets.length
+            ? supportTickets.map((t) => `
+                <div class="comment-item">
+                  <div style="display:flex; justify-content:space-between; gap:8px;">
+                    <span style="font-weight:800; font-size:13px; color:var(--accent);">${esc(t.senderName || 'Пользователь')}</span>
+                    <span class="meta" style="font-size:11px;">${esc(t.time || '')}</span>
+                  </div>
+                  <div style="font-size:14px; margin-top:4px;">${esc(t.text || '')}</div>
+                  <div class="actions" style="margin-top:6px;">
+                    ${t.senderUid ? `<button type="button" class="btn btn-mint" style="padding:5px 10px; font-size:12px;" onclick="hideModal('supportModal'); openDirectChat('${esc(t.senderUid)}', '${esc(t.senderName || 'Пользователь')}')">Написать в чат</button>` : ''}
+                    <button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
+                  </div>
                 </div>
-                <div style="font-size:14px; margin-top:4px;">${esc(t.text || '')}</div>
-                <div class="actions" style="margin-top:6px;">
-                  ${t.senderUid ? `<button type="button" class="btn btn-mint" style="padding:5px 10px; font-size:12px;" onclick="hideModal('supportModal'); openDirectChat('${esc(t.senderUid)}', '${esc(t.senderName || 'Пользователь')}')">Написать в чат</button>` : ''}
-                  <button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="deleteSupportTicket('${esc(t.id)}')">Удалить</button>
-                </div>
-              </div>
-            `).join('')
-          : '<div class="meta">Сообщений от пользователей пока нет.</div>';
-      }
+              `).join('')
+            : '<div class="meta">Сообщений от пользователей пока нет.</div>';
+        }
 
-      const uBox = document.getElementById('cPanelUsers');
-      if (uBox) {
-        const addedCount = getAddedUsersCount();
-        const notAddedCount = getNotAddedOrPendingCount();
-        const sortedUsers = [...users].sort((a, b) => Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0));
-        const counterHtml = `<div style="margin-bottom:10px; font-weight:800; color:var(--accent);">Добавилось участников: ${addedCount} • Не добавилось / ожидают: ${notAddedCount}</div>`;
-        uBox.innerHTML = counterHtml + (sortedUsers.length
-          ? sortedUsers.map((u) => `
-              <div class="list-item">
-                <div>
-                  <div style="font-weight:700;">${esc(u.fullName || 'Участник')}${renderAccountBadgeHtml(u.accountType)}${u.hideFromSearch ? '<span class="meta" style="margin-left:6px;">(скрыт из поиска)</span>' : ''}</div>
-                  <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
+        const uBox = document.getElementById('cPanelUsers');
+        if (uBox) {
+          const addedCount = getAddedUsersCount();
+          const notAddedCount = getNotAddedOrPendingCount();
+          const sortedUsers = [...users].sort((a, b) => Number(b.lastSeenMs || 0) - Number(a.lastSeenMs || 0));
+          const counterHtml = `<div style="margin-bottom:10px; font-weight:800; color:var(--accent);">Добавилось участников: ${addedCount} • Не добавилось / ожидают: ${notAddedCount}</div>`;
+          uBox.innerHTML = counterHtml + (sortedUsers.length
+            ? sortedUsers.map((u) => `
+                <div class="list-item">
+                  <div>
+                    <div style="font-weight:700;">${esc(u.fullName || 'Участник')}${renderAccountBadgeHtml(u.accountType)}${u.hideFromSearch ? '<span class="meta" style="margin-left:6px;">(скрыт из поиска)</span>' : ''}</div>
+                    <div>${formatPresenceHtml(u.lastSeenMs, u.hideLastSeen)}</div>
+                  </div>
+                  ${u.uid ? `<button type="button" class="btn btn-mint" style="padding:6px 10px; font-size:12px;" onclick="hideModal('supportModal'); openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Страница</button>` : ''}
                 </div>
-                ${u.uid ? `<button type="button" class="btn btn-mint" style="padding:6px 10px; font-size:12px;" onclick="hideModal('supportModal'); openPersonPage('${esc(u.uid)}', '${esc(u.fullName || 'Участник')}')">Страница</button>` : ''}
-              </div>
-            `).join('')
-          : '<div class="meta">Список участников пуст.</div>');
-      }
+              `).join('')
+            : '<div class="meta">Список участников пуст.</div>');
+        }
 
-      const eBox = document.getElementById('cPanelErrors');
-      if (eBox) {
-        const errCount = getTotalErrorsCount();
-        const errHeader = `<div style="margin-bottom:10px; font-weight:800; color:#ff8c98;">Всего ошибок: ${errCount}</div>`;
-        const rows = appErrorLogs.length
-          ? appErrorLogs.slice(0, 40).map((er) => `
-              <div class="comment-item">
-                <div style="display:flex; justify-content:space-between; gap:8px;">
-                  <span style="font-weight:700; font-size:12.5px; color:#ff8c98;">${esc(er.userName || 'Пользователь')}</span>
-                  <span class="meta" style="font-size:11px;">${esc(er.time || '')}</span>
+        const eBox = document.getElementById('cPanelErrors');
+        if (eBox) {
+          const errCount = getTotalErrorsCount();
+          const errHeader = `
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+              <span style="font-weight:800; color:#ff8c98;">Всего ошибок: ${errCount}</span>
+              ${errCount > 0 ? `<button type="button" class="btn btn-danger" style="padding:5px 10px; font-size:12px;" onclick="clearAllAppErrors()">Очистить</button>` : ''}
+            </div>
+          `;
+          const rows = appErrorLogs.length
+            ? appErrorLogs.slice(0, 40).map((er) => `
+                <div class="comment-item">
+                  <div style="display:flex; justify-content:space-between; gap:8px;">
+                    <span style="font-weight:700; font-size:12.5px; color:#ff8c98;">${esc(er.userName || 'Пользователь')}</span>
+                    <span class="meta" style="font-size:11px;">${esc(er.time || '')}</span>
+                  </div>
+                  <div style="font-size:12.5px; margin-top:4px; word-break:break-word;">${esc(er.message || 'Ошибка')}</div>
                 </div>
-                <div style="font-size:12.5px; margin-top:4px; word-break:break-word;">${esc(er.message || 'Ошибка')}</div>
-              </div>
-            `).join('')
-          : (state.lastSilentError
-              ? `<div class="comment-item"><div style="font-weight:700; font-size:12.5px; color:#ff8c98;">Локальный сбой</div><div style="font-size:12.5px; margin-top:4px;">${esc(state.lastSilentError.msg || 'Ошибка')}</div></div>`
-              : '<div class="meta">Ошибок не зафиксировано.</div>');
-        eBox.innerHTML = errHeader + rows;
-      }
+              `).join('')
+            : (state.lastSilentError
+                ? `<div class="comment-item"><div style="font-weight:700; font-size:12.5px; color:#ff8c98;">Локальный сбой</div><div style="font-size:12.5px; margin-top:4px;">${esc(state.lastSilentError.msg || 'Ошибка')}</div></div>`
+                : '<div class="meta">Ошибок не зафиксировано.</div>');
+          eBox.innerHTML = errHeader + rows;
+        }
+      } catch (e) {}
     }
 
     function openSupportModal() {
+      window.closeAllSideDrawers?.();
       const creator = isCreatorAccount();
-      document.getElementById('creatorOnlyPanel').style.display = creator ? 'block' : 'none';
-      document.getElementById('userSupportForm').style.display = creator ? 'none' : 'block';
-      document.getElementById('creatorCodeBox').style.display = 'none';
-      document.getElementById('supportModalTitle').textContent = creator ? 'Мониторинг' : 'Техподдержка SÄT';
-      document.getElementById('supportModalSub').textContent = creator
-        ? `Добавилось: ${getAddedUsersCount()} • Не добавилось: ${getNotAddedOrPendingCount()} • Ошибок: ${getTotalErrorsCount()} • Сообщений: ${supportTickets.length}`
-        : 'Напишите вопрос или обращение в техподдержку';
+      const onlyPanel = document.getElementById('creatorOnlyPanel');
+      const userForm = document.getElementById('userSupportForm');
+      const codeBox = document.getElementById('creatorCodeBox');
+      if (onlyPanel) onlyPanel.style.display = creator ? 'block' : 'none';
+      if (userForm) userForm.style.display = creator ? 'none' : 'block';
+      if (codeBox) codeBox.style.display = 'none';
+      const titleEl = document.getElementById('supportModalTitle');
+      const subEl = document.getElementById('supportModalSub');
+      if (titleEl) titleEl.textContent = creator ? 'Мониторинг' : 'Техподдержка SÄT';
+      if (subEl) {
+        subEl.textContent = creator
+          ? `Добавилось: ${getAddedUsersCount()} • Не добавилось: ${getNotAddedOrPendingCount()} • Ошибок: ${getTotalErrorsCount()} • Сообщений: ${supportTickets.length}`
+          : 'Напишите вопрос или обращение в техподдержку';
+      }
       if (creator) renderCreatorDashboard();
       document.getElementById('supportModal')?.classList.add('open');
     }
@@ -6489,7 +6532,7 @@
       clearReadingAttachment, openAddReadingForKind, openReadingItem, closeReadingViewer, toggleReaderPaperMode,
       changeReadingFont, openAddReadingModal, saveNewReadingItem, approveReadingItem, deleteReadingItem,
       openNamazQiblaModal, togglePrayerEditor, saveManualOskemenTimes,
-      onSupportTitleTripleTap, unlockCreatorByCode, openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket,
+      onSupportTitleTripleTap, unlockCreatorByCode, openSupportModal, sendSupportMessage, switchCreatorTab, deleteSupportTicket, clearAllAppErrors,
       openPhotoPicker, startCamera, startGallery, onImageChosen, deleteGalleryPhoto, saveChatPhotoToGallery, downloadChatPhoto, askPhotoCaption, applyCaptionNow,
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory, openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost, giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,

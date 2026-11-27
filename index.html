@@ -1898,6 +1898,26 @@
     </div>
   </div>
 
+  
+  <div id="manageGroupMembersModal" class="modal-bg" onclick="closeBackdrop(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div>
+          <h3 id="manageGroupTitle" style="margin: 0; font-size: 18px;">Участники группы</h3>
+          <div id="manageGroupSub" class="meta">Добавьте людей из друзей или поиска</div>
+        </div>
+        <button type="button" class="btn btn-ghost" style="padding: 6px 12px;" onclick="hideModal('manageGroupMembersModal')">✕</button>
+      </div>
+
+      <input id="manageGroupSearchInput" class="input" style="margin-top: 10px; padding: 9px 12px; font-size: 14px;" placeholder="Поиск человека среди друзей и в SÄT..." oninput="renderManageGroupMembersList()" />
+      <div id="manageGroupMembersList" style="margin-top: 8px; max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: 14px; padding: 6px 10px; background: var(--surface-elev);"></div>
+
+      <div class="actions" style="margin-top: 14px;">
+        <button type="button" class="btn btn-primary" style="width: 100%;" onclick="hideModal('manageGroupMembersModal')">Готово</button>
+      </div>
+    </div>
+  </div>
+
   <div id="createGroupModal" class="modal-bg" onclick="closeBackdrop(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <h3 style="margin: 0 0 10px;">Создать группу</h3>
@@ -1962,6 +1982,8 @@
           <h3 id="chatHeaderTitle" style="margin: 0; font-size: 16.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Чат</h3>
           <div id="chatHeaderSub" class="meta">Сообщения • Голос • Фото</div>
         </div>
+        <button id="groupMembersBtn" type="button" class="btn btn-mint" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="openManageGroupMembers(activeChatId)">Люди</button>
+        <button id="groupDeleteTopBtn" type="button" class="btn btn-danger" style="display: none; padding: 8px 10px; font-size: 12.5px;" onclick="deleteGroup(activeChatId)">Удалить</button>
         <button id="callToggleBtn" type="button" class="btn btn-primary" style="padding: 8px 12px; font-size: 13px;" onclick="toggleAudioCall()">Позвонить</button>
       </div>
 
@@ -5703,18 +5725,8 @@
       } catch (e) { toast('Не удалось отклонить заявку'); }
     }
 
-    function renderGroupsTab() {
-      const box = document.getElementById('groupsBox'); if (!box) return;
-      const myUid = getMyUid(); const groups = chats.filter((c) => c.type === 'group');
-      box.innerHTML = groups.length
-        ? groups.map((g) => {
-            const inG = Array.isArray(g.members) && g.members.includes(myUid);
-            return `<div class="list-item"><div><div style="font-weight:700;">${esc(g.title || 'Группа')}</div><div class="meta">${esc(g.description || '')}</div></div>${inG ? `<button type="button" class="btn btn-mint" style="padding:7px 12px; font-size:12.5px;" onclick="openChatRoom('${g.id}', '${esc(g.title)}')">Открыть</button>` : `<button type="button" class="btn btn-primary" style="padding:7px 12px; font-size:12.5px;" onclick="joinChatGroup('${g.id}', '${esc(g.title)}')">Войти</button>`}</div>`;
-          }).join('')
-        : '<div class="meta">Групп пока нет.</div>';
-    }
-
     const selectedGroupMemberUids = new Set();
+    let managingGroupId = null;
 
     function getAcceptedFriendUidsSet() {
       const myUid = String(getMyUid() || '');
@@ -5865,31 +5877,172 @@
       toast(invitedCount > 0 ? `Группа создана (${invitedCount} чел. добавлено)` : 'Группа создана');
     }
 
-    async function joinChatGroup(id, title) {
-      const myUid = getMyUid(); if (!myUid) return;
-      await updateDoc(doc(db, 'chats', id), { members: arrayUnion(myUid) }).catch(() => {}); openChatRoom(id, title);
+    function canManageOrDeleteGroup(g) {
+      if (!g) return false;
+      const myUid = String(getMyUid() || '');
+      if (isCreatorAccount()) return true;
+      if (myUid && g.creatorUid && String(g.creatorUid) === myUid) return true;
+      return false;
     }
 
-    function getChatDisplayTitle(c) {
-      if (c.type === 'group') return c.title || 'Группа';
-      const myUid = getMyUid();
-      const entry = Object.entries(c.memberNames || {}).find(([uid]) => uid && uid !== myUid);
-      return (entry && entry[1]) || c.title || 'Чат';
+    async function deleteGroup(groupId) {
+      const gid = String(groupId || '').trim();
+      if (!gid) return;
+      const g = chats.find((x) => String(x.id) === gid);
+      if (!canManageOrDeleteGroup(g)) {
+        toast('Удалять группу может её создатель или разработчик');
+        return;
+      }
+      chats = chats.filter((x) => String(x.id) !== gid);
+      if (activeChatId === gid) closeChat();
+      renderGroupsTab();
+      renderProfileChatsList();
+      try {
+        await deleteDoc(doc(db, 'chats', gid));
+        toast('Группа удалена');
+      } catch (e) {
+        queueCloudRetry(() => deleteDoc(doc(db, 'chats', gid)));
+        toast('Группа удалена локально, синхронизируем с сервером');
+      }
     }
 
-    function renderProfileChatsList() {
-      const box = document.getElementById('profileChatsList'); const badge = document.getElementById('chatsCountBadge');
+    async function leaveGroup(groupId) {
+      const gid = String(groupId || '').trim();
+      const myUid = String(getMyUid() || '');
+      if (!gid || !myUid) return;
+      chats = chats.map((c) => String(c.id) === gid
+        ? { ...c, members: (Array.isArray(c.members) ? c.members : []).filter((u) => String(u) !== myUid) }
+        : c
+      );
+      if (activeChatId === gid) closeChat();
+      renderGroupsTab();
+      renderProfileChatsList();
+      try {
+        const cur = chats.find((x) => String(x.id) === gid);
+        const nextMembers = (Array.isArray(cur?.members) ? cur.members : []).filter((u) => String(u) !== myUid);
+        await updateDoc(doc(db, 'chats', gid), { members: nextMembers });
+        toast('Вы вышли из группы');
+      } catch (e) {}
+    }
+
+    function openManageGroupMembers(groupId) {
+      const gid = String(groupId || '').trim();
+      const g = chats.find((x) => String(x.id) === gid);
+      if (!g || g.type !== 'group') { toast('Группа не найдена'); return; }
+      managingGroupId = gid;
+      const tEl = document.getElementById('manageGroupTitle');
+      if (tEl) tEl.textContent = `Участники • ${g.title || 'Группа'}`;
+      const sInp = document.getElementById('manageGroupSearchInput');
+      if (sInp) sInp.value = '';
+      renderManageGroupMembersList();
+      forceFetchAllUsersForSearch();
+      document.getElementById('manageGroupMembersModal')?.classList.add('open');
+    }
+
+    async function toggleMemberInExistingGroup(groupId, uid, name) {
+      const gid = String(groupId || managingGroupId || '').trim();
+      const targetUid = String(uid || '').trim();
+      const myUid = String(getMyUid() || '');
+      if (!gid || !targetUid) return;
+      const g = chats.find((x) => String(x.id) === gid);
+      if (!g) return;
+
+      const curMembers = Array.isArray(g.members) ? g.members.map(String) : [];
+      const isIn = curMembers.includes(targetUid);
+      if (isIn && targetUid === myUid) {
+        toast('Чтобы выйти из группы, нажмите «Выйти»');
+        return;
+      }
+
+      const nextMembers = isIn ? curMembers.filter((u) => u !== targetUid) : Array.from(new Set([...curMembers, targetUid]));
+      const nextNames = { ...(g.memberNames || {}) };
+      if (isIn) delete nextNames[targetUid];
+      else nextNames[targetUid] = name || 'Участник';
+
+      chats = chats.map((c) => (String(c.id) === gid ? { ...c, members: nextMembers, memberNames: nextNames } : c));
+      renderManageGroupMembersList();
+      renderGroupsTab();
+      renderProfileChatsList();
+
+      try {
+        await updateDoc(doc(db, 'chats', gid), { members: nextMembers, memberNames: nextNames });
+        toast(isIn ? 'Участник удалён из группы' : 'Участник добавлен в группу');
+      } catch (e) {
+        queueCloudRetry(() => updateDoc(doc(db, 'chats', gid), { members: nextMembers, memberNames: nextNames }));
+        toast(isIn ? 'Убрано, обновим при связи' : 'Добавлено, обновим при связи');
+      }
+    }
+
+    function renderManageGroupMembersList() {
+      const box = document.getElementById('manageGroupMembersList');
+      const subEl = document.getElementById('manageGroupSub');
       if (!box) return;
-      const myUid = getMyUid();
-      const myChats = chats.filter((c) => Array.isArray(c.members) ? (!myUid || c.members.includes(myUid)) : true);
-      if (badge) badge.textContent = String(myChats.length);
-      box.innerHTML = myChats.length
-        ? myChats.map((c) => {
-            const title = getChatDisplayTitle(c);
-            const unread = Boolean(myUid && c.lastSenderUid && c.lastSenderUid !== myUid && !(Array.isArray(c.readByUsers) && c.readByUsers.includes(myUid)));
-            return `<div class="chat-row-card ${unread ? 'has-unread' : ''}" onclick="openChatRoom('${esc(c.id)}', '${esc(title)}')"><div style="min-width:0; flex:1;"><div style="font-weight:800;">${esc(title)}</div><div class="meta">${esc(c.lastMessage || 'Открыть чат')}</div></div>${unread ? '<span class="tag-alert">Новое</span>' : '<span class="tag">Открыть</span>'}</div>`;
+      const g = chats.find((x) => String(x.id) === String(managingGroupId || ''));
+      if (!g) { box.innerHTML = '<div class="meta">Группа не выбрана.</div>'; return; }
+
+      const memberSet = new Set((Array.isArray(g.members) ? g.members : []).map(String));
+      if (subEl) subEl.textContent = `В группе: ${memberSet.size} чел. • Нажмите, чтобы добавить или убрать`;
+
+      const q = String(document.getElementById('manageGroupSearchInput')?.value || '').trim().toLowerCase().replace(/ё/g, 'е');
+      const candidates = getGroupCandidatePeople().filter((p) => {
+        if (!q) return true;
+        return p.fullName.toLowerCase().replace(/ё/g, 'е').includes(q);
+      });
+
+      if (!candidates.length) {
+        box.innerHTML = '<div class="meta" style="padding: 8px 0;">Других участников пока нет.</div>';
+        return;
+      }
+
+      box.innerHTML = candidates.map((p) => {
+        const isIn = memberSet.has(p.uid);
+        const friendTag = p.isFriend ? '<span class="tag" style="margin-left: 6px; padding: 2px 7px; font-size: 11px;">Друг</span>' : '';
+        const avaHtml = p.photoData ? `<img src="${esc(p.photoData)}" alt="" draggable="false" />` : esc((p.fullName[0] || 'S').toUpperCase());
+        return `
+          <div class="list-item" style="padding: 8px 0;">
+            <div style="display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1;">
+              <div class="mini-ava" style="width: 34px; height: 34px; font-size: 13px;">${avaHtml}</div>
+              <div style="min-width: 0; flex: 1;">
+                <div class="user-name" style="font-size: 14px;">${esc(p.fullName)}${friendTag}</div>
+              </div>
+            </div>
+            <button type="button" class="btn ${isIn ? 'btn-danger' : 'btn-primary'}" style="padding: 6px 10px; font-size: 12px;" onclick="toggleMemberInExistingGroup('${esc(g.id)}', '${esc(p.uid)}', '${esc(p.fullName)}')">${isIn ? 'Убрать' : '+ Добавить'}</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGroupsTab() {
+      const box = document.getElementById('groupsBox'); if (!box) return;
+      const myUid = String(getMyUid() || '');
+      const groups = chats.filter((c) => c.type === 'group');
+      box.innerHTML = groups.length
+        ? groups.map((g) => {
+            const membersArr = Array.isArray(g.members) ? g.members.map(String) : [];
+            const inG = Boolean(myUid && membersArr.includes(myUid));
+            const canDel = canManageOrDeleteGroup(g);
+            const countText = `${membersArr.length} уч.`;
+            const mainBtn = inG
+              ? `<button type="button" class="btn btn-mint" style="padding:7px 11px; font-size:12.5px;" onclick="openChatRoom('${esc(g.id)}', '${esc(g.title)}')">Открыть</button>`
+              : `<button type="button" class="btn btn-primary" style="padding:7px 11px; font-size:12.5px;" onclick="joinChatGroup('${esc(g.id)}', '${esc(g.title)}')">Войти</button>`;
+            const actionBtn = canDel
+              ? `<button type="button" class="btn btn-danger" style="padding:7px 10px; font-size:12px;" onclick="deleteGroup('${esc(g.id)}')">Удалить</button>`
+              : (inG ? `<button type="button" class="btn btn-ghost" style="padding:7px 10px; font-size:12px;" onclick="leaveGroup('${esc(g.id)}')">Выйти</button>` : '');
+
+            return `
+              <div class="list-item">
+                <div style="min-width:0; flex:1;">
+                  <div style="font-weight:700;">${esc(g.title || 'Группа')} <span class="meta" style="font-weight:600;">• ${esc(countText)}</span></div>
+                  <div class="meta">${esc(g.description || '')}</div>
+                </div>
+                <div style="display:flex; gap:6px; align-items:center; flex-shrink:0;">
+                  ${mainBtn}
+                  ${actionBtn}
+                </div>
+              </div>
+            `;
           }).join('')
-        : '<div class="meta" style="margin-top:8px;">Чатов пока нет.</div>';
+        : '<div class="meta">Групп пока нет.</div>';
     }
 
     async function openDirectChat(otherUid, otherName) {
@@ -5908,7 +6061,12 @@
         const peerId = c.members.find((u) => u && u !== myUid); const peerObj = users.find((u) => u.uid === peerId);
         subEl.innerHTML = peerObj ? formatPresenceHtml(peerObj.lastSeenMs, peerObj.hideLastSeen) : 'Сообщения • Голос • Фото';
       }
-      document.getElementById('callToggleBtn').style.display = c?.type === 'group' ? 'none' : 'inline-flex';
+      const isGroupChat = c?.type === 'group';
+      document.getElementById('callToggleBtn').style.display = isGroupChat ? 'none' : 'inline-flex';
+      const memBtn = document.getElementById('groupMembersBtn');
+      const delBtn = document.getElementById('groupDeleteTopBtn');
+      if (memBtn) memBtn.style.display = isGroupChat ? 'inline-flex' : 'none';
+      if (delBtn) delBtn.style.display = (isGroupChat && canManageOrDeleteGroup(c)) ? 'inline-flex' : 'none';
       if (chatUnsub) chatUnsub();
       chatUnsub = onSnapshot(query(collection(db, 'chats', id, 'messages'), orderBy('createdAt', 'asc')), async (snap) => {
         const curUid = getMyUid(); const prevCount = chatMsgs.length;
@@ -6336,7 +6494,7 @@
       onMyAvatarTap, pickChoiceAndOpen, viewOwnStory, removeOwnStory, openImageViewer, closeFullViewer, downloadCurrentViewerPhoto,
       openNewPostModal, choosePostDest, clearPostAttachment, submitNewPost, giveKarma, toggleCommentsPanel, addPostComment, deletePostComment, removePost,
       openPersonPage, closePeerScreen, switchPeerSubtab, onPeerAvatarTap, openPeerStoryViewer, refreshFriendsView, addFriend, acceptFriendReq, declineFriendReq,
-      openCreateGroupModal, toggleGroupMemberPick, renderGroupMemberPicker, createNewGroup, joinChatGroup, openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
+      openCreateGroupModal, toggleGroupMemberPick, renderGroupMemberPicker, createNewGroup, deleteGroup, leaveGroup, openManageGroupMembers, toggleMemberInExistingGroup, renderManageGroupMembersList, joinChatGroup, openDirectChat, openChatRoom, closeChat, sendMessage, insertEmoji,
       beginEditMessage, cancelEditMessage, saveEditedMessage, deleteChatMessage,
       startVoiceWithPause, stopVoiceRecordingNow, discardVoiceDraft, sendVoiceDraft, toggleVoicePlay,
       toggleAudioCall, acceptIncomingCall, toggleCallMute, hangupCall, openEditProfileModal, saveProfileData, hideModal, closeBackdrop
